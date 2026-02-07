@@ -1,28 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Création des éclats dorés (Sparkles)
-    const container = document.querySelector('.sparkle-container');
+    console.log("Lavri Zetwal - Prestige Mode Activated");
     
-    function createSparkle() {
-        const sparkle = document.createElement('div');
-        sparkle.classList.add('sparkle');
-        
-        const size = Math.random() * 5 + 2 + 'px';
-        sparkle.style.width = size;
-        sparkle.style.height = size;
-        
-        sparkle.style.left = Math.random() * 100 + 'vw';
-        sparkle.style.top = Math.random() * 100 + 'vh';
-        
-        container.appendChild(sparkle);
-        
-        setTimeout(() => {
-            sparkle.remove();
-        }, 2000);
-    }
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    });
 
-    setInterval(createSparkle, 150);
-
-    // Animation au défilement
-    const reveal = document.querySelector('.reveal');
-    reveal.style.opacity = '1';
+    document.querySelectorAll('.reveal').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = '1s ease-out';
+        observer.observe(el);
+    });
 });
