@@ -8,22 +8,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="stars-container">
-        <div class="star" style="top:10%; left:20%"></div>
-        <div class="star" style="top:30%; left:80%"></div>
-        <div class="star" style="top:70%; left:40%"></div>
-        <div class="star" style="top:50%; left:10%"></div>
-        <div class="star" style="top:90%; left:70%"></div>
+    <div class="star-field">
+        <div class="star s1"></div><div class="star s2"></div><div class="star s3"></div>
+        <div class="star s4"></div><div class="star s5"></div><div class="star s6"></div>
     </div>
 
     <nav class="nav">
         <div class="container nav-content">
             <a href="https://wa.me/79961103506" class="whatsapp-nav-btn">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA">
-                <span>WhatsApp</span>
+                <span>Commander</span>
             </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="tarifs.html">Tarifs</a></li>
+            </ul>
             <div class="logo">LAVRI <span>ZETWAL</span></div>
-            <div class="nav-empty"></div> </div>
+        </div>
     </nav>
 
     <header class="hero">
@@ -31,7 +33,7 @@
             <div class="hero-content reveal">
                 <span class="location-badge">Gonaïves • Ruelle Yamoul #5</span>
                 <h1>Pi pwòp, <br><span class="gold-shimmer">pi santi bon.</span></h1>
-                <p class="hero-subtitle">Eksperyans lave ki pi prestijye nan vil la.</p>
+                <p class="hero-subtitle gold-text">Lave pi rapid san traka</p>
                 <div class="hero-cta">
                     <a href="https://wa.me/79961103506" class="btn-main-gold">Lave kounye a</a>
                 </div>
@@ -39,30 +41,31 @@
         </div>
     </header>
 
-    <section class="premium-card-section">
-        <div class="container">
-            <div class="gold-card">
-                <div class="card-inner">
-                    <h2>Sèvis Zetwal</h2>
-                    <div class="price-display">1000 HTG</div>
-                    <p>10 Machin 22Kg disponib</p>
-                    <div class="bonus-gold">Lavage + Séchage GRATUIT</div>
+    <section class="info-prestige">
+        <div class="container grid-visible">
+            <div class="info-block-gold">
+                <span class="icon">✉</span>
+                <div class="details">
+                    <small>E-mail Direct</small>
+                    <strong>pwoduizetwal@gmail.com</strong>
+                </div>
+            </div>
+            <div class="info-block-gold">
+                <span class="icon">🕒</span>
+                <div class="details">
+                    <small>Lè nou ouvè</small>
+                    <strong>Chak jou: 8h - 18h</strong>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="contact-luxe">
-        <div class="container grid-luxe">
-            <div class="luxe-item">
-                <div class="icon-gold">✉</div>
-                <h3>Ekri nou</h3>
-                <p>pwoduizetwal@gmail.com</p>
-            </div>
-            <div class="luxe-item">
-                <div class="icon-gold">🕒</div>
-                <h3>Lè nou ouvè</h3>
-                <p>Chak jou: 8h - 18h</p>
+    <section class="main-offer">
+        <div class="container">
+            <div class="prestige-card">
+                <h2>10 Machin 22Kg</h2>
+                <div class="price">1000 HTG</div>
+                <p class="free-dry">Lavage + Séchage GRATUIT</p>
             </div>
         </div>
     </section>
