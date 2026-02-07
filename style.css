@@ -109,3 +109,19 @@ body {
     .logo { font-size: 2rem; }
     .grid-visible { grid-template-columns: 1fr 1fr; }
 }
+
+<section class="gallery-prestige">
+    <div class="container">
+        <h2 class="gold-shimmer-extreme" style="font-size: 2rem; margin-bottom: 30px;">Kote Eksperyans lan fèt</h2>
+        <div class="image-grid">
+            <div class="img-wrapper">
+                <img src="machine-zetwal.jpg" alt="10 Machin 22kg Lavri Zetwal">
+                <div class="img-overlay">10 Machin 22Kg Disponib</div>
+            </div>
+            <div class="img-wrapper">
+                <img src="lokal-zetwal.jpg" alt="Lokal Lavri Zetwal">
+                <div class="img-overlay">Yon Espas Pwòp e Konfòtab</div>
+            </div>
+        </div>
+    </div>
+</section>
