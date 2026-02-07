@@ -1,17 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Lavri Zetwal Prestige Initialisé");
-    
-    // Animation simple des blocs
-    const reveals = document.querySelectorAll('.reveal, .info-block-gold');
-    reveals.forEach((el, index) => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'all 0.8s ease-out';
-        el.style.transitionDelay = (index * 0.2) + 's';
+    const starContainer = document.getElementById('star-container');
+    const starCount = 50; // Nombre d'étoiles
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
         
-        setTimeout(() => {
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-        }, 100);
-    });
+        // Position aléatoire
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        
+        // Taille aléatoire (entre 2px et 5px)
+        const size = Math.random() * 3 + 2;
+        
+        // Durée d'animation aléatoire (entre 2s et 5s)
+        const duration = Math.random() * 3 + 2;
+        const delay = Math.random() * 5;
+
+        star.style.left = `${x}%`;
+        star.style.top = `${y}%`;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.setProperty('--duration', `${duration}s`);
+        star.style.animationDelay = `${delay}s`;
+
+        starContainer.appendChild(star);
+    }
 });
