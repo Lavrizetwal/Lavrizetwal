@@ -10,17 +10,14 @@
 
 body { 
     font-family: 'Montserrat', sans-serif; 
-    background: #000; /* Fond noir temporaire pour tester la brillance ? Non, restons sur le blanc luxe mais avec des effets visibles */
     background: radial-gradient(circle at center, var(--white) 0%, var(--cream) 100%);
     color: #333;
     overflow-x: hidden;
     width: 100%;
 }
 
-/* ÉTOILES DYNAMIQUES (Conteneur) */
+/* ÉTOILES DYNAMIQUES */
 .star-field { position: fixed; width: 100%; height: 100%; pointer-events: none; z-index: 1; top:0; left:0; }
-
-/* STYLE D'UNE ÉTOILE */
 .star { 
     position: absolute; 
     background: var(--gold-bright); 
@@ -29,7 +26,6 @@ body {
     box-shadow: 0 0 12px 2px var(--gold-glow);
     animation: twinkle var(--duration) infinite ease-in-out; 
 }
-
 @keyframes twinkle { 
     0%, 100% { opacity: 0; transform: scale(0.3); } 
     50% { opacity: 1; transform: scale(1.5); } 
@@ -40,47 +36,26 @@ body {
 /* NAVIGATION */
 .nav { padding: 15px 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 9999; border-bottom: 3px solid var(--gold); }
 .nav-content { display: flex; justify-content: space-between; align-items: center; }
-
 .wa-icon-btn { background: #25D366; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(37, 211, 102, 0.5); }
 .wa-img { width: 25px; height: 25px; }
-
 .nav-links { display: flex; list-style: none; gap: 15px; }
 .nav-links a { text-decoration: none; color: #444; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; }
 .nav-links a.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-
 .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 900; }
 .logo span { color: var(--gold); text-shadow: 0 0 10px var(--gold-glow); }
 
-/* HERO - ÉCRITURES EN OR QUI BRILLENT */
-.hero { padding: 80px 0; text-align: center; }
-
+/* HERO */
+.hero { padding: 60px 0 30px; text-align: center; }
 .location-badge-gold { 
-    color: var(--gold); 
-    font-weight: 900; 
-    font-size: 0.9rem;
-    border: 2px solid var(--gold);
-    padding: 8px 20px;
-    border-radius: 30px;
-    display: inline-block;
-    box-shadow: 0 0 15px var(--gold-glow);
-    background: white;
+    color: var(--gold); font-weight: 900; font-size: 0.9rem; border: 2px solid var(--gold);
+    padding: 8px 20px; border-radius: 30px; display: inline-block; box-shadow: 0 0 15px var(--gold-glow); background: white;
 }
-
 .main-title { font-family: 'Playfair Display', serif; font-size: 3rem; margin: 25px 0; line-height: 1.2; }
-
-/* EFFET DE BRILLANCE EXTRÊME SUR L'OR */
 .gold-shimmer-extreme { 
-    color: var(--gold-bright);
-    text-shadow: 0 0 20px var(--gold-glow), 0 0 40px var(--gold-glow);
+    color: var(--gold-bright); text-shadow: 0 0 20px var(--gold-glow), 0 0 40px var(--gold-glow);
     animation: pulseGlow 2s infinite alternate;
 }
-
-.gold-text-sub-glow { 
-    color: var(--gold); 
-    font-weight: 800; 
-    font-size: 1.5rem; 
-    text-shadow: 0 0 10px var(--gold-glow);
-}
+.gold-text-sub-glow { color: var(--gold); font-weight: 800; font-size: 1.5rem; text-shadow: 0 0 10px var(--gold-glow); }
 
 @keyframes pulseGlow {
     from { text-shadow: 0 0 10px var(--gold-glow); }
@@ -90,9 +65,21 @@ body {
 .btn-main-gold { 
     background: linear-gradient(135deg, var(--gold), var(--gold-bright));
     color: white; padding: 20px 40px; text-decoration: none; border-radius: 50px; 
-    font-weight: 900; display: inline-block; font-size: 1rem;
-    box-shadow: 0 10px 30px var(--gold-glow);
-    transition: 0.3s;
+    font-weight: 900; display: inline-block; font-size: 1rem; box-shadow: 0 10px 30px var(--gold-glow);
+}
+
+/* STYLE DE LA PHOTO */
+.gallery-prestige { padding: 20px 0 40px; text-align: center; }
+.image-showcase { display: flex; justify-content: center; }
+.img-wrapper { 
+    position: relative; border: 4px solid var(--gold); border-radius: 25px; 
+    overflow: hidden; box-shadow: 0 0 30px var(--gold-glow); width: 100%; max-width: 500px; height: 350px;
+}
+.img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.img-overlay { 
+    position: absolute; bottom: 0; left: 0; right: 0; 
+    background: rgba(212, 175, 55, 0.9); color: white; 
+    padding: 15px; font-weight: 900; font-size: 1.1rem;
 }
 
 /* INFO BLOCKS */
@@ -102,26 +89,10 @@ body {
     display: flex; align-items: center; gap: 20px; box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
 }
 
-.footer { padding: 40px; text-align: center; color: var(--gold); font-weight: 900; text-shadow: 0 0 5px var(--gold-glow); }
+.footer { padding: 40px; text-align: center; color: var(--gold); font-weight: 900; }
 
 @media (min-width: 768px) {
     .main-title { font-size: 5.5rem; }
     .logo { font-size: 2rem; }
     .grid-visible { grid-template-columns: 1fr 1fr; }
 }
-
-<section class="gallery-prestige">
-    <div class="container">
-        <h2 class="gold-shimmer-extreme" style="font-size: 2rem; margin-bottom: 30px;">Kote Eksperyans lan fèt</h2>
-        <div class="image-grid">
-            <div class="img-wrapper">
-                <img src="machine-zetwal.jpg" alt="10 Machin 22kg Lavri Zetwal">
-                <div class="img-overlay">10 Machin 22Kg Disponib</div>
-            </div>
-            <div class="img-wrapper">
-                <img src="lokal-zetwal.jpg" alt="Lokal Lavri Zetwal">
-                <div class="img-overlay">Yon Espas Pwòp e Konfòtab</div>
-            </div>
-        </div>
-    </div>
-</section>
