@@ -1,19 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Lavri Zetwal - Prestige Mode Activated");
+    console.log("Lavri Zetwal Prestige Initialisé");
     
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    });
-
-    document.querySelectorAll('.reveal').forEach(el => {
+    // Animation simple des blocs
+    const reveals = document.querySelectorAll('.reveal, .info-block-gold');
+    reveals.forEach((el, index) => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = '1s ease-out';
-        observer.observe(el);
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'all 0.8s ease-out';
+        el.style.transitionDelay = (index * 0.2) + 's';
+        
+        setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, 100);
     });
 });
