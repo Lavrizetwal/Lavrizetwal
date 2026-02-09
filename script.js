@@ -230,3 +230,48 @@ document.getElementById('btn-calc').addEventListener('click', function() {
     // Montrer la fiche
     document.getElementById('result-sheet').style.display = "block";
 });
+
+// --- LOGIQUE DU CALCULATEUR LAVRI ZETWAL ---
+function executeCalculation() {
+    const kg = parseFloat(document.getElementById('user-kg').value);
+    const pliyajPrice = parseInt(document.getElementById('pliyaj-select').value);
+    const sechageChecked = document.getElementById('sechage-opt').checked;
+    const sheet = document.getElementById('result-sheet');
+
+    if (isNaN(kg) || kg <= 0) {
+        alert("Silvouplè, mete konbe kilo rad ou genyen.");
+        return;
+    }
+
+    let basePrice = 0;
+    let nomForfait = "";
+
+    // Logique Forfait
+    if (kg < 10) { basePrice = 650; nomForfait = "LE PETIT (Mwens avantaj)"; }
+    else if (kg < 15) { basePrice = 850; nomForfait = "LE MALIN"; }
+    else { basePrice = 1000; nomForfait = "LE GÉANT (Pi bon pri)"; }
+
+    // Calcul Pliyaj (Tranches de 10kg)
+    let tranches = Math.ceil(kg / 10);
+    let pliyajTotal = pliyajPrice * tranches;
+
+    // Séchage (Gratis pour le Géant)
+    let sechageTotal = (sechageChecked && kg < 15) ? 200 : 0;
+
+    // Affichage des données
+    document.getElementById('res-forfait').innerText = nomForfait + " (" + basePrice + " HTG)";
+    document.getElementById('res-pliyaj').innerText = pliyajTotal;
+    document.getElementById('res-sechage').innerText = (sechageChecked && kg >= 15) ? "GRATIS 🔥" : sechageTotal;
+    document.getElementById('total-result').innerText = basePrice + pliyajTotal + sechageTotal;
+
+    // Apparition de la fiche
+    sheet.style.display = "block";
+    sheet.scrollIntoView({ behavior: 'smooth' });
+}
+
+// On attache l'événement au bouton
+document.addEventListener('click', function (e) {
+    if (e.target && e.target.id == 'btn-calc') {
+        executeCalculation();
+    }
+});
