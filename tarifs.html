@@ -3,65 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarifs - LAVRI ZETWAL</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <title>Tarifs VIP - LAVRI ZETWAL</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
 <body>
-    <div id="bubble-container"></div> <nav class="nav">
+
+    <div id="stars-container"></div>
+    <div id="bubble-container"></div>
+
+    <nav class="nav">
         <div class="container nav-content">
             <a href="https://wa.me/79961103506" class="wa-icon-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
             </a>
             <ul class="nav-links">
                 <li><a href="index.html">Akèy</a></li>
-                <li><a href="services.html">Sèvis</a></li>
                 <li><a href="tarifs.html" class="active">Tarif</a></li>
             </ul>
             <div class="logo-container">
+                <img src="logo.png" alt="Logo Lavri Zetwal" class="nav-logo-img" style="height: 40px; margin-right: 10px;">
                 <div class="logo-text">LAVRI <span>ZETWAL</span></div>
             </div>
         </div>
     </nav>
 
-    <section class="pricing-section" style="padding-top: 120px;">
+    <section class="pricing-page" style="padding-top: 120px; padding-bottom: 50px;">
         <div class="container">
-            <h1 class="gold-shimmer-extreme" style="text-align:center;">Chwazi Forfè Ou</h1>
-            <p style="text-align:center; color: #D4AF37; margin-bottom: 40px;">Plis ou pote, plis ou ekonomize ! ✨</p>
+            <h1 class="flashing-gold" style="text-align:center; font-size: 2.5rem; margin-bottom: 10px;">CHWAZI FÒFÈ OU</h1>
+            <p style="text-align:center; color: #D4AF37; margin-bottom: 50px; font-weight: bold;">Plis ou pote, plis ou ekonomize ! ✨</p>
 
             <div class="pricing-grid">
                 <div class="price-card">
-                    <h3>LE PETIT</h3>
+                    <h3 class="flashing-gold">LE PETIT</h3>
                     <p class="weight">5kg - 9kg</p>
                     <div class="price">650<span>HTG</span></div>
-                    <ul>
-                        <li>✅ Lavaj Rapid</li>
-                        <li>✅ Pwopte Garanti</li>
+                    <p class="unit-price" style="color: #aaa; font-size: 0.8rem;">(Sa fè 72 HTG pa Kg)</p>
+                    <ul class="features">
+                        <li>⚡ Pi rapid</li>
+                        <li>💰 Mwen chè</li>
                     </ul>
+                    <a href="https://wa.me/79961103506" class="btn-select">Mwen chwazi plan sa</a>
                 </div>
 
                 <div class="price-card popular">
-                    <h3>LE MALIN</h3>
+                    <div class="badge-gold">PLIS POPILÈ</div>
+                    <h3 class="flashing-gold">LE MALIN</h3>
                     <p class="weight">10kg - 14kg</p>
                     <div class="price">850<span>HTG</span></div>
-                    <ul>
-                        <li>✅ Ekonomize 150 HTG</li>
-                        <li>✅ Ideyal pou Fanmi</li>
+                    <p class="unit-price" style="color: #aaa; font-size: 0.8rem;">(Sa fè 60 HTG pa Kg)</p>
+                    <ul class="features">
+                        <li>✨ Balans pafè</li>
+                        <li>🏠 Ideyal pou fanmi</li>
                     </ul>
+                    <a href="https://wa.me/79961103506" class="btn-select">Mwen chwazi plan sa</a>
                 </div>
 
                 <div class="price-card best-value">
                     <div class="badge-gold">PI BON PRI</div>
-                    <h3>LE GÉANT</h3>
+                    <h3 class="flashing-gold">LE GÉANT</h3>
                     <p class="weight">15kg - 22kg</p>
                     <div class="price">1 000<span>HTG</span></div>
-                    <ul>
-                        <li>✅ Dra, Rideau, Couettes</li>
-                        <li>🔥 SECHAJ GRATIS !</li>
+                    <p class="unit-price" style="color: #FFD700; font-weight: bold;">(Sa fè 45 HTG pa Kg !)</p>
+                    <ul class="features">
+                        <li>🧺 Rad/dra/rido (tout ansanm)</li>
+                        <li>🔥 Sechaj gratis</li>
                     </ul>
-                    <a href="https://wa.me/79961103506" class="btn-gold" style="display:block; margin-top:20px; text-decoration:none; background:#D4AF37; color:black; padding:10px; border-radius:10px; font-weight:bold;">Kòmande Kounye a</a>
+                    <a href="https://wa.me/79961103506" class="btn-select" style="background: #FFD700; color: black;">Mwen chwazi plan sa</a>
+                </div>
+            </div>
+
+            <div class="calculator-box" style="max-width: 600px; margin: 50px auto; background: rgba(255,255,255,0.05); border: 1px solid #D4AF37; padding: 30px; border-radius: 20px; backdrop-filter: blur(15px);">
+                <h3 style="color: #D4AF37; text-align: center; margin-bottom: 20px;">🧮 KALKILE SÈVIS OU</h3>
+                
+                <div class="calc-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px;">Chwazi Fòfè ou :</label>
+                    <select id="base-price" style="width: 100%; padding: 10px; background: #1a1a1a; color: #D4AF37; border: 1px solid #D4AF37; border-radius: 5px;">
+                        <option value="650">Le Petit (650 HTG)</option>
+                        <option value="850">Le Malin (850 HTG)</option>
+                        <option value="1000">Le Géant (1000 HTG)</option>
+                    </select>
+                </div>
+
+                <div class="calc-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px;">Opsyon "Confort" :</label>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <label><input type="checkbox" class="extra-service" value="150"> Pliyaj Standard (+150 HTG)</label>
+                        <label><input type="checkbox" class="extra-service" value="250"> Pliyaj & Swen "Hôtellerie" (+250 HTG)</label>
+                    </div>
+                </div>
+
+                <div class="total-display" style="text-align: center; border-top: 1px solid rgba(212,175,55,0.3); padding-top: 20px;">
+                    <span style="font-size: 1.2rem;">TOTAL POU PEYE :</span>
+                    <div id="total-result" style="font-size: 2.5rem; color: #D4AF37; font-weight: 800;">650</div>
+                    <span style="color: #D4AF37;">HTG</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <script src="script.js"></script> </body>
+    <footer style="text-align: center; padding: 20px; color: #aaa; font-size: 0.8rem;">
+        © 2026 LAVRI ZETWAL. Tout dwa rezève.
+    </footer>
+
+    <script src="script.js"></script>
+</body>
 </html>
