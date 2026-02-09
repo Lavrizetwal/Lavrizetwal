@@ -75,3 +75,46 @@ document.addEventListener('touchmove', (e) => {
         createBubble(touch.clientX, touch.clientY);
     }
 }, {passive: true});
+/* --- LOGIQUE INTERACTIVE DES TARIFS --- */
+
+document.querySelectorAll('.price-card').forEach(card => {
+    // Effet au survol (Souris)
+    card.addEventListener('mouseenter', () => {
+        applyFocusEffect(card);
+    });
+
+    // Effet au toucher (Téléphone)
+    card.addEventListener('touchstart', () => {
+        applyFocusEffect(card);
+    }, {passive: true});
+
+    // Reset quand on sort de la carte
+    card.addEventListener('mouseleave', resetFocusEffect);
+});
+
+function applyFocusEffect(activeCard) {
+    document.querySelectorAll('.price-card').forEach(otherCard => {
+        if (otherCard !== activeCard) {
+            otherCard.style.opacity = "0.4";
+            otherCard.style.transform = "scale(0.95)";
+            otherCard.style.filter = "blur(2px)";
+        } else {
+            otherCard.style.opacity = "1";
+            otherCard.style.transform = activeCard.classList.contains('best-value') ? "scale(1.1)" : "scale(1.05)";
+            otherCard.style.filter = "none";
+        }
+    });
+}
+
+function resetFocusEffect() {
+    document.querySelectorAll('.price-card').forEach(card => {
+        card.style.opacity = "1";
+        card.style.filter = "none";
+        // On remet la taille d'origine (plus grande pour le Géant)
+        if (card.classList.contains('best-value')) {
+            card.style.transform = "scale(1.05)";
+        } else {
+            card.style.transform = "scale(1)";
+        }
+    });
+}
