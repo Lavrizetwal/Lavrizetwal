@@ -230,3 +230,44 @@ body {
     box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
     transform: translateY(-3px); /* La boîte se soulève légèrement */
 }
+/* --- CORRECTION FINALE PRESTIGE --- */
+
+/* 1. TOUTES LES ÉCRITURES "LAVRI ZETWAL" EN OR (DANS LA TÊTE) */
+.logo-text, 
+.logo-text span, 
+.nav-content .logo-container div {
+    color: var(--gold) !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 2. BOÎTES TRANSPARENTES (MÊME STYLE QUE LA TÊTE) */
+.footer-info-box, 
+[class*="mail"], 
+[class*="heure"] { 
+    background: rgba(255, 255, 255, 0.05) !important; /* Transparence totale */
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(212, 175, 55, 0.4) !important; /* Bordure or fine */
+    border-radius: 15px !important;
+    padding: 15px 25px !important;
+}
+
+/* 3. ÉCRITURES EMAIL ET HEURES EN OR */
+.footer-info-box p,
+.footer-info-box span,
+.footer-info-box a,
+[class*="mail"] p,
+[class*="heure"] p {
+    color: var(--gold) !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+/* 4. ICÔNES EN BLANC POUR LE CONTRASTE */
+.footer-info-box i, 
+.footer-info-box img {
+    filter: brightness(0) invert(1) !important;
+    margin-right: 10px !important;
+}
