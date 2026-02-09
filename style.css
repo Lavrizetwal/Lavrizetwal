@@ -189,3 +189,44 @@ body {
 .nav-links a {
     color: white !important; /* Tes liens (Akèy, Sèvis...) deviennent blancs */
 }
+/* Unification du style avec la tête (Nav) */
+.footer-info-box, [class*="mail"], [class*="heure"] { 
+    background: rgba(255, 255, 255, 0.05) !important; /* Même transparence que le nav */
+    backdrop-filter: blur(15px) saturate(150%); /* Effet verre brossé profond */
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(212, 175, 55, 0.3) !important; /* Bordure or très fine */
+    border-radius: 15px; /* Coins arrondis élégants */
+    color: var(--gold) !important; /* Écriture en Or */
+    padding: 15px 25px;
+    position: relative;
+    overflow: hidden; /* Pour l'effet d'éclat */
+    transition: all 0.4s ease;
+}
+
+/* L'effet Créatif : L'éclair de lumière qui passe sur la boîte */
+.footer-info-box::after, [class*="mail"]::after, [class*="heure"]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        to right, 
+        transparent, 
+        rgba(255, 255, 255, 0.1), 
+        transparent
+    );
+    transform: skewX(-25deg);
+    transition: 0.7s;
+}
+
+.footer-info-box:hover::after, [class*="mail"]:hover::after, [class*="heure"]:hover::after {
+    left: 150%; /* L'éclat traverse la boîte au survol */
+}
+
+.footer-info-box:hover {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+    transform: translateY(-3px); /* La boîte se soulève légèrement */
+}
