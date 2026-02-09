@@ -437,3 +437,43 @@ nav, .nav {
     0%, 100% { text-shadow: 0 0 5px #D4AF37; opacity: 1; }
     50% { text-shadow: 0 0 20px #D4AF37; opacity: 0.8; }
 }
+/* Bordure Or Fin sur les blocs */
+.price-card, .calculator-box, .info-card {
+    border: 1px solid rgba(212, 175, 55, 0.5) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+}
+
+/* Bouton Calculer */
+.btn-gold-action {
+    width: 100%;
+    background: #D4AF37;
+    color: black;
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.btn-gold-action:hover { background: #FFD700; transform: scale(1.02); }
+
+/* Fiche Résultat */
+.result-sheet {
+    display: none; /* Caché par défaut */
+    margin-top: 25px;
+    background: white;
+    color: #1a1a1a;
+    padding: 20px;
+    border-radius: 5px;
+    border-left: 5px solid #D4AF37;
+    animation: slideIn 0.5s ease;
+}
+
+.sheet-logo { height: 30px; margin-bottom: 10px; }
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
