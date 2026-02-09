@@ -73,33 +73,34 @@
                 </div>
             </div>
 
-            <div class="calculator-box" style="max-width: 600px; margin: 50px auto; background: rgba(255,255,255,0.05); border: 1px solid #D4AF37; padding: 30px; border-radius: 20px; backdrop-filter: blur(15px);">
-                <h3 style="color: #D4AF37; text-align: center; margin-bottom: 20px;">🧮 KALKILE SÈVIS OU</h3>
-                
-                <div class="calc-group" style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 10px;">Chwazi Fòfè ou :</label>
-                    <select id="base-price" style="width: 100%; padding: 10px; background: #1a1a1a; color: #D4AF37; border: 1px solid #D4AF37; border-radius: 5px;">
-                        <option value="650">Le Petit (650 HTG)</option>
-                        <option value="850">Le Malin (850 HTG)</option>
-                        <option value="1000">Le Géant (1000 HTG)</option>
-                    </select>
-                </div>
+           <div class="calculator-box">
+    <h3 class="flashing-gold" style="text-align: center;">🧮 KALKILE SÈVIS OU</h3>
+    
+    <div class="calc-group">
+        <label>Konbe Kilo rad ou genyen ?</label>
+        <input type="number" id="user-kg" placeholder="Mete konbe KG" min="5" style="width: 100%; padding: 10px; background: #1a1a1a; color: #D4AF37; border: 1px solid #D4AF37; border-radius: 5px;">
+    </div>
 
-                <div class="calc-group" style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 10px;">Opsyon "Confort" :</label>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <label><input type="checkbox" class="extra-service" value="150"> Pliyaj Standard (+150 HTG)</label>
-                        <label><input type="checkbox" class="extra-service" value="250"> Pliyaj & Swen "Hôtellerie" (+250 HTG)</label>
-                    </div>
-                </div>
-
-                <div class="total-display" style="text-align: center; border-top: 1px solid rgba(212,175,55,0.3); padding-top: 20px;">
-                    <span style="font-size: 1.2rem;">TOTAL POU PEYE :</span>
-                    <div id="total-result" style="font-size: 2.5rem; color: #D4AF37; font-weight: 800;">650</div>
-                    <span style="color: #D4AF37;">HTG</span>
-                </div>
-            </div>
+    <div class="calc-group">
+        <label>Opsyon Pliyaj (Chak 10kg) :</label>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top:10px;">
+            <label><input type="radio" name="pliyaj" value="150"> Pliyaj rad sèlman (+150 HTG)</label>
+            <label><input type="radio" name="pliyaj" value="250"> Dra / Rido (+250 HTG)</label>
+            <label><input type="radio" name="pliyaj" value="200"> Melanj (Rad + Dra/Rido) (+200 HTG)</label>
+            <label><input type="radio" name="pliyaj" value="0" checked> Pa gen pliyaj</label>
         </div>
+    </div>
+
+    <div class="calc-group">
+        <label><input type="checkbox" id="sechage-opt" value="200"> Ajoute Sèchaj (+200 HTG) <br><small>(Gratis si ou pran forfè GÉANT)</small></label>
+    </div>
+
+    <div class="total-display">
+        <span style="font-size: 1.2rem;">TOTAL POU PEYE :</span>
+        <div id="total-result" class="flashing-gold" style="font-size: 3rem;">0</div>
+        <span style="color: #D4AF37;">HTG</span>
+    </div>
+</div>
     </section>
 
     <footer style="text-align: center; padding: 20px; color: #aaa; font-size: 0.8rem;">
