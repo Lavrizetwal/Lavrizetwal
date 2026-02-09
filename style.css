@@ -543,3 +543,65 @@ nav, .nav {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+/* Conteneur principal */
+.magic-portal-box, .price-card {
+    position: relative;
+    padding: 3px; /* Épaisseur de la bordure magique */
+    background: linear-gradient(90deg, #D4AF37, #ae8625, #D4AF37);
+    background-size: 300% 300%;
+    border-radius: 20px;
+    animation: sparkles-flow 4s linear infinite;
+    overflow: hidden;
+}
+
+/* L'effet de grains d'or qui brillent dans la bordure */
+@keyframes sparkles-flow {
+    0% { background-position: 0% 50%; box-shadow: 0 0 10px #ae8625; }
+    50% { background-position: 100% 50%; box-shadow: 0 0 25px #D4AF37; }
+    100% { background-position: 0% 50%; box-shadow: 0 0 10px #ae8625; }
+}
+
+/* L'intérieur de la boîte reste noir fixe */
+.content-wrapper {
+    background: #0a0a0a;
+    padding: 25px;
+    border-radius: 18px;
+    height: 100%;
+    color: white;
+}
+
+/* Style des inputs dans le noir */
+.calc-group input, .calc-group select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    background: #1a1a1a;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #D4AF37;
+    border-radius: 8px;
+}
+
+.btn-magic {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    background: #D4AF37;
+    border: none;
+    border-radius: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Fiche de résultat VIP */
+.sheet-vip {
+    display: none;
+    margin-top: 25px;
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 12px;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
