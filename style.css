@@ -376,3 +376,38 @@ nav, .nav {
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 .opt-price { color: var(--gold); font-weight: bold; }
+/* Animation Clignotante Or */
+@keyframes gold-flash {
+    0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--gold); }
+    50% { opacity: 0.6; text-shadow: 0 0 20px var(--gold); }
+}
+
+.flashing-gold {
+    color: var(--gold) !important;
+    animation: gold-flash 2s infinite;
+    font-weight: 800;
+}
+
+/* Style des boutons dans les forfaits */
+.btn-select {
+    display: block;
+    background: var(--gold);
+    color: black !important;
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    margin-top: 15px;
+}
+
+/* Le Calculateur */
+.calculator-box {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--gold);
+    padding: 25px;
+    border-radius: 20px;
+    margin-top: 50px;
+    color: white;
+}
