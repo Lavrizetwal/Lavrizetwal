@@ -124,15 +124,14 @@ body {
 
 /* Le texte à côté (on garde ton style actuel) */
 .logo-text {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    font-weight: 900;
-    line-height: 1;
+   .logo-text {
+    color: #1a1a1a !important; /* Un noir très élégant pour trancher sur le blanc */
+    font-weight: 800;
 }
 
 .logo-text span {
-    color: var(--gold);
-    text-shadow: 0 0 10px var(--gold-glow);
+    color: var(--gold); /* "ZETWAL" reste en Or */
+}
 }
 
 /* Ajustement pour téléphone */
@@ -169,4 +168,24 @@ body {
         opacity: 0;
     }
 }
+/* Si tes boîtes ont une classe commune, utilise-la, sinon voici un style général */
+.footer-info-box, [class*="mail"], [class*="heure"] { 
+    background: rgba(255, 255, 255, 0.1) !important; /* Fond semi-transparent sombre */
+    border: 1px solid var(--gold); /* Bordure dorée fine */
+    color: var(--gold) !important; /* Texte en Or pour être lisible */
+    backdrop-filter: blur(5px); /* Effet de verre brossé */
+}
 
+/* Pour les icônes/emojis à l'intérieur */
+.footer-info-box i, .footer-info-box span {
+    color: white !important;
+}
+.nav {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.nav-links a {
+    color: white !important; /* Tes liens (Akèy, Sèvis...) deviennent blancs */
+}
