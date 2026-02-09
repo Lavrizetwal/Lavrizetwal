@@ -271,3 +271,38 @@ body {
     filter: brightness(0) invert(1) !important;
     margin-right: 10px !important;
 }
+/* --- LE CODE ULTIME DU GOAT --- */
+
+/* 1. FORCE LE LOGO EN OR (LAVRI ZETWAL) */
+.nav-content div, .nav-content span, .logo-text, .logo-text * {
+    color: #D4AF37 !important; /* Code hexa de l'or pur */
+    background: transparent !important;
+}
+
+/* 2. FORCE LES BOÎTES EN TRANSPARENT (Même style que le nav) */
+/* On cible les div qui contiennent tes infos en bas de page */
+section div[style*="background-color: white"], 
+section div[style*="background: white"],
+.footer-info-box, 
+.contact-item {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(212, 175, 55, 0.4) !important;
+    box-shadow: none !important;
+}
+
+/* 3. FORCE L'EMAIL ET L'HEURE EN OR */
+/* On cible tous les textes à l'intérieur des boîtes du bas */
+section div p, 
+section div span, 
+section div a {
+    color: #D4AF37 !important;
+    fill: #D4AF37 !important; /* Pour les icônes SVG si besoin */
+}
+
+/* 4. REND LE NAV TRANSPARENT (SI CE N'EST PAS DÉJÀ FAIT) */
+nav, .nav {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(15px) !important;
+}
