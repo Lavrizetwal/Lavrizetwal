@@ -49,3 +49,29 @@ function createBubble(x, y) {
         bubble.remove();
     }, 3000);
 }
+// Fonction pour créer une bulle
+function createBubble(x, y) {
+    const container = document.getElementById('bubble-container');
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const size = Math.random() * 20 + 10 + "px";
+    bubble.style.width = size;
+    bubble.style.height = size;
+    bubble.style.left = x + "px";
+    bubble.style.top = y + "px";
+    container.appendChild(bubble);
+    setTimeout(() => { bubble.remove(); }, 3000);
+}
+
+// Détection Souris (Ordi)
+document.addEventListener('mousemove', (e) => {
+    if (Math.random() > 0.9) createBubble(e.clientX, e.clientY);
+});
+
+// Détection Doigt (Téléphone) - C'est ça qui manquait !
+document.addEventListener('touchmove', (e) => {
+    if (Math.random() > 0.8) { // Un peu plus de bulles sur mobile pour l'effet
+        const touch = e.touches[0];
+        createBubble(touch.clientX, touch.clientY);
+    }
+}, {passive: true});
