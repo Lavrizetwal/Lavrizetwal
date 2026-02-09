@@ -21,3 +21,31 @@ document.addEventListener('DOMContentLoaded', () => {
         starContainer.appendChild(star);
     }
 });
+document.addEventListener('mousemove', (e) => {
+    // On ne crée pas une bulle à chaque millimètre pour ne pas ralentir le site
+    if (Math.random() > 0.9) { 
+        createBubble(e.clientX, e.clientY);
+    }
+});
+
+function createBubble(x, y) {
+    const container = document.getElementById('bubble-container');
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    
+    // Taille aléatoire pour plus de réalisme
+    const size = Math.random() * 20 + 10 + "px";
+    bubble.style.width = size;
+    bubble.style.height = size;
+    
+    // Position de la bulle sur la souris
+    bubble.style.left = x + "px";
+    bubble.style.top = y + "px";
+    
+    container.appendChild(bubble);
+    
+    // On détruit la bulle après l'animation pour ne pas alourdir le site
+    setTimeout(() => {
+        bubble.remove();
+    }, 3000);
+}
