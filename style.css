@@ -519,3 +519,27 @@ nav, .nav {
         <p style="text-align:center; font-size:0.7rem; margin-top:15px; color:#666;">Mèsi paske ou chwazi Lavri Zetwal!</p>
     </div>
 </div>
+/* Tourbillon de Grains d'Or */
+.calculator-box, .price-card {
+    position: relative;
+    background: rgba(0, 0, 0, 0.85) !important;
+    border: 1px solid rgba(212, 175, 55, 0.4) !important;
+    overflow: hidden;
+}
+
+.calculator-box::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background-image: radial-gradient(#D4AF37 1px, transparent 1px);
+    background-size: 20px 20px; /* Taille des grains */
+    opacity: 0.3;
+    animation: gold-grain-rotate 20s linear infinite;
+    z-index: 1;
+}
+
+@keyframes gold-grain-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
