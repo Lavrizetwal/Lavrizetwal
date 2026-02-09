@@ -477,3 +477,45 @@ nav, .nav {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+<div class="calculator-box" id="calc-container">
+    <h3 class="flashing-gold" style="text-align: center;">🧮 KALKILE SÈVIS OU</h3>
+    
+    <div class="calc-group" style="margin-bottom:15px;">
+        <label>Konbe Kilo rad ou genyen ?</label>
+        <input type="number" id="user-kg" placeholder="Ex: 12" style="width:100%; padding:12px; background:#222; border:1px solid gold; color:white; border-radius:8px;">
+    </div>
+
+    <div class="calc-group" style="margin-bottom:15px;">
+        <label>Opsyon Pliyaj (Chak 10kg) :</label><br>
+        <select id="pliyaj-select" style="width:100%; padding:12px; background:#222; border:1px solid gold; color:white; border-radius:8px;">
+            <option value="0">Pa gen pliyaj (0 HTG)</option>
+            <option value="150">Pliyaj rad (150 HTG)</option>
+            <option value="250">Dra / Rido (250 HTG)</option>
+            <option value="200">Melanj Rad ak Dra (200 HTG)</option>
+        </select>
+    </div>
+
+    <div class="calc-group" style="margin-bottom:15px;">
+        <label style="color:white; cursor:pointer;">
+            <input type="checkbox" id="sechage-opt"> Ajoute Sèchaj (+200 HTG)
+        </label>
+    </div>
+
+    <button id="btn-calc" style="width:100%; background:#D4AF37; color:black; padding:15px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:1.1rem;">
+        KALKILE KOUNYE A
+    </button>
+
+    <div id="result-sheet" style="display:none; margin-top:30px; background:white; color:black; padding:25px; border-radius:15px; border-left:8px solid #D4AF37; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <img src="logo.png" alt="Logo" style="height:40px; display:block; margin:0 auto 10px;">
+        <h4 style="text-align:center; border-bottom:2px solid #D4AF37; padding-bottom:10px; margin-bottom:15px; color:#1a1a1a;">RESIME SÈVIS OU</h4>
+        
+        <div style="font-size:1.1rem; line-height:1.8;">
+            <p><strong>Forfè:</strong> <span id="res-forfait" style="color:#d44037">---</span></p>
+            <p><strong>Pliyaj:</strong> <span id="res-pliyaj">0</span> HTG</p>
+            <p><strong>Sèchaj:</strong> <span id="res-sechage">0</span> HTG</p>
+            <hr>
+            <p style="font-size:1.5rem; text-align:center; font-weight:800;">TOTAL: <span id="total-result" style="color:#D4AF37">0</span> HTG</p>
+        </div>
+        <p style="text-align:center; font-size:0.7rem; margin-top:15px; color:#666;">Mèsi paske ou chwazi Lavri Zetwal!</p>
+    </div>
+</div>
