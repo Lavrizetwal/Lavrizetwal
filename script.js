@@ -118,3 +118,32 @@ function resetFocusEffect() {
         }
     });
 }
+// Fonction pour les étoiles clignotantes en arrière-plan
+function createStars() {
+    const container = document.getElementById('stars-container');
+    for (let i = 0; i < 50; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.top = Math.random() * 100 + 'vh';
+        star.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(star);
+    }
+}
+createStars();
+
+// Logique du Calculateur
+const baseSelect = document.getElementById('base-price');
+const checks = document.querySelectorAll('input[type="checkbox"]');
+const result = document.getElementById('total-result');
+
+function updatePrice() {
+    let total = parseInt(baseSelect.value);
+    checks.forEach(check => {
+        if (check.checked) total += parseInt(check.value);
+    });
+    result.innerText = total;
+}
+
+baseSelect.addEventListener('change', updatePrice);
+checks.forEach(c => c.addEventListener('change', updatePrice));
