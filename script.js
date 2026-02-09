@@ -147,3 +147,53 @@ function updatePrice() {
 
 baseSelect.addEventListener('change', updatePrice);
 checks.forEach(c => c.addEventListener('change', updatePrice));
+const kgInput = document.getElementById('user-kg');
+const pliyajRadios = document.getElementsByName('pliyaj');
+const sechageCheck = document.getElementById('sechage-opt');
+const resultDisplay = document.getElementById('total-result');
+
+function calculateFinalPrice() {
+    let kg = parseFloat(kgInput.value) || 0;
+    let total = 0;
+    let currentForfait = "";
+
+    // 1. Déterminer le forfait de base selon le KG
+    if (kg > 0 && kg <= 9) { total = 650; currentForfait = "petit"; }
+    else if (kg >= 10 && kg <= 14) { total = 850; currentForfait = "malin"; }
+    else if (kg >= 15) { total = 1000; currentForfait = "geant"; }
+
+    // 2. Calcul du Pliyaj par tranche de 10kg (ex: 11kg = 2 tranches)
+    let tranches = Math.ceil(kg / 10);
+    let pliyajPrice = 0;
+    pliyajRadios.forEach(radio => {
+        if (radio.checked) pliyajPrice = parseInt(radio.value);
+    });
+    total += (pliyajPrice * tranches);
+
+    // 3. Séchage (Gratuit pour le Géant)
+    if (sechageCheck.checked && currentForfait !== "geant") {
+        total += 200;
+    }
+
+    resultDisplay.innerText = total;
+}
+
+// Écouteurs d'événements
+kgInput.addEventListener('input', calculateFinalPrice);
+sechageCheck.addEventListener('change', calculateFinalPrice);
+pliyajRadios.forEach(r => r.addEventListener('change', calculateFinalPrice));
+
+// Générateur d'étoiles (à mettre une seule fois dans le fichier)
+function initStars() {
+    const container = document.getElementById('stars-container');
+    if(!container) return;
+    for (let i = 0; i < 80; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + "vw";
+        star.style.top = Math.random() * 100 + "vh";
+        star.style.animationDelay = Math.random() * 5 + "s";
+        container.appendChild(star);
+    }
+}
+initStars();
