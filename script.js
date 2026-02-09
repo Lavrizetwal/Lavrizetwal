@@ -197,3 +197,36 @@ function initStars() {
     }
 }
 initStars();
+document.getElementById('btn-calc').addEventListener('click', function() {
+    const kg = parseFloat(document.getElementById('user-kg').value) || 0;
+    const sechageOpt = document.getElementById('sechage-opt');
+    const pliyajRadios = document.getElementsByName('pliyaj');
+    
+    if (kg <= 0) { alert("Tanpri mete konbe kilo rad ou genyen"); return; }
+
+    let basePrice = 0;
+    let forfaitName = "";
+    
+    // Forfait
+    if (kg < 10) { basePrice = 650; forfaitName = "LE PETIT"; }
+    else if (kg < 15) { basePrice = 850; forfaitName = "LE MALIN"; }
+    else { basePrice = 1000; forfaitName = "LE GÉANT"; }
+
+    // Pliyaj par tranche de 10kg
+    let tranches = Math.ceil(kg / 10);
+    let pliyajUnit = 0;
+    pliyajRadios.forEach(r => { if(r.checked) pliyajUnit = parseInt(r.value); });
+    let totalPliyaj = pliyajUnit * tranches;
+
+    // Séchage (Gratuit pour Géant)
+    let totalSechage = (sechageOpt.checked && forfaitName !== "LE GÉANT") ? 200 : 0;
+
+    // Affichage
+    document.getElementById('res-forfait').innerText = forfaitName + " (" + basePrice + " HTG)";
+    document.getElementById('res-pliyaj').innerText = totalPliyaj;
+    document.getElementById('res-sechage').innerText = totalSechage;
+    document.getElementById('total-result').innerText = basePrice + totalPliyaj + totalSechage;
+
+    // Montrer la fiche
+    document.getElementById('result-sheet').style.display = "block";
+});
