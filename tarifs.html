@@ -73,32 +73,43 @@
                 </div>
             </div>
 
-           <div class="calculator-box">
+          <div class="calculator-box">
     <h3 class="flashing-gold" style="text-align: center;">🧮 KALKILE SÈVIS OU</h3>
     
     <div class="calc-group">
         <label>Konbe Kilo rad ou genyen ?</label>
-        <input type="number" id="user-kg" placeholder="Mete konbe KG" min="5" style="width: 100%; padding: 10px; background: #1a1a1a; color: #D4AF37; border: 1px solid #D4AF37; border-radius: 5px;">
+        <input type="number" id="user-kg" placeholder="Ex: 12" min="1">
     </div>
 
     <div class="calc-group">
         <label>Opsyon Pliyaj (Chak 10kg) :</label>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top:10px;">
-            <label><input type="radio" name="pliyaj" value="150"> Pliyaj rad sèlman (+150 HTG)</label>
-            <label><input type="radio" name="pliyaj" value="250"> Dra / Rido (+250 HTG)</label>
-            <label><input type="radio" name="pliyaj" value="200"> Melanj (Rad + Dra/Rido) (+200 HTG)</label>
+        <div class="radio-group">
+            <label><input type="radio" name="pliyaj" value="150"> Pliyaj rad (150 HTG)</label>
+            <label><input type="radio" name="pliyaj" value="250"> Dra / Rido (250 HTG)</label>
+            <label><input type="radio" name="pliyaj" value="200"> Melanj (200 HTG)</label>
             <label><input type="radio" name="pliyaj" value="0" checked> Pa gen pliyaj</label>
         </div>
     </div>
 
     <div class="calc-group">
-        <label><input type="checkbox" id="sechage-opt" value="200"> Ajoute Sèchaj (+200 HTG) <br><small>(Gratis si ou pran forfè GÉANT)</small></label>
+        <label><input type="checkbox" id="sechage-opt" value="200"> Ajoute Sèchaj (+200 HTG)</label>
     </div>
 
-    <div class="total-display">
-        <span style="font-size: 1.2rem;">TOTAL POU PEYE :</span>
-        <div id="total-result" class="flashing-gold" style="font-size: 3rem;">0</div>
-        <span style="color: #D4AF37;">HTG</span>
+    <button id="btn-calc" class="btn-gold-action">KALKILE KOUNYE A</button>
+
+    <div id="result-sheet" class="result-sheet">
+        <div class="sheet-header">
+            <img src="logo.png" alt="Logo" class="sheet-logo">
+            <h4>RESIME LÒD OU</h4>
+        </div>
+        <div class="sheet-content">
+            <p>Forfè: <span id="res-forfait">---</span></p>
+            <p>Pliyaj: <span id="res-pliyaj">0</span> HTG</p>
+            <p>Sèchaj: <span id="res-sechage">0</span> HTG</p>
+            <hr style="border: 0.5px solid rgba(212,175,55,0.3)">
+            <p class="total-final">TOTAL: <span id="total-result">0</span> HTG</p>
+        </div>
+        <p style="font-size: 0.7rem; margin-top: 10px;">LAVRI ZETWAL - Gonaïves</p>
     </div>
 </div>
     </section>
