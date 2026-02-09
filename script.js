@@ -275,3 +275,42 @@ document.addEventListener('click', function (e) {
         executeCalculation();
     }
 });
+// On s'assure que le script s'exécute BIEN
+window.onload = function() {
+    const calcBtn = document.getElementById('btn-calc');
+    
+    if (calcBtn) {
+        calcBtn.addEventListener('click', function() {
+            // Récupération
+            const kg = parseFloat(document.getElementById('user-kg').value);
+            const pliyaj = parseInt(document.getElementById('pliyaj-select').value);
+            const sechage = document.getElementById('sechage-opt').checked;
+            const sheet = document.getElementById('result-sheet');
+
+            if (!kg || kg <= 0) {
+                alert("Tanpri mete konbe kilo rad ou genyen.");
+                return;
+            }
+
+            // Calculs
+            let prixBase = (kg < 10) ? 650 : (kg < 15) ? 850 : 1000;
+            let nomForfait = (kg < 10) ? "LE PETIT (Mwens avantaj)" : (kg < 15) ? "LE MALIN" : "LE GÉANT (Pi bon pri)";
+            
+            let tranches = Math.ceil(kg / 10);
+            let totalPliyaj = pliyaj * tranches;
+            let totalSechage = (sechage && kg < 15) ? 200 : 0;
+
+            // Remplissage
+            document.getElementById('res-forfait').innerText = nomForfait + " (" + prixBase + " HTG)";
+            document.getElementById('res-pliyaj').innerText = totalPliyaj + " HTG";
+            document.getElementById('res-sechage').innerText = (sechage && kg >= 15) ? "GRATIS 🔥" : totalSechage + " HTG";
+            document.getElementById('total-result').innerText = prixBase + totalPliyaj + totalSechage;
+
+            // Affichage
+            sheet.style.display = "block";
+            sheet.scrollIntoView({ behavior: 'smooth' });
+        });
+    } else {
+        console.log("Erreur: Bouton btn-calc non trouvé !");
+    }
+};
