@@ -74,46 +74,74 @@
                 </div>
             </div>
 
-        <div class="calculator-box" id="magic-box">
-    <h3 class="flashing-gold" style="text-align: center; position: relative; z-index: 2;">🧮 KALKILE SÈVIS OU</h3>
-    
-    <div class="calc-group" style="position: relative; z-index: 2; margin-bottom:15px;">
-        <label>Konbe Kilo rad ou genyen ?</label>
-        <input type="number" id="user-kg" placeholder="Ex: 12" style="width:100%; padding:12px; background:rgba(0,0,0,0.7); border:1px solid #D4AF37; color:white; border-radius:8px;">
-    </div>
+    <div class="magic-portal-box">
+    <div class="content-wrapper">
+        <h3 class="flashing-gold" style="text-align: center;">🧮 KALKILE SÈVIS OU</h3>
+        
+        <div class="calc-group">
+            <label>Konbe Kilo rad ou genyen ?</label>
+            <input type="number" id="user-kg" placeholder="Ex: 12">
+        </div>
 
-    <div class="calc-group" style="position: relative; z-index: 2; margin-bottom:15px;">
-        <label>Opsyon Pliyaj (Chak 10kg) :</label><br>
-        <select id="pliyaj-select" style="width:100%; padding:12px; background:rgba(0,0,0,0.7); border:1px solid #D4AF37; color:white; border-radius:8px;">
-            <option value="0">Pa gen pliyaj (0 HTG)</option>
-            <option value="150">Pliyaj rad (150 HTG)</option>
-            <option value="250">Dra / Rido (250 HTG)</option>
-            <option value="200">Melanj Rad ak Dra (200 HTG)</option>
-        </select>
-    </div>
+        <div class="calc-group">
+            <label>Opsyon Pliyaj (Chak 10kg) :</label>
+            <select id="pliyaj-select">
+                <option value="0">Pa gen pliyaj (0 HTG)</option>
+                <option value="150">Pliyaj rad (150 HTG)</option>
+                <option value="250">Dra / Rido (250 HTG)</option>
+                <option value="200">Melanj Rad ak Dra (200 HTG)</option>
+            </select>
+        </div>
 
-    <div class="calc-group" style="position: relative; z-index: 2; margin-bottom:15px;">
-        <label style="color:white; cursor:pointer;">
-            <input type="checkbox" id="sechage-opt"> Ajoute Sèchaj (+200 HTG)
-        </label>
-    </div>
+        <div class="calc-group">
+            <label style="color:white; cursor:pointer;">
+                <input type="checkbox" id="sechage-opt"> Ajoute Sèchaj (+200 HTG)
+            </label>
+        </div>
 
-    <button type="button" id="btn-calc" style="width:100%; background:#D4AF37; color:black; padding:15px; border:none; border-radius:8px; font-weight:800; cursor:pointer; font-size:1.1rem; position: relative; z-index: 2;">
-        KALKILE KOUNYE A
-    </button>
+        <button type="button" onclick="calculerPrestige()" class="btn-magic">KALKILE KOUNYE A</button>
 
-    <div id="result-sheet" style="display:none; margin-top:30px; background:white; color:black; padding:25px; border-radius:15px; border-left:8px solid #D4AF37; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; z-index: 3;">
-        <img src="logo.png" alt="Logo" style="height:40px; display:block; margin:0 auto 10px;">
-        <h4 style="text-align:center; border-bottom:2px solid #D4AF37; padding-bottom:10px; margin-bottom:15px; color:#1a1a1a;">RESIME SÈVIS OU</h4>
-        <div style="font-size:1.1rem; line-height:1.8;">
-            <p><strong>Forfè:</strong> <span id="res-forfait">---</span></p>
-            <p><strong>Pliyaj:</strong> <span id="res-pliyaj">0</span> HTG</p>
-            <p><strong>Sèchaj:</strong> <span id="res-sechage">0</span> HTG</p>
-            <hr>
-            <p style="font-size:1.5rem; text-align:center; font-weight:800;">TOTAL: <span id="total-result" style="color:#D4AF37">0</span> HTG</p>
+        <div id="result-sheet" class="sheet-vip">
+            <img src="logo.png" alt="Logo" style="height:40px; display:block; margin:0 auto 10px;">
+            <h4 style="text-align:center; border-bottom:2px solid #D4AF37; padding-bottom:10px; color:#1a1a1a;">RESIME SÈVIS OU</h4>
+            <div id="sheet-data">
+                </div>
         </div>
     </div>
 </div>
+
+<script>
+function calculerPrestige() {
+    const kg = parseFloat(document.getElementById('user-kg').value);
+    const pliyaj = parseInt(document.getElementById('pliyaj-select').value);
+    const sechage = document.getElementById('sechage-opt').checked;
+    const sheet = document.getElementById('result-sheet');
+    const dataBox = document.getElementById('sheet-data');
+
+    if (!kg || kg <= 0) {
+        alert("Silvouplè, mete konbe kilo rad ou genyen.");
+        return;
+    }
+
+    let prixBase = (kg < 10) ? 650 : (kg < 15) ? 850 : 1000;
+    let nomForfait = (kg < 10) ? "LE PETIT (Mwens avantaj)" : (kg < 15) ? "LE MALIN" : "LE GÉANT (Pi bon pri)";
+    let tranches = Math.ceil(kg / 10);
+    let totalPliyaj = pliyaj * tranches;
+    let totalSechage = (sechage && kg < 15) ? 200 : 0;
+    let finalTotal = prixBase + totalPliyaj + totalSechage;
+
+    dataBox.innerHTML = `
+        <p><strong>Forfè:</strong> ${nomForfait} (${prixBase} HTG)</p>
+        <p><strong>Pliyaj:</strong> ${totalPliyaj} HTG</p>
+        <p><strong>Sèchaj:</strong> ${totalSechage === 0 && sechage ? "GRATIS 🔥" : totalSechage + " HTG"}</p>
+        <hr>
+        <h2 style="text-align:center; color:#D4AF37;">TOTAL: ${finalTotal} HTG</h2>
+    `;
+
+    sheet.style.display = "block";
+    sheet.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
     </section>
 
     <footer style="text-align: center; padding: 20px; color: #aaa; font-size: 0.8rem;">
