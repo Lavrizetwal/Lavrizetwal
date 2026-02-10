@@ -52,135 +52,34 @@
             </div>
         </div>
     </section>
-<section class="game-section">
-    <div class="container">
-        <h2 class="flashing-gold" style="text-align:center;">🎮 ZÒN JÈ LAVRI ZETWAL</h2>
-        
-        <div class="game-grid">
-        <div id="main-app-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px;">
+<section id="main-game-area" style="padding: 40px 20px; text-align: center;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; align-items: stretch;">
 
-    <div class="tarif-item interactive-card" id="auth-section" style="flex: 1; min-width: 300px; max-width: 400px; position: relative; overflow: hidden;">
-        <div class="glow-border"></div>
-        <h3 id="auth-title" style="color: #ffd700; text-shadow: 0 0 10px #ffd700;">Konekte epi jwe ak Zetwal</h3>
-        <p id="user-status" style="color: white; margin-bottom: 20px;">Konekte pou sove pwen ou yo</p>
-
-        <div id="login-methods">
-            <button id="btn-google" class="social-btn">Google</button>
-            <button id="btn-facebook" class="social-btn" style="background: #4267B2;">Facebook</button>
-            <button id="btn-phone" class="social-btn" style="background: #34b7f1;">Telefòn</button>
+        <div class="tarif-item interactive-card" id="auth-section" style="flex: 1; min-width: 300px; max-width: 450px; padding: 30px; border: 2px solid #ffd700; border-radius: 20px; background: rgba(0,0,0,0.9);">
+            <h3 id="auth-title" style="color: #ffd700; font-size: 1.5rem;">Konekte epi jwe</h3>
+            <p id="user-status" style="color: white; margin: 15px 0;">Chaje pwen ou yo sou Zetwal</p>
+            
+            <div id="login-methods">
+                <button id="btn-google" class="social-btn" style="background: #db4437;">Google</button>
+                <button id="btn-facebook" class="social-btn" style="background: #4267B2;">Facebook</button>
+                <button id="btn-phone" class="social-btn" style="background: #34b7f1;">Telefòn</button>
+            </div>
+            <button id="btn-logout" class="social-btn" style="display: none; background: #555; margin-top: 10px;">Dekonekte</button>
         </div>
 
-        <button id="btn-logout" class="social-btn" style="display: none; background: #555;">Dekonekte</button>
-    </div>
-
-    <div class="tarif-item interactive-card" id="game-section" style="flex: 1; min-width: 300px; max-width: 400px; opacity: 0.5; pointer-events: none; position: relative;">
-        <div class="glow-border"></div>
-        <h3 style="color: #ffd700;">Zòn Jwèt</h3>
-        <div id="game-content">
-            <p style="color: #ccc;">🔒 Konekte w pou w ka jwe</p>
-            <div id="game-list" style="display: none;">
-                <button class="social-btn" style="background: linear-gradient(45deg, #ff00cc, #3333ff);">JWE JWE ZETWAL (BETA)</button>
+        <div class="tarif-item interactive-card" id="game-section" style="flex: 1; min-width: 300px; max-width: 450px; padding: 30px; border: 2px solid #555; border-radius: 20px; background: rgba(0,0,0,0.9); opacity: 0.6; pointer-events: none;">
+            <h3 style="color: #ffd700;">Lavri Challenge 🧺</h3>
+            <div id="game-content">
+                <p id="lock-msg" style="color: #ccc;">🔒 Konekte w pou w jwe</p>
             </div>
         </div>
-    </div>
-</div>
 
-<style>
-/* Effet de bordure et Zoom */
-.interactive-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 2px solid rgba(255, 215, 0, 0.3) !important;
-}
-.interactive-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
-    border-color: #ffd700 !important;
-}
-
-/* Scintillement de la bordure */
-@keyframes glow {
-    0% { border-color: #ffd700; }
-    50% { border-color: #ffffff; }
-    100% { border-color: #ffd700; }
-}
-.interactive-card:hover {
-    animation: glow 1.5s infinite;
-}
-
-.social-btn {
-    width: 100%; margin: 8px 0; padding: 12px; 
-    background: #db4437; color: white; border: none; 
-    border-radius: 8px; cursor: pointer; font-weight: bold;
-    transition: 0.2s;
-}
-.social-btn:hover { filter: brightness(1.2); }
-</style>
-
-            <div class="magic-card" id="game-launcher">
-                <div class="card-inner">
-                    <h3 class="flashing-gold">🧺 LAVRI CHALLENGE</h3>
-                    <p>Ranpli machin 22kg a epi genyen pwen !</p>
-                    <button class="btn-gold" onclick="showRules()" style="margin-top:20px; background:#00ff00;">JOUE KOUNYE A</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-    <section class="info-prestige">
-        <div class="container grid-visible">
-            <div class="info-block-gold">
-                <span class="icon">✉</span>
-                <div class="details">
-                    <small>E-mail Direct</small>
-                    <span class="info-text">pwoduizetwal@gmail.com</span>
-                </div>
-            </div>
-            <div class="info-block-gold">
-                <span class="icon">🕒</span>
-                <div class="details">
-                    <small>Lè nou ouvè</small>
-                    <span class="info-text">Chak jou: 8h - 18h</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="footer">
-        <p>&copy; 2026 LAVRI ZETWAL. Tout dwa rezève.</p>
-    </footer>
-
-    <script src="script.js"></script>
-<section class="game-section">
-    <div class="container">
-        <h2 class="flashing-gold" style="text-align:center;">🎮 KONEKSYON; Jwèt ak pwen</h2>
-        
-        <div id="main-app-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; align-items: stretch;">
-
-            <div class="tarif-item interactive-card" id="auth-section" style="flex: 1; min-width: 300px; max-width: 450px; min-height: 350px; padding: 30px; display: flex; flex-direction: column; justify-content: center;">
-                <h3 id="auth-title" style="color: #ffd700;">Konekte epi jwe ak Zetwal</h3>
-                <p id="user-status" style="color: white; margin-bottom: 20px;">Konekte pou sove pwen ou yo</p>
-
-                <div id="login-methods">
-                    <button id="btn-google" class="social-btn" style="background: #db4437;">Google</button>
-                    <button id="btn-facebook" class="social-btn" style="background: #4267B2;">Facebook</button>
-                    <button id="btn-phone" class="social-btn" style="background: #34b7f1;">Telefòn</button>
-                </div>
-                <button id="btn-logout" class="social-btn" style="display: none; background: #555;">Dekonekte</button>
-            </div>
-
-            <div class="tarif-item interactive-card" id="game-section" style="flex: 1; min-width: 300px; max-width: 450px; min-height: 350px; padding: 30px; opacity: 0.5; pointer-events: none; display: flex; flex-direction: column; justify-content: center;">
-                <h3 style="color: #ffd700;">Zòn Jwèt</h3>
-                <div id="game-content">
-                    <p id="lock-msg" style="color: #ccc;">🔒 Konekte w pou w debloke Lavri Challenge</p>
-                </div>
-            </div>
-        </div>
     </div>
 </section>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
@@ -193,71 +92,75 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-
-  // Sons (Utilisation de sons système propres)
-  const loginSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2518/2518-preview.mp3'); 
+  
+  // Correction du son : On les charge une seule fois
+  const loginSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2518/2518-preview.mp3');
   const logoutSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2517/2517-preview.mp3');
 
-  const userStatus = document.getElementById('user-status');
-  const gameSection = document.getElementById('game-section');
-  const gameContent = document.getElementById('game-content');
-  const loginMethods = document.getElementById('login-methods');
-  const btnLogout = document.getElementById('btn-logout');
-
   onAuthStateChanged(auth, (user) => {
+    const userStatus = document.getElementById('user-status');
+    const gameSection = document.getElementById('game-section');
+    const gameContent = document.getElementById('game-content');
+    const loginMethods = document.getElementById('login-methods');
+    const btnLogout = document.getElementById('btn-logout');
+
     if (user) {
       userStatus.innerHTML = "Byenvini, <strong style='color:#ffd700;'>" + user.displayName + "</strong>";
       loginMethods.style.display = "none";
       btnLogout.style.display = "block";
       gameSection.style.opacity = "1";
       gameSection.style.pointerEvents = "auto";
+      gameSection.style.borderColor = "#ffd700";
+
+      // Lancement du mini-jeu
       gameContent.innerHTML = `
-        <p style="color:#00ff00; font-weight:bold;">🔓 LAVRI CHALLENGE DEBLOKE!</p>
-        <p style='color:white; font-size:0.9rem;'>Ranpli machin 22kg a epi genyen pwen!</p>
-        <button class="social-btn" style="background: linear-gradient(45deg, #ffd700, #ff8c00); color: black; margin-top:15px;">JOUE KOUNYE A 🚀</button>
+        <p style="color:#00ff00;">🔓 Debloque!</p>
+        <p style='color:white;'>Chajman: <span id="weight">0</span>kg / 22kg</p>
+        <div style="background:#333; height:10px; border-radius:5px; margin:10px 0;">
+            <div id="bar" style="width:0%; background:#ffd700; height:100%; border-radius:5px; transition:0.3s;"></div>
+        </div>
+        <button id="play-btn" class="social-btn" style="background:orange; color:black;">PEZE POU RANPLI! 🧺</button>
       `;
-      loginSound.play().catch(() => {}); // Joue le son de connexion
+
+      let w = 0;
+      document.getElementById('play-btn').onclick = () => {
+          if(w < 22) {
+              w += 2;
+              document.getElementById('weight').innerText = w;
+              document.getElementById('bar').style.width = (w/22*100) + "%";
+              if(w >= 22) alert("FÉLICITATIONS! Pwen yo sove! 🎉");
+          }
+      };
+      // On ne joue le son que si c'est une nouvelle connexion (évite la boucle)
     } else {
       userStatus.innerText = "Konekte pou sove pwen ou yo";
       loginMethods.style.display = "block";
       btnLogout.style.display = "none";
-      gameSection.style.opacity = "0.5";
-      gameSection.style.pointerEvents = "none";
-      gameContent.innerHTML = '<p style="color: #ccc;">🔒 Konekte w pou w debloke Lavri Challenge</p>';
+      gameSection.style.opacity = "0.6";
+      gameContent.innerHTML = '<p style="color: #ccc;">🔒 Konekte w pou w jwe</p>';
     }
   });
 
-  // Effet étoiles Mobile & Desktop
-  const createStar = (x, y) => {
-    const star = document.createElement('div');
-    star.innerHTML = '⭐';
-    star.style.cssText = `position:fixed; left:${x}px; top:${y}px; font-size:12px; pointer-events:none; color:#ffd700; z-index:9999;`;
-    document.body.appendChild(star);
-    setTimeout(() => {
-      star.style.transition = 'opacity 0.8s, transform 0.8s';
-      star.style.opacity = '0';
-      star.style.transform = 'translateY(-20px) scale(0.5)';
-      setTimeout(() => star.remove(), 800);
-    }, 50);
+  document.getElementById('btn-google').onclick = () => {
+      signInWithPopup(auth, new GoogleAuthProvider()).then(() => loginSound.play());
   };
-
-  window.addEventListener('mousemove', (e) => createStar(e.clientX, e.clientY));
-  window.addEventListener('touchstart', (e) => createStar(e.touches[0].clientX, e.touches[0].clientY));
-
-  document.getElementById('btn-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
-  btnLogout.onclick = () => {
-    signOut(auth).then(() => logoutSound.play().catch(() => {}));
+  document.getElementById('btn-logout').onclick = () => {
+      signOut(auth).then(() => logoutSound.play());
   };
 </script>
 
 <style>
-.social-btn { width: 100%; margin: 8px 0; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-.social-btn:hover { transform: scale(1.02); filter: brightness(1.2); }
-.interactive-card { transition: all 0.4s ease; border: 2px solid rgba(255, 215, 0, 0.2) !important; background: rgba(0,0,0,0.85) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.interactive-card:hover { transform: translateY(-10px); border-color: #ffd700 !important; box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3); }
+.social-btn { width: 100%; margin: 8px 0; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+.interactive-card:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,215,0,0.4); }
 </style>
+      </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 LAVRI ZETWAL. Tout dwa rezève.</p>
+    </footer>
 </body>
 </html>
+
 
 
 
