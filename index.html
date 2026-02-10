@@ -94,55 +94,65 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   
-  // SONS DING & DONG (Qualité Premium)
-  const ding = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); // Ding élégant
-  const dong = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'); // Dong profond
+  // SONS (Nouveaux liens plus compatibles)
+  const ding = new Audio('https://pixabay.com/static/audio/2022/03/15/audio_783852077e.mp3'); // Ding
+  const dong = new Audio('https://pixabay.com/static/audio/2022/03/10/audio_c35278d327.mp3'); // Dong
 
-  // --- 1. GALAXIE D'OR ---
+  // Préchauffage des sons pour mobile au premier clic
+  document.addEventListener('click', () => {
+    ding.load(); dong.load();
+  }, { once: true });
+
+  // --- 1. GALAXIE OR & BLANC ---
   const canvas = document.getElementById('galaxy-bg');
   const ctx = canvas.getContext('2d');
   let stars = [];
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   window.onresize = resize; resize();
 
-  for(let i=0; i<150; i++) {
+  for(let i=0; i<120; i++) {
     stars.push({
       x: Math.random()*canvas.width, 
       y: Math.random()*canvas.height, 
-      size: Math.random()*2, 
-      speed: Math.random()*0.4 + 0.1,
+      size: Math.random()*2.5, 
+      speed: Math.random()*0.3 + 0.1,
+      color: Math.random() > 0.5 ? '255, 215, 0' : '255, 255, 255',
       opacity: Math.random(),
-      blinkSpeed: Math.random()*0.02
+      blink: Math.random()*0.02
     });
   }
 
   function animateGalaxy() {
     ctx.clearRect(0,0,canvas.width, canvas.height);
     stars.forEach(s => {
-      s.opacity += s.blinkSpeed;
-      if(s.opacity > 1 || s.opacity < 0.1) s.blinkSpeed *= -1;
-      
-      ctx.fillStyle = `rgba(255, 215, 0, ${Math.abs(s.opacity)})`; // COULEUR OR
+      s.opacity += s.blink;
+      if(s.opacity > 1 || s.opacity < 0.2) s.blink *= -1;
+      ctx.fillStyle = `rgba(${s.color}, ${Math.abs(s.opacity)})`;
       ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
-      s.y += s.speed; if(s.y > canvas.height) s.y = 0;
+      s.y += s.speed; if(s.y > canvas.height) s.y = -10;
     });
     requestAnimationFrame(animateGalaxy);
   }
   animateGalaxy();
 
-  // --- 2. ÉTINCELLES MOBILE & DESKTOP ---
-  function createSpark(x, y, isGold) {
+  // --- 2. TRACES ÉTOILES & BULLES ---
+  function createParticle(x, y) {
     const p = document.createElement('div');
-    p.innerHTML = isGold ? '✨' : '🫧';
-    p.style.cssText = `position:fixed; left:${x}px; top:${y}px; pointer-events:none; z-index:10000; font-size:15px; transition:0.8s; color:#ffd700;`;
+    const isStar = Math.random() > 0.4; // 60% bulles, 40% étoiles
+    p.innerHTML = isStar ? '✨' : '🫧';
+    p.style.cssText = `position:fixed; left:${x}px; top:${y}px; pointer-events:none; z-index:10000; font-size:${isStar?'12px':'16px'}; transition:1s;`;
     document.body.appendChild(p);
-    setTimeout(() => { p.style.transform = `translate(${(Math.random()-0.5)*40}px, -60px) scale(0)`; p.style.opacity='0'; setTimeout(()=>p.remove(), 800); }, 50);
+    setTimeout(() => { 
+      p.style.transform = `translate(${(Math.random()-0.5)*30}px, -50px) scale(0)`; 
+      p.style.opacity='0'; 
+      setTimeout(()=>p.remove(), 1000); 
+    }, 50);
   }
 
-  window.addEventListener('mousemove', (e) => createSpark(e.clientX, e.clientY, true));
-  window.addEventListener('touchstart', (e) => createSpark(e.touches[0].clientX, e.touches[0].clientY, true));
+  window.addEventListener('mousemove', (e) => { if(Math.random() > 0.7) createParticle(e.clientX, e.clientY); });
+  window.addEventListener('touchstart', (e) => createParticle(e.touches[0].clientX, e.touches[0].clientY));
 
-  // --- 3. FIREBASE & JEU ---
+  // --- 3. FIREBASE ---
   onAuthStateChanged(auth, (user) => {
     const userStatus = document.getElementById('user-status');
     const gameSection = document.getElementById('game-section');
@@ -156,24 +166,7 @@
       btnLogout.style.display = "block";
       gameSection.style.opacity = "1";
       gameSection.style.pointerEvents = "auto";
-      gameSection.style.borderColor = "#ffd700";
-      
-      gameContent.innerHTML = `
-        <div style="padding:10px; background:rgba(255,215,0,0.05); border-radius:10px;">
-            <p style="color:#ffd700; font-weight:bold;">LAVRI CHALLENGE AKTIF!</p>
-            <p style="color:white">Chajman: <span id="weight">0</span>/22kg</p>
-            <div style="background:#222; height:12px; border-radius:6px; margin:10px 0; overflow:hidden;">
-                <div id="bar" style="width:0%; background:linear-gradient(to right, #ffd700, #fff); height:100%; transition:0.3s;"></div>
-            </div>
-            <button id="play-btn" class="social-btn" style="background:#ffd700; color:black;">🔥 PEZE POU RANPLI!</button>
-        </div>
-      `;
-
-      let w = 0;
-      document.getElementById('play-btn').onclick = () => {
-        if(w < 22) { w += 2; document.getElementById('weight').innerText = w; document.getElementById('bar').style.width = (w/22*100) + "%";
-        if(w >= 22) alert("FÉLICITATIONS ! 🎉"); }
-      };
+      gameContent.innerHTML = `<button id="play-btn" class="social-btn" style="background:#ffd700; color:black;">🔥 LANSE LAVRI CHALLENGE</button>`;
     } else {
       loginMethods.style.display = "block";
       btnLogout.style.display = "none";
@@ -182,17 +175,17 @@
   });
 
   document.getElementById('btn-google').onclick = () => {
-    signInWithPopup(auth, new GoogleAuthProvider()).then(() => ding.play()).catch(()=>{})
+    signInWithPopup(auth, new GoogleAuthProvider()).then(() => ding.play()).catch(e => console.log(e));
   };
   document.getElementById('btn-logout').onclick = () => {
-    signOut(auth).then(() => dong.play()).catch(()=>{})
+    signOut(auth).then(() => dong.play()).catch(e => console.log(e));
   };
 </script>
 
 <style>
 .social-btn { width: 100%; margin: 8px 0; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
-.interactive-card { transition: 0.4s ease; border: 2px solid rgba(255,215,0,0.2) !important; }
-.interactive-card:hover { transform: scale(1.03); border-color: #ffd700 !important; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+.interactive-card { transition: 0.4s; border: 2px solid rgba(255,215,0,0.1) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.interactive-card:hover { transform: translateY(-5px); border-color: #ffd700 !important; }
 </style>
       </section>
 
@@ -201,6 +194,7 @@
     </footer>
 </body>
 </html>
+
 
 
 
