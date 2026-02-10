@@ -150,6 +150,34 @@
     </footer>
 
     <script src="script.js"></script>
+<section class="game-section">
+    <div class="container">
+        <h2 class="flashing-gold" style="text-align:center;">🎮 KONEKSYON; Jwèt ak pwen</h2>
+        
+        <div id="main-app-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; align-items: stretch;">
+
+            <div class="tarif-item interactive-card" id="auth-section" style="flex: 1; min-width: 300px; max-width: 450px; min-height: 350px; padding: 30px; display: flex; flex-direction: column; justify-content: center;">
+                <h3 id="auth-title" style="color: #ffd700;">Konekte epi jwe ak Zetwal</h3>
+                <p id="user-status" style="color: white; margin-bottom: 20px;">Konekte pou sove pwen ou yo</p>
+
+                <div id="login-methods">
+                    <button id="btn-google" class="social-btn" style="background: #db4437;">Google</button>
+                    <button id="btn-facebook" class="social-btn" style="background: #4267B2;">Facebook</button>
+                    <button id="btn-phone" class="social-btn" style="background: #34b7f1;">Telefòn</button>
+                </div>
+                <button id="btn-logout" class="social-btn" style="display: none; background: #555;">Dekonekte</button>
+            </div>
+
+            <div class="tarif-item interactive-card" id="game-section" style="flex: 1; min-width: 300px; max-width: 450px; min-height: 350px; padding: 30px; opacity: 0.5; pointer-events: none; display: flex; flex-direction: column; justify-content: center;">
+                <h3 style="color: #ffd700;">Zòn Jwèt</h3>
+                <div id="game-content">
+                    <p id="lock-msg" style="color: #ccc;">🔒 Konekte w pou w debloke Lavri Challenge</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -166,57 +194,71 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  // Sons (Utilisation de sons système propres)
+  const loginSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2518/2518-preview.mp3'); 
+  const logoutSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2517/2517-preview.mp3');
+
   const userStatus = document.getElementById('user-status');
   const gameSection = document.getElementById('game-section');
   const gameContent = document.getElementById('game-content');
   const loginMethods = document.getElementById('login-methods');
   const btnLogout = document.getElementById('btn-logout');
 
-  // --- GESTION DE L'ÉTAT ---
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      userStatus.innerHTML = "Kont: <strong style='color:#ffd700;'>" + user.displayName + "</strong>";
+      userStatus.innerHTML = "Byenvini, <strong style='color:#ffd700;'>" + user.displayName + "</strong>";
       loginMethods.style.display = "none";
       btnLogout.style.display = "block";
-      // Débloque le bloc de jeu
       gameSection.style.opacity = "1";
       gameSection.style.pointerEvents = "auto";
-      gameContent.innerHTML = '<p style="color:#00ff00;">🔓 Debloque!</p><button class="social-btn" style="background: linear-gradient(45deg, #ffd700, #ff8c00); color: black;">LANSE JWE A 🚀</button>';
+      gameContent.innerHTML = `
+        <p style="color:#00ff00; font-weight:bold;">🔓 LAVRI CHALLENGE DEBLOKE!</p>
+        <p style='color:white; font-size:0.9rem;'>Ranpli machin 22kg a epi genyen pwen!</p>
+        <button class="social-btn" style="background: linear-gradient(45deg, #ffd700, #ff8c00); color: black; margin-top:15px;">JOUE KOUNYE A 🚀</button>
+      `;
+      loginSound.play().catch(() => {}); // Joue le son de connexion
     } else {
+      userStatus.innerText = "Konekte pou sove pwen ou yo";
       loginMethods.style.display = "block";
       btnLogout.style.display = "none";
       gameSection.style.opacity = "0.5";
       gameSection.style.pointerEvents = "none";
+      gameContent.innerHTML = '<p style="color: #ccc;">🔒 Konekte w pou w debloke Lavri Challenge</p>';
     }
   });
 
-  // --- EFFET ÉTOILES SOURIS ---
-  document.addEventListener('mousemove', (e) => {
+  // Effet étoiles Mobile & Desktop
+  const createStar = (x, y) => {
     const star = document.createElement('div');
     star.innerHTML = '⭐';
-    star.style.position = 'fixed';
-    star.style.left = e.clientX + 'px';
-    star.style.top = e.clientY + 'px';
-    star.style.fontSize = '10px';
-    star.style.pointerEvents = 'none';
-    star.style.color = '#ffd700';
-    star.style.zIndex = '9999';
+    star.style.cssText = `position:fixed; left:${x}px; top:${y}px; font-size:12px; pointer-events:none; color:#ffd700; z-index:9999;`;
     document.body.appendChild(star);
-
     setTimeout(() => {
-      star.style.transition = 'opacity 1s, transform 1s';
+      star.style.transition = 'opacity 0.8s, transform 0.8s';
       star.style.opacity = '0';
-      star.style.transform = 'translateY(20px)';
-    }, 100);
-    setTimeout(() => star.remove(), 1000);
-  });
+      star.style.transform = 'translateY(-20px) scale(0.5)';
+      setTimeout(() => star.remove(), 800);
+    }, 50);
+  };
 
-  // --- BOUTONS ---
+  window.addEventListener('mousemove', (e) => createStar(e.clientX, e.clientY));
+  window.addEventListener('touchstart', (e) => createStar(e.touches[0].clientX, e.touches[0].clientY));
+
   document.getElementById('btn-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
-  btnLogout.onclick = () => signOut(auth);
+  btnLogout.onclick = () => {
+    signOut(auth).then(() => logoutSound.play().catch(() => {}));
+  };
 </script>
+
+<style>
+.social-btn { width: 100%; margin: 8px 0; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+.social-btn:hover { transform: scale(1.02); filter: brightness(1.2); }
+.interactive-card { transition: all 0.4s ease; border: 2px solid rgba(255, 215, 0, 0.2) !important; background: rgba(0,0,0,0.85) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.interactive-card:hover { transform: translateY(-10px); border-color: #ffd700 !important; box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3); }
+</style>
 </body>
 </html>
+
 
 
 
