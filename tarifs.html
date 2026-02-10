@@ -3,31 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarifs - LAVRI ZETWAL</title>
+    <title>Tarifs VIP - LAVRI ZETWAL</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* CSS INTERNE POUR FIXER LES COLONNES IMMÉDIATEMENT */
+        /* --- SYSTÈME DE GRILLE ET ZOOM --- */
         .pricing-wrapper {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            padding: 100px 20px 40px;
+            gap: 30px;
+            padding: 120px 20px 40px;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
 
         .magic-card {
             flex: 1;
             min-width: 300px;
             max-width: 350px;
-            background: #0a0a0a;
+            background: rgba(10, 10, 10, 0.9);
             border-radius: 20px;
-            padding: 3px; /* Épaisseur de la bordure magique */
+            padding: 3px; 
             position: relative;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s;
+            /* Bordure lumineuse par défaut */
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
             background: linear-gradient(90deg, #D4AF37, #5c4b1a, #D4AF37);
             background-size: 300% 300%;
             animation: borderRotate 4s linear infinite;
+        }
+
+        /* Effet ZOOM et ÉCLAT au survol */
+        .magic-card:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+            z-index: 20;
         }
 
         @keyframes borderRotate {
@@ -45,35 +57,31 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            color: white;
         }
 
-        .bad-status { color: #ff4d4d; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-        .flashing-gold { color: #D4AF37; font-weight: 800; margin: 10px 0; }
-        .price { font-size: 2.5rem; color: #D4AF37; font-weight: 900; }
-        .unit-price { font-size: 0.8rem; color: #888; margin-bottom: 20px; }
-        
-        .feature-list { list-style: none; padding: 0; margin-bottom: 30px; text-align: left; width: 100%; }
-        .feature-list li { margin: 10px 0; font-size: 0.9rem; }
-
-        .btn-chwazi {
+        /* --- ÉTINCELLES VOYAGEUSES --- */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
             background: #D4AF37;
-            color: black;
-            padding: 12px 25px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: auto;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fly 1s forwards;
         }
 
-        /* RESPONSIVE MOBILE */
-        @media (max-width: 768px) {
-            .pricing-wrapper { padding-top: 80px; }
-            .magic-card { min-width: 100%; }
+        @keyframes fly {
+            to {
+                transform: translate(var(--tw-x), var(--tw-y));
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
+
+    <div id="stars-container"></div>
+    <div id="bubble-container"></div>
 
     <nav class="nav">
         <div class="container nav-content">
@@ -83,108 +91,134 @@
                 <li><a href="tarifs.html" class="active">Tarif</a></li>
             </ul>
             <div class="logo-container">
+                <img src="logo.png" alt="Logo" style="height: 45px; margin-right: 10px;">
                 <div class="logo-text">LAVRI <span>ZETWAL</span></div>
             </div>
         </div>
     </nav>
 
     <div class="pricing-wrapper">
-        <div class="magic-card">
+        <div class="magic-card" onmousemove="createSparkles(event, this)">
             <div class="card-inner">
-                <span class="bad-status">Mwens avantaj</span>
+                <span style="color: #ff4d4d; font-size: 0.7rem; font-weight: bold;">MWENS AVANTAJ</span>
                 <h3 class="flashing-gold">LE PETIT</h3>
                 <p>5kg - 9kg</p>
-                <div class="price">650<span>HTG</span></div>
-                <p class="unit-price">(Sa fè 72 HTG pa Kg)</p>
-                <ul class="feature-list">
+                <div class="price" style="color:#D4AF37; font-size:2.5rem; font-weight:900;">650<span style="font-size:1rem;">HTG</span></div>
+                <p style="color:#888; font-size:0.8rem;">(Sa fè 72 HTG pa Kg)</p>
+                <ul style="list-style:none; padding:0; text-align:left; width:100%; margin: 20px 0;">
                     <li>⚡ Pi rapid</li>
                     <li>💰 Mwens kòb</li>
                 </ul>
-                <a href="#" class="btn-chwazi">Mwen chwazi plan sa</a>
+                <a href="https://wa.me/79961103506" class="btn-gold" style="background:#D4AF37; color:black; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold; margin-top:auto;">Mwen chwazi plan sa</a>
             </div>
         </div>
 
-        <div class="magic-card">
+        <div class="magic-card" onmousemove="createSparkles(event, this)">
             <div class="card-inner">
-                <span style="color:gold; font-size:0.7rem;">FORFÈ POPILÈ</span>
+                <span style="color: gold; font-size: 0.7rem;">POPILÈ</span>
                 <h3 class="flashing-gold">LE MALIN</h3>
                 <p>10kg - 14kg</p>
-                <div class="price">850<span>HTG</span></div>
-                <p class="unit-price">(Sa fè 60 HTG pa Kg)</p>
-                <ul class="feature-list">
+                <div class="price" style="color:#D4AF37; font-size:2.5rem; font-weight:900;">850<span style="font-size:1rem;">HTG</span></div>
+                <p style="color:#888; font-size:0.8rem;">(Sa fè 60 HTG pa Kg)</p>
+                <ul style="list-style:none; padding:0; text-align:left; width:100%; margin: 20px 0;">
                     <li>✨ Balans pafè</li>
                     <li>🏠 Ideyal pou fanmi</li>
                 </ul>
-                <a href="#" class="btn-chwazi">Mwen chwazi plan sa</a>
+                <a href="https://wa.me/79961103506" class="btn-gold" style="background:#D4AF37; color:black; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold; margin-top:auto;">Mwen chwazi plan sa</a>
             </div>
         </div>
 
-        <div class="magic-card" style="box-shadow: 0 0 20px rgba(212,175,55,0.4);">
+        <div class="magic-card" onmousemove="createSparkles(event, this)">
             <div class="card-inner">
-                <span style="color:#00ff00; font-size:0.7rem; font-weight:bold;">PI BON PRI</span>
+                <span style="color: #00ff00; font-size: 0.7rem; font-weight:bold;">PI BON PRI</span>
                 <h3 class="flashing-gold">LE GÉANT</h3>
                 <p>15kg - 22kg</p>
-                <div class="price">1 000<span>HTG</span></div>
-                <p class="unit-price" style="color:#00ff00;">(Sa fè 45 HTG pa Kg !)</p>
-                <ul class="feature-list">
-                    <li>🧺 Rad/dra/rido (tout ansanm)</li>
+                <div class="price" style="color:#D4AF37; font-size:2.5rem; font-weight:900;">1 000<span style="font-size:1rem;">HTG</span></div>
+                <p style="color:#00ff00; font-size:0.8rem;">(Sa fè 45 HTG pa Kg !)</p>
+                <ul style="list-style:none; padding:0; text-align:left; width:100%; margin: 20px 0;">
+                    <li>🧺 Tout ansanm</li>
                     <li>🔥 Sechaj gratis</li>
                 </ul>
-                <a href="#" class="btn-chwazi" style="background: #00ff00;">Mwen chwazi plan sa</a>
+                <a href="https://wa.me/79961103506" class="btn-gold" style="background:#00ff00; color:black; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold; margin-top:auto;">Mwen chwazi plan sa</a>
             </div>
         </div>
     </div>
 
-    <div class="container">
-        <div class="magic-card" style="max-width: 600px; margin: 40px auto;">
+    <div class="container" style="position:relative; z-index:10; padding-bottom:50px;">
+        <div class="magic-card" style="max-width: 600px; margin: 0 auto;" onmousemove="createSparkles(event, this)">
             <div class="card-inner">
                 <h3 class="flashing-gold">🧮 KALKILE SÈVIS OU</h3>
-                <div style="width:100%; text-align:left; margin-top:20px;">
+                <div style="width:100%; text-align:left; margin-top:20px; color:white;">
                     <label>Konbyen Kilo rad ou genyen ?</label>
-                    <input type="number" id="user-kg" style="width:100%; padding:10px; margin:10px 0; background:#1a1a1a; border:1px solid #D4AF37; color:white; border-radius:5px;">
+                    <input type="number" id="user-kg" style="width:100%; padding:12px; margin:10px 0; background:#1a1a1a; border:1px solid #D4AF37; color:gold; border-radius:8px;">
                     
-                    <label>Opsyon Pliyaj (Chak 10kg) :</label>
-                    <select id="pliyaj-select" style="width:100%; padding:10px; margin:10px 0; background:#1a1a1a; border:1px solid #D4AF37; color:white;">
+                    <label>Pliyaj (Chak 10kg) :</label>
+                    <select id="pliyaj-select" style="width:100%; padding:12px; margin:10px 0; background:#1a1a1a; border:1px solid #D4AF37; color:gold;">
                         <option value="0">Pa gen pliyaj</option>
-                        <option value="150">Pliyaj rad (150 HTG)</option>
+                        <option value="150">Rad (150 HTG)</option>
                         <option value="250">Dra / Rido (250 HTG)</option>
                         <option value="200">Melanj (200 HTG)</option>
                     </select>
 
-                    <label><input type="checkbox" id="sechage-opt"> Ajoute Sèchaj (+200 HTG)</label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="checkbox" id="sechage-opt"> Ajoute Sèchaj (+200 HTG)
+                    </label>
                 </div>
-                <button onclick="calculerVIP()" style="width:100%; padding:15px; margin-top:20px; background:#D4AF37; border:none; font-weight:bold; cursor:pointer; border-radius:5px;">KALKILE KOUNYE A</button>
+                <button onclick="calculerVIP()" style="width:100%; padding:15px; margin-top:20px; background:#D4AF37; color:black; border:none; font-weight:800; cursor:pointer; border-radius:8px;">KALKILE KOUNYE A</button>
                 
-                <div id="resultat-vip" style="display:none; margin-top:20px; background:white; color:black; padding:15px; border-radius:10px; width:100%;">
+                <div id="resultat-vip" style="display:none; margin-top:20px; background:white; color:black; padding:20px; border-radius:15px; width:100%; border-left: 5px solid #D4AF37;">
                     </div>
             </div>
         </div>
     </div>
 
+    <script src="script.js"></script>
+    
     <script>
+        // LOGIQUE ÉTINCELLES
+        function createSparkles(e, element) {
+            for (let i = 0; i < 2; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                element.appendChild(sparkle);
+                
+                const rect = element.getBoundingClientRect();
+                sparkle.style.left = (e.clientX - rect.left) + 'px';
+                sparkle.style.top = (e.clientY - rect.top) + 'px';
+                
+                sparkle.style.setProperty('--tw-x', (Math.random() - 0.5) * 100 + 'px');
+                sparkle.style.setProperty('--tw-y', (Math.random() - 0.5) * 100 + 'px');
+                
+                setTimeout(() => sparkle.remove(), 1000);
+            }
+        }
+
+        // LOGIQUE CALCUL
         function calculerVIP() {
             const kg = parseFloat(document.getElementById('user-kg').value);
             const pliyaj = parseInt(document.getElementById('pliyaj-select').value);
             const sechage = document.getElementById('sechage-opt').checked;
             const resBox = document.getElementById('resultat-vip');
 
-            if(!kg) { alert("Antre kilo yo!"); return; }
+            if(!kg || kg <= 0) { alert("Antre konbyen kilo!"); return; }
 
             let base = (kg < 10) ? 650 : (kg < 15) ? 850 : 1000;
             let reduction = (kg >= 15) ? 0.7 : (kg >= 10) ? 0.85 : 1;
             
             let tranches = Math.ceil(kg / 10);
             let totalPliyaj = Math.round((pliyaj * tranches) * reduction);
-            let totalSechage = (sechage && kg < 15) ? Math.round(200 * reduction) : 0;
+            let totalSechage = (sechage) ? (kg >= 15 ? 0 : Math.round(200 * reduction)) : 0;
 
             resBox.innerHTML = `
-                <h4 style="text-align:center; border-bottom:1px solid #ccc;">RESIME</h4>
-                <p>Forfè: ${base} HTG</p>
-                <p>Pliyaj: ${totalPliyaj} HTG</p>
-                <p>Sèchaj: ${totalSechage} HTG</p>
-                <h3 style="text-align:center; color:#D4AF37;">TOTAL: ${base + totalPliyaj + totalSechage} HTG</h3>
+                <img src="logo.png" style="height:30px; display:block; margin:0 auto 10px;">
+                <h4 style="text-align:center; border-bottom:1px solid #ddd; padding-bottom:10px;">RESIME SÈVIS OU</h4>
+                <p><b>Forfè:</b> ${base} HTG</p>
+                <p><b>Pliyaj:</b> ${totalPliyaj} HTG ${reduction < 1 ? '<small>(Remise VIP)</small>' : ''}</p>
+                <p><b>Sèchaj:</b> ${totalSechage === 0 && sechage ? "GRATIS 🔥" : totalSechage + " HTG"}</p>
+                <h2 style="text-align:center; color:#D4AF37; margin-top:10px;">TOTAL: ${base + totalPliyaj + totalSechage} HTG</h2>
             `;
             resBox.style.display = "block";
+            resBox.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
