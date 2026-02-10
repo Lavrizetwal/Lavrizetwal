@@ -107,7 +107,12 @@
     </footer>
 
     <script src="script.js"></script>
-  <script type="module">
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  // ========================================================
+ <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
@@ -130,8 +135,42 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 </script>
+  // ========================================================
+  const firebaseConfig = {
+    apiKey: "TON_API_KEY",
+    authDomain: "TON_PROJET.firebaseapp.com",
+    projectId: "TON_PROJET",
+    storageBucket: "TON_PROJET.appspot.com",
+    messagingSenderId: "ID",
+    appId: "APP_ID"
+  };
+  // ========================================================
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  window.addEventListener('load', () => {
+    const loginButton = document.getElementById('google-login');
+
+    if (loginButton) {
+      loginButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            alert("Connecté ! Bienvenue " + result.user.displayName);
+          })
+          .catch((error) => {
+            console.error("Erreur Firebase :", error);
+            alert("Erreur : " + error.message);
+          });
+      });
+    }
+  });
+</script>
 </body>
 </html>
+
 
 
 
