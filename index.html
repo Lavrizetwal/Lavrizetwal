@@ -108,11 +108,9 @@
 
     <script src="script.js"></script>
 <script type="module">
-  // 1. Importation des outils Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  // 2. Ta configuration Firebase (déjà remplie avec tes vraies infos)
   const firebaseConfig = {
     apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
     authDomain: "lavrizetwal.firebaseapp.com",
@@ -123,39 +121,40 @@
     measurementId: "G-65R9V5MRBV"
   };
 
-  // 3. Initialisation du moteur
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // 4. Le cerveau qui fait fonctionner le bouton
-  window.addEventListener('load', () => {
-    // On cherche le bouton par son ID
-    const loginButton = document.getElementById('google-login');
+  // Éléments de ton interface que je vois sur ta photo (Ligne 63 et 66)
+  const userStatus = document.getElementById('user-status'); 
+  const loginButton = document.getElementById('google-login');
 
-    if (loginButton) {
-      loginButton.addEventListener('click', (e) => {
-        e.preventDefault(); // Empêche le rechargement de la page
-        
-        signInWithPopup(auth, provider)
-          .then((result) => {
-            // Si ça marche :
-            console.log("Utilisateur connecté :", result.user);
-            alert("Siksè ! Byenvini " + result.user.displayName);
-          })
-          .catch((error) => {
-            // Si ça échoue :
-            console.error("Erreur Firebase :", error.code);
-            alert("Erreur : " + error.message);
-          });
-      });
+  // SURVEILLANT : Change le texte quand on se connecte
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Remplace "Konekte pou sove pwen ou yo" par le nom
+      if (userStatus) userStatus.innerText = "Byenvini, " + user.displayName + " ! ✨";
+      if (loginButton) loginButton.style.display = "none"; // Cache le bouton Gmail
     } else {
-      console.error("ERREUR : Je ne trouve pas de bouton avec id='google-login'");
+      if (userStatus) userStatus.innerText = "Konekte pou sove pwen ou yo";
+      if (loginButton) loginButton.style.display = "block";
     }
   });
+
+  // ACTION DU BOUTON
+  if (loginButton) {
+    loginButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      signInWithPopup(auth, provider).catch((error) => {
+        console.error("Erreur :", error.code);
+        alert("Erreur : " + error.message);
+      });
+    });
+  }
 </script>
 </body>
 </html>
+
 
 
 
