@@ -66,7 +66,7 @@
                 <button id="btn-facebook" class="social-btn" style="background: #4267B2;">Facebook</button>
                 <button id="btn-phone" class="social-btn" style="background: #34b7f1;">Telefòn</button>
             </div>
-            <button id="btn-logout" class="social-btn" style="display: none; background: #555;">Dekonekte</button>
+            <button id="btn-logout" class="social-btn" style="display: none; background: #555; margin-top: 10px;">Dekonekte</button>
         </div>
 
         <div class="tarif-item interactive-card" id="game-section" style="flex: 1; min-width: 320px; max-width: 450px; padding: 35px; border: 2px solid #333; border-radius: 20px; background: rgba(0,0,0,0.85); opacity: 0.6; pointer-events: none;">
@@ -75,7 +75,6 @@
                 <p id="lock-msg" style="color: #ccc;">🔒 Konekte w pou w jwe</p>
             </div>
         </div>
-
     </div>
 </section>
 
@@ -95,22 +94,35 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   
-  // SONS (Chargement forcé)
-  const loginSnd = new Audio('https://www.soundjay.com/buttons/sounds/button-37.mp3');
-  const logoutSnd = new Audio('https://www.soundjay.com/buttons/sounds/button-10.mp3');
+  // SONS DING & DONG (Qualité Premium)
+  const ding = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); // Ding élégant
+  const dong = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'); // Dong profond
 
-  // --- 1. MOTEUR DE LA GALAXIE (Fond étoilé) ---
+  // --- 1. GALAXIE D'OR ---
   const canvas = document.getElementById('galaxy-bg');
   const ctx = canvas.getContext('2d');
   let stars = [];
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   window.onresize = resize; resize();
 
-  for(let i=0; i<150; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, size: Math.random()*2, speed: Math.random()*0.5});
+  for(let i=0; i<150; i++) {
+    stars.push({
+      x: Math.random()*canvas.width, 
+      y: Math.random()*canvas.height, 
+      size: Math.random()*2, 
+      speed: Math.random()*0.4 + 0.1,
+      opacity: Math.random(),
+      blinkSpeed: Math.random()*0.02
+    });
+  }
+
   function animateGalaxy() {
     ctx.clearRect(0,0,canvas.width, canvas.height);
-    ctx.fillStyle = "white";
     stars.forEach(s => {
+      s.opacity += s.blinkSpeed;
+      if(s.opacity > 1 || s.opacity < 0.1) s.blinkSpeed *= -1;
+      
+      ctx.fillStyle = `rgba(255, 215, 0, ${Math.abs(s.opacity)})`; // COULEUR OR
       ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
       s.y += s.speed; if(s.y > canvas.height) s.y = 0;
     });
@@ -118,22 +130,19 @@
   }
   animateGalaxy();
 
-  // --- 2. ÉTINCELLES D'OR & BULLES (Souris) ---
+  // --- 2. ÉTINCELLES MOBILE & DESKTOP ---
   function createSpark(x, y, isGold) {
     const p = document.createElement('div');
     p.innerHTML = isGold ? '✨' : '🫧';
-    p.style.cssText = `position:fixed; left:${x}px; top:${y}px; pointer-events:none; z-index:10000; font-size:${isGold?'15px':'10px'}; transition: 1s; color:${isGold?'#ffd700':'#fff'}`;
+    p.style.cssText = `position:fixed; left:${x}px; top:${y}px; pointer-events:none; z-index:10000; font-size:15px; transition:0.8s; color:#ffd700;`;
     document.body.appendChild(p);
-    setTimeout(() => { p.style.transform = `translate(${(Math.random()-0.5)*50}px, -100px) scale(0)`; p.style.opacity = '0'; setTimeout(()=>p.remove(), 1000); }, 50);
+    setTimeout(() => { p.style.transform = `translate(${(Math.random()-0.5)*40}px, -60px) scale(0)`; p.style.opacity='0'; setTimeout(()=>p.remove(), 800); }, 50);
   }
 
-  window.addEventListener('mousemove', (e) => {
-    // Si la souris est sur un bloc, étincelles d'or, sinon bulles
-    const onBlock = e.target.closest('.interactive-card');
-    createSpark(e.clientX, e.clientY, !!onBlock);
-  });
+  window.addEventListener('mousemove', (e) => createSpark(e.clientX, e.clientY, true));
+  window.addEventListener('touchstart', (e) => createSpark(e.touches[0].clientX, e.touches[0].clientY, true));
 
-  // --- 3. LOGIQUE FIREBASE & JEU ---
+  // --- 3. FIREBASE & JEU ---
   onAuthStateChanged(auth, (user) => {
     const userStatus = document.getElementById('user-status');
     const gameSection = document.getElementById('game-section');
@@ -147,46 +156,43 @@
       btnLogout.style.display = "block";
       gameSection.style.opacity = "1";
       gameSection.style.pointerEvents = "auto";
-      gameSection.style.border = "2px solid #ffd700";
-      gameSection.style.boxShadow = "0 0 20px #ffd700";
-
+      gameSection.style.borderColor = "#ffd700";
+      
       gameContent.innerHTML = `
-        <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;">
+        <div style="padding:10px; background:rgba(255,215,0,0.05); border-radius:10px;">
             <p style="color:#ffd700; font-weight:bold;">LAVRI CHALLENGE AKTIF!</p>
             <p style="color:white">Chajman: <span id="weight">0</span>/22kg</p>
             <div style="background:#222; height:12px; border-radius:6px; margin:10px 0; overflow:hidden;">
                 <div id="bar" style="width:0%; background:linear-gradient(to right, #ffd700, #fff); height:100%; transition:0.3s;"></div>
             </div>
-            <button id="play-btn" class="social-btn" style="background:#ffd700; color:black; font-size:1.1rem;">🔥 RANPLI L!</button>
+            <button id="play-btn" class="social-btn" style="background:#ffd700; color:black;">🔥 PEZE POU RANPLI!</button>
         </div>
       `;
 
       let w = 0;
       document.getElementById('play-btn').onclick = () => {
         if(w < 22) { w += 2; document.getElementById('weight').innerText = w; document.getElementById('bar').style.width = (w/22*100) + "%";
-        if(w >= 22) alert("FÉLICITATIONS ! 🎉 Pwen ou yo anrejistre."); }
+        if(w >= 22) alert("FÉLICITATIONS ! 🎉"); }
       };
     } else {
       loginMethods.style.display = "block";
       btnLogout.style.display = "none";
       gameSection.style.opacity = "0.6";
-      gameSection.style.border = "2px solid #333";
     }
   });
 
   document.getElementById('btn-google').onclick = () => {
-    signInWithPopup(auth, new GoogleAuthProvider()).then(() => loginSnd.play().catch(()=>{}))
+    signInWithPopup(auth, new GoogleAuthProvider()).then(() => ding.play()).catch(()=>{})
   };
   document.getElementById('btn-logout').onclick = () => {
-    signOut(auth).then(() => logoutSnd.play().catch(()=>{}))
+    signOut(auth).then(() => dong.play()).catch(()=>{})
   };
 </script>
 
 <style>
-.social-btn { width: 100%; margin: 8px 0; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-.social-btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
-.interactive-card { transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.interactive-card:hover { transform: scale(1.05) rotate(1deg); border-color: #ffd700 !important; }
+.social-btn { width: 100%; margin: 8px 0; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+.interactive-card { transition: 0.4s ease; border: 2px solid rgba(255,215,0,0.2) !important; }
+.interactive-card:hover { transform: scale(1.03); border-color: #ffd700 !important; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
 </style>
       </section>
 
@@ -195,6 +201,7 @@
     </footer>
 </body>
 </html>
+
 
 
 
