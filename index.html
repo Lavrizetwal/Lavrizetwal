@@ -52,159 +52,225 @@
             </div>
         </div>
     </section>
-<canvas id="galaxy-bg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #050505;"></canvas>
+<style>
+    :root { --gold: #ffd700; --glow: rgba(255, 215, 0, 0.4); }
+    
+    .interactive-card { 
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        background: rgba(0, 0, 0, 0.85); 
+        border: 2px solid rgba(255, 215, 0, 0.1);
+        overflow: hidden;
+    }
+    /* L'effet de Zoom Agrandissant dont tu parlais */
+    .interactive-card:hover { 
+        transform: scale(1.05) translateY(-10px); 
+        border-color: var(--gold); 
+        box-shadow: 0 15px 50px var(--glow);
+    }
 
-<section id="main-game-area" style="padding: 20px; text-align: center; position: relative; z-index: 10;">
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; align-items: stretch;">
+    .social-btn { 
+        width: 100%; margin: 8px 0; padding: 14px; border: none; border-radius: 12px; 
+        cursor: pointer; font-weight: bold; color: white; transition: 0.3s;
+        text-transform: uppercase; letter-spacing: 1px;
+    }
 
-        <div class="interactive-card" id="auth-section" style="flex: 1; min-width: 300px; max-width: 380px; padding: 25px; border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 20px; background: rgba(0,0,0,0.9);">
-            <h3 id="auth-title" style="color: #ffd700;">🌟 Lavri Zetwal</h3>
-            <div id="user-info-display">
-                <p id="user-status" style="color: white; margin: 15px 0;">Konekte pou w kòmanse</p>
-                <div id="login-methods">
-                    <button id="btn-google" class="social-btn" style="background: #db4437;">Google</button>
+    .cloth-btn {
+        background: #111; border: 1px solid #333; border-radius: 15px; 
+        width: 80px; height: 80px; cursor: pointer; transition: 0.3s;
+    }
+    .cloth-btn:active { transform: scale(0.9); }
+
+    /* Filtres de couleurs légendaires */
+    .is-white { filter: drop-shadow(0 0 5px #fff); }
+    .is-gold { filter: drop-shadow(0 0 5px var(--gold)); }
+    .is-blue { filter: hue-rotate(190deg) drop-shadow(0 0 5px #00d4ff); }
+
+    #report-modal { 
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+        z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+    }
+</style>
+
+<canvas id="galaxy-bg" style="position: fixed; inset: 0; z-index: -1; background: #000;"></canvas>
+<div id="ai-core" style="position: fixed; bottom: 100px; right: 30px; width: 50px; height: 50px; background: radial-gradient(circle, var(--gold), #fff); border-radius: 50%; box-shadow: 0 0 30px var(--gold); z-index: 1000; pointer-events: none;"></div>
+
+<section style="padding: 40px 20px; text-align: center; position: relative; z-index: 10;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
+
+        <div class="tarif-item interactive-card" style="flex: 1; min-width: 320px; max-width: 400px; padding: 40px; border-radius: 25px;">
+            <h3 style="color: var(--gold); text-shadow: 0 0 15px var(--gold); font-size: 1.8rem;">🌟 Profil Zetwal</h3>
+            <div id="user-status" style="color: #eee; margin: 20px 0; font-size: 1.1rem;">Chajman done...</div>
+            
+            <div id="player-stats" style="display:none;">
+                <div style="background: rgba(255, 215, 0, 0.15); padding: 20px; border-radius: 20px; border: 1px solid var(--gold);">
+                    <p style="font-size: 2.2rem; margin: 0; font-weight: 900; color: #fff;">💰 <span id="balance">100</span></p>
+                    <small style="color: var(--gold);">Pwen ki disponib</small>
                 </div>
-                <div id="player-stats" style="display:none; margin-top:10px;">
-                    <div style="background:rgba(255,215,0,0.1); padding:10px; border-radius:10px; border:1px solid #ffd700; color:white;">
-                        Pwen: <strong>100</strong>
-                    </div>
-                    <button id="btn-logout" class="social-btn" style="background: #333; margin-top: 15px; font-size: 0.8rem;">Dekonekte</button>
-                </div>
+                <button id="btn-logout" class="social-btn" style="background: #222; margin-top: 20px; border: 1px solid #444;">DEKONEKTE</button>
+            </div>
+
+            <div id="login-methods">
+                <button id="btn-google" class="social-btn" style="background: #db4437; box-shadow: 0 4px 15px rgba(219, 68, 55, 0.4);">Google Connect</button>
             </div>
         </div>
 
-        <div class="interactive-card" id="game-section" style="flex: 2; min-width: 320px; max-width: 500px; padding: 25px; border: 2px solid #333; border-radius: 20px; background: rgba(0,0,0,0.9); opacity: 0.4; pointer-events: none;">
-            <h3 style="color: #ffd700;">Lavri Challenge 🧺</h3>
+        <div class="tarif-item interactive-card" id="game-section" style="flex: 2; min-width: 340px; max-width: 550px; padding: 40px; border-radius: 25px; opacity: 0.3; pointer-events: none;">
+            <h3 style="color: var(--gold); margin-bottom: 30px;">LAVRI CHALLENGE 🧺</h3>
             <div id="game-ui" style="display:none;">
-                <div style="display:flex; justify-content:space-between; color:white; margin-bottom:10px;">
-                    <span id="game-timer">⏱️ 60s</span>
-                    <span id="weight-display" style="color:#ffd700; font-weight:bold;">0 / 22kg</span>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 25px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
+                    <span id="game-timer" style="font-size: 1.2rem; font-weight: bold; color: #fff;">⏱️ 60s</span>
+                    <span style="color: var(--gold); font-weight: bold; font-size: 1.2rem;">🎯 <span id="weight-display">0</span> / 22kg</span>
                 </div>
-                <div id="clothes-conveyor" style="display: flex; justify-content: center; gap: 10px; min-height: 100px; margin-bottom:15px;"></div>
-                <button id="finishBtn" class="social-btn" style="background: linear-gradient(45deg, #ffd700, #ffa500); color: black;">TÈMINE (-3 pts)</button>
+                <div id="clothes-conveyor" style="display: flex; justify-content: center; gap: 15px; min-height: 120px; margin-bottom: 25px;"></div>
+                <button id="finishBtn" class="social-btn" style="background: linear-gradient(45deg, var(--gold), #ffa500); color: #000; font-size: 1.1rem; border-radius: 50px;">TÈMINE LESSIVE (-3 pts)</button>
             </div>
-            <p id="lock-msg" style="color: #666;">🔒 Konekte w pou debloke jwèt la</p>
+            <div id="lock-msg" style="color: #888; font-size: 1.2rem; margin-top: 40px;">🔒 Konekte w pou debloke jwèt la</div>
         </div>
 
     </div>
 </section>
 
+<footer style="text-align: center; padding: 60px 20px; position: relative; z-index: 10;">
+    <p style="color: var(--gold); font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.5); font-size: 1.2rem; letter-spacing: 2px;">
+        © 2026 LAVRI ZETWAL. TOUT DWA REZÈVE.
+    </p>
+</footer>
+
+<div id="report-modal">
+    <div style="background: #000; padding: 40px; border-radius: 30px; border: 2px solid var(--gold); text-align: center; max-width: 400px; width: 90%;">
+        <h2 id="report-title" style="color: var(--gold); font-size: 2rem;">RÉSILTA</h2>
+        <p id="report-details" style="color: white; font-size: 1.2rem; margin: 25px 0;"></p>
+        <button onclick="document.getElementById('report-modal').style.display='none'" class="social-btn" style="background: var(--gold); color: black; border-radius: 50px;">KONTINYE</button>
+    </div>
+</div>
+
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-    authDomain: "lavrizetwal.firebaseapp.com",
-    projectId: "lavrizetwal",
-    storageBucket: "lavrizetwal.firebasestorage.app",
-    messagingSenderId: "291921316186",
-    appId: "1:291921316186:web:f55e8b34526960df394b63"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  let weight = 0, errors = 0, gameActive = false, timer, usedColors = new Set();
-  const clothes = [
-    {e:"👕", w:2, c:"white", cl:"is-white"}, {e:"👖", w:4, c:"color", cl:"is-blue"},
-    {e:"👗", w:3.5, c:"color", cl:"is-green"}, {e:"🧦", w:1, c:"white", cl:"is-white"}
-  ];
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      document.getElementById('user-status').innerHTML = `Byenvini, <strong style="color:#ffd700">${user.displayName}</strong>`;
-      document.getElementById('login-methods').style.display = "none";
-      document.getElementById('player-stats').style.display = "block";
-      document.getElementById('game-section').style.opacity = "1";
-      document.getElementById('game-section').style.pointerEvents = "auto";
-      document.getElementById('game-ui').style.display = "block";
-      document.getElementById('lock-msg').style.display = "none";
-      resetGame();
-    } else {
-      document.getElementById('login-methods').style.display = "block";
-      document.getElementById('player-stats').style.display = "none";
-      document.getElementById('game-section').style.opacity = "0.4";
-      document.getElementById('game-section').style.pointerEvents = "none";
-      document.getElementById('game-ui').style.display = "none";
-      document.getElementById('lock-msg').style.display = "block";
-    }
-  });
-
-  function generateCloth() {
-    const d = clothes[Math.floor(Math.random()*clothes.length)];
-    const wrap = document.createElement("div");
-    wrap.innerHTML = `<button class="cloth-btn ${d.cl}" style="background:#222; border:1px solid #444; border-radius:10px; width:70px; height:70px; cursor:pointer;">
-        <span style="font-size:1.5rem;">${d.e}</span><br><small style="color:#aaa">${d.w}kg</small>
-    </button>`;
-    wrap.onclick = () => {
-        if(!gameActive) { gameActive=true; startTimer(); }
-        weight += d.w;
-        if(d.c === "white" && usedColors.has("color")) errors++;
-        if(d.c === "color" && usedColors.has("white")) errors++;
-        usedColors.add(d.c);
-        document.getElementById('weight-display').innerText = weight.toFixed(1) + " / 22kg";
-        wrap.remove(); generateCloth();
+    const firebaseConfig = {
+        apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+        authDomain: "lavrizetwal.firebaseapp.com",
+        projectId: "lavrizetwal",
+        storageBucket: "lavrizetwal.firebasestorage.app",
+        messagingSenderId: "291921316186",
+        appId: "1:291921316186:web:f55e8b34526960df394b63"
     };
-    document.getElementById("clothes-conveyor").appendChild(wrap);
-  }
 
-  function startTimer() {
-    let t = 60;
-    timer = setInterval(() => {
-        t--; document.getElementById('game-timer').innerText = `⏱️ ${t}s`;
-        if(t <= 0) finalize();
-    }, 1000);
-  }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-  function finalize() {
-    clearInterval(timer);
-    const success = (weight >= 20.5 && weight <= 22 && errors === 0);
-    alert(success ? "BRAVO! ✨ Ou genyen." : "ECHÈK! ❌ Pwa oswa koulè pa bon.");
-    resetGame();
-  }
+    // --- 1. SYSTÈME DE TRACES MAGIQUES (OR & BULLES) ---
+    function createMagic(x, y) {
+        const p = document.createElement('div');
+        const isStar = Math.random() > 0.5;
+        p.innerHTML = isStar ? '✨' : '🫧';
+        p.style.cssText = `position:fixed; left:${x}px; top:${y}px; pointer-events:none; z-index:10000; font-size:20px; transition:1.5s; color:#ffd700; text-shadow:0 0 10px #ffd700;`;
+        document.body.appendChild(p);
+        setTimeout(() => { 
+            p.style.transform = `translate(${(Math.random()-0.5)*100}px, -150px) rotate(360deg) scale(0)`; 
+            p.style.opacity='0'; setTimeout(()=>p.remove(), 1500); 
+        }, 50);
+    }
+    window.addEventListener('mousemove', (e) => { if(Math.random()>0.9) createMagic(e.clientX, e.clientY); });
 
-  function resetGame() {
-    weight = 0; errors = 0; gameActive = false; clearInterval(timer); usedColors.clear();
-    document.getElementById('weight-display').innerText = "0 / 22kg";
-    document.getElementById('clothes-conveyor').innerHTML = "";
-    for(let i=0; i<3; i++) generateCloth();
-  }
+    // --- 2. GALAXIE OR & BLANC CLIGNOTANTE ---
+    const canvas = document.getElementById('galaxy-bg');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function res() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.onresize = res; res();
 
-  document.getElementById('btn-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
-  document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => location.reload());
-  document.getElementById('finishBtn').onclick = () => finalize();
+    for(let i=0; i<150; i++) {
+        stars.push({
+            x: Math.random()*canvas.width, y: Math.random()*canvas.height, 
+            size: Math.random()*2.5, speed: Math.random()*0.4 + 0.1,
+            color: Math.random() > 0.4 ? '255, 215, 0' : '255, 255, 255',
+            op: Math.random(), blink: Math.random()*0.03
+        });
+    }
 
-  // Animation Galaxy Simple
-  const canvas = document.getElementById('galaxy-bg');
-  const ctx = canvas.getContext('2d');
-  let stars = [];
-  function res() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  window.onresize = res; res();
-  for(let i=0; i<80; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, v: Math.random()*0.2});
-  function anim() {
-    ctx.clearRect(0,0,canvas.width, canvas.height);
-    stars.forEach(s => {
-      ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
-      s.y += s.v; if(s.y > canvas.height) s.y = -5;
+    function animate() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        stars.forEach(s => {
+            s.op += s.blink; if(s.op > 1 || s.op < 0.2) s.blink *= -1;
+            ctx.fillStyle = `rgba(${s.color}, ${Math.abs(s.op)})`;
+            ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+            s.y += s.speed; if(s.y > canvas.height) s.y = -10;
+        });
+        const core = document.getElementById('ai-core');
+        if(core) core.style.transform = `scale(${1 + Math.sin(Date.now()/400)*0.2})`;
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // --- 3. LOGIQUE JEU LAVRI ---
+    let weight = 0, errors = 0, gameActive = false, timer, usedColors = new Set();
+    const clothes = [
+        {e:"👕", w:2, c:"white", cl:"is-white"}, {e:"👖", w:4.5, c:"color", cl:"is-blue"},
+        {e:"👗", w:3.5, c:"color", cl:"is-gold"}, {e:"🧦", w:1.2, c:"white", cl:"is-white"}
+    ];
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('user-status').innerHTML = `Byenvini, <strong style="color:#ffd700">${user.displayName}</strong>`;
+            document.getElementById('login-methods').style.display = "none";
+            document.getElementById('player-stats').style.display = "block";
+            document.getElementById('game-section').style.opacity = "1";
+            document.getElementById('game-section').style.pointerEvents = "auto";
+            document.getElementById('game-ui').style.display = "block";
+            document.getElementById('lock-msg').style.display = "none";
+            resetGame();
+        }
     });
-    requestAnimationFrame(anim);
-  }
-  anim();
+
+    function generateCloth() {
+        const d = clothes[Math.floor(Math.random()*clothes.length)];
+        const wrap = document.createElement("div");
+        wrap.innerHTML = `<button class="cloth-btn ${d.cl}"><span style="font-size:1.8rem;">${d.e}</span><br><small style="color:var(--gold)">${d.w}kg</small></button>`;
+        wrap.onclick = () => {
+            if(!gameActive) { gameActive=true; startTimer(); }
+            weight += d.w;
+            if(d.c === "white" && Array.from(usedColors).some(c => c !== "white")) errors++;
+            usedColors.add(d.c);
+            document.getElementById('weight-display').innerText = weight.toFixed(1);
+            wrap.remove(); generateCloth();
+        };
+        document.getElementById("clothes-conveyor").appendChild(wrap);
+    }
+
+    function startTimer() {
+        let t = 60;
+        timer = setInterval(() => {
+            t--; document.getElementById('game-timer').innerText = `⏱️ ${t}s`;
+            if(t <= 0) finalize();
+        }, 1000);
+    }
+
+    function finalize() {
+        clearInterval(timer);
+        const win = (weight >= 20.5 && weight <= 22 && errors === 0);
+        document.getElementById('report-title').innerText = win ? "✨ VICTOIRE !" : "❌ ÉCHEC";
+        document.getElementById('report-details').innerText = `Pwa Total: ${weight.toFixed(1)}kg\nErè Koulè: ${errors}`;
+        document.getElementById('report-modal').style.display = "flex";
+        resetGame();
+    }
+
+    function resetGame() {
+        weight = 0; errors = 0; gameActive = false; clearInterval(timer); usedColors.clear();
+        document.getElementById('weight-display').innerText = "0";
+        document.getElementById('clothes-conveyor').innerHTML = "";
+        for(let i=0; i<3; i++) generateCloth();
+    }
+
+    document.getElementById('btn-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
+    document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => location.reload());
+    document.getElementById('finishBtn').onclick = () => finalize();
 </script>
 
-<style>
-  .social-btn { width: 100%; margin: 8px 0; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
-  .interactive-card { transition: 0.4s; }
-  .is-white { filter: brightness(2) grayscale(1); }
-  .is-blue { filter: hue-rotate(180deg) saturate(3); }
-  .is-green { filter: hue-rotate(90deg) saturate(3); }
-</style>
 </body>
 </html>
 
-</body>
-</html>
 
 
 
