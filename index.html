@@ -52,7 +52,36 @@
             </div>
         </div>
     </section>
-<div id="ai-core" style="position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; background: radial-gradient(circle, #ffd700, #fff); border-radius: 50%; box-shadow: 0 0 20px #ffd700; opacity: 0.6; z-index: 1000; transition: 0.5s; cursor: help;" title="Gemini AI Presence"></div>
+<canvas id="galaxy-bg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #050505;"></canvas>
+
+<div id="ai-core" style="position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; background: radial-gradient(circle, #ffd700, #fff); border-radius: 50%; box-shadow: 0 0 20px #ffd700; opacity: 0.6; z-index: 1000; transition: 0.5s;"></div>
+
+<section id="main-game-area" style="padding: 40px 20px; text-align: center; position: relative; z-index: 10;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
+
+        <div class="tarif-item interactive-card" id="auth-section" style="flex: 1; min-width: 320px; max-width: 450px; padding: 35px; border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 20px; background: rgba(0,0,0,0.85);">
+            <h3 id="auth-title" style="color: #ffd700; text-shadow: 0 0 15px #ffd700;">Konekte epi jwe</h3>
+            <p id="user-status" style="color: white; margin: 15px 0;">Konekte pou sove pwen ou yo</p>
+            <div id="login-methods">
+                <button id="btn-google" class="social-btn" style="background: #db4437;">Google</button>
+                <button id="btn-facebook" class="social-btn" style="background: #4267B2;">Facebook</button>
+                <button id="btn-phone" class="social-btn" style="background: #34b7f1;">Telefòn</button>
+            </div>
+            <button id="btn-logout" class="social-btn" style="display: none; background: #555; margin-top: 10px;">Dekonekte</button>
+        </div>
+
+        <div class="tarif-item interactive-card" id="game-section" style="flex: 1; min-width: 320px; max-width: 450px; padding: 35px; border: 2px solid #333; border-radius: 20px; background: rgba(0,0,0,0.85); opacity: 0.6; pointer-events: none;">
+            <h3 style="color: #ffd700;">Lavri Challenge 🧺</h3>
+            <div id="game-content">
+                <p>🔒 Konekte w pou w jwe</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 LAVRI ZETWAL. Tout dwa rezève.</p>
+</footer>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -69,72 +98,49 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  
   const ding = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
   const dong = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
 
-  // --- 1. GALAXIE MAÎTRE (OR & BLANC) ---
+  // GALAXIE OR ET BLANC
   const canvas = document.getElementById('galaxy-bg');
   const ctx = canvas.getContext('2d');
   let stars = [];
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   window.onresize = resize; resize();
-
-  for(let i=0; i<120; i++) {
-    stars.push({
-      x: Math.random()*canvas.width, y: Math.random()*canvas.height, 
-      size: Math.random()*2, speed: Math.random()*0.3 + 0.1,
-      color: Math.random() > 0.5 ? '255, 215, 0' : '255, 255, 255',
-      opacity: Math.random(), blink: Math.random()*0.02
-    });
-  }
-
+  for(let i=0; i<120; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*2.5, speed:Math.random()*0.3+0.1, color:Math.random()>0.5?'255,215,0':'255,255,255', opacity:Math.random(), blink:Math.random()*0.02});
   function animate() {
     ctx.clearRect(0,0,canvas.width, canvas.height);
     stars.forEach(s => {
-      s.opacity += s.blink; if(s.opacity > 1 || s.opacity < 0.2) s.blink *= -1;
-      ctx.fillStyle = `rgba(${s.color}, ${Math.abs(s.opacity)})`;
-      ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
-      s.y += s.speed; if(s.y > canvas.height) s.y = -10;
+      s.opacity += s.blink; if(s.opacity>1 || s.opacity<0.2) s.blink*=-1;
+      ctx.fillStyle=`rgba(${s.color},${Math.abs(s.opacity)})`; ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+      s.y+=s.speed; if(s.y>canvas.height) s.y=-10;
     });
-    // Animation du Cœur IA
-    const aiCore = document.getElementById('ai-core');
-    if(aiCore) aiCore.style.transform = `scale(${1 + Math.sin(Date.now()/500)*0.1})`;
+    const ai = document.getElementById('ai-core'); if(ai) ai.style.transform=`scale(${1+Math.sin(Date.now()/500)*0.15})`;
     requestAnimationFrame(animate);
   }
   animate();
 
-  // --- 2. TRACES (OR + BULLES) ---
+  // ÉTOILES ET BULLES
   function createParticle(x, y) {
     const p = document.createElement('div');
-    const isStar = Math.random() > 0.5;
+    const isStar = Math.random() > 0.4;
     p.innerHTML = isStar ? '✨' : '🫧';
-    p.style.cssText = `position:fixed; left:${x}px; top:${y}px; pointer-events:none; z-index:10000; font-size:14px; transition:1s;`;
+    p.style.cssText = `position:fixed; left:${x}px; top:${y}px; pointer-events:none; z-index:10000; font-size:16px; transition:1s; color:#ffd700;`;
     document.body.appendChild(p);
-    setTimeout(() => { 
-      p.style.transform = `translate(${(Math.random()-0.5)*40}px, -60px) scale(0)`; 
-      p.style.opacity='0'; setTimeout(()=>p.remove(), 1000); 
-    }, 50);
+    setTimeout(() => { p.style.transform = `translate(${(Math.random()-0.5)*40}px, -60px) scale(0)`; p.style.opacity='0'; setTimeout(()=>p.remove(), 1000); }, 50);
   }
   window.addEventListener('mousemove', (e) => { if(Math.random()>0.8) createParticle(e.clientX, e.clientY); });
+  window.addEventListener('touchstart', (e) => createParticle(e.touches[0].clientX, e.touches[0].clientY));
 
-  // --- 3. LOGIQUE JEU LAVRI CHALLENGE ---
+  // JEU ET FIREBASE
   let weight = 0;
-  function updateGameUI() {
-    const bar = document.getElementById('game-bar');
-    const txt = document.getElementById('weight-display');
-    if(bar) bar.style.width = (weight/22*100) + "%";
-    if(txt) txt.innerText = weight + "kg";
-    // Ma touche : L'IA réagit au poids
-    const aiCore = document.getElementById('ai-core');
-    if(weight > 0) aiCore.style.boxShadow = `0 0 ${20 + weight}px #ffd700`;
-  }
-
   window.addWeight = (v) => {
     weight += v;
-    updateGameUI();
-    if(weight === 22) { alert("PÈFE! ✨ Ou genyen 50 pwen!"); weight = 0; updateGameUI(); }
-    else if(weight > 22) { alert("DEBÒDE! 🌊 W'ap pèdi pwen."); weight = 0; updateGameUI(); }
+    document.getElementById('weight-display').innerText = weight + "kg";
+    document.getElementById('game-bar').style.width = (weight/22*100) + "%";
+    document.getElementById('ai-core').style.boxShadow = `0 0 ${20+weight}px #ffd700`;
+    if(weight === 22) { alert("PÈFE! ✨ +50 pwen!"); weight = 0; }
+    else if(weight > 22) { alert("DEBÒDE! 🌊"); weight = 0; }
   };
 
   onAuthStateChanged(auth, (user) => {
@@ -142,84 +148,35 @@
     const userStatus = document.getElementById('user-status');
     if (user) {
       userStatus.innerHTML = `Byenvini, <strong style="color:#ffd700">${user.displayName}</strong>`;
-      document.getElementById('login-methods').style.display = "none";
-      document.getElementById('btn-logout').style.display = "block";
-      document.getElementById('game-section').style.opacity = "1";
-      document.getElementById('game-section').style.pointerEvents = "auto";
-      
-      gameContent.innerHTML = `
-        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:15px;">
-          <p>Pwa: <span id="weight-display" style="color:#ffd700; font-weight:bold;">0kg</span> / 22kg</p>
-          <div style="background:#222; height:15px; border-radius:10px; margin:10px 0; overflow:hidden; border:1px solid #444;">
-            <div id="game-bar" style="width:0%; height:100%; background:linear-gradient(90deg, #ffd700, #fff); transition:0.3s;"></div>
-          </div>
-          <button class="social-btn" onclick="addWeight(2)" style="background:#444; width:45%; display:inline-block;">+2kg</button>
-          <button class="social-btn" onclick="addWeight(5)" style="background:#444; width:45%; display:inline-block;">+5kg</button>
-        </div>
-      `;
+      document.getElementById('login-methods').style.display="none";
+      document.getElementById('btn-logout').style.display="block";
+      document.getElementById('game-section').style.opacity="1";
+      document.getElementById('game-section').style.pointerEvents="auto";
+      gameContent.innerHTML = `<div style="padding:15px; background:rgba(255,255,255,0.05); border-radius:15px;"><p>Pwa: <span id="weight-display" style="color:#ffd700; font-weight:bold;">0kg</span>/22kg</p><div style="background:#222; height:15px; border-radius:10px; margin:10px 0; overflow:hidden;"><div id="game-bar" style="width:0%; height:100%; background:#ffd700; transition:0.3s;"></div></div><button class="social-btn" onclick="addWeight(2)" style="background:#444; width:45%; display:inline-block;">+2kg</button><button class="social-btn" onclick="addWeight(5)" style="background:#444; width:45%; display:inline-block;">+5kg</button></div>`;
     } else {
-      document.getElementById('login-methods').style.display = "block";
-      document.getElementById('btn-logout').style.display = "none";
-      document.getElementById('game-section').style.opacity = "0.6";
+      document.getElementById('login-methods').style.display="block";
+      document.getElementById('btn-logout').style.display="none";
+      document.getElementById('game-section').style.opacity="0.6";
     }
   });
 
   document.getElementById('btn-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).then(()=>ding.play());
   document.getElementById('btn-logout').onclick = () => signOut(auth).then(()=>dong.play());
 </script>
-      </section>
+
+<style>
+.social-btn { width: 100%; margin: 8px 0; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; }
+.interactive-card { transition: 0.4s; }
+.interactive-card:hover { transform: translateY(-5px); border-color: #ffd700 !important; }
+</style>
+     </section>
 
     <footer class="footer">
         <p>&copy; 2026 LAVRI ZETWAL. Tout dwa rezève.</p>
     </footer>
-    // Dans onAuthStateChanged, quand user est connecté :
-gameContent.innerHTML = `
-    <div id="game-container" style="position: relative; color: white;">
-        <div id="machine-visual" style="width: 100px; height: 120px; border: 4px solid #fff; margin: 0 auto; border-radius: 10px; position: relative; overflow: hidden; background: #222;">
-            <div id="water-level" style="position: absolute; bottom: 0; width: 100%; background: rgba(0, 213, 255, 0.6); transition: height 0.3s ease;"></div>
-            <div id="bubbles-container"></div>
-            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: #ffd700; font-weight: bold; font-size: 1.2rem;" id="live-weight">0</div>
-        </div>
-        
-        <p style="margin-top: 15px; font-size: 0.9rem;">Objektif: 22kg (Pa depase l!)</p>
-        
-        <div style="display: flex; justify-content: space-around; margin-top: 15px;">
-            <button class="game-btn" onclick="addWeight(2)">+2kg</button>
-            <button class="game-btn" onclick="addWeight(5)">+5kg</button>
-        </div>
-
-        <button id="reset-game" style="margin-top: 10px; background: none; border: 1px solid #555; color: #ccc; cursor: pointer; font-size: 0.7rem;">Rekòmanse</button>
-    </div>
-`;
-
-// LOGIQUE DU JEU (À mettre dans ton script)
-let currentWeight = 0;
-const goal = 22;
-
-window.addWeight = (val) => {
-    currentWeight += val;
-    const water = document.getElementById('water-level');
-    const display = document.getElementById('live-weight');
-    
-    display.innerText = currentWeight;
-    water.style.height = (currentWeight / goal * 100) + "%";
-
-    if (currentWeight === goal) {
-        alert("BRAVO ! Machin nan plen pafè. Ou genyen 50 pwen ! 🎉");
-        resetGame();
-    } else if (currentWeight > goal) {
-        alert("OH NON ! Li debòde... W'ap pèdi 10 pwen. 🌊");
-        resetGame();
-    }
-};
-
-window.resetGame = () => {
-    currentWeight = 0;
-    document.getElementById('live-weight').innerText = "0";
-    document.getElementById('water-level').style.height = "0%";
-};
 </body>
 </html>
+
 
 
 
