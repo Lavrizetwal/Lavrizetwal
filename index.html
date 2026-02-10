@@ -172,8 +172,55 @@
     <footer class="footer">
         <p>&copy; 2026 LAVRI ZETWAL. Tout dwa rezève.</p>
     </footer>
+    // Dans onAuthStateChanged, quand user est connecté :
+gameContent.innerHTML = `
+    <div id="game-container" style="position: relative; color: white;">
+        <div id="machine-visual" style="width: 100px; height: 120px; border: 4px solid #fff; margin: 0 auto; border-radius: 10px; position: relative; overflow: hidden; background: #222;">
+            <div id="water-level" style="position: absolute; bottom: 0; width: 100%; background: rgba(0, 213, 255, 0.6); transition: height 0.3s ease;"></div>
+            <div id="bubbles-container"></div>
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: #ffd700; font-weight: bold; font-size: 1.2rem;" id="live-weight">0</div>
+        </div>
+        
+        <p style="margin-top: 15px; font-size: 0.9rem;">Objektif: 22kg (Pa depase l!)</p>
+        
+        <div style="display: flex; justify-content: space-around; margin-top: 15px;">
+            <button class="game-btn" onclick="addWeight(2)">+2kg</button>
+            <button class="game-btn" onclick="addWeight(5)">+5kg</button>
+        </div>
+
+        <button id="reset-game" style="margin-top: 10px; background: none; border: 1px solid #555; color: #ccc; cursor: pointer; font-size: 0.7rem;">Rekòmanse</button>
+    </div>
+`;
+
+// LOGIQUE DU JEU (À mettre dans ton script)
+let currentWeight = 0;
+const goal = 22;
+
+window.addWeight = (val) => {
+    currentWeight += val;
+    const water = document.getElementById('water-level');
+    const display = document.getElementById('live-weight');
+    
+    display.innerText = currentWeight;
+    water.style.height = (currentWeight / goal * 100) + "%";
+
+    if (currentWeight === goal) {
+        alert("BRAVO ! Machin nan plen pafè. Ou genyen 50 pwen ! 🎉");
+        resetGame();
+    } else if (currentWeight > goal) {
+        alert("OH NON ! Li debòde... W'ap pèdi 10 pwen. 🌊");
+        resetGame();
+    }
+};
+
+window.resetGame = () => {
+    currentWeight = 0;
+    document.getElementById('live-weight').innerText = "0";
+    document.getElementById('water-level').style.height = "0%";
+};
 </body>
 </html>
+
 
 
 
