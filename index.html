@@ -57,15 +57,18 @@
         <h2 class="flashing-gold" style="text-align:center;">🎮 ZÒN JÈ LAVRI ZETWAL</h2>
         
         <div class="game-grid">
-            <div class="magic-card" id="account-zone">
-                <div class="card-inner">
-                    <h3 class="flashing-gold">👤 KONT OU</h3>
-                    <p id="user-status">Konekte pou sove pwen ou yo</p>
-                    <div class="auth-buttons">
-                        <button class="btn-gold" id="google-login">Konekte ak GMAIL</button>
-                        <p style="font-size: 0.8rem; margin: 10px 0;">Oswa ak Email</p>
-                        <input type="email" id="user-email" placeholder="Mail ou...">
-                        <button class="btn-gold-outline">Antre</button>
+        <div class="tarif-item" id="auth-section" style="max-width: 400px; margin: 20px auto; padding: 20px; border: 2px solid #ffd700; border-radius: 15px; background: rgba(0,0,0,0.8); text-align: center;">
+    <h3 id="auth-title" style="color: #ffd700;">Konekte epi jwe ak Zetwal</h3>
+    <p id="user-status" style="color: white; margin-bottom: 20px;">Konekte pou sove pwen ou yo</p>
+
+    <div id="login-methods">
+        <button id="btn-google" style="width: 100%; margin: 5px 0; padding: 10px; background: #db4437; color: white; border: none; border-radius: 5px; cursor: pointer;">Google</button>
+        <button id="btn-facebook" style="width: 100%; margin: 5px 0; padding: 10px; background: #4267B2; color: white; border: none; border-radius: 5px; cursor: pointer;">Facebook</button>
+        <button id="btn-phone" style="width: 100%; margin: 5px 0; padding: 10px; background: #34b7f1; color: white; border: none; border-radius: 5px; cursor: pointer;">Telefòn</button>
+    </div>
+
+    <button id="btn-logout" style="display: none; width: 100%; margin-top: 10px; padding: 10px; background: #555; color: white; border: none; border-radius: 5px; cursor: pointer;">Dekonekte</button>
+</div>
                     </div>
                     <div id="user-points" style="display:none; margin-top:15px;">
                         <span style="font-size: 1.2rem;">Pwen ou : <strong style="color:gold;">0</strong></span>
@@ -109,7 +112,7 @@
     <script src="script.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
@@ -117,43 +120,55 @@
     projectId: "lavrizetwal",
     storageBucket: "lavrizetwal.firebasestorage.app",
     messagingSenderId: "291921316186",
-    appId: "1:291921316186:web:f55e8b34526960df394b63",
-    measurementId: "G-65R9V5MRBV"
+    appId: "1:291921316186:web:f55e8b34526960df394b63"
   };
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
 
-  // Éléments de ton interface que je vois sur ta photo (Ligne 63 et 66)
-  const userStatus = document.getElementById('user-status'); 
-  const loginButton = document.getElementById('google-login');
+  // Éléments UI
+  const userStatus = document.getElementById('user-status');
+  const authTitle = document.getElementById('auth-title');
+  const loginMethods = document.getElementById('login-methods');
+  const btnLogout = document.getElementById('btn-logout');
 
-  // SURVEILLANT : Change le texte quand on se connecte
+  // 1. SURVEILLER L'ÉTAT (Réponse à tes questions 1 et 2)
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      // Remplace "Konekte pou sove pwen ou yo" par le nom
-      if (userStatus) userStatus.innerText = "Byenvini, " + user.displayName + " ! ✨";
-      if (loginButton) loginButton.style.display = "none"; // Cache le bouton Gmail
+      // SI CONNECTÉ : On cache les boutons de connexion, on montre le nom et "Dekonekte"
+      authTitle.innerText = "Zòn Pwofil";
+      userStatus.innerHTML = "Byenvini, <br><strong style='color:#ffd700;'>" + (user.displayName || user.phoneNumber) + "</strong>";
+      loginMethods.style.display = "none";
+      btnLogout.style.display = "block";
     } else {
-      if (userStatus) userStatus.innerText = "Konekte pou sove pwen ou yo";
-      if (loginButton) loginButton.style.display = "block";
+      // SI DÉCONNECTÉ : On remet tout à zéro
+      authTitle.innerText = "Konekte epi jwe ak Zetwal";
+      userStatus.innerText = "Konekte pou sove pwen ou yo";
+      loginMethods.style.display = "block";
+      btnLogout.style.display = "none";
     }
   });
 
-  // ACTION DU BOUTON
-  if (loginButton) {
-    loginButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      signInWithPopup(auth, provider).catch((error) => {
-        console.error("Erreur :", error.code);
-        alert("Erreur : " + error.message);
-      });
+  // 2. ACTIONS DES BOUTONS
+  // Google
+  document.getElementById('btn-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
+  
+  // Facebook (Note: Tu dois activer Facebook dans ta console Firebase d'abord)
+  document.getElementById('btn-facebook').onclick = () => signInWithPopup(auth, new FacebookAuthProvider());
+
+  // Téléphone (Ouvre une simple alerte pour l'instant car c'est plus complexe)
+  document.getElementById('btn-phone').onclick = () => alert("Koneksyon pa telefòn ap disponib talè !");
+
+  // DECONNEXION (Réponse à ta question 1)
+  btnLogout.onclick = () => {
+    signOut(auth).then(() => {
+        alert("Ou dekonekte !");
     });
-  }
+  };
 </script>
 </body>
 </html>
+
 
 
 
