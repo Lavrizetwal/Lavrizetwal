@@ -605,3 +605,44 @@ nav, .nav {
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* Espacement des colonnes */
+.pricing-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Plus d'espace entre les cartes */
+    padding: 40px 20px;
+    flex-wrap: wrap;
+}
+
+.price-card {
+    padding: 40px 25px !important; /* Plus d'air à l'intérieur */
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* État "Mwens avantaj" */
+.bad-status {
+    font-size: 0.7rem;
+    color: #ff4d4d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- EFFET ÉTINCELLES VOYAGEUSES --- */
+@keyframes spark-travel {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+}
+
+.spark {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #D4AF37;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 10px #FFD700;
+}
