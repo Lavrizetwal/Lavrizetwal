@@ -52,188 +52,164 @@
             </div>
         </div>
     </section>
-<style>
-    .social-btn { width: 100%; margin: 8px 0; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-    .interactive-card { transition: transform 0.3s, box-shadow 0.3s; background: rgba(0,0,0,0.9); border-radius: 20px; border: 1px solid #333; }
-    .interactive-card:hover { transform: translateY(-5px); box-shadow: 0 0 25px rgba(255,215,0,0.2); }
-    
-    .cloth-btn { background: #1a1a1a; border: 1px solid #444; color: white; padding: 10px; border-radius: 15px; cursor: pointer; width: 85px; height: 85px; }
-    .cloth-btn .emoji { font-size: 2rem; display: block; margin-bottom: 4px; }
-    .change-btn { display: block; margin: 6px auto; background: none; border: 1px solid #555; border-radius: 8px; color: #888; font-size: 11px; cursor: pointer; }
-    
-    .is-white .emoji { filter: brightness(2) grayscale(1); }
-    .is-black .emoji { filter: brightness(0.2) grayscale(1); }
-    .is-blue  .emoji { filter: sepia(1) saturate(10) hue-rotate(180deg); }
-    .is-green .emoji { filter: sepia(1) saturate(10) hue-rotate(70deg); }
-    
-    #report-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; }
-</style>
-
-<canvas id="galaxy-bg" style="position:fixed; inset:0; z-index:-1; pointer-events:none;"></canvas>
-
-<section style="padding: 20px; text-align: center; position: relative; z-index: 10;">
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
-
-        <div class="interactive-card" style="flex: 1; min-width: 300px; max-width: 350px; padding: 25px; border: 2px solid #ffd700;">
-            <div id="user-status" style="margin-bottom: 10px; font-weight: bold; color: #ffd700;">Vérification...</div>
-
-            <div id="player-stats" style="display: none;">
-                <div style="background: rgba(255,215,0,0.1); padding: 15px; border-radius: 15px; border: 1px solid #ffd700;">
-                    <p style="font-size: 1.8rem; margin: 0; font-weight: bold;">💰 <span id="balance">0</span></p>
-                    <small>Pwen Lavri</small>
-                </div>
-                <button id="btn-exchange" class="social-btn" style="background: #222; border: 1px solid #ffd700; color: #ffd700; margin-top:15px;">🎁 Echanje 50 Pwen</button>
-                <button id="btn-logout" class="social-btn" style="background: #333; color: white; margin-top: 10px; font-size: 0.8rem;">Déconnexion</button>
-            </div>
-
-            <div id="login-methods">
-                <button id="btn-google" class="social-btn" style="background: #db4437; color: white;">Connexion Google</button>
-            </div>
-        </div>
-
-        <div class="interactive-card" id="game-section" style="flex: 2; min-width: 320px; max-width: 550px; padding: 25px; opacity: 0.4; pointer-events: none;">
-            <div id="game-ui" style="display: none;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                    <span id="game-timer" style="font-weight: bold;">⏱️ 60s</span>
-                    <span style="color: #ffd700;">🎯 Vize 20.5 - 22kg</span>
-                </div>
-                <div id="clothes-conveyor" style="display: flex; justify-content: center; gap: 10px; min-height: 120px;"></div>
-                <button id="finishBtn" class="social-btn" style="background: linear-gradient(45deg, #ffd700, #ffa500); color: black;">TÈMINE LESSIVE (-3 pts)</button>
-            </div>
-            <div id="lock-msg">🔒 Connecte-toi pour jouer</div>
-        </div>
-    </div>
-</section>
-
-<div id="report-modal">
-    <div style="background: #111; padding: 25px; border-radius: 20px; border: 2px solid #ffd700; max-width: 400px; width: 85%;">
-        <h3 id="report-title" style="color: #ffd700;">Résilta</h3>
-        <div id="report-details" style="text-align: left; color: white; margin: 15px 0; font-size: 0.9rem;"></div>
-        <button onclick="document.getElementById('report-modal').style.display='none'" class="social-btn" style="background: #ffd700; color: black;">OK</button>
-    </div>
-</div>
-
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  // 1. Imports propres et unifiés (Version stable)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-        authDomain: "lavrizetwal.firebaseapp.com",
-        projectId: "lavrizetwal",
-        storageBucket: "lavrizetwal.firebasestorage.app",
-        messagingSenderId: "291921316186",
-        appId: "1:291921316186:web:f55e8b34526960df394b63"
+  // 2. Ta configuration officielle
+  const firebaseConfig = {
+    apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+    authDomain: "lavrizetwal.firebaseapp.com",
+    projectId: "lavrizetwal",
+    storageBucket: "lavrizetwal.firebasestorage.app",
+    messagingSenderId: "291921316186",
+    appId: "1:291921316186:web:f55e8b34526960df394b63",
+    measurementId: "G-65R9V5MRBV"
+  };
+
+  // 3. Initialisation
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let playerData, gameActive = false, time = 60, weight = 0, errors = 0;
+  let usedColors = new Set(), timer, sessionHistory = [];
+
+  const clothes = [
+    {e:"👕", w:2, c:"white", cl:"is-white", n:"Blan"},
+    {e:"👕", w:2.5, c:"black", cl:"is-black", n:"Nwa"},
+    {e:"👗", w:4, c:"color", cl:"is-green", n:"Koulè"},
+    {e:"🧦", w:1, c:"white", cl:"is-white", n:"Blan"},
+    {e:"👚", w:3, c:"color", cl:"is-blue", n:"Koulè"}
+  ];
+
+  // 4. Gestion de l'utilisateur (Le coeur du problème)
+  onAuthStateChanged(auth, async (user) => {
+    const statusText = document.getElementById("user-status");
+    const loginBtn = document.getElementById("login-methods");
+    const statsDiv = document.getElementById("player-stats");
+    const gameSec = document.getElementById("game-section");
+
+    if (user) {
+      statusText.textContent = "Chajman done...";
+      try {
+        const ref = doc(db, "users", user.uid);
+        let snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          await setDoc(ref, { points: 100, created: serverTimestamp() });
+          snap = await getDoc(ref);
+        }
+
+        playerData = snap.data();
+
+        // Mise à jour de l'interface
+        loginBtn.style.display = "none";
+        statusText.innerHTML = `Byenvini <b style="color:#ffd700">${user.displayName}</b>`;
+        document.getElementById("balance").textContent = playerData.points;
+        statsDiv.style.display = "block";
+        gameSec.style.opacity = "1";
+        gameSec.style.pointerEvents = "auto";
+        document.getElementById("game-ui").style.display = "block";
+        if(document.getElementById("lock-msg")) document.getElementById("lock-msg").style.display = "none";
+        
+        resetGame();
+      } catch (e) {
+        console.error(e);
+        statusText.textContent = "Erè koneksyon baz done";
+      }
+    } else {
+      statusText.textContent = "Konekte w pou w jwe";
+      loginBtn.style.display = "block";
+      statsDiv.style.display = "none";
+      gameSec.style.opacity = "0.4";
+    }
+  });
+
+  // 5. Fonctions du Jeu
+  function generateCloth() {
+    const d = clothes[Math.floor(Math.random()*clothes.length)];
+    const container = document.getElementById("clothes-conveyor");
+    if(!container) return;
+    
+    const wrap = document.createElement("div");
+    const btn = document.createElement("button");
+    btn.className = `cloth-btn ${d.cl}`;
+    btn.innerHTML = `<span class="emoji">${d.e}</span><small>${d.w}kg</small>`;
+    
+    btn.onclick = () => {
+      if(!gameActive) startGame();
+      weight += d.w;
+      const isErr = (d.c==="white" && (usedColors.has("color") || usedColors.has("black"))) || (usedColors.has("white") && d.c!=="white");
+      if(isErr) errors++;
+      usedColors.add(d.c);
+      sessionHistory.push({d, isErr});
+      wrap.remove(); generateCloth();
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const skip = document.createElement("button");
+    skip.className = "change-btn"; skip.textContent = "🔄";
+    skip.onclick = () => { wrap.remove(); generateCloth(); };
 
-    let playerData, gameActive = false, time = 60, weight = 0, errors = 0;
-    let usedColors = new Set(), timer, sessionHistory = [];
+    wrap.append(btn, skip);
+    container.appendChild(wrap);
+  }
 
-    const clothes = [
-        {e:"👕", w:2, c:"white", cl:"is-white", n:"Blan"},
-        {e:"👕", w:2.5, c:"black", cl:"is-black", n:"Nwa"},
-        {e:"👗", w:4, c:"color", cl:"is-green", n:"Koulè"},
-        {e:"🧦", w:1, c:"white", cl:"is-white", n:"Blan"},
-        {e:"👚", w:3, c:"color", cl:"is-blue", n:"Koulè"}
-    ];
+  function startGame() {
+    gameActive = true;
+    timer = setInterval(() => {
+      time--; 
+      const timerEl = document.getElementById("game-timer");
+      if(timerEl) timerEl.textContent = `⏱️ ${time}s`;
+      if(time <= 0) finalize(false);
+    }, 1000);
+  }
 
-    onAuthStateChanged(auth, async user => {
-        const loginBtn = document.getElementById("login-methods");
-        const statsDiv = document.getElementById("player-stats");
-        const gameSec = document.getElementById("game-section");
-        if (user) {
-            loginBtn.style.display = "none";
-            const ref = doc(db, "users", user.uid);
-            let snap = await getDoc(ref);
-            if (!snap.exists()) {
-                await setDoc(ref, { points: 100, created: serverTimestamp() });
-                snap = await getDoc(ref);
-            }
-            playerData = snap.data();
-            document.getElementById("user-status").textContent = user.displayName;
-            document.getElementById("balance").textContent = playerData.points;
-            statsDiv.style.display = "block";
-            gameSec.style.opacity = "1";
-            gameSec.style.pointerEvents = "auto";
-            document.getElementById("game-ui").style.display = "block";
-            document.getElementById("lock-msg").style.display = "none";
-            resetGame();
-        }
-    });
-
-    function generateCloth() {
-        const d = clothes[Math.floor(Math.random()*clothes.length)];
-        const wrap = document.createElement("div");
-        const btn = document.createElement("button");
-        btn.className = `cloth-btn ${d.cl}`;
-        btn.innerHTML = `<span class="emoji">${d.e}</span><small>${d.w}kg</small>`;
-        btn.onclick = () => {
-            if(!gameActive) startGame();
-            weight += d.w;
-            const isErr = (d.c==="white" && (usedColors.has("color") || usedColors.has("black"))) || (usedColors.has("white") && d.c!=="white");
-            if(isErr) errors++;
-            usedColors.add(d.c);
-            sessionHistory.push({d, isErr});
-            wrap.remove(); generateCloth();
-        };
-        const skip = document.createElement("button");
-        skip.className = "change-btn"; skip.textContent = "🔄";
-        skip.onclick = () => { wrap.remove(); generateCloth(); };
-        wrap.append(btn, skip);
-        document.getElementById("clothes-conveyor").appendChild(wrap);
-    }
-
-    function startGame() {
-        gameActive = true;
-        timer = setInterval(() => {
-            time--; document.getElementById("game-timer").textContent = `⏱️ ${time}s`;
-            if(time <= 0) finalize(false);
-        }, 1000);
-    }
-
-    async function finalize(success) {
-        clearInterval(timer);
-        let gain = -3;
-        if(success) gain = (errors===0?10:(errors===1?5:3));
-        playerData.points += gain;
-        await updateDoc(doc(db,"users",auth.currentUser.uid), {points:playerData.points});
-        document.getElementById("balance").textContent = playerData.points;
-        document.getElementById("report-modal").style.display = "flex";
-        document.getElementById("report-details").innerHTML = `Pwa: ${weight.toFixed(1)}kg | Erè: ${errors} | Pwen: ${gain}`;
-        resetGame();
-    }
-
-    function resetGame() {
-        gameActive = false; time = 60; weight = 0; errors = 0; usedColors.clear(); sessionHistory = [];
-        document.getElementById("clothes-conveyor").innerHTML = "";
-        for(let i=0;i<3;i++) generateCloth();
-    }
-
-    document.getElementById("btn-google").onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
-    document.getElementById("btn-logout").onclick = () => signOut(auth).then(()=>location.reload());
-    document.getElementById("finishBtn").onclick = () => finalize(weight>=20.5 && weight<=22 && errors<3);
+  async function finalize(success) {
+    clearInterval(timer);
+    let gain = -3;
+    if(success) gain = (errors===0?10:(errors===1?5:3));
     
-    // Animation Galaxy
-    const c=document.getElementById("galaxy-bg"), ctx=c.getContext("2d");
-    function res(){c.width=innerWidth; c.height=innerHeight;}
-    window.onresize=res; res();
-    let stars = [...Array(50)].map(()=>({x:Math.random()*c.width, y:Math.random()*c.height, v:Math.random()*0.5}));
-    (function loop(){
-        ctx.clearRect(0,0,c.width,c.height);
-        stars.forEach(s=>{ ctx.fillStyle="white"; ctx.beginPath(); ctx.arc(s.x,s.y,1,0,Math.PI*2); ctx.fill(); s.y+=s.v; if(s.y>c.height) s.y=0; });
-        requestAnimationFrame(loop);
-    })();
+    playerData.points += gain;
+    await updateDoc(doc(db,"users",auth.currentUser.uid), {points:playerData.points});
+    
+    document.getElementById("balance").textContent = playerData.points;
+    document.getElementById("report-modal").style.display = "flex";
+    document.getElementById("report-details").innerHTML = `Pwa: ${weight.toFixed(1)}kg | Erè: ${errors} | Gain: ${gain} pts`;
+    resetGame();
+  }
+
+  function resetGame() {
+    gameActive = false; time = 60; weight = 0; errors = 0; usedColors.clear(); sessionHistory = [];
+    const conv = document.getElementById("clothes-conveyor");
+    if(conv) conv.innerHTML = "";
+    for(let i=0;i<3;i++) generateCloth();
+  }
+
+  // Événements boutons
+  document.getElementById("btn-google").onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
+  document.getElementById("btn-logout").onclick = () => signOut(auth).then(()=>location.reload());
+  document.getElementById("finishBtn").onclick = () => finalize(weight>=20.5 && weight<=22 && errors<3);
+  
+  // Bouton d'échange
+  document.getElementById("btn-exchange").onclick = async () => {
+    if(playerData.points < 50) return alert("Pwen ou pa ase!");
+    const code = "LAVRI-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    playerData.points -= 50;
+    await updateDoc(doc(db, "users", auth.currentUser.uid), { points: playerData.points });
+    document.getElementById("balance").textContent = playerData.points;
+    alert(`🎟️ KÒD: ${code}\nMontre sa nan laverie a!`);
+  };
+
 </script>
 </body>
 </html>
 
 </body>
 </html>
+
 
 
 
