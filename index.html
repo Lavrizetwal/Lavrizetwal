@@ -74,20 +74,18 @@
         <div class="tarif-item interactive-card" id="game-section" style="flex: 2; min-width: 320px; max-width: 550px; padding: 25px; border-radius: 20px; background: rgba(0,0,0,0.95); border: 2px solid #333; opacity: 0.5; pointer-events: none;">
             <h2 style="color: #ffd700;">🧺 Lavri Challenge</h2>
             
-            <div style="font-size: 0.75rem; background: rgba(255,215,0,0.1); padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px dashed #ffd700; text-align: left;">
-                <strong>RÈGLES :</strong><br>
-                🚫 Pa melanje ⚪ <strong>Blan</strong> ak 🔴 <strong>Koulè</strong> oswa ⚫ <strong>Nwa</strong>.<br>
-                ⚖️ Pwa ideyal : <strong>20.5kg rive 22kg</strong>.<br>
-                ⚠️ 3 erè = Pèdi. Chak jwèt koute 3 pwen.
+            <div style="font-size: 0.75rem; background: rgba(255,215,0,0.1); padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px dashed #ffd700;">
+                🔴 <strong>Koulè</strong> | ⚫ <strong>Nwa</strong> | ⚪ <strong>Blan</strong><br>
+                Pa melanje Blan ak lòt yo! (20.5kg - 22kg)
             </div>
 
             <div id="game-ui" style="display:none;">
                 <div style="display: flex; justify-content: space-around; background: #222; padding: 10px; border-radius: 10px; border: 1px solid #444;">
-                    <div>⏱️ <span id="time" style="font-weight:bold;">60</span>s</div>
-                    <div>⚖️ <span id="weight" style="color:#00ff00; font-weight:bold;">0</span> / 22kg</div>
+                    <div>⏱️ <span id="time">60</span>s</div>
+                    <div>⚖️ <span id="weight">0</span> / 22kg</div>
                 </div>
                 
-                <div id="clothes-conveyor" style="display: flex; justify-content: center; gap: 15px; margin: 20px 0; min-height: 100px;"></div>
+                <div id="clothes-conveyor" style="display: flex; justify-content: center; gap: 15px; margin: 20px 0; min-height: 120px;"></div>
 
                 <button id="finishBtn" class="social-btn" style="background: linear-gradient(45deg, #ffd700, #ffa500); color: black;">TÈMINE LESSIVE (-3 pwen)</button>
             </div>
@@ -98,7 +96,7 @@
 
 <div id="report-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); padding:30px; border-radius:20px; border:2px solid #ffd700; z-index:2000; width:90%; max-width:400px; text-align:center;">
     <h3 id="report-title" style="color:#ffd700;">Résilta</h3>
-    <div id="report-details" style="margin:20px 0; max-height:200px; overflow-y:auto; text-align:left; font-size:0.9rem;"></div>
+    <div id="report-details" style="margin:20px 0; max-height:200px; overflow-y:auto; text-align:left;"></div>
     <button onclick="document.getElementById('report-modal').style.display='none'" class="social-btn" style="background:#ffd700; color:black;">OK</button>
 </div>
 
@@ -110,15 +108,18 @@ const firebaseConfig = { apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ", auth
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-let player = { points: 100, lastReward: Date.now(), version: "2.0" }; // Version pour reset points
-let gameActive = false, time = 60, weight = 0, errors = 0, usedColors = new Set(), timerInterval;
-let sessionChoices = [];
+let player = { points: 100, lastReward: Date.now(), version: "3.0" };
+let gameActive = false, time = 60, weight = 0, errors = 0, usedColors = new Set(), timerInterval, sessionChoices = [];
 
+// Bibliothèque avec styles CSS forcés
 const clothesLibrary = [
-    { e: "👕", w: 2, c: "white", n: "T-shirt Blan" }, { e: "🧦", w: 1, c: "black", n: "Chosèt Nwa" },
-    { e: "👖", w: 3, c: "color", n: "Jean Koulè" }, { e: "👚", w: 2.5, c: "color", n: "Chemiz Koulè" },
-    { e: "🩳", w: 1.5, c: "black", n: "Kalson Nwa" }, { e: "👔", w: 2, c: "white", n: "Chemiz Blan" },
-    { e: "👗", w: 4, c: "color", n: "Wòb Koulè" }
+    { e: "👕", w: 2, c: "white", n: "Blan", class: "is-white" },
+    { e: "👕", w: 2.5, c: "black", n: "Nwa", class: "is-black" },
+    { e: "👕", w: 3, c: "color", n: "Wouj", class: "is-red" },
+    { e: "👗", w: 4, c: "color", n: "Vè", class: "is-green" },
+    { e: "🧦", w: 1, c: "white", n: "Blan", class: "is-white" },
+    { e: "🧦", w: 1.2, c: "black", n: "Nwa", class: "is-black" },
+    { e: "👚", w: 2, c: "color", n: "Ble", class: "is-blue" }
 ];
 
 // --- GALAXIE ---
@@ -127,7 +128,7 @@ const ctx = canvas.getContext('2d');
 let stars = [];
 function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 window.onresize = resize; resize();
-for(let i=0; i<100; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*2, speed:Math.random()*0.2+0.1, color:Math.random()>0.5?'255,215,0':'255,255,255', op:Math.random(), blk:Math.random()*0.02});
+for(let i=0; i<80; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*2, speed:Math.random()*0.1+0.1, color:Math.random()>0.5?'255,215,0':'255,255,255', op:Math.random(), blk:Math.random()*0.02});
 function anim() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     stars.forEach(s=>{ s.op+=s.blk; if(s.op>1||s.op<0.2) s.blk*=-1; ctx.fillStyle=`rgba(${s.color},${Math.abs(s.op)})`; ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill(); s.y+=s.speed; if(s.y>canvas.height) s.y=-10; });
@@ -136,7 +137,7 @@ function anim() {
 }
 anim();
 
-// --- LOGIQUE ---
+// --- LOGIQUE JEU ---
 function updateUI() {
     document.getElementById("balance").textContent = player.points;
     document.getElementById("weight").textContent = weight.toFixed(1);
@@ -146,45 +147,32 @@ function updateUI() {
 function generateCloth() {
     const data = clothesLibrary[Math.floor(Math.random() * clothesLibrary.length)];
     const btn = document.createElement("button");
-    btn.className = "cloth-btn";
-    btn.innerHTML = `${data.e}<br><small>${data.w}kg</small>`;
+    btn.className = `cloth-btn ${data.class}`;
+    btn.innerHTML = `<span class="emoji">${data.e}</span><br><small>${data.w}kg</small>`;
     btn.onclick = () => {
         if(!gameActive) startGame();
         weight += data.w;
-        let isError = false;
+        let isErr = false;
         if ((data.c === "white" && (usedColors.has("color") || usedColors.has("black"))) || (usedColors.has("white") && data.c !== "white")) {
-            errors++;
-            isError = true;
+            errors++; isErr = true;
         }
         usedColors.add(data.c);
-        sessionChoices.push({ ...data, error: isError });
+        sessionChoices.push({ ...data, error: isErr });
         btn.style.opacity = "0"; setTimeout(() => { btn.remove(); generateCloth(); }, 150);
         updateUI();
     };
     document.getElementById("clothes-conveyor").appendChild(btn);
 }
 
-function startGame() {
-    gameActive = true;
-    timerInterval = setInterval(() => {
-        time--; if(time <= 0) showReport("Tan fini!");
-        updateUI();
-    }, 1000);
-}
+function startGame() { gameActive = true; timerInterval = setInterval(() => { time--; if(time <= 0) showReport("Tan fini!"); updateUI(); }, 1000); }
 
 function showReport(title) {
     clearInterval(timerInterval);
     const modal = document.getElementById("report-modal");
-    const details = document.getElementById("report-details");
+    let html = `<p>⚖️ Pwa: <strong>${weight.toFixed(1)}kg</strong> | ❌ Erè: <strong>${errors}</strong></p><hr>`;
+    sessionChoices.forEach(c => { html += `<div style="color:${c.error?'#ff4444':'#00ff00'}">${c.error?'❌':'✅'} ${c.e} ${c.n} (${c.w}kg)</div>`; });
+    document.getElementById("report-details").innerHTML = html;
     document.getElementById("report-title").innerText = title;
-    
-    let html = `<p>⚖️ Pwa total: <strong>${weight.toFixed(1)}kg</strong></p>`;
-    html += `<p>❌ Erè triyaj: <strong>${errors}</strong></p><hr>`;
-    sessionChoices.forEach(c => {
-        html += `<div style="color:${c.error?'#ff4444':'#00ff00'}">${c.error?'❌':'✅'} ${c.e} ${c.n} (${c.w}kg)</div>`;
-    });
-    
-    details.innerHTML = html;
     modal.style.display = "block";
     resetGame();
 }
@@ -197,16 +185,14 @@ function resetGame() {
 }
 
 document.getElementById("finishBtn").onclick = () => {
-    if(player.points < 3) return alert("Ou bezwen 3 pwen!");
+    if(player.points < 3) return alert("Ou bezwen pwen!");
     player.points -= 3;
     let win = 0;
     if(weight >= 20.5 && weight <= 22 && errors < 3) {
-        if(errors === 0) win = 10; else if(errors === 1) win = 5; else win = 3;
+        win = errors === 0 ? 10 : (errors === 1 ? 5 : 3);
         player.points += win;
-        showReport(`🎉 SIKSE! Ou genyen ${win} pwen`);
-    } else {
-        showReport(`❌ ECHÈK! Machin nan pa bon`);
-    }
+        showReport("🎉 SIKSE!");
+    } else { showReport("❌ ECHÈK!"); }
     localStorage.setItem(`lavri_${auth.currentUser.uid}`, JSON.stringify(player));
     updateUI();
 };
@@ -215,14 +201,8 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         let saved = localStorage.getItem(`lavri_${user.uid}`);
         let parsed = saved ? JSON.parse(saved) : null;
-        // Reset à 100 si nouvelle version ou premier utilisateur
-        if(!parsed || parsed.version !== "2.0") {
-            player = { points: 100, lastReward: Date.now(), version: "2.0" };
-        } else {
-            player = parsed;
-        }
+        player = (!parsed || parsed.version !== "3.0") ? { points: 100, lastReward: Date.now(), version: "3.0" } : parsed;
         localStorage.setItem(`lavri_${user.uid}`, JSON.stringify(player));
-        
         document.getElementById("user-status").innerHTML = `Byenvini <b style="color:#ffd700">${user.displayName}</b>`;
         document.getElementById("login-methods").style.display = "none";
         document.getElementById("player-stats").style.display = "block";
@@ -240,7 +220,16 @@ document.getElementById('btn-logout').onclick = () => signOut(auth).then(()=>loc
 
 <style>
 .social-btn { width: 100%; margin: 5px 0; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; }
-.cloth-btn { background: #333; border: 1px solid #ffd700; color: white; padding: 10px; border-radius: 12px; cursor: pointer; width: 75px; transition: 0.2s; }
+.cloth-btn { background: #222; border: 2px solid #444; color: white; padding: 10px; border-radius: 15px; cursor: pointer; width: 85px; transition: 0.2s; }
+.cloth-btn .emoji { font-size: 2rem; display: inline-block; transition: 0.3s; }
+
+/* FILTRES CSS POUR FORCER LES COULEURS DES EMOJIS */
+.is-white .emoji { filter: brightness(2) grayscale(1); } /* Force le Blanc */
+.is-black .emoji { filter: brightness(0.2) grayscale(1); } /* Force le Noir */
+.is-red .emoji   { filter: sepia(1) saturate(10) hue-rotate(-50deg); } /* Force le Rouge */
+.is-green .emoji { filter: sepia(1) saturate(10) hue-rotate(70deg); }  /* Force le Vert */
+.is-blue .emoji  { filter: sepia(1) saturate(10) hue-rotate(180deg); } /* Force le Bleu */
+
 .interactive-card { transition: 0.4s; }
 </style>
 </body>
@@ -248,6 +237,7 @@ document.getElementById('btn-logout').onclick = () => signOut(auth).then(()=>loc
 
 </body>
 </html>
+
 
 
 
