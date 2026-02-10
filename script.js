@@ -314,3 +314,74 @@ window.onload = function() {
         console.log("Erreur: Bouton btn-calc non trouvé !");
     }
 };
+
+// 1. SYSTÈME D'ÉTINCELLES (AVENGERS STYLE)
+document.querySelectorAll('.price-card, .calculator-box').forEach(box => {
+    box.addEventListener('mousemove', (e) => {
+        for(let i=0; i<3; i++) { // Créer 3 étincelles par mouvement
+            const spark = document.createElement('div');
+            spark.className = 'spark';
+            box.appendChild(spark);
+            
+            const rect = box.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            spark.style.left = x + 'px';
+            spark.style.top = y + 'px';
+            
+            // Direction aléatoire pour le voyage de l'étincelle
+            spark.style.setProperty('--x', (Math.random() - 0.5) * 200 + 'px');
+            spark.style.setProperty('--y', (Math.random() - 0.5) * 200 + 'px');
+            
+            spark.style.animation = `spark-travel ${Math.random() * 1 + 0.5}s forwards`;
+            
+            setTimeout(() => spark.remove(), 1500);
+        }
+    });
+});
+
+// 2. CALCULATEUR AVEC AVANTAGE DÉGRESSIF
+function calculerPrestige() {
+    const kg = parseFloat(document.getElementById('user-kg').value);
+    const pliyajBase = parseInt(document.getElementById('pliyaj-select').value);
+    const sechage = document.getElementById('sechage-opt').checked;
+    
+    if (!kg || kg <= 0) return;
+
+    let prixBase, nomForfait, reduction;
+
+    // Définition des avantages selon le forfait
+    if (kg < 10) { 
+        prixBase = 650; nomForfait = "LE PETIT"; 
+        reduction = 1.0; // Pas de réduction (Prix plein)
+    } else if (kg < 15) { 
+        prixBase = 850; nomForfait = "LE MALIN"; 
+        reduction = 0.85; // 15% de réduction sur les options
+    } else { 
+        prixBase = 1000; nomForfait = "LE GÉANT"; 
+        reduction = 0.70; // 30% de réduction sur les options !
+    }
+
+    let tranches = Math.ceil(kg / 10);
+    // On applique la réduction sur le pliage
+    let totalPliyaj = Math.round((pliyajBase * tranches) * reduction);
+    
+    // Séchage avantageux
+    let totalSechage = 0;
+    if (sechage) {
+        if (kg >= 15) totalSechage = 0; // GRATUIT
+        else totalSechage = Math.round(200 * reduction); // Réduit pour le Malin
+    }
+
+    const finalTotal = prixBase + totalPliyaj + totalSechage;
+
+    document.getElementById('sheet-data').innerHTML = `
+        <p><strong>Forfè:</strong> ${nomForfait} (${prixBase} HTG)</p>
+        <p><strong>Pliyaj:</strong> ${totalPliyaj} HTG ${(reduction < 1) ? '<span style="color:gold">(Rabais VIP inclus)</span>' : ''}</p>
+        <p><strong>Sèchaj:</strong> ${totalSechage === 0 && sechage ? "GRATIS 🔥" : totalSechage + " HTG"}</p>
+        <hr>
+        <h2 style="text-align:center; color:#D4AF37;">TOTAL: ${finalTotal} HTG</h2>
+    `;
+    document.getElementById('result-sheet').style.display = "block";
+}
