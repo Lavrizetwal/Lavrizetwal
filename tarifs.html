@@ -3,155 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarifs VIP - LAVRI ZETWAL</title>
+    <title>Tarifs - LAVRI ZETWAL</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* CSS INTERNE POUR FIXER LES COLONNES IMMÉDIATEMENT */
+        .pricing-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 100px 20px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .magic-card {
+            flex: 1;
+            min-width: 300px;
+            max-width: 350px;
+            background: #0a0a0a;
+            border-radius: 20px;
+            padding: 3px; /* Épaisseur de la bordure magique */
+            position: relative;
+            background: linear-gradient(90deg, #D4AF37, #5c4b1a, #D4AF37);
+            background-size: 300% 300%;
+            animation: borderRotate 4s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card-inner {
+            background: #0f0f0f;
+            border-radius: 17px;
+            padding: 30px 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        .bad-status { color: #ff4d4d; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
+        .flashing-gold { color: #D4AF37; font-weight: 800; margin: 10px 0; }
+        .price { font-size: 2.5rem; color: #D4AF37; font-weight: 900; }
+        .unit-price { font-size: 0.8rem; color: #888; margin-bottom: 20px; }
+        
+        .feature-list { list-style: none; padding: 0; margin-bottom: 30px; text-align: left; width: 100%; }
+        .feature-list li { margin: 10px 0; font-size: 0.9rem; }
+
+        .btn-chwazi {
+            background: #D4AF37;
+            color: black;
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: auto;
+        }
+
+        /* RESPONSIVE MOBILE */
+        @media (max-width: 768px) {
+            .pricing-wrapper { padding-top: 80px; }
+            .magic-card { min-width: 100%; }
+        }
+    </style>
 </head>
 <body>
 
-    <div id="stars-container"></div>
-    <div id="bubble-container"></div>
-
     <nav class="nav">
         <div class="container nav-content">
-            <a href="https://wa.me/79961103506" class="wa-icon-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-            </a>
-           <ul class="nav-links">
-    <li><a href="index.html">Akèy</a></li>
-    <li><a href="services.html">Sèvis</a></li>
-    <li><a href="tarifs.html" class="active">Tarif</a></li>
-</ul>
+            <ul class="nav-links">
+                <li><a href="index.html">Akèy</a></li>
+                <li><a href="services.html">Sèvis</a></li>
+                <li><a href="tarifs.html" class="active">Tarif</a></li>
+            </ul>
             <div class="logo-container">
-                <img src="logo.png" alt="Logo Lavri Zetwal" class="nav-logo-img" style="height: 40px; margin-right: 10px;">
                 <div class="logo-text">LAVRI <span>ZETWAL</span></div>
             </div>
         </div>
     </nav>
 
-    <section class="pricing-page" style="padding-top: 120px; padding-bottom: 50px;">
-        <div class="container">
-            <h1 class="flashing-gold" style="text-align:center; font-size: 2.5rem; margin-bottom: 10px;">CHWAZI FÒFÈ OU</h1>
-            <p style="text-align:center; color: #D4AF37; margin-bottom: 50px; font-weight: bold;">Plis ou pote, plis ou ekonomize ! ✨</p>
-
-         <div class="price-card">
-    <div class="card-header">
-        <span class="bad-status">Mwens avantaj</span>
-        <h3 class="flashing-gold">LE PETIT</h3>
-    </div>
-    </div>
-
-                    <p class="weight">5kg - 9kg</p>
-                    <div class="price">650<span>HTG</span></div>
-                    <p class="unit-price" style="color: #aaa; font-size: 0.8rem;">(Sa fè 72 HTG pa Kg)</p>
-                    <ul class="features">
-                        <li>⚡ Pi rapid</li>
-                        <li>💰 Mwen chè</li>
-                    </ul>
-                    <a href="https://wa.me/79961103506" class="btn-select">Mwen chwazi plan sa</a>
-                </div>
-
-                <div class="price-card popular">
-                    <div class="badge-gold">PLIS POPILÈ</div>
-                    <h3 class="flashing-gold">LE MALIN</h3>
-                    <p class="weight">10kg - 14kg</p>
-                    <div class="price">850<span>HTG</span></div>
-                    <p class="unit-price" style="color: #aaa; font-size: 0.8rem;">(Sa fè 60 HTG pa Kg)</p>
-                    <ul class="features">
-                        <li>✨ Balans pafè</li>
-                        <li>🏠 Ideyal pou fanmi</li>
-                    </ul>
-                    <a href="https://wa.me/79961103506" class="btn-select">Mwen chwazi plan sa</a>
-                </div>
-
-                <div class="price-card best-value">
-                    <div class="badge-gold">PI BON PRI</div>
-                    <h3 class="flashing-gold">LE GÉANT</h3>
-                    <p class="weight">15kg - 22kg</p>
-                    <div class="price">1 000<span>HTG</span></div>
-                    <p class="unit-price" style="color: #FFD700; font-weight: bold;">(Sa fè 45 HTG pa Kg !)</p>
-                    <ul class="features">
-                        <li>🧺 Rad/dra/rido (tout ansanm)</li>
-                        <li>🔥 Sechaj gratis</li>
-                    </ul>
-                    <a href="https://wa.me/79961103506" class="btn-select" style="background: #FFD700; color: black;">Mwen chwazi plan sa</a>
-                </div>
+    <div class="pricing-wrapper">
+        <div class="magic-card">
+            <div class="card-inner">
+                <span class="bad-status">Mwens avantaj</span>
+                <h3 class="flashing-gold">LE PETIT</h3>
+                <p>5kg - 9kg</p>
+                <div class="price">650<span>HTG</span></div>
+                <p class="unit-price">(Sa fè 72 HTG pa Kg)</p>
+                <ul class="feature-list">
+                    <li>⚡ Pi rapid</li>
+                    <li>💰 Mwens kòb</li>
+                </ul>
+                <a href="#" class="btn-chwazi">Mwen chwazi plan sa</a>
             </div>
-
-    <div class="magic-portal-box">
-    <div class="content-wrapper">
-        <h3 class="flashing-gold" style="text-align: center;">🧮 KALKILE SÈVIS OU</h3>
-        
-        <div class="calc-group">
-            <label>Konbyen Kilo rad ou genyen ?</label>
-            <input type="number" id="user-kg" placeholder="Ex: 12">
         </div>
 
-        <div class="calc-group">
-            <label>Opsyon Pliyaj (Chak 10kg) :</label>
-            <select id="pliyaj-select">
-                <option value="0">Pa gen pliyaj (0 HTG)</option>
-                <option value="150">Pliyaj rad (150 HTG)</option>
-                <option value="250">Dra / Rido (250 HTG)</option>
-                <option value="200">Melanj Rad ak Dra (200 HTG)</option>
-            </select>
+        <div class="magic-card">
+            <div class="card-inner">
+                <span style="color:gold; font-size:0.7rem;">FORFÈ POPILÈ</span>
+                <h3 class="flashing-gold">LE MALIN</h3>
+                <p>10kg - 14kg</p>
+                <div class="price">850<span>HTG</span></div>
+                <p class="unit-price">(Sa fè 60 HTG pa Kg)</p>
+                <ul class="feature-list">
+                    <li>✨ Balans pafè</li>
+                    <li>🏠 Ideyal pou fanmi</li>
+                </ul>
+                <a href="#" class="btn-chwazi">Mwen chwazi plan sa</a>
+            </div>
         </div>
 
-        <div class="calc-group">
-            <label style="color:white; cursor:pointer;">
-                <input type="checkbox" id="sechage-opt"> Ajoute Sèchaj (+200 HTG)
-            </label>
-        </div>
-
-        <button type="button" onclick="calculerPrestige()" class="btn-magic">KALKILE KOUNYE A</button>
-
-        <div id="result-sheet" class="sheet-vip">
-            <img src="logo.png" alt="Logo" style="height:40px; display:block; margin:0 auto 10px;">
-            <h4 style="text-align:center; border-bottom:2px solid #D4AF37; padding-bottom:10px; color:#1a1a1a;">RESIME SÈVIS OU</h4>
-            <div id="sheet-data">
-                </div>
+        <div class="magic-card" style="box-shadow: 0 0 20px rgba(212,175,55,0.4);">
+            <div class="card-inner">
+                <span style="color:#00ff00; font-size:0.7rem; font-weight:bold;">PI BON PRI</span>
+                <h3 class="flashing-gold">LE GÉANT</h3>
+                <p>15kg - 22kg</p>
+                <div class="price">1 000<span>HTG</span></div>
+                <p class="unit-price" style="color:#00ff00;">(Sa fè 45 HTG pa Kg !)</p>
+                <ul class="feature-list">
+                    <li>🧺 Rad/dra/rido (tout ansanm)</li>
+                    <li>🔥 Sechaj gratis</li>
+                </ul>
+                <a href="#" class="btn-chwazi" style="background: #00ff00;">Mwen chwazi plan sa</a>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-function calculerPrestige() {
-    const kg = parseFloat(document.getElementById('user-kg').value);
-    const pliyaj = parseInt(document.getElementById('pliyaj-select').value);
-    const sechage = document.getElementById('sechage-opt').checked;
-    const sheet = document.getElementById('result-sheet');
-    const dataBox = document.getElementById('sheet-data');
+    <div class="container">
+        <div class="magic-card" style="max-width: 600px; margin: 40px auto;">
+            <div class="card-inner">
+                <h3 class="flashing-gold">🧮 KALKILE SÈVIS OU</h3>
+                <div style="width:100%; text-align:left; margin-top:20px;">
+                    <label>Konbyen Kilo rad ou genyen ?</label>
+                    <input type="number" id="user-kg" style="width:100%; padding:10px; margin:10px 0; background:#1a1a1a; border:1px solid #D4AF37; color:white; border-radius:5px;">
+                    
+                    <label>Opsyon Pliyaj (Chak 10kg) :</label>
+                    <select id="pliyaj-select" style="width:100%; padding:10px; margin:10px 0; background:#1a1a1a; border:1px solid #D4AF37; color:white;">
+                        <option value="0">Pa gen pliyaj</option>
+                        <option value="150">Pliyaj rad (150 HTG)</option>
+                        <option value="250">Dra / Rido (250 HTG)</option>
+                        <option value="200">Melanj (200 HTG)</option>
+                    </select>
 
-    if (!kg || kg <= 0) {
-        alert("Silvouplè, mete konbe kilo rad ou genyen.");
-        return;
-    }
+                    <label><input type="checkbox" id="sechage-opt"> Ajoute Sèchaj (+200 HTG)</label>
+                </div>
+                <button onclick="calculerVIP()" style="width:100%; padding:15px; margin-top:20px; background:#D4AF37; border:none; font-weight:bold; cursor:pointer; border-radius:5px;">KALKILE KOUNYE A</button>
+                
+                <div id="resultat-vip" style="display:none; margin-top:20px; background:white; color:black; padding:15px; border-radius:10px; width:100%;">
+                    </div>
+            </div>
+        </div>
+    </div>
 
-    let prixBase = (kg < 10) ? 650 : (kg < 15) ? 850 : 1000;
-    let nomForfait = (kg < 10) ? "LE PETIT (Mwens avantaj)" : (kg < 15) ? "LE MALIN" : "LE GÉANT (Pi bon pri)";
-    let tranches = Math.ceil(kg / 10);
-    let totalPliyaj = pliyaj * tranches;
-    let totalSechage = (sechage && kg < 15) ? 200 : 0;
-    let finalTotal = prixBase + totalPliyaj + totalSechage;
+    <script>
+        function calculerVIP() {
+            const kg = parseFloat(document.getElementById('user-kg').value);
+            const pliyaj = parseInt(document.getElementById('pliyaj-select').value);
+            const sechage = document.getElementById('sechage-opt').checked;
+            const resBox = document.getElementById('resultat-vip');
 
-    dataBox.innerHTML = `
-        <p><strong>Forfè:</strong> ${nomForfait} (${prixBase} HTG)</p>
-        <p><strong>Pliyaj:</strong> ${totalPliyaj} HTG</p>
-        <p><strong>Sèchaj:</strong> ${totalSechage === 0 && sechage ? "GRATIS 🔥" : totalSechage + " HTG"}</p>
-        <hr>
-        <h2 style="text-align:center; color:#D4AF37;">TOTAL: ${finalTotal} HTG</h2>
-    `;
+            if(!kg) { alert("Antre kilo yo!"); return; }
 
-    sheet.style.display = "block";
-    sheet.scrollIntoView({ behavior: 'smooth' });
-}
-</script>
-    </section>
+            let base = (kg < 10) ? 650 : (kg < 15) ? 850 : 1000;
+            let reduction = (kg >= 15) ? 0.7 : (kg >= 10) ? 0.85 : 1;
+            
+            let tranches = Math.ceil(kg / 10);
+            let totalPliyaj = Math.round((pliyaj * tranches) * reduction);
+            let totalSechage = (sechage && kg < 15) ? Math.round(200 * reduction) : 0;
 
-    <footer style="text-align: center; padding: 20px; color: #aaa; font-size: 0.8rem;">
-        © 2026 LAVRI ZETWAL. Tout dwa rezève.
-    </footer>
-
-    <script src="script.js"></script>
+            resBox.innerHTML = `
+                <h4 style="text-align:center; border-bottom:1px solid #ccc;">RESIME</h4>
+                <p>Forfè: ${base} HTG</p>
+                <p>Pliyaj: ${totalPliyaj} HTG</p>
+                <p>Sèchaj: ${totalSechage} HTG</p>
+                <h3 style="text-align:center; color:#D4AF37;">TOTAL: ${base + totalPliyaj + totalSechage} HTG</h3>
+            `;
+            resBox.style.display = "block";
+        }
+    </script>
 </body>
 </html>
