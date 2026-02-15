@@ -55,105 +55,118 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
-    :root { --lò: #ffd700; --nwa: #020202; --lò-fènwa: #b8860b; }
+    :root { --lò: #ffd700; --nwa: #020202; --blan: #ffffff; }
     
-    /* DEBLOKE SCROLL LA */
     body { 
         background: var(--nwa); 
         color: white; 
-        font-family: 'Poppins', sans-serif; 
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         margin: 0; 
         overflow-x: hidden; 
         overflow-y: auto; 
         min-height: 100vh;
-        touch-action: pan-y; /* Pèmèt scroll sou telefòn */
+        touch-action: pan-y;
     }
 
-    /* GALAKSI FIXED PA DÈYÈ */
-    #galaxy-bg { position: fixed; top: 0; left: 0; z-index: -2; pointer-events: none; }
+    #galaxy-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 
-    /* TRAS SOURIS & TOUCH */
-    .trail { position: fixed; pointer-events: none; z-index: 10000; border-radius: 50%; animation: fadeOut 0.8s ease-out forwards; }
-    .gold-spark { width: 3px; height: 15px; background: linear-gradient(to bottom, var(--lò), transparent); }
-    .bubble-trail { width: 12px; height: 12px; border: 1.5px solid rgba(255,255,255,0.4); box-shadow: 0 0 5px white; }
-    @keyframes fadeOut { to { opacity: 0; transform: scale(0.2) translateY(-30px); } }
+    /* LOGIN OVERLAY MODERNE */
+    #login-screen {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+        z-index: 9999; display: flex; align-items: center; justify-content: center;
+        backdrop-filter: blur(20px); transition: 0.5s;
+    }
+    .login-card {
+        text-align: center; padding: 40px; border: 2px solid var(--lò);
+        border-radius: 30px; background: rgba(255,215,0,0.05);
+        box-shadow: 0 0 50px rgba(255,215,0,0.2);
+    }
+    .login-btn {
+        background: var(--lò); color: black; border: none; padding: 15px 40px;
+        border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 1.1rem;
+        transition: 0.3s; margin-top: 20px;
+    }
+    .login-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--lò); }
+
+    /* EFFETS SOURIS & TOUCH */
+    .trail { position: fixed; pointer-events: none; z-index: 9000; border-radius: 50%; animation: fadeOut 0.8s forwards; }
+    .gold-spark { width: 3px; height: 15px; background: var(--lò); }
+    .bubble-trail { width: 12px; height: 12px; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 0 5px white; }
+    @keyframes fadeOut { to { opacity: 0; transform: scale(0) translateY(-20px); } }
 
     /* ZETWAL CORE K AP RESPIRE */
     #zetwal-core {
-        position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
+        position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px;
         background: radial-gradient(circle, #fff, var(--lò)); border-radius: 50%;
-        z-index: 5000; display: flex; align-items: center; justify-content: center;
-        font-weight: 900; font-size: 10px; color: black;
-        animation: respire-core 3s infinite ease-in-out; box-shadow: 0 0 20px var(--lò);
+        z-index: 8000; display: flex; align-items: center; justify-content: center;
+        font-weight: 900; font-size: 11px; color: black;
+        animation: respire-core 3s infinite ease-in-out; box-shadow: 0 0 25px var(--lò);
     }
-    @keyframes respire-core { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 0 40px #fff; } }
+    @keyframes respire-core { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 50px #fff; } }
 
-    /* ESPAS JWÈT LA */
-    .game-container {
-        background: rgba(255, 215, 0, 0.05);
-        border: 2px solid rgba(255, 215, 0, 0.2);
-        backdrop-filter: blur(15px);
-        border-radius: 30px;
-        padding: 25px;
-        box-shadow: inset 0 0 50px rgba(255, 215, 0, 0.1);
-        display: inline-block;
-        transition: transform 0.3s;
+    /* ESPACE JEU (SAGA STYLE) */
+    .game-section { text-align: center; position: relative; z-index: 100; padding: 20px; display: none; }
+    .stats-container { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; }
+    .stat-box { 
+        background: rgba(0,0,0,0.8); border: 1px solid var(--lò); padding: 15px 25px; 
+        border-radius: 20px; min-width: 100px; transition: 0.4s;
     }
-    .game-container:hover { transform: scale(1.02); }
+    .stat-box:hover { transform: scale(1.1); border-color: white; }
+    .stat-val { font-size: 2rem; font-weight: 900; color: var(--lò); display: block; }
 
-    #game-grid { display: grid; grid-template-columns: repeat(6, 55px); grid-template-rows: repeat(6, 55px); gap: 10px; }
-
+    #game-grid {
+        display: grid; grid-template-columns: repeat(6, 60px); grid-template-rows: repeat(6, 60px);
+        gap: 12px; background: rgba(255, 215, 0, 0.1); padding: 20px;
+        border-radius: 25px; border: 2px solid var(--lò); margin: 0 auto; width: fit-content;
+        box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
     .tile {
-        width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center;
-        justify-content: center; font-size: 30px; cursor: pointer; transition: 0.2s;
-        background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,215,0,0.1);
+        width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center;
+        justify-content: center; font-size: 32px; cursor: pointer; transition: 0.3s;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2);
     }
-    .tile:active { transform: scale(0.85); }
-    .selected { transform: scale(1.2); border: 2px solid white; box-shadow: 0 0 20px var(--lò); z-index: 10; }
+    .tile:hover { transform: scale(1.1) rotate(5deg); background: rgba(255,215,0,0.2); }
+    .selected { border: 3px solid white; box-shadow: 0 0 20px white; transform: scale(1.15); z-index: 10; }
 
-    .stat-card { background: rgba(0,0,0,0.7); border: 1px solid var(--lò); border-radius: 15px; padding: 10px 20px; min-width: 80px; }
-    .stat-val { font-size: 1.8rem; font-weight: 900; color: var(--lò); }
-
-    footer { text-align: center; padding: 60px 20px; color: var(--lò); font-weight: bold; }
+    /* FOOTER */
+    footer { text-align: center; padding: 80px 20px; position: relative; z-index: 10; }
+    .footer-line { width: 150px; height: 1px; background: var(--lò); margin: 0 auto 20px; opacity: 0.5; }
+    .copyright { letter-spacing: 3px; font-weight: bold; color: var(--lò); text-transform: uppercase; }
 </style>
 
 <canvas id="galaxy-bg"></canvas>
 
-<div id="star-3d-header" style="width: 100%; height: 300px; cursor: grab; position: relative; z-index: 100;"></div>
+<div id="login-screen">
+    <div class="login-card">
+        <h1 style="color:var(--lò); letter-spacing: 5px;">LAVRI ZETWAL</h1>
+        <p style="opacity:0.8;">Antre nan dimansyon pwestij la</p>
+        <button class="login-btn" onclick="startGame()">KÒMANSE JWÈT LA</button>
+    </div>
+</div>
 
-<section style="text-align: center; position: relative; z-index: 10; margin-top: -50px; padding-bottom: 50px;">
-    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
-        <div class="stat-card">
-            <small>SCORE</small>
-            <div id="score-val" class="stat-val">0</div>
-        </div>
-        <div class="stat-card" style="border-color: #ff4500;">
-            <small>MOUVMAN</small>
-            <div id="moves-val" class="stat-val" style="color: #ff4500;">20</div>
-        </div>
-        <div class="stat-card">
-            <small>NIVO</small>
-            <div id="level-val" class="stat-val">1</div>
-        </div>
+<div id="star-3d-header" style="width: 100%; height: 350px; cursor: grab;"></div>
+
+<section id="game-ui" class="game-section">
+    <div class="stats-container">
+        <div class="stat-box"><small>SCORE</small><span id="score" class="stat-val">0</span></div>
+        <div class="stat-box" style="border-color:#ff4500;"><small>MOUVMAN</small><span id="moves" class="stat-val" style="color:#ff4500;">20</span></div>
+        <div class="stat-box"><small>NIVO</small><span id="level" class="stat-val">1</span></div>
     </div>
 
-    <div class="game-container">
-        <div id="game-grid"></div>
-    </div>
-    
-    <p id="msg" style="margin-top: 20px; font-weight: bold; color: var(--lò); text-shadow: 0 0 10px black;">🎯 Atenn 500 pwen pou Nivo 2!</p>
+    <div id="game-grid"></div>
+    <p style="margin-top: 25px; color: var(--lò); font-weight: 900; letter-spacing: 1px;">🎯 ATENN 500 PWEN POU NIVO 2!</p>
 </section>
 
 <footer>
-    <div style="width: 100px; height: 1px; background: var(--lò); margin: 0 auto 20px;"></div>
-    <p style="letter-spacing: 5px;">LAVRI ZETWAL SAGA</p>
-    <small style="opacity: 0.5;">© 2026 PRESTIGE DIGITAL</small>
+    <div class="footer-line"></div>
+    <p class="copyright">LAVRI ZETWAL SAGA</p>
+    <p style="font-size: 0.8rem; opacity: 0.6;">© 2026 • TOUT DWA REZÈVE</p>
 </footer>
 
 <div id="zetwal-core">ZETWAL</div>
 
 <script>
-    // --- 1. GALAKSI K AP RESPIRE & KOMÈT LÒ ---
+    // 1. GALAKSI KI RESPIRE & COMÈTES D'OR
     const canvas = document.getElementById('galaxy-bg');
     const ctx = canvas.getContext('2d');
     let stars = [], comets = [];
@@ -161,139 +174,114 @@
     function initGalaxy() {
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         stars = [];
-        for(let i=0; i<180; i++) {
-            stars.push({
-                x: Math.random()*canvas.width, 
-                y: Math.random()*canvas.height, 
-                r: Math.random()*1.5,
-                opacity: Math.random(),
-                speed: 0.005 + Math.random()*0.015
-            });
-        }
+        for(let i=0; i<200; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*1.5, o:Math.random(), s:0.01+Math.random()*0.02});
     }
     window.addEventListener('resize', initGalaxy); initGalaxy();
 
     function drawGalaxy() {
         ctx.fillStyle = '#020202'; ctx.fillRect(0,0,canvas.width, canvas.height);
-        
         stars.forEach(s => {
-            s.opacity += s.speed;
-            if(s.opacity > 1 || s.opacity < 0.2) s.speed *= -1;
-            ctx.globalAlpha = Math.abs(s.opacity);
-            ctx.fillStyle = "white";
+            s.o += s.s; if(s.o > 1 || s.o < 0.2) s.s *= -1;
+            ctx.globalAlpha = Math.abs(s.o); ctx.fillStyle = "white";
             ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
         });
         ctx.globalAlpha = 1;
-
-        if(Math.random() < 0.01) comets.push({x: -50, y: Math.random()*canvas.height/2, v: 7, size: 2});
-
+        if(Math.random() < 0.015) comets.push({x: -100, y: Math.random()*canvas.height/2, v: 10, size: 2.5});
         comets.forEach((c, i) => {
-            ctx.shadowBlur = 10; ctx.shadowColor = "#ffd700";
-            ctx.fillStyle = "#ffd700";
+            ctx.shadowBlur = 15; ctx.shadowColor = "#ffd700"; ctx.fillStyle = "#ffd700";
             ctx.beginPath(); ctx.arc(c.x, c.y, c.size, 0, Math.PI*2); ctx.fill();
-            let grad = ctx.createLinearGradient(c.x, c.y, c.x-40, c.y-20);
-            grad.addColorStop(0, "rgba(255,215,0,0.6)"); grad.addColorStop(1, "transparent");
-            ctx.strokeStyle = grad; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x-50, c.y-25); ctx.stroke();
-            c.x += c.v; c.y += c.v/2;
-            if(c.x > canvas.width + 100) comets.splice(i,1);
+            let g = ctx.createLinearGradient(c.x, c.y, c.x-60, c.y-30);
+            g.addColorStop(0, "rgba(255,215,0,0.8)"); g.addColorStop(1, "transparent");
+            ctx.strokeStyle = g; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x-80, c.y-40); ctx.stroke();
+            c.x += c.v; c.y += c.v/2; if(c.x > canvas.width + 100) comets.splice(i,1);
         });
-        ctx.shadowBlur = 0;
-        requestAnimationFrame(drawGalaxy);
+        ctx.shadowBlur = 0; requestAnimationFrame(drawGalaxy);
     }
     drawGalaxy();
 
-    // --- 2. TRAS SOURIS & TOUCH ---
+    // 2. TRAS SOURIS & TOUCH (BULLES/OR)
     function createTrail(x, y) {
         const t = document.createElement('div');
-        const gold = Math.random() > 0.5;
-        t.className = gold ? 'trail gold-spark' : 'trail bubble-trail';
+        const isGold = Math.random() > 0.5;
+        t.className = isGold ? 'trail gold-spark' : 'trail bubble-trail';
         t.style.left = x + 'px'; t.style.top = y + 'px';
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 800);
     }
     window.addEventListener('mousemove', (e) => createTrail(e.clientX, e.clientY));
-    window.addEventListener('touchmove', (e) => {
-        createTrail(e.touches[0].clientX, e.touches[0].clientY);
-    });
+    window.addEventListener('touchmove', (e) => createTrail(e.touches[0].clientX, e.touches[0].clientY));
 
-    // --- 3. ZETWAL 3D ENTÈAKTIF ---
+    // 3. ZETWAL 3D (VISIBLE ET INTERACTIVE)
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / 300, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / 350, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, 300);
+    renderer.setSize(window.innerWidth, 350);
     document.getElementById('star-3d-header').appendChild(renderer.domElement);
 
     const shape = new THREE.Shape();
-    const out = 1.3, inn = 0.6;
-    for(let i=0; i<10; i++) {
+    const out = 1.5, inn = 0.7;
+    for(let i=0; i<10; i++){
         let r = (i%2===0)?out:inn;
         let a = (i*Math.PI)/5 - Math.PI/2;
         if(i===0) shape.moveTo(Math.cos(a)*r, Math.sin(a)*r);
         else shape.lineTo(Math.cos(a)*r, Math.sin(a)*r);
     }
-    const starGeo = new THREE.ExtrudeGeometry(shape, {depth:0.3, bevelEnabled:true, bevelSize:0.05});
-    const starMat = new THREE.MeshStandardMaterial({color:0xffd700, metalness:1, roughness:0.1});
-    const starMesh = new THREE.Mesh(starGeo, starMat);
+    const starMesh = new THREE.Mesh(
+        new THREE.ExtrudeGeometry(shape, {depth:0.4, bevelEnabled:true, bevelSize:0.1}),
+        new THREE.MeshStandardMaterial({color:0xffd700, metalness:1, roughness:0.1})
+    );
     scene.add(starMesh);
-    scene.add(new THREE.PointLight(0xffffff, 2).set(5,5,5));
+    const pLight = new THREE.PointLight(0xffffff, 2.5); pLight.position.set(5,5,5); scene.add(pLight);
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    camera.position.z = 4.5;
+    camera.position.z = 5;
 
     function anim3D() { requestAnimationFrame(anim3D); starMesh.rotation.y += 0.01; renderer.render(scene, camera); }
     anim3D();
 
-    // Kontwòl 3D
-    window.addEventListener('mousemove', (e) => { if(e.buttons) { starMesh.rotation.y += e.movementX*0.01; starMesh.rotation.x += e.movementY*0.01; } });
-    let lastT = null;
+    // Interaksyon 3D
+    window.addEventListener('mousemove', (e) => { if(e.buttons){ starMesh.rotation.y += e.movementX*0.01; starMesh.rotation.x += e.movementY*0.01; } });
+    let lt = null;
     window.addEventListener('touchmove', (e) => {
-        let t = e.touches[0];
-        if(lastT) {
-            starMesh.rotation.y += (t.clientX - lastT.x)*0.01;
-            starMesh.rotation.x += (t.clientY - lastT.y)*0.01;
-        }
-        lastT = {x: t.clientX, y: t.clientY};
+        let t = e.touches[0]; if(lt){ starMesh.rotation.y += (t.clientX - lt.x)*0.01; starMesh.rotation.x += (t.clientY - lt.y)*0.01; }
+        lt = {x:t.clientX, y:t.clientY};
     });
-    window.addEventListener('touchend', () => lastT = null);
+    window.addEventListener('touchend', () => lt = null);
 
-    // --- 4. JWÈT MATCH-3 ---
-    let score = 0, moves = 20, level = 1;
-    const items = ['👕', '👖', '👗', '🧥', '👚'];
-    const colors = ['#ffffff', '#3498db', '#e74c3c', '#f1c40f', '#9b59b6'];
-    let board = [];
+    // 4. LOGIK JWÈT MATCH-3
+    let score = 0, moves = 20, level = 1, board = [];
+    const items = ['👕', '👖', '👗', '🧥', '👚'], colors = ['#ffffff', '#3498db', '#e74c3c', '#f1c40f', '#9b59b6'];
+
+    function startGame() {
+        document.getElementById('login-screen').style.opacity = '0';
+        setTimeout(() => { document.getElementById('login-screen').style.display = 'none'; document.getElementById('game-ui').style.display = 'block'; }, 500);
+        initBoard();
+    }
 
     function initBoard() {
         const grid = document.getElementById('game-grid'); grid.innerHTML = '';
         for(let r=0; r<6; r++) {
             board[r] = [];
             for(let c=0; c<6; c++) {
-                let id = Math.floor(Math.random()*items.length);
-                board[r][c] = id;
-                let tile = document.createElement('div');
-                tile.className = 'tile'; tile.id = `t-${r}-${c}`;
+                let id = Math.floor(Math.random()*items.length); board[r][c] = id;
+                let tile = document.createElement('div'); tile.className = 'tile'; tile.id = `t-${r}-${c}`;
                 tile.innerHTML = items[id]; tile.style.color = colors[id];
-                tile.onclick = () => select(r,c);
-                grid.appendChild(tile);
+                tile.onclick = () => handleSelect(r,c); grid.appendChild(tile);
             }
         }
     }
 
     let active = null;
-    function select(r, c) {
+    function handleSelect(r, c) {
         if(moves <= 0) return;
-        if(!active) {
-            active = {r,c}; document.getElementById(`t-${r}-${c}`).classList.add('selected');
-        } else {
+        const el = document.getElementById(`t-${r}-${c}`);
+        if(!active) { active = {r,c}; el.classList.add('selected'); }
+        else {
             if(Math.abs(active.r-r) + Math.abs(active.c-c) === 1) {
                 let tmp = board[r][c]; board[r][c] = board[active.r][active.c]; board[active.r][active.c] = tmp;
-                moves--; document.getElementById('moves-val').innerText = moves;
-                score += 50; document.getElementById('score-val').innerText = score;
-                if(score >= 500 && level === 1) {
-                    level = 2; moves += 15;
-                    document.getElementById('level-val').innerText = level;
-                    document.getElementById('moves-val').innerText = moves;
-                    document.getElementById('msg').innerText = "BRAVO! NIVO 2 DEBLOKE!";
-                }
+                moves--; score += 60;
+                document.getElementById('score').innerText = score;
+                document.getElementById('moves').innerText = moves;
+                if(score >= 500 && level === 1) { level = 2; moves += 15; document.getElementById('level').innerText = level; document.getElementById('moves').innerText = moves; }
             }
             document.getElementById(`t-${active.r}-${active.c}`).classList.remove('selected');
             active = null; render();
@@ -303,15 +291,15 @@
     function render() {
         for(let r=0; r<6; r++) {
             for(let c=0; c<6; c++) {
-                let t = document.getElementById(`t-${r}-${c}`);
+                const t = document.getElementById(`t-${r}-${c}`);
                 t.innerHTML = items[board[r][c]]; t.style.color = colors[board[r][c]];
             }
         }
     }
-    initBoard();
 </script>
 </body>
 </html>
+
 
 
 
