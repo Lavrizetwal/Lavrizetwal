@@ -56,9 +56,21 @@
 
 <style>
     :root { --lò: #ffd700; --nwa: #020202; --lò-fènwa: #b8860b; }
-    body { background: var(--nwa); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow: hidden; touch-action: none; }
+    
+    /* DEBLOKE SCROLL LA */
+    body { 
+        background: var(--nwa); 
+        color: white; 
+        font-family: 'Poppins', sans-serif; 
+        margin: 0; 
+        overflow-x: hidden; 
+        overflow-y: auto; 
+        min-height: 100vh;
+        touch-action: pan-y; /* Pèmèt scroll sou telefòn */
+    }
 
-    #galaxy-bg { position: fixed; inset: 0; z-index: -1; }
+    /* GALAKSI FIXED PA DÈYÈ */
+    #galaxy-bg { position: fixed; top: 0; left: 0; z-index: -2; pointer-events: none; }
 
     /* TRAS SOURIS & TOUCH */
     .trail { position: fixed; pointer-events: none; z-index: 10000; border-radius: 50%; animation: fadeOut 0.8s ease-out forwards; }
@@ -66,15 +78,15 @@
     .bubble-trail { width: 12px; height: 12px; border: 1.5px solid rgba(255,255,255,0.4); box-shadow: 0 0 5px white; }
     @keyframes fadeOut { to { opacity: 0; transform: scale(0.2) translateY(-30px); } }
 
-    /* ZETWAL CORE */
+    /* ZETWAL CORE K AP RESPIRE */
     #zetwal-core {
         position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
         background: radial-gradient(circle, #fff, var(--lò)); border-radius: 50%;
         z-index: 5000; display: flex; align-items: center; justify-content: center;
         font-weight: 900; font-size: 10px; color: black;
-        animation: respire 3s infinite ease-in-out; box-shadow: 0 0 20px var(--lò);
+        animation: respire-core 3s infinite ease-in-out; box-shadow: 0 0 20px var(--lò);
     }
-    @keyframes respire { 0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--lò); } 50% { transform: scale(1.1); box-shadow: 0 0 40px #fff; } }
+    @keyframes respire-core { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 0 40px #fff; } }
 
     /* ESPAS JWÈT LA */
     .game-container {
@@ -85,30 +97,32 @@
         padding: 25px;
         box-shadow: inset 0 0 50px rgba(255, 215, 0, 0.1);
         display: inline-block;
+        transition: transform 0.3s;
     }
+    .game-container:hover { transform: scale(1.02); }
 
-    #game-grid {
-        display: grid; grid-template-columns: repeat(6, 55px); grid-template-rows: repeat(6, 55px);
-        gap: 10px;
-    }
+    #game-grid { display: grid; grid-template-columns: repeat(6, 55px); grid-template-rows: repeat(6, 55px); gap: 10px; }
 
     .tile {
         width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center;
-        justify-content: center; font-size: 30px; cursor: pointer; transition: transform 0.2s;
+        justify-content: center; font-size: 30px; cursor: pointer; transition: 0.2s;
         background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,215,0,0.1);
     }
+    .tile:active { transform: scale(0.85); }
     .selected { transform: scale(1.2); border: 2px solid white; box-shadow: 0 0 20px var(--lò); z-index: 10; }
 
-    .stat-card { background: rgba(0,0,0,0.6); border: 1px solid var(--lò); border-radius: 15px; padding: 10px 20px; }
+    .stat-card { background: rgba(0,0,0,0.7); border: 1px solid var(--lò); border-radius: 15px; padding: 10px 20px; min-width: 80px; }
     .stat-val { font-size: 1.8rem; font-weight: 900; color: var(--lò); }
+
+    footer { text-align: center; padding: 60px 20px; color: var(--lò); font-weight: bold; }
 </style>
 
 <canvas id="galaxy-bg"></canvas>
 
-<div id="star-3d-header" style="width: 100%; height: 250px; cursor: grab; position: relative; z-index: 100;"></div>
+<div id="star-3d-header" style="width: 100%; height: 300px; cursor: grab; position: relative; z-index: 100;"></div>
 
-<section style="text-align: center; position: relative; z-index: 10; margin-top: -50px;">
-    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+<section style="text-align: center; position: relative; z-index: 10; margin-top: -50px; padding-bottom: 50px;">
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
         <div class="stat-card">
             <small>SCORE</small>
             <div id="score-val" class="stat-val">0</div>
@@ -127,13 +141,19 @@
         <div id="game-grid"></div>
     </div>
     
-    <p id="msg" style="margin-top: 15px; font-weight: bold; color: var(--lò);">Fè 500 pwen pou w pase nivo 2!</p>
+    <p id="msg" style="margin-top: 20px; font-weight: bold; color: var(--lò); text-shadow: 0 0 10px black;">🎯 Atenn 500 pwen pou Nivo 2!</p>
 </section>
+
+<footer>
+    <div style="width: 100px; height: 1px; background: var(--lò); margin: 0 auto 20px;"></div>
+    <p style="letter-spacing: 5px;">LAVRI ZETWAL SAGA</p>
+    <small style="opacity: 0.5;">© 2026 PRESTIGE DIGITAL</small>
+</footer>
 
 <div id="zetwal-core">ZETWAL</div>
 
 <script>
-    // --- 1. COMÈTES D'OR & GALAKSI ---
+    // --- 1. GALAKSI K AP RESPIRE & KOMÈT LÒ ---
     const canvas = document.getElementById('galaxy-bg');
     const ctx = canvas.getContext('2d');
     let stars = [], comets = [];
@@ -141,57 +161,71 @@
     function initGalaxy() {
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         stars = [];
-        for(let i=0; i<150; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5});
+        for(let i=0; i<180; i++) {
+            stars.push({
+                x: Math.random()*canvas.width, 
+                y: Math.random()*canvas.height, 
+                r: Math.random()*1.5,
+                opacity: Math.random(),
+                speed: 0.005 + Math.random()*0.015
+            });
+        }
     }
     window.addEventListener('resize', initGalaxy); initGalaxy();
 
-    function draw() {
+    function drawGalaxy() {
         ctx.fillStyle = '#020202'; ctx.fillRect(0,0,canvas.width, canvas.height);
-        ctx.fillStyle = "white";
-        stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
+        
+        stars.forEach(s => {
+            s.opacity += s.speed;
+            if(s.opacity > 1 || s.opacity < 0.2) s.speed *= -1;
+            ctx.globalAlpha = Math.abs(s.opacity);
+            ctx.fillStyle = "white";
+            ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
 
-        if(Math.random() < 0.015) comets.push({x: -50, y: Math.random()*canvas.height/2, v: 8, size: 2+Math.random()*3});
+        if(Math.random() < 0.01) comets.push({x: -50, y: Math.random()*canvas.height/2, v: 7, size: 2});
 
         comets.forEach((c, i) => {
-            ctx.shadowBlur = 15; ctx.shadowColor = "#ffd700";
+            ctx.shadowBlur = 10; ctx.shadowColor = "#ffd700";
             ctx.fillStyle = "#ffd700";
             ctx.beginPath(); ctx.arc(c.x, c.y, c.size, 0, Math.PI*2); ctx.fill();
-            // Ke komèt la
             let grad = ctx.createLinearGradient(c.x, c.y, c.x-40, c.y-20);
-            grad.addColorStop(0, "rgba(255,215,0,0.8)"); grad.addColorStop(1, "transparent");
-            ctx.strokeStyle = grad; ctx.lineWidth = c.size;
-            ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x-60, c.y-30); ctx.stroke();
+            grad.addColorStop(0, "rgba(255,215,0,0.6)"); grad.addColorStop(1, "transparent");
+            ctx.strokeStyle = grad; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x-50, c.y-25); ctx.stroke();
             c.x += c.v; c.y += c.v/2;
             if(c.x > canvas.width + 100) comets.splice(i,1);
         });
         ctx.shadowBlur = 0;
-        requestAnimationFrame(draw);
+        requestAnimationFrame(drawGalaxy);
     }
-    draw();
+    drawGalaxy();
 
     // --- 2. TRAS SOURIS & TOUCH ---
     function createTrail(x, y) {
-        for(let i=0; i<2; i++) {
-            const t = document.createElement('div');
-            const gold = Math.random() > 0.5;
-            t.className = gold ? 'trail gold-spark' : 'trail bubble-trail';
-            t.style.left = x + 'px'; t.style.top = y + 'px';
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 800);
-        }
+        const t = document.createElement('div');
+        const gold = Math.random() > 0.5;
+        t.className = gold ? 'trail gold-spark' : 'trail bubble-trail';
+        t.style.left = x + 'px'; t.style.top = y + 'px';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 800);
     }
     window.addEventListener('mousemove', (e) => createTrail(e.clientX, e.clientY));
-    window.addEventListener('touchmove', (e) => createTrail(e.touches[0].clientX, e.touches[0].clientY));
+    window.addEventListener('touchmove', (e) => {
+        createTrail(e.touches[0].clientX, e.touches[0].clientY);
+    });
 
-    // --- 3. ZETWAL 3D PWESTIJ ---
+    // --- 3. ZETWAL 3D ENTÈAKTIF ---
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / 250, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / 300, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, 250);
+    renderer.setSize(window.innerWidth, 300);
     document.getElementById('star-3d-header').appendChild(renderer.domElement);
 
     const shape = new THREE.Shape();
-    const out = 1.2, inn = 0.5;
+    const out = 1.3, inn = 0.6;
     for(let i=0; i<10; i++) {
         let r = (i%2===0)?out:inn;
         let a = (i*Math.PI)/5 - Math.PI/2;
@@ -200,26 +234,29 @@
     }
     const starGeo = new THREE.ExtrudeGeometry(shape, {depth:0.3, bevelEnabled:true, bevelSize:0.05});
     const starMat = new THREE.MeshStandardMaterial({color:0xffd700, metalness:1, roughness:0.1});
-    const star = new THREE.Mesh(starGeo, starMat);
-    scene.add(star);
+    const starMesh = new THREE.Mesh(starGeo, starMat);
+    scene.add(starMesh);
     scene.add(new THREE.PointLight(0xffffff, 2).set(5,5,5));
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    camera.position.z = 4;
+    camera.position.z = 4.5;
 
-    function anim3D() { requestAnimationFrame(anim3D); star.rotation.y += 0.01; renderer.render(scene, camera); }
+    function anim3D() { requestAnimationFrame(anim3D); starMesh.rotation.y += 0.01; renderer.render(scene, camera); }
     anim3D();
 
-    // Kontwòl 3D (Mouse & Touch)
-    let moveX = 0, moveY = 0;
-    window.addEventListener('mousemove', (e) => { if(e.buttons) { star.rotation.y += e.movementX*0.01; star.rotation.x += e.movementY*0.01; } });
+    // Kontwòl 3D
+    window.addEventListener('mousemove', (e) => { if(e.buttons) { starMesh.rotation.y += e.movementX*0.01; starMesh.rotation.x += e.movementY*0.01; } });
+    let lastT = null;
     window.addEventListener('touchmove', (e) => {
-        let touch = e.touches[0];
-        star.rotation.y += (touch.clientX - moveX)*0.01;
-        star.rotation.x += (touch.clientY - moveY)*0.01;
-        moveX = touch.clientX; moveY = touch.clientY;
+        let t = e.touches[0];
+        if(lastT) {
+            starMesh.rotation.y += (t.clientX - lastT.x)*0.01;
+            starMesh.rotation.x += (t.clientY - lastT.y)*0.01;
+        }
+        lastT = {x: t.clientX, y: t.clientY};
     });
+    window.addEventListener('touchend', () => lastT = null);
 
-    // --- 4. JWÈT MATCH-3 AVÈK DIFIKILTE ---
+    // --- 4. JWÈT MATCH-3 ---
     let score = 0, moves = 20, level = 1;
     const items = ['👕', '👖', '👗', '🧥', '👚'];
     const colors = ['#ffffff', '#3498db', '#e74c3c', '#f1c40f', '#9b59b6'];
@@ -243,14 +280,20 @@
 
     let active = null;
     function select(r, c) {
-        if(moves <= 0) return alert("JWÈT FINI! Ou pa gen mouvman ankò.");
+        if(moves <= 0) return;
         if(!active) {
             active = {r,c}; document.getElementById(`t-${r}-${c}`).classList.add('selected');
         } else {
             if(Math.abs(active.r-r) + Math.abs(active.c-c) === 1) {
                 let tmp = board[r][c]; board[r][c] = board[active.r][active.c]; board[active.r][active.c] = tmp;
                 moves--; document.getElementById('moves-val').innerText = moves;
-                checkMatches();
+                score += 50; document.getElementById('score-val').innerText = score;
+                if(score >= 500 && level === 1) {
+                    level = 2; moves += 15;
+                    document.getElementById('level-val').innerText = level;
+                    document.getElementById('moves-val').innerText = moves;
+                    document.getElementById('msg').innerText = "BRAVO! NIVO 2 DEBLOKE!";
+                }
             }
             document.getElementById(`t-${active.r}-${active.c}`).classList.remove('selected');
             active = null; render();
@@ -265,20 +308,11 @@
             }
         }
     }
-
-    function checkMatches() {
-        score += 40; document.getElementById('score-val').innerText = score;
-        if(score >= 500 && level === 1) {
-            level = 2; moves += 15;
-            document.getElementById('level-val').innerText = level;
-            document.getElementById('moves-val').innerText = moves;
-            document.getElementById('msg').innerText = "BRAVO! Nivo 2 debloke (+15 mouvman)";
-        }
-    }
     initBoard();
 </script>
 </body>
 </html>
+
 
 
 
