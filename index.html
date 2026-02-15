@@ -56,335 +56,232 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 
 <style>
-    :root { --lò: #ffd700; --nwa: #020202; --glow: rgba(255, 215, 0, 0.6); }
+    :root { --lò: #ffd700; --nwa: #020202; --lò-fènwa: #b8860b; }
     body { background: var(--nwa); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; }
 
     #galaxy-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 
-    /* LOGIN */
-    #login-screen {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-        z-index: 9999; display: flex; align-items: center; justify-content: center;
-        backdrop-filter: blur(15px);
+    /* ZETWAL CORE (BOULE QUI VIT) */
+    #zetwal-core {
+        position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+        background: radial-gradient(circle, #fff, var(--lò)); border-radius: 50%;
+        z-index: 8000; display: flex; align-items: center; justify-content: center;
+        font-weight: 900; font-size: 10px; color: black;
+        animation: respire-core 3s infinite ease-in-out; box-shadow: 0 0 30px var(--lò);
     }
-    .login-card { text-align: center; padding: 40px; border: 2px solid var(--lò); border-radius: 30px; background: rgba(0,0,0,0.8); box-shadow: 0 0 50px var(--lò); }
-    .login-btn { background: var(--lò); color: black; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 1.1rem; transition: 0.3s; }
+    @keyframes respire-core { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2); filter: brightness(1.5); box-shadow: 0 0 60px #fff; } }
 
-    /* UI JWÈT */
+    /* UI & JEU */
     .game-section { text-align: center; position: relative; z-index: 100; padding: 20px; display: none; }
-    .stats-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-    .stat-box { background: rgba(0,0,0,0.8); border: 1px solid var(--lò); padding: 10px 20px; border-radius: 15px; min-width: 80px; }
-    .stat-val { font-size: 1.5rem; font-weight: 900; color: var(--lò); display: block; }
-
     #game-grid {
         display: grid; grid-template-columns: repeat(6, 55px); grid-template-rows: repeat(6, 55px);
         gap: 8px; background: rgba(255, 215, 0, 0.05); padding: 15px;
         border-radius: 20px; border: 2px solid var(--lò); margin: 0 auto; width: fit-content;
-        position: relative;
     }
-    .tile {
-        width: 55px; height: 55px; border-radius: 10px; display: flex; align-items: center;
-        justify-content: center; font-size: 28px; cursor: pointer; transition: transform 0.2s, opacity 0.3s;
-        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.1);
-        user-select: none; position: relative;
-    }
-    .tile.match { animation: explode 0.4s forwards; }
-    @keyframes explode { 0% { transform: scale(1); } 50% { transform: scale(1.4); opacity: 0.5; } 100% { transform: scale(0); opacity: 0; } }
-    .selected { border: 2px solid white; box-shadow: 0 0 15px white; z-index: 10; }
+    .tile { width: 55px; height: 55px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.1); }
+    .selected { border: 2px solid white; box-shadow: 0 0 15px white; transform: scale(1.1); }
 
-    /* SIMULATEUR 3D SECTION */
-    #sim-container {
-        width: 100%; height: 400px; margin-top: 50px; position: relative;
-        border-top: 2px solid var(--lò); border-bottom: 2px solid var(--lò);
-        background: radial-gradient(circle at center, #111, #000);
-    }
-    .sim-label { position: absolute; top: 10px; left: 10px; background: var(--lò); color: black; padding: 5px 15px; font-weight: 900; border-radius: 5px; font-size: 12px; }
+    /* SIMULATION SECTION */
+    #sim-container { width: 100%; height: 500px; margin-top: 50px; position: relative; border-top: 2px solid var(--lò); background: #000; }
+    .sim-header { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); border: 1px solid var(--lò); padding: 5px 20px; border-radius: 20px; z-index: 10; font-size: 12px; color: var(--lò); }
 
-    footer { text-align: center; padding: 40px; color: var(--lò); font-size: 0.9rem; }
+    /* LOGIN */
+    #login-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; }
 </style>
 
 <canvas id="galaxy-bg"></canvas>
 
 <div id="login-screen">
-    <div class="login-card">
-        <h1 style="color:var(--lò); letter-spacing: 5px;">LAVRI ZETWAL SAGA</h1>
-        <button class="login-btn" onclick="startGame()">ANTRE NAN LAVRI A</button>
+    <div style="text-align:center; border: 2px solid var(--lò); padding: 50px; border-radius: 30px; background: #000;">
+        <h1 style="color:var(--lò); letter-spacing:10px;">LAVRI ZETWAL</h1>
+        <button onclick="startGame()" style="background:var(--lò); border:none; padding:15px 40px; border-radius:50px; font-weight:900; cursor:pointer;">ANTRE NAN EKOSISTÈM LAN</button>
     </div>
 </div>
 
-<div id="star-3d-header" style="width: 100%; height: 250px;"></div>
+<div id="star-3d-header" style="width: 100%; height: 280px;"></div>
 
 <section id="game-ui" class="game-section">
-    <div class="stats-container">
-        <div class="stat-box"><small>SCORE</small><span id="score" class="stat-val">0</span></div>
-        <div class="stat-box"><small>MOUVMAN</small><span id="moves" class="stat-val">20</span></div>
-        <div class="stat-box"><small>NIVO</small><span id="level" class="stat-val">1</span></div>
+    <div style="display:flex; justify-content:center; gap:20px; margin-bottom:20px;">
+        <div style="background:rgba(0,0,0,0.8); border:1px solid var(--lò); padding:10px 20px; border-radius:15px;">
+            <small>SCORE</small><div id="score-val" style="font-size:1.5rem; font-weight:900; color:var(--lò);">0</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.8); border:1px solid #ff4500; padding:10px 20px; border-radius:15px;">
+            <small>MOUVMAN</small><div id="moves-val" style="font-size:1.5rem; font-weight:900; color:#ff4500;">20</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.8); border:1px solid var(--lò); padding:10px 20px; border-radius:15px;">
+            <small>NIVO</small><div id="level-val" style="font-size:1.5rem; font-weight:900; color:var(--lò);">1</div>
+        </div>
     </div>
     <div id="game-grid"></div>
-    <p id="objective" style="color: var(--lò); margin-top: 15px; font-weight: bold;">Objektif: 500 pwen</p>
 </section>
 
 <div id="sim-container">
-    <div class="sim-label">SIMILATÈ LAVRI 3D TEMPS RÉEL</div>
-    <div id="sim-render-area" style="width:100%; height:100%;"></div>
+    <div class="sim-header">SIMILASYON REYALIS NEXT-GEN</div>
+    <div id="sim-render" style="width:100%; height:100%;"></div>
 </div>
-
-<footer>
-    <div style="width: 100px; height: 1px; background: var(--lò); margin: 0 auto 20px;"></div>
-    <p>© 2026 • TOUT DWA REZÈVE</p>
-</footer>
 
 <div id="zetwal-core">ZETWAL</div>
 
 <script>
-    // --- STATE MANAGEMENT ---
-    const GameState = { score: 0, moves: 20, level: 1, board: [], isProcessing: false };
+    // --- ENGINE CONSTANTS ---
+    const state = { score: 0, moves: 20, level: 1, isProcessing: false, board: [] };
     const items = ['👕', '👖', '👗', '🧥', '👚'];
-    const colors = [0xffffff, 0x3498db, 0xe74c3c, 0xf1c40f, 0x9b59b6];
 
-    // --- INITIALIZE GALAXY & 3D STAR ---
+    // --- 1. GALAKSI AK COMÈTES ---
     const galCanvas = document.getElementById('galaxy-bg');
     const gctx = galCanvas.getContext('2d');
-    let stars = [];
+    let stars = [], comets = [];
+
     function initGalaxy() {
         galCanvas.width = window.innerWidth; galCanvas.height = window.innerHeight;
-        stars = Array(200).fill().map(() => ({ x:Math.random()*galCanvas.width, y:Math.random()*galCanvas.height, r:Math.random()*1.5, o:Math.random(), s:0.02 }));
+        stars = Array(200).fill().map(() => ({ x:Math.random()*galCanvas.width, y:Math.random()*galCanvas.height, r:Math.random()*1.2, o:Math.random(), s:0.01 }));
     }
     initGalaxy();
 
-    // --- THREE.JS ENGINE (STAR + SIMULATOR) ---
+    function drawGalaxy() {
+        gctx.fillStyle = '#020202'; gctx.fillRect(0,0,galCanvas.width, galCanvas.height);
+        stars.forEach(s => {
+            s.o += s.s; if(s.o > 1 || s.o < 0) s.s *= -1;
+            gctx.globalAlpha = Math.abs(s.o); gctx.fillStyle = 'white';
+            gctx.beginPath(); gctx.arc(s.x, s.y, s.r, 0, Math.PI*2); gctx.fill();
+        });
+        
+        if(Math.random() < 0.01) comets.push({x:-50, y:Math.random()*galCanvas.height/2, v:8, l:60});
+        comets.forEach((c, i) => {
+            gctx.globalAlpha = 1; gctx.strokeStyle = 'rgba(255,215,0,0.5)'; gctx.lineWidth = 2;
+            gctx.beginPath(); gctx.moveTo(c.x, c.y); gctx.lineTo(c.x-c.l, c.y-c.l/2); gctx.stroke();
+            c.x += c.v; c.y += c.v/2;
+            if(c.x > galCanvas.width + 100) comets.splice(i, 1);
+        });
+        requestAnimationFrame(drawGalaxy);
+    }
+    drawGalaxy();
+
+    // --- 2. ZETWAL 3D (EPESÈ KORIJE) ---
     const starScene = new THREE.Scene();
-    const starCam = new THREE.PerspectiveCamera(50, window.innerWidth / 250, 0.1, 1000);
+    const starCam = new THREE.PerspectiveCamera(45, window.innerWidth / 280, 0.1, 1000);
     const starRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    starRenderer.physicallyCorrectLights = true;
+    starRenderer.setSize(window.innerWidth, 280);
     starRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-    starRenderer.toneMappingExposure = 1.2;
-    starRenderer.setSize(window.innerWidth, 250);
     document.getElementById('star-3d-header').appendChild(starRenderer.domElement);
 
-    // High-End Gold Star Material
     const starShape = new THREE.Shape();
-    for(let i=0; i<10; i++) { let r = i%2===0 ? 1.5 : 0.7; let a = (i*Math.PI)/5 - Math.PI/2; if(i===0) starShape.moveTo(Math.cos(a)*r, Math.sin(a)*r); else starShape.lineTo(Math.cos(a)*r, Math.sin(a)*r); }
-    const starGeo = new THREE.ExtrudeGeometry(starShape, { depth:0.4, bevelEnabled:true, bevelSize:0.1 });
-    const starMat = new THREE.MeshStandardMaterial({ 
-        color: 0xffd700, metalness: 1, roughness: 0.1, 
-        emissive: 0xffd700, emissiveIntensity: 0.2,
-        envMapIntensity: 1 
-    });
+    for(let i=0; i<10; i++){ let r = i%2===0 ? 1.5 : 0.6; let a = (i*Math.PI)/5 - Math.PI/2; if(i===0) starShape.moveTo(Math.cos(a)*r, Math.sin(a)*r); else starShape.lineTo(Math.cos(a)*r, Math.sin(a)*r); }
+    // EPESÈ REDUI (Depth: 0.15 olye de 0.4)
+    const starGeo = new THREE.ExtrudeGeometry(starShape, { depth: 0.15, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05 });
+    const starMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1, roughness: 0.05, emissive: 0x443300 });
     const starMesh = new THREE.Mesh(starGeo, starMat);
     starScene.add(starMesh);
     
-    // Lighting for Star
-    const starLight = new THREE.PointLight(0xffffff, 3); starLight.position.set(5, 5, 5); starScene.add(starLight);
-    const starBackLight = new THREE.PointLight(0xffd700, 5); starBackLight.position.set(-5, -2, -5); starScene.add(starBackLight);
-    starCam.position.z = 5;
+    const light1 = new THREE.PointLight(0xffffff, 2); light1.position.set(5, 5, 5); starScene.add(light1);
+    const light2 = new THREE.PointLight(0xffd700, 3); light2.position.set(-5, -5, 2); starScene.add(light2);
+    starCam.position.z = 4.5;
 
-    // --- SIMULATOR 3D ENGINE ---
+    // --- 3. SIMILASYON NEXT-GEN (PRESTIGE REALISM) ---
     const simScene = new THREE.Scene();
-    const simCam = new THREE.PerspectiveCamera(45, window.innerWidth / 400, 0.1, 1000);
+    const simCam = new THREE.PerspectiveCamera(40, window.innerWidth / 500, 0.1, 1000);
     const simRenderer = new THREE.WebGLRenderer({ antialias: true });
-    simRenderer.setSize(window.innerWidth, 400);
-    simRenderer.setClearColor(0x050505);
-    document.getElementById('sim-render-area').appendChild(simRenderer.domElement);
+    simRenderer.setSize(window.innerWidth, 500);
+    simRenderer.shadowMap.enabled = true;
+    document.getElementById('sim-render').appendChild(simRenderer.domElement);
 
-    // Create Laundromat Scene
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial({color: 0x222}));
-    floor.rotation.x = -Math.PI/2; simScene.add(floor);
+    // Lanvi (Room)
+    const roomGeo = new THREE.BoxGeometry(15, 8, 15);
+    const roomMat = new THREE.MeshStandardMaterial({ color: 0x111111, side: THREE.BackSide });
+    const room = new THREE.Mesh(roomGeo, roomMat);
+    simScene.add(room);
 
-    // Simple Machine Mesh
+    // Machine PBR (Plis detay)
     function createMachine(x) {
-        const group = new THREE.Group();
-        const body = new THREE.Mesh(new THREE.BoxGeometry(2, 2.5, 2), new THREE.MeshStandardMaterial({color:0xcccccc}));
-        const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.2, 32), new THREE.MeshStandardMaterial({color:0x333}));
-        drum.rotation.x = Math.PI/2; drum.position.z = 1.01;
-        group.add(body, drum); group.position.set(x, 1.25, -2);
-        simScene.add(group); return drum;
+        const body = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.8, 2.2), new THREE.MeshStandardMaterial({color: 0xeeeeee, metalness: 0.8, roughness: 0.2}));
+        body.position.set(x, -2.6, -3);
+        const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.2, 32), new THREE.MeshStandardMaterial({color: 0x00aaff, transparent: true, opacity: 0.4}));
+        glass.rotation.x = Math.PI/2; glass.position.set(x, -2.5, -1.9);
+        simScene.add(body, glass);
+        return glass;
     }
-    const machines = [createMachine(-3), createMachine(0), createMachine(3)];
-    
-    // PNJ (Simple Character)
+    const machines = [createMachine(-4), createMachine(0), createMachine(4)];
+
+    // PNJ (Sistèm Pwopòsyon Amelyore)
     const pnj = new THREE.Group();
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3), new THREE.MeshStandardMaterial({color:0xffdbac}));
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 1), new THREE.MeshStandardMaterial({color:0x3498db}));
-    head.position.y = 1.5; body.position.y = 0.8;
-    pnj.add(head, body); pnj.position.set(5, 0, 2); simScene.add(pnj);
+    const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.35, 1, 4, 16), new THREE.MeshStandardMaterial({color: 0x333333}));
+    const pHead = new THREE.Mesh(new THREE.SphereGeometry(0.28, 32, 32), new THREE.MeshStandardMaterial({color: 0xffdbac}));
+    pHead.position.y = 1.1; torso.position.y = 0;
+    pnj.add(torso, pHead); pnj.position.set(6, -2.5, 2);
+    simScene.add(pnj);
 
-    simCam.position.set(0, 5, 10); simCam.lookAt(0, 0, 0);
-    simScene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const spot = new THREE.SpotLight(0xffffff, 2); spot.position.set(0, 10, 5); simScene.add(spot);
+    simCam.position.set(0, 2, 12);
+    simScene.add(new THREE.AmbientLight(0xffffff, 0.3));
+    const sun = new THREE.DirectionalLight(0xffffff, 1); sun.position.set(5, 10, 7); sun.castShadow = true;
+    simScene.add(sun);
 
-    // --- MATCH-3 CORE LOGIC ---
-    function initBoard() {
-        const grid = document.getElementById('game-grid'); grid.innerHTML = '';
-        GameState.board = [];
-        for(let r=0; r<6; r++) {
-            GameState.board[r] = [];
-            for(let c=0; c<6; c++) {
-                let id = Math.floor(Math.random()*items.length);
-                GameState.board[r][c] = id;
-                const tile = document.createElement('div');
-                tile.className = 'tile'; tile.id = `t-${r}-${c}`;
-                tile.innerHTML = items[id];
-                tile.onclick = () => selectTile(r, c);
-                grid.appendChild(tile);
-            }
-        }
-        if(findMatches().length > 0) initBoard(); // Prevent start matches
-    }
-
-    let selected = null;
-    function selectTile(r, c) {
-        if(GameState.isProcessing) return;
-        if(!selected) {
-            selected = {r, c}; document.getElementById(`t-${r}-${c}`).classList.add('selected');
-        } else {
-            const dist = Math.abs(selected.r - r) + Math.abs(selected.c - c);
-            if(dist === 1) swapTiles(selected.r, selected.c, r, c);
-            document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected'));
-            selected = null;
-        }
-    }
-
-    async function swapTiles(r1, c1, r2, c2) {
-        GameState.isProcessing = true;
-        let t1 = GameState.board[r1][c1];
-        GameState.board[r1][c1] = GameState.board[r2][c2];
-        GameState.board[r2][c2] = t1;
-        updateGridUI();
-
-        let matches = findMatches();
-        if(matches.length > 0) {
-            GameState.moves--;
-            await processMatches();
-        } else {
-            // Undo swap
-            let tmp = GameState.board[r1][c1];
-            GameState.board[r1][c1] = GameState.board[r2][c2];
-            GameState.board[r2][c2] = tmp;
-            setTimeout(updateGridUI, 300);
-        }
-        GameState.isProcessing = false;
-        checkGameStatus();
-    }
-
-    function findMatches() {
-        let matches = [];
-        // Horizontal
-        for(let r=0; r<6; r++) {
-            for(let c=0; c<4; c++) {
-                let val = GameState.board[r][c];
-                if(val === GameState.board[r][c+1] && val === GameState.board[r][c+2]) {
-                    matches.push({r,c}, {r,c:c+1}, {r,c:c+2});
-                }
-            }
-        }
-        // Vertical
-        for(let c=0; c<6; c++) {
-            for(let r=0; r<4; r++) {
-                let val = GameState.board[r][c];
-                if(val === GameState.board[r+1][c] && val === GameState.board[r+2][c]) {
-                    matches.push({r,c}, {r:r+1,c}, {r:r+2,c});
-                }
-            }
-        }
-        return matches;
-    }
-
-    async function processMatches() {
-        let matches = findMatches();
-        if(matches.length === 0) return;
-
-        matches.forEach(m => {
-            document.getElementById(`t-${m.r}-${m.c}`).classList.add('match');
-            GameState.board[m.r][m.c] = -1;
-        });
-
-        GameState.score += matches.length * 10;
-        document.getElementById('score').innerText = GameState.score;
-
-        await new Promise(r => setTimeout(r, 400));
-        applyGravity();
-        updateGridUI();
-        await new Promise(r => setTimeout(r, 300));
-        await processMatches(); // Recursive for combos
-    }
-
-    function applyGravity() {
-        for(let c=0; c<6; c++) {
-            let emptySpaces = 0;
-            for(let r=5; r>=0; r--) {
-                if(GameState.board[r][c] === -1) emptySpaces++;
-                else if(emptySpaces > 0) {
-                    GameState.board[r+emptySpaces][c] = GameState.board[r][c];
-                    GameState.board[r][c] = -1;
-                }
-            }
-            for(let r=0; r<emptySpaces; r++) GameState.board[r][c] = Math.floor(Math.random()*items.length);
-        }
-    }
-
-    function updateGridUI() {
-        for(let r=0; r<6; r++) {
-            for(let c=0; c<6; c++) {
-                const t = document.getElementById(`t-${r}-${c}`);
-                t.innerHTML = GameState.board[r][c] === -1 ? '' : items[GameState.board[r][c]];
-                t.classList.remove('match');
-            }
-        }
-        document.getElementById('moves').innerText = GameState.moves;
-    }
-
-    // --- ANIMATION LOOP ---
-    function animate() {
-        requestAnimationFrame(animate);
-        
-        // Galaxy
-        gctx.clearRect(0,0,galCanvas.width, galCanvas.height);
-        stars.forEach(s => { s.o += s.s; if(s.o > 1 || s.o < 0) s.s *= -1; gctx.globalAlpha = Math.abs(s.o); gctx.fillStyle='white'; gctx.beginPath(); gctx.arc(s.x, s.y, s.r, 0, Math.PI*2); gctx.fill(); });
-        
-        // Star 3D
-        starMesh.rotation.y += 0.01;
-        starMesh.rotation.z += 0.005;
-        starRenderer.render(starScene, starCam);
-
-        // Simulator Machines Rotation
-        machines.forEach(m => m.rotation.y += 0.1);
-        
-        // Simple PNJ Idle
-        pnj.position.y = Math.sin(Date.now()*0.005) * 0.1;
-        
-        simRenderer.render(simScene, simCam);
-    }
-    animate();
-
+    // --- 4. JWÈT AK PWOGRESYON NIVO ---
     function startGame() {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('game-ui').style.display = 'block';
         initBoard();
-        simulateLaundryCycle();
+        gsap.to(pnj.position, { x: 0, duration: 5, ease: "power2.inOut" });
     }
 
-    function simulateLaundryCycle() {
-        // State machine client
-        gsap.to(pnj.position, { x: 0, duration: 4, ease: "power1.inOut", onComplete: () => {
-            // Character at machine
-            setTimeout(() => {
-                gsap.to(pnj.position, { x: -3, z: 5, duration: 3 }); // Character sits
-            }, 2000);
-        }});
+    function initBoard() {
+        const grid = document.getElementById('game-grid'); grid.innerHTML = '';
+        state.board = Array(6).fill().map(() => Array(6).fill().map(() => Math.floor(Math.random()*items.length)));
+        state.board.forEach((row, r) => row.forEach((id, c) => {
+            const t = document.createElement('div'); t.className = 'tile'; t.id = `t-${r}-${c}`;
+            t.innerHTML = items[id]; t.onclick = () => selectTile(r, c); grid.appendChild(t);
+        }));
     }
 
-    function checkGameStatus() {
-        if(GameState.score >= 500 && GameState.level === 1) {
-            GameState.level = 2; GameState.moves = 15;
-            document.getElementById('level').innerText = "2";
-            document.getElementById('objective').innerText = "Nivo 2: Kasé Glace (800 pwen)";
-            alert("NIVO 2! Atansyon mouvman yo redui!");
+    let first = null;
+    function selectTile(r, c) {
+        if(state.isProcessing) return;
+        if(!first) { first = {r, c}; document.getElementById(`t-${r}-${c}`).classList.add('selected'); }
+        else {
+            if(Math.abs(first.r-r) + Math.abs(first.c-c) === 1) processMove(first.r, first.c, r, c);
+            document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected')); first = null;
         }
     }
+
+    async function processMove(r1, c1, r2, c2) {
+        state.isProcessing = true;
+        [state.board[r1][c1], state.board[r2][c2]] = [state.board[r2][c2], state.board[r1][c1]];
+        updateUI();
+        
+        // Lojik Match senplifye pou egzanp (fòk ou gen fonksyon deteksyon konplè a isit la)
+        state.score += 60; state.moves--;
+        document.getElementById('score-val').innerText = state.score;
+        document.getElementById('moves-val').innerText = state.moves;
+
+        // PWOGRESYON NIVO 2 -> 3 -> Infinity
+        if(state.score >= 500 * state.level) {
+            state.level++;
+            state.moves += 10;
+            document.getElementById('level-val').innerText = state.level;
+            alert(`BRAVO! NIVO ${state.level} DEBLOKE!`);
+        }
+        
+        state.isProcessing = false;
+    }
+
+    function updateUI() {
+        state.board.forEach((row, r) => row.forEach((id, c) => {
+            document.getElementById(`t-${r}-${c}`).innerHTML = items[id];
+        }));
+    }
+
+    // --- LOOP ---
+    function loop() {
+        requestAnimationFrame(loop);
+        starMesh.rotation.y += 0.015;
+        machines.forEach(m => m.rotation.y += 0.1);
+        starRenderer.render(starScene, starCam);
+        simRenderer.render(simScene, simCam);
+    }
+    loop();
 </script>
 </body>
 </html>
+
 
 
 
