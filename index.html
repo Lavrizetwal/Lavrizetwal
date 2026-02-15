@@ -56,30 +56,51 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 
 <style>
-:root { --lò: #ffd700; --nwa: #020202; --glow: rgba(255, 215, 0, 0.6); }
-body { background: var(--nwa); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; }
+    :root { --lò: #ffd700; --nwa: #020202; --glow: rgba(255, 215, 0, 0.6); }
+    body { background: var(--nwa); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; }
 
-#galaxy-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
+    #galaxy-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 
-#login-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-.login-card { text-align: center; padding: 40px; border: 2px solid var(--lò); border-radius: 30px; background: rgba(0,0,0,0.8); box-shadow: 0 0 50px var(--lò); }
-.login-btn { background: var(--lò); color: black; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 1.1rem; transition: 0.3s; }
+    /* LOGIN */
+    #login-screen {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+        z-index: 9999; display: flex; align-items: center; justify-content: center;
+        backdrop-filter: blur(15px);
+    }
+    .login-card { text-align: center; padding: 40px; border: 2px solid var(--lò); border-radius: 30px; background: rgba(0,0,0,0.8); box-shadow: 0 0 50px var(--lò); }
+    .login-btn { background: var(--lò); color: black; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; cursor: pointer; font-size: 1.1rem; transition: 0.3s; }
 
-.game-section { text-align: center; position: relative; z-index: 100; padding: 20px; display: none; }
-.stats-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-.stat-box { background: rgba(0,0,0,0.8); border: 1px solid var(--lò); padding: 10px 20px; border-radius: 15px; min-width: 80px; }
-.stat-val { font-size: 1.5rem; font-weight: 900; color: var(--lò); display: block; }
+    /* UI JWÈT */
+    .game-section { text-align: center; position: relative; z-index: 100; padding: 20px; display: none; }
+    .stats-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+    .stat-box { background: rgba(0,0,0,0.8); border: 1px solid var(--lò); padding: 10px 20px; border-radius: 15px; min-width: 80px; }
+    .stat-val { font-size: 1.5rem; font-weight: 900; color: var(--lò); display: block; }
 
-#game-grid { display: grid; grid-template-columns: repeat(6, 55px); grid-template-rows: repeat(6, 55px); gap: 8px; background: rgba(255, 215, 0, 0.05); padding: 15px; border-radius: 20px; border: 2px solid var(--lò); margin: 0 auto; width: fit-content; position: relative; }
-.tile { width: 55px; height: 55px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; transition: transform 0.2s, opacity 0.3s; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.1); user-select: none; position: relative; }
-.tile.match { animation: explode 0.4s forwards; }
-@keyframes explode { 0% { transform: scale(1); } 50% { transform: scale(1.4); opacity: 0.5; } 100% { transform: scale(0); opacity: 0; } }
-.selected { border: 2px solid white; box-shadow: 0 0 15px white; z-index: 10; }
+    #game-grid {
+        display: grid; grid-template-columns: repeat(6, 55px); grid-template-rows: repeat(6, 55px);
+        gap: 8px; background: rgba(255, 215, 0, 0.05); padding: 15px;
+        border-radius: 20px; border: 2px solid var(--lò); margin: 0 auto; width: fit-content;
+        position: relative;
+    }
+    .tile {
+        width: 55px; height: 55px; border-radius: 10px; display: flex; align-items: center;
+        justify-content: center; font-size: 28px; cursor: pointer; transition: transform 0.2s, opacity 0.3s;
+        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.1);
+        user-select: none; position: relative;
+    }
+    .tile.match { animation: explode 0.4s forwards; }
+    @keyframes explode { 0% { transform: scale(1); } 50% { transform: scale(1.4); opacity: 0.5; } 100% { transform: scale(0); opacity: 0; } }
+    .selected { border: 2px solid white; box-shadow: 0 0 15px white; z-index: 10; }
 
-#sim-container { width: 100%; height: 400px; margin-top: 50px; position: relative; border-top: 2px solid var(--lò); border-bottom: 2px solid var(--lò); background: radial-gradient(circle at center, #111, #000); }
-.sim-label { position: absolute; top: 10px; left: 10px; background: var(--lò); color: black; padding: 5px 15px; font-weight: 900; border-radius: 5px; font-size: 12px; }
+    /* SIMULATEUR 3D SECTION */
+    #sim-container {
+        width: 100%; height: 400px; margin-top: 50px; position: relative;
+        border-top: 2px solid var(--lò); border-bottom: 2px solid var(--lò);
+        background: radial-gradient(circle at center, #111, #000);
+    }
+    .sim-label { position: absolute; top: 10px; left: 10px; background: var(--lò); color: black; padding: 5px 15px; font-weight: 900; border-radius: 5px; font-size: 12px; }
 
-footer { text-align: center; padding: 40px; color: var(--lò); font-size: 0.9rem; }
+    footer { text-align: center; padding: 40px; color: var(--lò); font-size: 0.9rem; }
 </style>
 
 <canvas id="galaxy-bg"></canvas>
@@ -116,176 +137,255 @@ footer { text-align: center; padding: 40px; color: var(--lò); font-size: 0.9rem
 <div id="zetwal-core">ZETWAL</div>
 
 <script>
-/* ===============================
-   🔥 GEMINI LAVRI ZETWAL COMBO
-   =============================== */
+    // --- STATE MANAGEMENT ---
+    const GameState = { score: 0, moves: 20, level: 1, board: [], isProcessing: false };
+    const items = ['👕', '👖', '👗', '🧥', '👚'];
+    const colors = [0xffffff, 0x3498db, 0xe74c3c, 0xf1c40f, 0x9b59b6];
 
-// --- STATE MANAGEMENT ---
-const GameState = { score: 0, moves: 20, level: 1, board: [], isProcessing: false };
-const items = ['👕','👖','👗','🧥','👚'];
+    // --- INITIALIZE GALAXY & 3D STAR ---
+    const galCanvas = document.getElementById('galaxy-bg');
+    const gctx = galCanvas.getContext('2d');
+    let stars = [];
+    function initGalaxy() {
+        galCanvas.width = window.innerWidth; galCanvas.height = window.innerHeight;
+        stars = Array(200).fill().map(() => ({ x:Math.random()*galCanvas.width, y:Math.random()*galCanvas.height, r:Math.random()*1.5, o:Math.random(), s:0.02 }));
+    }
+    initGalaxy();
 
-// --- GALAXY BACKGROUND ---
-const galCanvas = document.getElementById('galaxy-bg');
-const gctx = galCanvas.getContext('2d');
-let stars = [];
-function initGalaxy() {
-    galCanvas.width = window.innerWidth; galCanvas.height = window.innerHeight;
-    stars = Array(200).fill().map(() => ({ x:Math.random()*galCanvas.width, y:Math.random()*galCanvas.height, r:Math.random()*1.5, o:Math.random(), s:0.02 }));
-}
-initGalaxy();
+    // --- THREE.JS ENGINE (STAR + SIMULATOR) ---
+    const starScene = new THREE.Scene();
+    const starCam = new THREE.PerspectiveCamera(50, window.innerWidth / 250, 0.1, 1000);
+    const starRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    starRenderer.physicallyCorrectLights = true;
+    starRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+    starRenderer.toneMappingExposure = 1.2;
+    starRenderer.setSize(window.innerWidth, 250);
+    document.getElementById('star-3d-header').appendChild(starRenderer.domElement);
 
-// --- THREE.JS STAR HEADER ---
-const starScene = new THREE.Scene();
-const starCam = new THREE.PerspectiveCamera(50, window.innerWidth / 250, 0.1, 1000);
-const starRenderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
-starRenderer.setSize(window.innerWidth, 250);
-document.getElementById('star-3d-header').appendChild(starRenderer.domElement);
+    // High-End Gold Star Material
+    const starShape = new THREE.Shape();
+    for(let i=0; i<10; i++) { let r = i%2===0 ? 1.5 : 0.7; let a = (i*Math.PI)/5 - Math.PI/2; if(i===0) starShape.moveTo(Math.cos(a)*r, Math.sin(a)*r); else starShape.lineTo(Math.cos(a)*r, Math.sin(a)*r); }
+    const starGeo = new THREE.ExtrudeGeometry(starShape, { depth:0.4, bevelEnabled:true, bevelSize:0.1 });
+    const starMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffd700, metalness: 1, roughness: 0.1, 
+        emissive: 0xffd700, emissiveIntensity: 0.2,
+        envMapIntensity: 1 
+    });
+    const starMesh = new THREE.Mesh(starGeo, starMat);
+    starScene.add(starMesh);
+    
+    // Lighting for Star
+    const starLight = new THREE.PointLight(0xffffff, 3); starLight.position.set(5, 5, 5); starScene.add(starLight);
+    const starBackLight = new THREE.PointLight(0xffd700, 5); starBackLight.position.set(-5, -2, -5); starScene.add(starBackLight);
+    starCam.position.z = 5;
 
-const starShape = new THREE.Shape();
-for(let i=0;i<10;i++){let r=i%2===0?1.5:0.7; let a=(i*Math.PI)/5 - Math.PI/2; if(i===0) starShape.moveTo(Math.cos(a)*r,Math.sin(a)*r); else starShape.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
-const starGeo = new THREE.ExtrudeGeometry(starShape,{depth:0.4,bevelEnabled:true,bevelSize:0.1});
-const starMat = new THREE.MeshStandardMaterial({color:0xffd700,metalness:1,roughness:0.1,emissive:0xffd700,emissiveIntensity:0.2});
-const starMesh = new THREE.Mesh(starGeo, starMat);
-starScene.add(starMesh);
-const starLight = new THREE.PointLight(0xffffff,3); starLight.position.set(5,5,5); starScene.add(starLight);
-const starBackLight = new THREE.PointLight(0xffd700,5); starBackLight.position.set(-5,-2,-5); starScene.add(starBackLight);
-starCam.position.z = 5;
+    // --- SIMULATOR 3D ENGINE ---
+    const simScene = new THREE.Scene();
+    const simCam = new THREE.PerspectiveCamera(45, window.innerWidth / 400, 0.1, 1000);
+    const simRenderer = new THREE.WebGLRenderer({ antialias: true });
+    simRenderer.setSize(window.innerWidth, 400);
+    simRenderer.setClearColor(0x050505);
+    document.getElementById('sim-render-area').appendChild(simRenderer.domElement);
 
-// --- SIMULATOR 3D ENGINE ---
-const simScene = new THREE.Scene();
-const simCam = new THREE.PerspectiveCamera(45, window.innerWidth/400,0.1,1000);
-const simRenderer = new THREE.WebGLRenderer({antialias:true});
-simRenderer.setSize(window.innerWidth,400);
-simRenderer.setClearColor(0x050505);
-document.getElementById('sim-render-area').appendChild(simRenderer.domElement);
+    // Create Laundromat Scene
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial({color: 0x222}));
+    floor.rotation.x = -Math.PI/2; simScene.add(floor);
 
-// Floor
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshStandardMaterial({color:0x222}));
-floor.rotation.x = -Math.PI/2; simScene.add(floor);
+    // Simple Machine Mesh
+    function createMachine(x) {
+        const group = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.BoxGeometry(2, 2.5, 2), new THREE.MeshStandardMaterial({color:0xcccccc}));
+        const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.2, 32), new THREE.MeshStandardMaterial({color:0x333}));
+        drum.rotation.x = Math.PI/2; drum.position.z = 1.01;
+        group.add(body, drum); group.position.set(x, 1.25, -2);
+        simScene.add(group); return drum;
+    }
+    const machines = [createMachine(-3), createMachine(0), createMachine(3)];
+    
+    // PNJ (Simple Character)
+    const pnj = new THREE.Group();
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3), new THREE.MeshStandardMaterial({color:0xffdbac}));
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 1), new THREE.MeshStandardMaterial({color:0x3498db}));
+    head.position.y = 1.5; body.position.y = 0.8;
+    pnj.add(head, body); pnj.position.set(5, 0, 2); simScene.add(pnj);
 
-// Machines
-function createMachine(x){
-    const group = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.BoxGeometry(2,2.5,2), new THREE.MeshStandardMaterial({color:0xcccccc}));
-    const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,0.2,32), new THREE.MeshStandardMaterial({color:0x333}));
-    drum.rotation.x = Math.PI/2; drum.position.z=1.01;
-    group.add(body,drum); group.position.set(x,1.25,-2);
-    simScene.add(group); return drum;
-}
-const machines=[createMachine(-3),createMachine(0),createMachine(3)];
+    simCam.position.set(0, 5, 10); simCam.lookAt(0, 0, 0);
+    simScene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const spot = new THREE.SpotLight(0xffffff, 2); spot.position.set(0, 10, 5); simScene.add(spot);
 
-// PNJ
-const pnj = new THREE.Group();
-const head = new THREE.Mesh(new THREE.SphereGeometry(0.3), new THREE.MeshStandardMaterial({color:0xffdbac}));
-const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.4,1), new THREE.MeshStandardMaterial({color:0x3498db}));
-head.position.y=1.5; body.position.y=0.8;
-pnj.add(head,body); pnj.position.set(5,0,2); simScene.add(pnj);
+    // --- MATCH-3 CORE LOGIC ---
+    function initBoard() {
+        const grid = document.getElementById('game-grid'); grid.innerHTML = '';
+        GameState.board = [];
+        for(let r=0; r<6; r++) {
+            GameState.board[r] = [];
+            for(let c=0; c<6; c++) {
+                let id = Math.floor(Math.random()*items.length);
+                GameState.board[r][c] = id;
+                const tile = document.createElement('div');
+                tile.className = 'tile'; tile.id = `t-${r}-${c}`;
+                tile.innerHTML = items[id];
+                tile.onclick = () => selectTile(r, c);
+                grid.appendChild(tile);
+            }
+        }
+        if(findMatches().length > 0) initBoard(); // Prevent start matches
+    }
 
-simCam.position.set(0,5,10); simCam.lookAt(0,0,0);
-simScene.add(new THREE.AmbientLight(0xffffff,0.5));
-const spot = new THREE.SpotLight(0xffffff,2); spot.position.set(0,10,5); simScene.add(spot);
-
-// --- MATCH-3 LOGIC ---
-function initBoard(){
-    const grid=document.getElementById('game-grid'); grid.innerHTML='';
-    GameState.board=[];
-    for(let r=0;r<6;r++){ GameState.board[r]=[];
-        for(let c=0;c<6;c++){
-            let id=Math.floor(Math.random()*items.length);
-            GameState.board[r][c]=id;
-            const tile=document.createElement('div');
-            tile.className='tile'; tile.id=`t-${r}-${c}`; tile.innerHTML=items[id];
-            tile.onclick=()=>selectTile(r,c); grid.appendChild(tile);
+    let selected = null;
+    function selectTile(r, c) {
+        if(GameState.isProcessing) return;
+        if(!selected) {
+            selected = {r, c}; document.getElementById(`t-${r}-${c}`).classList.add('selected');
+        } else {
+            const dist = Math.abs(selected.r - r) + Math.abs(selected.c - c);
+            if(dist === 1) swapTiles(selected.r, selected.c, r, c);
+            document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected'));
+            selected = null;
         }
     }
-    if(findMatches().length>0)initBoard();
-}
-let selected=null;
-function selectTile(r,c){
-    if(GameState.isProcessing)return;
-    if(!selected){ selected={r,c}; document.getElementById(`t-${r}-${c}`).classList.add('selected'); }
-    else{
-        const dist=Math.abs(selected.r-r)+Math.abs(selected.c-c);
-        if(dist===1) swapTiles(selected.r,selected.c,r,c);
-        document.querySelectorAll('.tile').forEach(t=>t.classList.remove('selected'));
-        selected=null;
-    }
-}
-async function swapTiles(r1,c1,r2,c2){
-    GameState.isProcessing=true;
-    let t1=GameState.board[r1][c1]; GameState.board[r1][c1]=GameState.board[r2][c2]; GameState.board[r2][c2]=t1;
-    updateGridUI();
-    let matches=findMatches();
-    if(matches.length>0){ GameState.moves--; await processMatches(); } 
-    else { let tmp=GameState.board[r1][c1]; GameState.board[r1][c1]=GameState.board[r2][c2]; GameState.board[r2][c2]=tmp; setTimeout(updateGridUI,300);}
-    GameState.isProcessing=false; checkGameStatus();
-}
-function findMatches(){
-    let matches=[];
-    for(let r=0;r<6;r++){ for(let c=0;c<4;c++){ let val=GameState.board[r][c]; if(val===GameState.board[r][c+1]&&val===GameState.board[r][c+2]){ matches.push({r,c},{r,c:c+1},{r,c:c+2}); } } }
-    for(let c=0;c<6;c++){ for(let r=0;r<4;r++){ let val=GameState.board[r][c]; if(val===GameState.board[r+1][c]&&val===GameState.board[r+2][c]){ matches.push({r,c},{r:r+1,c},{r:r+2,c}); } } }
-    return matches;
-}
-async function processMatches(){
-    let matches=findMatches(); if(matches.length===0)return;
-    matches.forEach(m=>{ document.getElementById(`t-${m.r}-${m.c}`).classList.add('match'); GameState.board[m.r][m.c]=-1; });
-    GameState.score+=matches.length*10;
-    document.getElementById('score').innerText=GameState.score;
-    await new Promise(r=>setTimeout(r,400));
-    applyGravity(); updateGridUI(); await new Promise(r=>setTimeout(r,300)); await processMatches();
-}
-function applyGravity(){
-    for(let c=0;c<6;c++){
-        let emptySpaces=0;
-        for(let r=5;r>=0;r--){
-            if(GameState.board[r][c]===-1) emptySpaces++;
-            else if(emptySpaces>0){ GameState.board[r+emptySpaces][c]=GameState.board[r][c]; GameState.board[r][c]=-1; }
+
+    async function swapTiles(r1, c1, r2, c2) {
+        GameState.isProcessing = true;
+        let t1 = GameState.board[r1][c1];
+        GameState.board[r1][c1] = GameState.board[r2][c2];
+        GameState.board[r2][c2] = t1;
+        updateGridUI();
+
+        let matches = findMatches();
+        if(matches.length > 0) {
+            GameState.moves--;
+            await processMatches();
+        } else {
+            // Undo swap
+            let tmp = GameState.board[r1][c1];
+            GameState.board[r1][c1] = GameState.board[r2][c2];
+            GameState.board[r2][c2] = tmp;
+            setTimeout(updateGridUI, 300);
         }
-        for(let r=0;r<emptySpaces;r++) GameState.board[r][c]=Math.floor(Math.random()*items.length);
+        GameState.isProcessing = false;
+        checkGameStatus();
     }
-}
-function updateGridUI(){
-    for(let r=0;r<6;r++){ for(let c=0;c<6;c++){
-        const t=document.getElementById(`t-${r}-${c}`);
-        t.innerHTML=GameState.board[r][c]===-1?'':items[GameState.board[r][c]];
-        t.classList.remove('match');
-    } }
-    document.getElementById('moves').innerText=GameState.moves;
-}
 
-// --- ANIMATION LOOP ---
-function animate(){
-    requestAnimationFrame(animate);
-    gctx.clearRect(0,0,galCanvas.width,galCanvas.height);
-    stars.forEach(s=>{ s.o+=s.s; if(s.o>1||s.o<0)s.s*=-1; gctx.globalAlpha=Math.abs(s.o); gctx.fillStyle='white'; gctx.beginPath(); gctx.arc(s.x,s.y,s.r,0,Math.PI*2); gctx.fill(); });
-    starMesh.rotation.y+=0.01; starMesh.rotation.z+=0.005; starRenderer.render(starScene,starCam);
-    machines.forEach(m=>m.rotation.y+=0.1); pnj.position.y=Math.sin(Date.now()*0.005)*0.1;
-    simRenderer.render(simScene,simCam);
-}
-animate();
-
-function startGame(){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('game-ui').style.display='block';
-    initBoard();
-    simulateLaundryCycle();
-}
-
-function simulateLaundryCycle(){
-    gsap.to(pnj.position,{x:0,duration:4,ease:"power1.inOut",onComplete:()=>{ setTimeout(()=>{ gsap.to(pnj.position,{x:-3,z:5,duration:3}); },2000);}});
-}
-
-function checkGameStatus(){
-    if(GameState.score>=500&&GameState.level===1){
-        GameState.level=2; GameState.moves=15;
-        document.getElementById('level').innerText="2";
-        document.getElementById('objective').innerText="Nivo 2: Kasé Glace (800 pwen)";
-        alert("NIVO 2! Atansyon mouvman yo redui!");
+    function findMatches() {
+        let matches = [];
+        // Horizontal
+        for(let r=0; r<6; r++) {
+            for(let c=0; c<4; c++) {
+                let val = GameState.board[r][c];
+                if(val === GameState.board[r][c+1] && val === GameState.board[r][c+2]) {
+                    matches.push({r,c}, {r,c:c+1}, {r,c:c+2});
+                }
+            }
+        }
+        // Vertical
+        for(let c=0; c<6; c++) {
+            for(let r=0; r<4; r++) {
+                let val = GameState.board[r][c];
+                if(val === GameState.board[r+1][c] && val === GameState.board[r+2][c]) {
+                    matches.push({r,c}, {r:r+1,c}, {r:r+2,c});
+                }
+            }
+        }
+        return matches;
     }
-}
+
+    async function processMatches() {
+        let matches = findMatches();
+        if(matches.length === 0) return;
+
+        matches.forEach(m => {
+            document.getElementById(`t-${m.r}-${m.c}`).classList.add('match');
+            GameState.board[m.r][m.c] = -1;
+        });
+
+        GameState.score += matches.length * 10;
+        document.getElementById('score').innerText = GameState.score;
+
+        await new Promise(r => setTimeout(r, 400));
+        applyGravity();
+        updateGridUI();
+        await new Promise(r => setTimeout(r, 300));
+        await processMatches(); // Recursive for combos
+    }
+
+    function applyGravity() {
+        for(let c=0; c<6; c++) {
+            let emptySpaces = 0;
+            for(let r=5; r>=0; r--) {
+                if(GameState.board[r][c] === -1) emptySpaces++;
+                else if(emptySpaces > 0) {
+                    GameState.board[r+emptySpaces][c] = GameState.board[r][c];
+                    GameState.board[r][c] = -1;
+                }
+            }
+            for(let r=0; r<emptySpaces; r++) GameState.board[r][c] = Math.floor(Math.random()*items.length);
+        }
+    }
+
+    function updateGridUI() {
+        for(let r=0; r<6; r++) {
+            for(let c=0; c<6; c++) {
+                const t = document.getElementById(`t-${r}-${c}`);
+                t.innerHTML = GameState.board[r][c] === -1 ? '' : items[GameState.board[r][c]];
+                t.classList.remove('match');
+            }
+        }
+        document.getElementById('moves').innerText = GameState.moves;
+    }
+
+    // --- ANIMATION LOOP ---
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Galaxy
+        gctx.clearRect(0,0,galCanvas.width, galCanvas.height);
+        stars.forEach(s => { s.o += s.s; if(s.o > 1 || s.o < 0) s.s *= -1; gctx.globalAlpha = Math.abs(s.o); gctx.fillStyle='white'; gctx.beginPath(); gctx.arc(s.x, s.y, s.r, 0, Math.PI*2); gctx.fill(); });
+        
+        // Star 3D
+        starMesh.rotation.y += 0.01;
+        starMesh.rotation.z += 0.005;
+        starRenderer.render(starScene, starCam);
+
+        // Simulator Machines Rotation
+        machines.forEach(m => m.rotation.y += 0.1);
+        
+        // Simple PNJ Idle
+        pnj.position.y = Math.sin(Date.now()*0.005) * 0.1;
+        
+        simRenderer.render(simScene, simCam);
+    }
+    animate();
+
+    function startGame() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('game-ui').style.display = 'block';
+        initBoard();
+        simulateLaundryCycle();
+    }
+
+    function simulateLaundryCycle() {
+        // State machine client
+        gsap.to(pnj.position, { x: 0, duration: 4, ease: "power1.inOut", onComplete: () => {
+            // Character at machine
+            setTimeout(() => {
+                gsap.to(pnj.position, { x: -3, z: 5, duration: 3 }); // Character sits
+            }, 2000);
+        }});
+    }
+
+    function checkGameStatus() {
+        if(GameState.score >= 500 && GameState.level === 1) {
+            GameState.level = 2; GameState.moves = 15;
+            document.getElementById('level').innerText = "2";
+            document.getElementById('objective').innerText = "Nivo 2: Kasé Glace (800 pwen)";
+            alert("NIVO 2! Atansyon mouvman yo redui!");
+        }
+    }
 </script>
 </body>
 </html>
+
 
 
 
