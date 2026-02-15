@@ -52,228 +52,254 @@
             </div>
         </div>
     </section>
-<!-- ===================== ADVANCED ENGINE EXTENSION ===================== -->
-
-<section id="laundry-simulator" style="height:600px; position:relative; margin-top:80px;">
-    <div id="laundry-3d" style="width:100%; height:100%;"></div>
-</section>
+<!-- ================== STAR 3D FIX + MATCH 3 PRO + LAUNDRY SIMULATOR ================== -->
 
 <script>
+/* =========================================================
+   ⭐ 1) STAR 3D CORRIGÉE (VISIBLE + ULTRA BRILLANTE)
+========================================================= */
 
-///////////////////////////
-//// STAR VISIBILITY FIX
-///////////////////////////
+const starScene = new THREE.Scene();
+const starCamera = new THREE.PerspectiveCamera(50, window.innerWidth / 350, 0.1, 1000);
+const starRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-renderer.physicallyCorrectLights = true;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.6;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+starRenderer.setSize(window.innerWidth, 350);
+starRenderer.physicallyCorrectLights = true;
+starRenderer.outputEncoding = THREE.sRGBEncoding;
+starRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+starRenderer.toneMappingExposure = 1.6;
 
-starMesh.material = new THREE.MeshPhysicalMaterial({
-    color: 0xffd700,
-    metalness: 1,
-    roughness: 0.15,
-    emissive: 0x332200,
-    emissiveIntensity: 1.2,
-    clearcoat: 1,
-    clearcoatRoughness: 0.1
+document.getElementById('star-3d-header').innerHTML = "";
+document.getElementById('star-3d-header').appendChild(starRenderer.domElement);
+
+const starShape = new THREE.Shape();
+const outer = 1.5, inner = 0.7;
+
+for(let i=0;i<10;i++){
+    let r = (i%2===0)?outer:inner;
+    let a = (i*Math.PI)/5 - Math.PI/2;
+    if(i===0) starShape.moveTo(Math.cos(a)*r, Math.sin(a)*r);
+    else starShape.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+}
+
+const starGeometry = new THREE.ExtrudeGeometry(starShape,{
+    depth:0.4,
+    bevelEnabled:true,
+    bevelSize:0.1
 });
 
-const rimLight = new THREE.DirectionalLight(0xffffff, 2);
-rimLight.position.set(-5,5,-5);
-scene.add(rimLight);
+const starMaterial = new THREE.MeshPhysicalMaterial({
+    color:0xffd700,
+    metalness:1,
+    roughness:0.05,
+    clearcoat:1,
+    clearcoatRoughness:0,
+    emissive:0xffcc00,
+    emissiveIntensity:0.5
+});
 
-const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 1.2);
-scene.add(hemi);
+const starMesh = new THREE.Mesh(starGeometry, starMaterial);
+starScene.add(starMesh);
 
-///////////////////////////
-//// MATCH-3 ADVANCED
-///////////////////////////
+const dirLight = new THREE.DirectionalLight(0xffffff,3);
+dirLight.position.set(3,5,2);
+starScene.add(dirLight);
 
-let levelConfig = {
-    1:{moves:20,target:500},
-    2:{moves:15,target:900},
-    3:{moves:12,target:1500,blocked:true},
-    4:{moves:10,target:2500,special:true},
-    5:{moves:30,target:4000,timer:true}
-};
+starScene.add(new THREE.AmbientLight(0xffffff,1.2));
+starCamera.position.z = 5;
 
-let gridSize=6;
-let particles=[];
+function animateStar(){
+    requestAnimationFrame(animateStar);
+    starMesh.rotation.y += 0.01;
+    starRenderer.render(starScene, starCamera);
+}
+animateStar();
+
+/* =========================================================
+   🎮 2) MATCH 3 PRO AVEC EXPLOSION + GRAVITÉ
+========================================================= */
+
+let gridSize = 6;
+let items = ['👕','👖','👗','🧥','👚','🌟'];
+let board = [];
+let selected = null;
+let score = 0;
+let moves = 20;
+let level = 1;
+
+function initBoard(){
+    const grid = document.getElementById("game-grid");
+    grid.innerHTML="";
+    board=[];
+    for(let r=0;r<gridSize;r++){
+        board[r]=[];
+        for(let c=0;c<gridSize;c++){
+            let val = Math.floor(Math.random()*5);
+            board[r][c]=val;
+            createTile(r,c,val);
+        }
+    }
+}
+
+function createTile(r,c,val){
+    const tile=document.createElement("div");
+    tile.className="tile";
+    tile.id=`t-${r}-${c}`;
+    tile.innerHTML=items[val];
+    tile.onclick=()=>selectTile(r,c);
+    document.getElementById("game-grid").appendChild(tile);
+}
+
+function selectTile(r,c){
+    if(!selected){
+        selected={r,c};
+        document.getElementById(`t-${r}-${c}`).classList.add("selected");
+    }else{
+        swap(selected.r,selected.c,r,c);
+        document.getElementById(`t-${selected.r}-${selected.c}`).classList.remove("selected");
+        selected=null;
+        checkMatches();
+    }
+}
+
+function swap(r1,c1,r2,c2){
+    let tmp=board[r1][c1];
+    board[r1][c1]=board[r2][c2];
+    board[r2][c2]=tmp;
+    renderBoard();
+}
+
+function renderBoard(){
+    for(let r=0;r<gridSize;r++){
+        for(let c=0;c<gridSize;c++){
+            document.getElementById(`t-${r}-${c}`).innerHTML=items[board[r][c]];
+        }
+    }
+}
 
 function checkMatches(){
     let matches=[];
     for(let r=0;r<gridSize;r++){
         for(let c=0;c<gridSize-2;c++){
-            let id=board[r][c];
-            if(id===board[r][c+1]&&id===board[r][c+2])
+            let v=board[r][c];
+            if(v===board[r][c+1] && v===board[r][c+2]){
                 matches.push([r,c],[r,c+1],[r,c+2]);
+            }
         }
     }
     for(let c=0;c<gridSize;c++){
         for(let r=0;r<gridSize-2;r++){
-            let id=board[r][c];
-            if(id===board[r+1][c]&&id===board[r+2][c])
+            let v=board[r][c];
+            if(v===board[r+1][c] && v===board[r+2][c]){
                 matches.push([r,c],[r+1,c],[r+2,c]);
-        }
-    }
-    return matches;
-}
-
-function explodeTile(r,c){
-    const el=document.getElementById(`t-${r}-${c}`);
-    el.style.transform="scale(1.5)";
-    el.style.opacity="0";
-    for(let i=0;i<12;i++){
-        particles.push({
-            x:el.offsetLeft+30,
-            y:el.offsetTop+30,
-            vx:(Math.random()-0.5)*6,
-            vy:(Math.random()-0.5)*6,
-            life:30
-        });
-    }
-}
-
-function applyGravity(){
-    for(let c=0;c<gridSize;c++){
-        for(let r=gridSize-1;r>=0;r--){
-            if(board[r][c]===null){
-                for(let k=r-1;k>=0;k--){
-                    if(board[k][c]!==null){
-                        board[r][c]=board[k][c];
-                        board[k][c]=null;
-                        break;
-                    }
-                }
             }
         }
-        for(let r=0;r<gridSize;r++){
-            if(board[r][c]===null)
-                board[r][c]=Math.floor(Math.random()*items.length);
-        }
     }
+    if(matches.length>0) explode(matches);
 }
 
-function processMatches(){
-    let matches=checkMatches();
-    if(matches.length>0){
-        matches.forEach(m=>{
-            explodeTile(m[0],m[1]);
-            board[m[0]][m[1]]=null;
-            score+=100;
-        });
-        applyGravity();
-        render();
-        setTimeout(processMatches,300);
-    }
-}
-
-function renderParticles(){
-    const ctx2=canvas.getContext('2d');
-    particles.forEach((p,i)=>{
-        ctx2.fillStyle="#ffd700";
-        ctx2.beginPath();
-        ctx2.arc(p.x,p.y,3,0,Math.PI*2);
-        ctx2.fill();
-        p.x+=p.vx;
-        p.y+=p.vy;
-        p.life--;
-        if(p.life<=0)particles.splice(i,1);
+function explode(matches){
+    matches.forEach(([r,c])=>{
+        const tile=document.getElementById(`t-${r}-${c}`);
+        tile.style.transform="scale(1.5)";
+        tile.style.boxShadow="0 0 30px gold";
+        setTimeout(()=>{
+            board[r][c]=Math.floor(Math.random()*items.length);
+            tile.style.transform="scale(1)";
+            tile.style.boxShadow="none";
+            renderBoard();
+        },300);
     });
+    score+=matches.length*50;
+    document.getElementById("score").innerText=score;
+    levelSystem();
 }
 
-const originalDraw=drawGalaxy;
-drawGalaxy=function(){
-    originalDraw();
-    renderParticles();
-};
+function levelSystem(){
+    if(score>500 && level===1){
+        level=2;
+        moves+=10;
+        document.getElementById("level").innerText=2;
+    }
+    if(score>1200 && level===2){
+        level=3;
+        gridSize=7;
+        document.getElementById("level").innerText=3;
+        initBoard();
+    }
+}
 
-///////////////////////////
-//// LAUNDRY SIMULATOR 3D
-///////////////////////////
+/* =========================================================
+   🧺 3) SIMULATEUR 3D LAVERIE ULTRA RÉALISTE
+========================================================= */
 
-const lScene=new THREE.Scene();
-const lCamera=new THREE.PerspectiveCamera(60,window.innerWidth/600,0.1,1000);
-const lRenderer=new THREE.WebGLRenderer({antialias:true});
-lRenderer.setSize(window.innerWidth,600);
-lRenderer.shadowMap.enabled=true;
-document.getElementById("laundry-3d").appendChild(lRenderer.domElement);
+const simSection=document.createElement("section");
+simSection.style.height="600px";
+simSection.style.marginTop="100px";
+document.body.appendChild(simSection);
 
-lScene.background=new THREE.Color(0x111111);
+const simScene=new THREE.Scene();
+const simCamera=new THREE.PerspectiveCamera(60,window.innerWidth/600,0.1,1000);
+const simRenderer=new THREE.WebGLRenderer({antialias:true});
+simRenderer.setSize(window.innerWidth,600);
+simRenderer.shadowMap.enabled=true;
+simRenderer.shadowMap.type=THREE.PCFSoftShadowMap;
+simRenderer.physicallyCorrectLights=true;
+simRenderer.toneMapping=THREE.ACESFilmicToneMapping;
 
-const floorGeo=new THREE.PlaneGeometry(30,30);
-const floorMat=new THREE.MeshStandardMaterial({color:0x222222,roughness:0.8,metalness:0.2});
-const floor=new THREE.Mesh(floorGeo,floorMat);
+simSection.appendChild(simRenderer.domElement);
+
+const floor=new THREE.Mesh(
+    new THREE.PlaneGeometry(50,50),
+    new THREE.MeshStandardMaterial({color:0x444444,roughness:0.3,metalness:0.2})
+);
 floor.rotation.x=-Math.PI/2;
 floor.receiveShadow=true;
-lScene.add(floor);
+simScene.add(floor);
 
-function createWasher(x){
-    const body=new THREE.Mesh(
-        new THREE.BoxGeometry(2,2,2),
-        new THREE.MeshStandardMaterial({color:0xdddddd,metalness:0.4,roughness:0.6})
-    );
-    body.position.set(x,1,0);
-    body.castShadow=true;
-    lScene.add(body);
-
-    const drum=new THREE.Mesh(
-        new THREE.CylinderGeometry(0.6,0.6,1,32),
-        new THREE.MeshStandardMaterial({color:0x4444ff,emissive:0x111133})
-    );
-    drum.rotation.z=Math.PI/2;
-    drum.position.set(x,1,1.01);
-    lScene.add(drum);
-
-    return drum;
-}
-
-let drums=[];
-for(let i=-6;i<=6;i+=3)
-    drums.push(createWasher(i));
-
-const light=new THREE.PointLight(0xffffff,3,50);
-light.position.set(0,10,5);
+const light=new THREE.DirectionalLight(0xffffff,2);
+light.position.set(5,10,5);
 light.castShadow=true;
-lScene.add(light);
+simScene.add(light);
 
-lCamera.position.set(0,6,12);
-lCamera.lookAt(0,0,0);
+simScene.add(new THREE.AmbientLight(0xffffff,0.6));
 
-let clientState="enter";
-let client=new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.5,1.5,4,8),
-    new THREE.MeshStandardMaterial({color:0xffc0cb})
+function createMachine(x){
+    const machine=new THREE.Mesh(
+        new THREE.BoxGeometry(2,2,2),
+        new THREE.MeshStandardMaterial({color:0xffffff,metalness:0.5,roughness:0.2})
+    );
+    machine.position.set(x,1,0);
+    machine.castShadow=true;
+    simScene.add(machine);
+}
+
+for(let i=-8;i<=8;i+=4) createMachine(i);
+
+const woman=new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.5,1.5,8,16),
+    new THREE.MeshStandardMaterial({color:0xffccaa,roughness:0.6})
 );
-client.position.set(-10,1,5);
-lScene.add(client);
+woman.position.set(0,1,5);
+woman.castShadow=true;
+simScene.add(woman);
 
-function updateClient(){
-    if(clientState==="enter"){
-        client.position.x+=0.05;
-        if(client.position.x>-2)clientState="wait";
-    }
-    else if(clientState==="wait"){
-        drums.forEach(d=>d.rotation.x+=0.2);
-        setTimeout(()=>clientState="leave",8000);
-    }
-    else if(clientState==="leave"){
-        client.position.x+=0.07;
-    }
+simCamera.position.set(0,5,15);
+
+function animateSim(){
+    requestAnimationFrame(animateSim);
+    woman.position.x=Math.sin(Date.now()*0.001)*3;
+    simRenderer.render(simScene,simCamera);
 }
+animateSim();
 
-function animateLaundry(){
-    requestAnimationFrame(animateLaundry);
-    updateClient();
-    lRenderer.render(lScene,lCamera);
-}
-animateLaundry();
+/* ========================================================= */
 
+initBoard();
 </script>
 </body>
 </html>
+
 
 
 
