@@ -54,209 +54,162 @@
     </section>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-<div id="container-3d" style="width: 100%; height: 400px; cursor: move; position: relative; z-index: 20;">
-    </div>
-
-<script>
-    // 1. KONFIGIRASYON SEN AN
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 400, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    
-    renderer.setSize(window.innerWidth, 400);
-    document.getElementById('container-3d').appendChild(renderer.domElement);
-
-    // 2. KREYASYON ZETWAL 3D A (GEOMETRY)
-    const shape = new THREE.OctahedronGeometry(1.5, 0); // Yon fòm ki sanble ak yon dyaman/zetwal
-    const material = new THREE.MeshStandardMaterial({
-        color: 0xffd700, // Koulè lò
-        metalness: 1,
-        roughness: 0.1,
-        emissive: 0x442200
-    });
-    const star = new THREE.Mesh(shape, material);
-    scene.add(star);
-
-    // 3. LIMYÈ (POU LÒ A KA KLERE)
-    const light = new THREE.PointLight(0xffffff, 2, 100);
-    light.position.set(5, 5, 5);
-    scene.add(light);
-    scene.add(new THREE.AmbientLight(0x404040, 2));
-
-    camera.position.z = 5;
-
-    // 4. ANIMASYON AK ENTERAKSYON
-    let isDragging = false;
-    let previousMousePosition = { x: 0, y: 0 };
-
-    function animate() {
-        requestAnimationFrame(animate);
-        
-        if (!isDragging) {
-            star.rotation.y += 0.01; // Zetwal la vire pou kont li
-            star.rotation.x += 0.005;
-        }
-
-        renderer.render(scene, camera);
-    }
-
-    // KONTWÒL AK SOURIS (POU JWÈ A KA VIRE L)
-    window.addEventListener('mousedown', () => isDragging = true);
-    window.addEventListener('mouseup', () => isDragging = false);
-    window.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            const deltaMove = {
-                x: e.offsetX - previousMousePosition.x,
-                y: e.offsetY - previousMousePosition.y
-            };
-            star.rotation.y += deltaMove.x * 0.01;
-            star.rotation.x += deltaMove.y * 0.01;
-        }
-        previousMousePosition = { x: e.offsetX, y: e.offsetY };
-    });
-
-    animate();
-
-    // AJISTE SI EKRAN AN CHANJE SIZE
-    window.addEventListener('resize', () => {
-        renderer.setSize(window.innerWidth, 400);
-        camera.aspect = window.innerWidth / 400;
-        camera.updateProjectionMatrix();
-    });
-</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
 <style>
-    :root { --lò: #ffd700; --nwa-fond: #050505; --glas: rgba(255, 215, 0, 0.1); }
+    :root { --lò: #ffd700; --nwa: #000000; }
     
+    body { background: #000; margin: 0; overflow-x: hidden; color: white; font-family: 'Segoe UI', sans-serif; }
+    #galaxy-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
+
+    /* ESTIL KAT YO */
     .kat-entèaktif { 
-        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); 
-        background: rgba(0, 0, 0, 0.95); 
-        border: 1px solid rgba(255, 215, 0, 0.2); 
-        border-radius: 30px; position: relative; overflow: hidden;
+        background: rgba(10, 10, 10, 0.9); border: 1px solid rgba(255, 215, 0, 0.2); 
+        border-radius: 25px; transition: 0.5s; position: relative; z-index: 10;
     }
-    .kat-entèaktif:hover { transform: translateY(-10px); border-color: var(--lò); box-shadow: 0 0 50px rgba(255, 215, 0, 0.3); }
+    .kat-entèaktif:hover { border-color: var(--lò); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); }
 
-    /* ESTIL RAD YO - VIP GLASSMORPHISM */
+    /* RAD YO AK EFÈ LIMYÈ */
     .bouton-rad { 
-        background: rgba(255, 215, 0, 0.03); 
-        border: 2px solid rgba(255, 215, 0, 0.2); 
-        border-radius: 20px; width: 95px; height: 105px; cursor: pointer; 
-        transition: 0.3s; display: flex; flex-direction: column; 
-        align-items: center; justify-content: center; backdrop-filter: blur(8px);
+        background: rgba(255, 215, 0, 0.05); border: 2px solid rgba(255, 215, 0, 0.2); 
+        border-radius: 15px; width: 85px; height: 95px; cursor: pointer; transition: 0.3s;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-    .bouton-rad:hover { background: rgba(255, 215, 0, 0.15); transform: scale(1.05); }
+    .rad-blan { box-shadow: inset 0 0 15px #fff; filter: drop-shadow(0 0 8px #fff); }
+    .rad-nwa { box-shadow: inset 0 0 15px #000; background: #000 !important; filter: drop-shadow(0 0 5px var(--lò)); }
+    .rad-koulè { box-shadow: inset 0 0 15px var(--lò); filter: drop-shadow(0 0 10px var(--lò)); }
 
-    .rad-blan { box-shadow: inset 0 0 20px #ffffff; filter: drop-shadow(0 0 10px #ffffff); }
-    .rad-nwa { box-shadow: inset 0 0 20px #000000; background: rgba(0,0,0,0.8) !important; filter: drop-shadow(0 0 5px var(--lò)); }
-    .rad-koulè { box-shadow: inset 0 0 20px var(--lò); filter: drop-shadow(0 0 12px var(--lò)); }
+    /* EFÈ SOURIS */
+    .etensèl { position: fixed; pointer-events: none; width: 2px; height: 12px; background: var(--lò); z-index: 10000; }
+    .boul-kim { position: fixed; pointer-events: none; z-index: 9999; transition: 1.2s; opacity: 0.6; }
 
-    /* ETENSÈL YO (SPARKS) */
-    .etensèl { position: fixed; pointer-events: none; width: 2px; height: 12px; background: var(--lò); z-index: 10000; border-radius: 2px; }
+    /* BOUTON GOOGLE KI REPARE */
+    #btn-google { 
+        background: #db4437 !important; color: white !important; border: none; 
+        padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; 
+        width: 100%; display: block; position: relative; z-index: 100;
+    }
 </style>
 
-<canvas id="galaxy-bg" style="position: fixed; inset: 0; z-index: -1; background: #000;"></canvas>
+<canvas id="galaxy-bg"></canvas>
 
-<div id="zetwal-3d-container" style="width: 100%; height: 250px; margin-top: 20px; position: relative; z-index: 20;"></div>
+<div id="zetwal-3d-container" style="width: 100%; height: 180px; z-index: 5;"></div>
 
-<section style="padding: 20px; text-align: center; position: relative; z-index: 10;">
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
+<section style="padding: 20px; text-align: center; position: relative;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
 
-        <div class="kat-entèaktif" style="flex: 1; min-width: 300px; max-width: 350px; padding: 35px;">
-            <h3 style="color: var(--lò); letter-spacing: 3px; font-weight: 900;">🌟 ESPAS ZETWAL</h3>
-            <div id="user-status" style="margin: 25px 0; color: white; font-size: 1.1rem;">N ap verifye idantite w...</div>
-            <div id="player-stats" style="display:none;">
-                <div style="background: linear-gradient(145deg, rgba(255,215,0,0.2), rgba(0,0,0,0.5)); padding: 25px; border-radius: 25px; border: 1px solid var(--lò);">
-                    <p style="font-size: 2.5rem; margin: 0; font-weight: 900; color: white;">💰 <span id="balance">0</span></p>
-                    <small style="color: var(--lò); text-transform: uppercase;">Pwen ki disponib</small>
-                </div>
-                <button id="btn-logout" style="background: none; border: 1px solid #444; color: #777; margin-top: 25px; cursor: pointer; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: bold;">DEKONEKTE</button>
-            </div>
+        <div class="kat-entèaktif" style="flex: 1; min-width: 300px; padding: 25px;">
+            <h3 style="color: var(--lò);">🌟 ESPAS ZETWAL</h3>
+            <div id="user-status" style="margin: 15px 0;">N ap verifye...</div>
             <div id="login-methods">
-                <button id="btn-google" style="background: #db4437; color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; width: 100%; box-shadow: 0 10px 20px rgba(219,68,55,0.3);">GOOGLE CONNECT</button>
+                <button id="btn-google">KONEKSYON GOOGLE</button>
+            </div>
+            <div id="player-stats" style="display:none;">
+                <p style="font-size: 2rem;">💰 <span id="balance">0</span></p>
+                <button id="btn-logout" style="color: #666; background: none; border: none; cursor:pointer;">Dekonekte</button>
             </div>
         </div>
 
-        <div class="kat-entèaktif" id="game-card" style="flex: 2; min-width: 340px; max-width: 650px; padding: 35px; opacity: 0.2; pointer-events: none;">
-            <div id="rules-box" style="font-size: 0.95rem; color: #ccc; margin-bottom: 25px; border-left: 5px solid var(--lò); padding-left: 20px; text-align: left; line-height: 1.6; background: rgba(255,215,0,0.05); padding: 15px; border-radius: 10px;">
-                <b style="color: var(--lò); font-size: 1.1rem;">RÈG PWOFESYONÈL YO :</b><br>
-                • Triye rad yo pa kategori: Pa melanje Blan/Nwa ak Koulè.<br>
-                • Kalkil Mental: Vize yon pwa ant <b>20.5kg ak 22kg</b>.<br>
-                • Atansyon: Yon sèl erè nan triyaj la ap anile tout siksè w.
+        <div class="kat-entèaktif" id="game-card" style="flex: 2; min-width: 320px; padding: 25px; opacity: 0.3; pointer-events: none;">
+            <div id="rules-box" style="text-align: left; border-left: 4px solid var(--lò); padding-left: 15px; margin-bottom: 20px; font-size: 0.9rem; color: #bbb;">
+                <b style="color: var(--lò);">RÈG PWOFESYONÈL YO:</b><br>
+                Triye pa kategori epi kalkile ant <b>20.5kg ak 22kg</b> nan tèt ou.
             </div>
-
             <div id="game-ui" style="display:none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                    <span id="game-timer" style="font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--lò);">⏱️ 60s</span>
-                    <span style="background: var(--lò); color: #000; padding: 8px 20px; border-radius: 50px; font-weight: 900; font-size: 0.9rem; letter-spacing: 1px;">🎯 KALKIL MANTAL</span>
+                <div style="display:flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span id="game-timer" style="font-size: 1.5rem; font-weight: bold;">⏱️ 60s</span>
+                    <span style="background: var(--lò); color: #000; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 0.8rem;">🎯 KALKIL MENTAL</span>
                 </div>
-                
-                <div id="clothes-conveyor" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 15px; margin-bottom: 35px;"></div>
-                
-                <button id="finishBtn" style="background: linear-gradient(45deg, var(--lò), #ffa500); color: black; font-weight: 900; padding: 20px; border-radius: 18px; border: none; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(255,165,0,0.4);">KONPLETE LAVRI A</button>
+                <div id="clothes-conveyor" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px;"></div>
+                <button id="finishBtn" style="background: linear-gradient(45deg, var(--lò), #ffa500); border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 900; margin-top: 20px; cursor: pointer;">KONPLETE LAVRI A</button>
             </div>
         </div>
     </div>
 </section>
 
-<footer style="text-align: center; padding: 80px 20px 40px; position: relative; z-index: 10;">
-    <div style="width: 200px; height: 2px; background: linear-gradient(90deg, transparent, var(--lò), transparent); margin: 0 auto 30px;"></div>
-    <p style="color: var(--lò); font-weight: 900; text-shadow: 0 0 20px rgba(255,215,0,0.5); font-size: 1.5rem; letter-spacing: 8px;">
-        © 2026 LAVRI ZETWAL
-    </p>
-    <p style="color: #666; font-size: 0.8rem; margin-top: 15px; letter-spacing: 4px; font-weight: bold;">EKSPLWATASYON PWESTIJ • TOUT DWA REZÈVE</p>
+<footer style="text-align: center; padding: 40px; color: var(--lò); letter-spacing: 5px; font-weight: 900;">
+    © 2026 LAVRI ZETWAL
 </footer>
 
-<div id="report-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.99); z-index:10000; align-items:center; justify-content:center; padding: 25px;">
-    <div style="background:#000; padding:50px; border-radius:40px; border:2px solid var(--lò); max-width:550px; width:100%; text-align:center;">
-        <h2 style="color:var(--lò); font-size: 2.8rem; letter-spacing: 2px;">RAPÒ FINAL</h2>
-        <div style="font-size: 4rem; font-weight: 900; color: white; margin: 25px 0;"><span id="final-weight">0</span><small style="font-size: 1.2rem; color: var(--lò);">kg</small></div>
-        <p style="color:#aaa; font-size: 1.1rem;">Koleksyon rad ou te chwazi yo :</p>
-        <div id="history-gallery" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:25px 0;"></div>
-        <p id="report-status" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 35px;"></p>
-        <button onclick="location.reload()" style="background:var(--lò); color:black; padding:18px 50px; border-radius:50px; border:none; font-weight:900; cursor:pointer; font-size: 1.1rem;">REKÒMANSE JWÈT LA</button>
-    </div>
-</div>
+<script type="module">
+    // REPARASYON FIREBASE AK SOURIS
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-<script>
-    // ==========================================
-    // MOTÈ 3D ZETWAL (THREE.JS)
-    // ==========================================
-    const container3D = document.getElementById('zetwal-3d-container');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 250, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, 250);
-    container3D.appendChild(renderer.domElement);
+    const firebaseConfig = {
+        apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+        authDomain: "lavrizetwal.firebaseapp.com",
+        projectId: "lavrizetwal",
+        storageBucket: "lavrizetwal.firebasestorage.app",
+        messagingSenderId: "291921316186",
+        appId: "1:291921316186:web:f55e8b34526960df394b63"
+    };
 
-    const geo = new THREE.IcosahedronGeometry(1.2, 0);
-    const mat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1, roughness: 0.1 });
-    const zetwal3D = new THREE.Mesh(geo, mat);
-    scene.add(zetwal3D);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    const l1 = new THREE.PointLight(0xffffff, 2, 50); l1.position.set(5, 5, 5); scene.add(l1);
-    scene.add(new THREE.AmbientLight(0x404040, 2)); camera.position.z = 3.5;
-
-    function anim3D() {
-        requestAnimationFrame(anim3D);
-        zetwal3D.rotation.y += 0.015;
-        zetwal3D.rotation.z += 0.005;
-        renderer.render(scene, camera);
-    }
-    anim3D();
-
-    window.addEventListener('resize', () => {
-        renderer.setSize(window.innerWidth, 250);
-        camera.aspect = window.innerWidth / 250; camera.updateProjectionMatrix();
+    // 1. EFÈ SOURIS (ETENSÈL AK KIM)
+    window.addEventListener('mousemove', (e) => {
+        const isInside = e.target.closest('.kat-entèaktif');
+        if (isInside) {
+            const s = document.createElement('div'); s.className = 'etensèl';
+            s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px';
+            document.body.appendChild(s);
+            s.animate([{ opacity: 1 }, { opacity: 0, transform: `translate(${(Math.random()-0.5)*50}px, 50px)` }], 600).onfinish = () => s.remove();
+        } else {
+            if(Math.random() > 0.9) {
+                const b = document.createElement('div'); b.className = 'boul-kim';
+                b.innerHTML = '🫧'; b.style.left = e.clientX + 'px'; b.style.top = e.clientY + 'px';
+                document.body.appendChild(b);
+                setTimeout(() => { b.style.transform = `translateY(-100px) scale(1.5)`; b.style.opacity = '0'; setTimeout(()=>b.remove(), 1000); }, 10);
+            }
+        }
     });
 
-    // ==========================================
-    // LOGIK JWÈT & FIREBASE
-    // ==========================================
-    // (Mete kòd JavaScript Firebase ou a isit la jan nou te fè l la)
+    // 2. FOND GALAKSI REPARE
+    const cvs = document.getElementById('galaxy-bg'); const ctx = cvs.getContext('2d');
+    let sts = [];
+    function res() { cvs.width = window.innerWidth; cvs.height = window.innerHeight; }
+    window.onresize = res; res();
+    for(let i=0; i<150; i++) sts.push({x:Math.random()*cvs.width, y:Math.random()*cvs.height, s:Math.random()*2, c:Math.random()>0.5?'#ffd700':'#fff'});
+    function draw() {
+        ctx.clearRect(0,0,cvs.width,cvs.height);
+        sts.forEach(s => { ctx.fillStyle = s.c; ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, 7); ctx.fill(); s.y+=0.3; if(s.y>cvs.height) s.y=0; });
+        requestAnimationFrame(draw);
+    }
+    draw();
+
+    // 3. LOGO 3D (REPARE)
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 180, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, 180);
+    document.getElementById('zetwal-3d-container').appendChild(renderer.domElement);
+    const star = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshStandardMaterial({color:0xffd700, metalness:1, roughness:0.1}));
+    scene.add(star);
+    const light = new THREE.PointLight(0xffffff, 2); light.position.set(5,5,5); scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040, 2)); camera.position.z = 3;
+    function anim() { requestAnimationFrame(anim); star.rotation.y+=0.01; renderer.render(scene, camera); }
+    anim();
+
+    // 4. KONEKSYON GOOGLE
+    document.getElementById('btn-google').onclick = () => {
+        signInWithPopup(auth, new GoogleAuthProvider()).catch(err => alert("Erè: " + err.message));
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('user-status').innerHTML = `Byenvini, <b>${user.displayName}</b>`;
+            document.getElementById('login-methods').style.display = "none";
+            document.getElementById('player-stats').style.display = "block";
+            document.getElementById('game-card').style.opacity = "1";
+            document.getElementById('game-card').style.pointerEvents = "auto";
+            document.getElementById('game-ui').style.display = "block";
+            // Kòmanse jenerasyon rad yo isit la...
+        }
+    });
 </script>
 </body>
 </html>
+
 
 
 
