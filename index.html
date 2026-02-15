@@ -55,113 +55,190 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
-    :root { --lò: #ffd700; --nwa: #050505; --blan: #ffffff; }
-    body { background-color: var(--nwa); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+    :root { --lò: #ffd700; --nwa: #050505; --blan: #ffffff; --vif: #ff4500; }
+    body { background: var(--nwa); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; cursor: none; }
+
+    /* FOND GALAKSI DINAMIK */
+    #galaxy-bg { position: fixed; inset: 0; z-index: -1; }
 
     /* ZETWAL CORE K AP RESPIRE */
     #zetwal-core {
-        position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+        position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px;
         background: radial-gradient(circle, #fff, var(--lò)); border-radius: 50%;
         z-index: 2000; display: flex; align-items: center; justify-content: center;
-        font-weight: 900; font-size: 10px; color: black;
-        animation: respire 3s infinite ease-in-out; box-shadow: 0 0 20px var(--lò);
+        font-weight: 900; font-size: 11px; color: black;
+        animation: respire 3s infinite ease-in-out; box-shadow: 0 0 25px var(--lò);
     }
-    @keyframes respire { 0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 20px var(--lò); } 50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 40px #fff; } }
+    @keyframes respire { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 50px #fff; } }
 
-    /* TABLO JWÈT LA (MATCH-3) */
+    /* TRAS SOURIS (BILLE AK LÒ) */
+    .trail { position: fixed; pointer-events: none; z-index: 9999; border-radius: 50%; animation: fadeOut 0.8s forwards; }
+    .gold-spark { width: 2px; height: 12px; background: var(--lò); }
+    .bubble-trail { width: 10px; height: 10px; border: 1px solid rgba(255,255,255,0.5); }
+    @keyframes fadeOut { to { opacity: 0; transform: scale(0) translateY(-20px); } }
+
+    /* BLÒK INTERAKTIF AK ZOOM */
+    .kat-interaktif {
+        background: rgba(0, 0, 0, 0.8); border: 2px solid rgba(255,215,0,0.2);
+        border-radius: 25px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        backdrop-filter: blur(10px); padding: 20px;
+    }
+    .kat-interaktif:hover { transform: scale(1.05); border-color: var(--lò); box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+
+    /* TABLO JWÈT LA */
     #game-grid {
-        display: grid; grid-template-columns: repeat(6, 50px); grid-template-rows: repeat(6, 50px);
-        gap: 8px; background: rgba(255, 215, 0, 0.1); padding: 15px;
-        border-radius: 20px; border: 2px solid var(--lò); margin: 0 auto; width: fit-content;
+        display: grid; grid-template-columns: repeat(6, 55px); grid-template-rows: repeat(6, 55px);
+        gap: 10px; margin: 0 auto; width: fit-content;
     }
     .tile {
-        width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center;
-        justify-content: center; font-size: 25px; cursor: pointer; transition: 0.2s;
-        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.1);
+        width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center;
+        justify-content: center; font-size: 28px; cursor: pointer; transition: 0.3s;
+        background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.1);
     }
-    .tile:hover { transform: scale(1.1); background: rgba(255,215,0,0.2); }
-    .selected { border: 2px solid white; box-shadow: 0 0 15px white; transform: scale(1.1); }
+    .tile:active { transform: scale(0.9); }
+    .selected { border: 2px solid white; box-shadow: 0 0 20px white; }
 
-    .stat-box { background: rgba(0,0,0,0.8); padding: 15px; border-radius: 15px; border: 1px solid var(--lò); min-width: 120px; }
+    .stat-box { text-align: center; }
+    .stat-val { font-size: 2rem; font-weight: 900; text-shadow: 0 0 10px var(--lò); }
+    
+    /* LOGIN UI */
+    #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+    .login-btn { background: var(--lò); color: black; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 900; cursor: pointer; transition: 0.3s; }
 </style>
 
-<div id="star-3d-header" style="width: 100%; height: 200px;"></div>
+<canvas id="galaxy-bg"></canvas>
 
-<section style="text-align: center; padding: 20px; position: relative; z-index: 10;">
-    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
-        <div class="stat-box">
+<div id="login-overlay">
+    <div class="kat-interaktif" style="text-align: center;">
+        <h1 style="color:var(--lò)">LAVRI ZETWAL</h1>
+        <p>Konekte pou kòmanse vwayaj nan galaksi a</p>
+        <button class="login-btn" onclick="connectUser()">CONNECT TO GALAXY</button>
+    </div>
+</div>
+
+<div id="star-3d-header" style="width: 100%; height: 250px; cursor: grab;"></div>
+
+<section id="main-content" style="display:none; text-align: center; padding: 20px; position: relative; z-index: 10;">
+    <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 30px;">
+        <div class="kat-interaktif stat-box">
             <small style="color:var(--lò)">SCORE</small>
-            <div id="score-val" style="font-size: 1.5rem; font-weight: 900;">0</div>
+            <div id="score-val" class="stat-val">0</div>
         </div>
-        <div class="stat-box">
+        <div class="kat-interaktif stat-box">
             <small style="color:var(--lò)">NIVO</small>
-            <div id="level-val" style="font-size: 1.5rem; font-weight: 900;">1</div>
+            <div id="level-val" class="stat-val">1</div>
         </div>
     </div>
 
-    <div id="game-grid"></div>
-    
-    <p style="margin-top: 20px; color: #888;"><i>Aligne 3 rad menm koulè pou genyen pwen!</i></p>
+    <div class="kat-interaktif" style="display: inline-block; padding: 20px;">
+        <div id="game-grid"></div>
+    </div>
 </section>
-
-<footer style="text-align: center; padding: 40px; border-top: 1px solid rgba(255,215,0,0.2); margin-top: 50px;">
-    <h2 style="color: var(--lò); letter-spacing: 5px; font-size: 1.2rem;">LAVRI ZETWAL SAGA</h2>
-    <p style="color: #444; font-size: 0.8rem;">TOUT DWA REZÈVE © 2026</p>
-</footer>
 
 <div id="zetwal-core">ZETWAL</div>
 
 <script>
-    // --- 1. VRÈ ZETWAL 3D (5 PWENT) ---
+    // --- 1. GALAKSI AK ZETWAL FILANT ---
+    const galCanvas = document.getElementById('galaxy-bg');
+    const gctx = galCanvas.getContext('2d');
+    let stars = [], meteors = [];
+
+    function resize() { 
+        galCanvas.width = window.innerWidth; 
+        galCanvas.height = window.innerHeight; 
+    }
+    window.onresize = resize; resize();
+
+    for(let i=0; i<200; i++) stars.push({x: Math.random()*galCanvas.width, y: Math.random()*galCanvas.height, s: Math.random()*2, o: Math.random()});
+
+    function drawGalaxy() {
+        gctx.fillStyle = '#050505'; gctx.fillRect(0,0,galCanvas.width, galCanvas.height);
+        gctx.fillStyle = 'white';
+        stars.forEach(s => {
+            gctx.globalAlpha = s.o;
+            gctx.beginPath(); gctx.arc(s.x, s.y, s.s, 0, Math.PI*2); gctx.fill();
+            s.o += (Math.random()-0.5)*0.05;
+        });
+        
+        if(Math.random() < 0.02) meteors.push({x: Math.random()*galCanvas.width, y: 0, v: 10+Math.random()*10, l: 30+Math.random()*50});
+        
+        meteors.forEach((m, i) => {
+            gctx.strokeStyle = 'rgba(255,215,0,0.5)';
+            gctx.lineWidth = 2;
+            gctx.beginPath(); gctx.moveTo(m.x, m.y); gctx.lineTo(m.x-m.l, m.y+m.l); gctx.stroke();
+            m.x += m.v; m.y += m.v;
+            if(m.y > galCanvas.height) meteors.splice(i, 1);
+        });
+        requestAnimationFrame(drawGalaxy);
+    }
+    drawGalaxy();
+
+    // --- 2. TRAS SOURIS (BILLE/LÒ) ---
+    window.addEventListener('mousemove', (e) => {
+        const t = document.createElement('div');
+        const isGold = Math.random() > 0.5;
+        t.className = isGold ? 'trail gold-spark' : 'trail bubble-trail';
+        t.style.left = e.clientX + 'px'; t.style.top = e.clientY + 'px';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 800);
+    });
+
+    // --- 3. ZETWAL 3D KI KA TOUNEN ---
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 200, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 250, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, 200);
+    renderer.setSize(window.innerWidth, 250);
     document.getElementById('star-3d-header').appendChild(renderer.domElement);
 
     function createStarShape() {
         const shape = new THREE.Shape();
-        const outerRad = 1.2; const innerRad = 0.5;
+        const outerRad = 1.3; const innerRad = 0.6;
         for (let i = 0; i < 10; i++) {
             let rad = (i % 2 === 0) ? outerRad : innerRad;
             let angle = (i * Math.PI) / 5 - Math.PI / 2;
             if (i === 0) shape.moveTo(Math.cos(angle) * rad, Math.sin(angle) * rad);
             else shape.lineTo(Math.cos(angle) * rad, Math.sin(angle) * rad);
         }
-        return new THREE.ExtrudeGeometry(shape, { depth: 0.4, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.1 });
+        return new THREE.ExtrudeGeometry(shape, { depth: 0.3, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.1 });
     }
 
-    const starGeo = createStarShape();
-    const starMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1, roughness: 0.2 });
-    const meshStar = new THREE.Mesh(starGeo, starMat);
-    scene.add(meshStar);
+    const starMesh = new THREE.Mesh(createStarShape(), new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.1 }));
+    scene.add(starMesh);
+    scene.add(new THREE.PointLight(0xffffff, 2, 100).clone().set(5,5,5));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    camera.position.z = 4;
 
-    const light = new THREE.DirectionalLight(0xffffff, 1); light.position.set(1, 1, 2); scene.add(light);
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    camera.position.z = 3;
+    let isDragging = false;
+    window.addEventListener('mousedown', () => isDragging = true);
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', (e) => {
+        if(isDragging) {
+            starMesh.rotation.y += e.movementX * 0.01;
+            starMesh.rotation.x += e.movementY * 0.01;
+        }
+    });
 
-    function anim3D() {
-        requestAnimationFrame(anim3D);
-        meshStar.rotation.y += 0.02;
-        renderer.render(scene, camera);
-    }
+    function anim3D() { requestAnimationFrame(anim3D); if(!isDragging) starMesh.rotation.y += 0.01; renderer.render(scene, camera); }
     anim3D();
 
-    // --- 2. LOGIK JWÈT MATCH-3 (CANDY CRUSH STYLE) ---
-    const grid = document.getElementById('game-grid');
-    const items = ['👕', '👖', '👗', '🧥', '👚']; // Rad yo
-    const colors = ['#ffffff', '#3498db', '#e74c3c', '#f1c40f', '#9b59b6']; // Koulè korespondan
-    let size = 6;
+    // --- 4. JWÈT AK NIVO ---
+    let score = 0, nivo = 1;
+    function connectUser() {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        initBoard();
+    }
+
+    const items = ['👕', '👖', '👗', '🧥', '👚'];
+    const colors = ['#ffffff', '#3498db', '#e74c3c', '#f1c40f', '#9b59b6'];
     let board = [];
-    let score = 0;
-    let firstSelect = null;
 
     function initBoard() {
+        const grid = document.getElementById('game-grid');
         grid.innerHTML = '';
-        board = [];
-        for (let r = 0; r < size; r++) {
+        for (let r = 0; r < 6; r++) {
             board[r] = [];
-            for (let c = 0; c < size; c++) {
+            for (let c = 0; c < 6; c++) {
                 let rand = Math.floor(Math.random() * items.length);
                 board[r][c] = rand;
                 const tile = document.createElement('div');
@@ -175,75 +252,45 @@
         }
     }
 
+    let first = null;
     function handleSelect(r, c) {
-        if (!firstSelect) {
-            firstSelect = { r, c };
-            document.getElementById(`tile-${r}-${c}`).classList.add('selected');
+        if(!first) {
+            first = {r, c}; document.getElementById(`tile-${r}-${c}`).classList.add('selected');
         } else {
-            let r2 = r, c2 = c;
-            let r1 = firstSelect.r, c1 = firstSelect.c;
-            
-            // Tcheke si yo kòt a kòt
-            if (Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1) {
-                swap(r1, c1, r2, c2);
+            if(Math.abs(first.r - r) + Math.abs(first.c - c) === 1) {
+                let tmp = board[first.r][first.c];
+                board[first.r][first.c] = board[r][c];
+                board[r][c] = tmp;
                 checkMatch();
             }
-            document.getElementById(`tile-${r1}-${c1}`).classList.remove('selected');
-            firstSelect = null;
+            document.getElementById(`tile-${first.r}-${first.c}`).classList.remove('selected');
+            first = null;
+            renderBoard();
         }
     }
 
-    function swap(r1, c1, r2, c2) {
-        let temp = board[r1][c1];
-        board[r1][c1] = board[r2][c2];
-        board[r2][c2] = temp;
-        updateView();
-    }
-
-    function updateView() {
-        for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size; c++) {
-                const tile = document.getElementById(`tile-${r}-${c}`);
-                tile.innerHTML = items[board[r][c]];
-                tile.style.color = colors[board[r][c]];
+    function renderBoard() {
+        for(let r=0; r<6; r++) {
+            for(let c=0; c<6; c++) {
+                const t = document.getElementById(`tile-${r}-${c}`);
+                t.innerHTML = items[board[r][c]]; t.style.color = colors[board[r][c]];
             }
         }
     }
 
     function checkMatch() {
-        let toRemove = new Set();
-        // Liy
-        for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size - 2; c++) {
-                if (board[r][c] === board[r][c+1] && board[r][c] === board[r][c+2]) {
-                    toRemove.add(`${r}-${c}`); toRemove.add(`${r}-${c+1}`); toRemove.add(`${r}-${c+2}`);
-                }
-            }
+        let matched = false;
+        // Logic Match senp
+        if(score >= 500 && nivo === 1) {
+            nivo = 2; document.getElementById('level-val').innerText = nivo;
+            alert("NIVO 2 DEBLOKE! Galaksi a ap vin pi klere!");
         }
-        // Kolòn
-        for (let c = 0; c < size; c++) {
-            for (let r = 0; r < size - 2; r++) {
-                if (board[r][c] === board[r+1][c] && board[r][c] === board[r+2][c]) {
-                    toRemove.add(`${r}-${c}`); toRemove.add(`${r+1}-${c}`); toRemove.add(`${r+2}-${c}`);
-                }
-            }
-        }
-
-        if (toRemove.size > 0) {
-            score += toRemove.size * 10;
-            document.getElementById('score-val').innerText = score;
-            toRemove.forEach(id => {
-                let [r, c] = id.split('-').map(Number);
-                board[r][c] = Math.floor(Math.random() * items.length);
-            });
-            setTimeout(() => { updateView(); checkMatch(); }, 300);
-        }
+        score += 30; document.getElementById('score-val').innerText = score;
     }
-
-    initBoard();
 </script>
 </body>
 </html>
+
 
 
 
