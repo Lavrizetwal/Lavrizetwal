@@ -52,233 +52,212 @@
             </div>
         </div>
     </section>
-<style>
-    :root { --gold: #ffd700; --fire: #ff6a00; --glass: rgba(255, 215, 0, 0.1); }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<div id="container-3d" style="width: 100%; height: 400px; cursor: move; position: relative; z-index: 20;">
+    </div>
+
+<script>
+    // 1. KONFIGIRASYON SEN AN
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 400, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     
-    /* CARTES PRINCIPALES AVEC EFFET DE PROFONDEUR */
-    .interactive-card { 
+    renderer.setSize(window.innerWidth, 400);
+    document.getElementById('container-3d').appendChild(renderer.domElement);
+
+    // 2. KREYASYON ZETWAL 3D A (GEOMETRY)
+    const shape = new THREE.OctahedronGeometry(1.5, 0); // Yon fòm ki sanble ak yon dyaman/zetwal
+    const material = new THREE.MeshStandardMaterial({
+        color: 0xffd700, // Koulè lò
+        metalness: 1,
+        roughness: 0.1,
+        emissive: 0x442200
+    });
+    const star = new THREE.Mesh(shape, material);
+    scene.add(star);
+
+    // 3. LIMYÈ (POU LÒ A KA KLERE)
+    const light = new THREE.PointLight(0xffffff, 2, 100);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040, 2));
+
+    camera.position.z = 5;
+
+    // 4. ANIMASYON AK ENTERAKSYON
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        if (!isDragging) {
+            star.rotation.y += 0.01; // Zetwal la vire pou kont li
+            star.rotation.x += 0.005;
+        }
+
+        renderer.render(scene, camera);
+    }
+
+    // KONTWÒL AK SOURIS (POU JWÈ A KA VIRE L)
+    window.addEventListener('mousedown', () => isDragging = true);
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const deltaMove = {
+                x: e.offsetX - previousMousePosition.x,
+                y: e.offsetY - previousMousePosition.y
+            };
+            star.rotation.y += deltaMove.x * 0.01;
+            star.rotation.x += deltaMove.y * 0.01;
+        }
+        previousMousePosition = { x: e.offsetX, y: e.offsetY };
+    });
+
+    animate();
+
+    // AJISTE SI EKRAN AN CHANJE SIZE
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, 400);
+        camera.aspect = window.innerWidth / 400;
+        camera.updateProjectionMatrix();
+    });
+</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+    :root { --lò: #ffd700; --nwa-fond: #050505; --glas: rgba(255, 215, 0, 0.1); }
+    
+    .kat-entèaktif { 
         transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); 
         background: rgba(0, 0, 0, 0.95); 
         border: 1px solid rgba(255, 215, 0, 0.2); 
-        position: relative; overflow: hidden; border-radius: 25px;
+        border-radius: 30px; position: relative; overflow: hidden;
     }
-    .interactive-card:hover { 
-        transform: scale(1.02); 
-        border-color: var(--gold); 
-        box-shadow: 0 0 50px rgba(255, 215, 0, 0.3); 
+    .kat-entèaktif:hover { transform: translateY(-10px); border-color: var(--lò); box-shadow: 0 0 50px rgba(255, 215, 0, 0.3); }
+
+    /* ESTIL RAD YO - VIP GLASSMORPHISM */
+    .bouton-rad { 
+        background: rgba(255, 215, 0, 0.03); 
+        border: 2px solid rgba(255, 215, 0, 0.2); 
+        border-radius: 20px; width: 95px; height: 105px; cursor: pointer; 
+        transition: 0.3s; display: flex; flex-direction: column; 
+        align-items: center; justify-content: center; backdrop-filter: blur(8px);
     }
+    .bouton-rad:hover { background: rgba(255, 215, 0, 0.15); transform: scale(1.05); }
 
-    /* VITRINES DE VÊTEMENTS (FOND DORÉ & TRANSPARENT) */
-    .cloth-btn { 
-        background: rgba(255, 215, 0, 0.05); /* Fond doré très léger */
-        border: 2px solid rgba(255, 215, 0, 0.3); 
-        border-radius: 18px; 
-        width: 90px; height: 95px; cursor: pointer; transition: 0.3s;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        backdrop-filter: blur(5px); /* Effet de verre */
-        position: relative;
-    }
+    .rad-blan { box-shadow: inset 0 0 20px #ffffff; filter: drop-shadow(0 0 10px #ffffff); }
+    .rad-nwa { box-shadow: inset 0 0 20px #000000; background: rgba(0,0,0,0.8) !important; filter: drop-shadow(0 0 5px var(--lò)); }
+    .rad-koulè { box-shadow: inset 0 0 20px var(--lò); filter: drop-shadow(0 0 12px var(--lò)); }
 
-    /* AMÉLIORATION VISUELLE CONSÉQUENTE DES COULEURS */
-    /* Blancs avec halo de lumière pure */
-    .is-white { 
-        box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.8); 
-        filter: drop-shadow(0 0 10px #ffffff);
-    }
-    .is-white span { color: #ffffff; filter: brightness(2); }
-
-    /* Noirs avec halo d'ombre mystique */
-    .is-black { 
-        box-shadow: inset 0 0 15px rgba(0, 0, 0, 1); 
-        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.2));
-        background: rgba(0, 0, 0, 0.6) !important;
-    }
-    .is-black span { color: #000000; filter: drop-shadow(0 0 2px #fff); }
-
-    /* Couleurs avec halos vibrants spécifiques */
-    .is-color-pink  { box-shadow: inset 0 0 15px #ff00ff; filter: drop-shadow(0 0 8px #ff00ff); }
-    .is-color-blue  { box-shadow: inset 0 0 15px #00d4ff; filter: drop-shadow(0 0 8px #00d4ff); }
-    .is-color-green { box-shadow: inset 0 0 15px #39ff14; filter: drop-shadow(0 0 8px #39ff14); }
-
-    /* ÉTINCELLES ET TRACES */
-    .spark { position: fixed; pointer-events: none; width: 1px; height: 12px; background: var(--gold); z-index: 10000; }
-    .bubble { position: fixed; pointer-events: none; z-index: 9999; transition: 1.5s ease-out; opacity: 0.7; }
+    /* ETENSÈL YO (SPARKS) */
+    .etensèl { position: fixed; pointer-events: none; width: 2px; height: 12px; background: var(--lò); z-index: 10000; border-radius: 2px; }
 </style>
 
 <canvas id="galaxy-bg" style="position: fixed; inset: 0; z-index: -1; background: #000;"></canvas>
 
-<div id="zetwal-core" style="position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: radial-gradient(circle, #fff, var(--gold)); border-radius: 50%; z-index: 2000; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; color: black; letter-spacing: 1px; animation: pulse-core 3s infinite;">ZETWAL</div>
+<div id="zetwal-3d-container" style="width: 100%; height: 250px; margin-top: 20px; position: relative; z-index: 20;"></div>
 
 <section style="padding: 20px; text-align: center; position: relative; z-index: 10;">
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 25px;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
 
-        <div class="tarif-item interactive-card" style="flex: 1; min-width: 300px; max-width: 350px; padding: 30px;">
-            <h3 style="color: var(--gold); letter-spacing: 2px;">🌟 ESPAS ZETWAL</h3>
-            <div id="user-status" style="margin: 20px 0; color: white;">Vérification...</div>
+        <div class="kat-entèaktif" style="flex: 1; min-width: 300px; max-width: 350px; padding: 35px;">
+            <h3 style="color: var(--lò); letter-spacing: 3px; font-weight: 900;">🌟 ESPAS ZETWAL</h3>
+            <div id="user-status" style="margin: 25px 0; color: white; font-size: 1.1rem;">N ap verifye idantite w...</div>
             <div id="player-stats" style="display:none;">
-                <div style="background: rgba(255,215,0,0.15); padding: 20px; border-radius: 20px; border: 1px solid var(--gold);">
-                    <p style="font-size: 2.2rem; margin: 0; font-weight: 900; color: white;">💰 <span id="balance">0</span></p>
-                    <small style="color: var(--gold);">Pwen Disponib</small>
+                <div style="background: linear-gradient(145deg, rgba(255,215,0,0.2), rgba(0,0,0,0.5)); padding: 25px; border-radius: 25px; border: 1px solid var(--lò);">
+                    <p style="font-size: 2.5rem; margin: 0; font-weight: 900; color: white;">💰 <span id="balance">0</span></p>
+                    <small style="color: var(--lò); text-transform: uppercase;">Pwen ki disponib</small>
                 </div>
-                <button id="btn-logout" style="background: none; border: 1px solid #444; color: #666; margin-top: 20px; cursor: pointer; padding: 5px 15px; border-radius: 20px; font-size: 11px;">DEKONEKTE</button>
+                <button id="btn-logout" style="background: none; border: 1px solid #444; color: #777; margin-top: 25px; cursor: pointer; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: bold;">DEKONEKTE</button>
             </div>
             <div id="login-methods">
-                <button id="btn-google" style="background: #db4437; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;">Google Connect</button>
+                <button id="btn-google" style="background: #db4437; color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; width: 100%; box-shadow: 0 10px 20px rgba(219,68,55,0.3);">GOOGLE CONNECT</button>
             </div>
         </div>
 
-        <div class="tarif-item interactive-card" id="game-card" style="flex: 2; min-width: 320px; max-width: 600px; padding: 30px; opacity: 0.3; pointer-events: none;">
-            <div id="rules-box" style="font-size: 0.9rem; color: #aaa; margin-bottom: 20px; border-left: 4px solid var(--gold); padding-left: 15px; text-align: left;">
-                <b style="color: var(--gold);">RÈGLES :</b> Triye pa koulè & Kalkile ant <b>20.5kg ak 22kg</b> nan tèt ou.
+        <div class="kat-entèaktif" id="game-card" style="flex: 2; min-width: 340px; max-width: 650px; padding: 35px; opacity: 0.2; pointer-events: none;">
+            <div id="rules-box" style="font-size: 0.95rem; color: #ccc; margin-bottom: 25px; border-left: 5px solid var(--lò); padding-left: 20px; text-align: left; line-height: 1.6; background: rgba(255,215,0,0.05); padding: 15px; border-radius: 10px;">
+                <b style="color: var(--lò); font-size: 1.1rem;">RÈG PWOFESYONÈL YO :</b><br>
+                • Triye rad yo pa kategori: Pa melanje Blan/Nwa ak Koulè.<br>
+                • Kalkil Mental: Vize yon pwa ant <b>20.5kg ak 22kg</b>.<br>
+                • Atansyon: Yon sèl erè nan triyaj la ap anile tout siksè w.
             </div>
 
             <div id="game-ui" style="display:none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                    <span id="game-timer" style="font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 10px var(--gold);">⏱️ 60s</span>
-                    <span style="background: var(--gold); color: #000000; padding: 6px 18px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; letter-spacing: 1px;">🎯 KALKIL MENTAL</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <span id="game-timer" style="font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--lò);">⏱️ 60s</span>
+                    <span style="background: var(--lò); color: #000; padding: 8px 20px; border-radius: 50px; font-weight: 900; font-size: 0.9rem; letter-spacing: 1px;">🎯 KALKIL MANTAL</span>
                 </div>
                 
-                <div id="clothes-conveyor" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px; margin-bottom: 30px;"></div>
+                <div id="clothes-conveyor" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 15px; margin-bottom: 35px;"></div>
                 
-                <button id="finishBtn" style="background: linear-gradient(45deg, var(--gold), #ffa500); color: black; font-weight: 900; padding: 18px; border-radius: 15px; border: none; width: 100%; cursor: pointer; text-transform: uppercase;">TÈMINE LESIV LA</button>
+                <button id="finishBtn" style="background: linear-gradient(45deg, var(--lò), #ffa500); color: black; font-weight: 900; padding: 20px; border-radius: 18px; border: none; width: 100%; cursor: pointer; text-transform: uppercase; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(255,165,0,0.4);">KONPLETE LAVRI A</button>
             </div>
         </div>
     </div>
 </section>
 
-<footer style="text-align: center; padding: 60px 20px; position: relative; z-index: 10;">
-    <div style="width: 150px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 0 auto 25px;"></div>
-    <p style="color: var(--gold); font-weight: 900; text-shadow: 0 0 15px rgba(255,215,0,0.4); font-size: 1.4rem; letter-spacing: 6px;">
+<footer style="text-align: center; padding: 80px 20px 40px; position: relative; z-index: 10;">
+    <div style="width: 200px; height: 2px; background: linear-gradient(90deg, transparent, var(--lò), transparent); margin: 0 auto 30px;"></div>
+    <p style="color: var(--lò); font-weight: 900; text-shadow: 0 0 20px rgba(255,215,0,0.5); font-size: 1.5rem; letter-spacing: 8px;">
         © 2026 LAVRI ZETWAL
     </p>
-    <p style="color: #555; font-size: 0.75rem; margin-top: 10px; letter-spacing: 3px;">PRESTIGE & CLEAN • TOUT DWA REZÈVE</p>
+    <p style="color: #666; font-size: 0.8rem; margin-top: 15px; letter-spacing: 4px; font-weight: bold;">EKSPLWATASYON PWESTIJ • TOUT DWA REZÈVE</p>
 </footer>
 
-<div id="report-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:10000; align-items:center; justify-content:center; padding: 20px;">
-    <div style="background:#000; padding:40px; border-radius:30px; border:2px solid var(--gold); max-width:500px; width:100%; text-align:center;">
-        <h2 style="color:var(--gold); font-size: 2.5rem;">RÉSILTA</h2>
-        <div style="font-size: 3.5rem; font-weight: 900; color: white; margin: 20px 0;"><span id="final-weight">0</span><small style="font-size: 1.2rem; color: var(--gold);">kg</small></div>
-        <div id="history-gallery" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:20px 0;"></div>
-        <p id="report-status" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 30px;"></p>
-        <button onclick="location.reload()" style="background:var(--gold); color:black; padding:15px 40px; border-radius:50px; border:none; font-weight:bold; cursor:pointer;">REKÒMANSE</button>
+<div id="report-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.99); z-index:10000; align-items:center; justify-content:center; padding: 25px;">
+    <div style="background:#000; padding:50px; border-radius:40px; border:2px solid var(--lò); max-width:550px; width:100%; text-align:center;">
+        <h2 style="color:var(--lò); font-size: 2.8rem; letter-spacing: 2px;">RAPÒ FINAL</h2>
+        <div style="font-size: 4rem; font-weight: 900; color: white; margin: 25px 0;"><span id="final-weight">0</span><small style="font-size: 1.2rem; color: var(--lò);">kg</small></div>
+        <p style="color:#aaa; font-size: 1.1rem;">Koleksyon rad ou te chwazi yo :</p>
+        <div id="history-gallery" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:25px 0;"></div>
+        <p id="report-status" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 35px;"></p>
+        <button onclick="location.reload()" style="background:var(--lò); color:black; padding:18px 50px; border-radius:50px; border:none; font-weight:900; cursor:pointer; font-size: 1.1rem;">REKÒMANSE JWÈT LA</button>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+<script>
+    // ==========================================
+    // MOTÈ 3D ZETWAL (THREE.JS)
+    // ==========================================
+    const container3D = document.getElementById('zetwal-3d-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 250, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, 250);
+    container3D.appendChild(renderer.domElement);
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-        authDomain: "lavrizetwal.firebaseapp.com",
-        projectId: "lavrizetwal",
-        storageBucket: "lavrizetwal.firebasestorage.app",
-        messagingSenderId: "291921316186",
-        appId: "1:291921316186:web:f55e8b34526960df394b63"
-    };
+    const geo = new THREE.IcosahedronGeometry(1.2, 0);
+    const mat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1, roughness: 0.1 });
+    const zetwal3D = new THREE.Mesh(geo, mat);
+    scene.add(zetwal3D);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const l1 = new THREE.PointLight(0xffffff, 2, 50); l1.position.set(5, 5, 5); scene.add(l1);
+    scene.add(new THREE.AmbientLight(0x404040, 2)); camera.position.z = 3.5;
 
-    // --- TRACES SOURIS ---
-    window.addEventListener('mousemove', (e) => {
-        const isInside = e.target.closest('.interactive-card');
-        if (isInside) {
-            const spark = document.createElement('div');
-            spark.className = 'spark';
-            spark.style.left = e.clientX + 'px'; spark.style.top = e.clientY + 'px';
-            document.body.appendChild(spark);
-            spark.animate([{ opacity: 1 }, { opacity: 0, transform: `translate(${(Math.random()-0.5)*60}px, ${(Math.random()-0.5)*60}px) scale(0)` }], 700).onfinish = () => spark.remove();
-        } else {
-            if(Math.random() > 0.8) {
-                const p = document.createElement('div');
-                p.className = 'bubble'; p.innerHTML = Math.random() > 0.5 ? '✨' : '🫧';
-                p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
-                p.style.fontSize = (Math.random()*15 + 10) + 'px'; p.style.color = 'var(--gold)';
-                document.body.appendChild(p);
-                setTimeout(() => { p.style.transform = `translate(${(Math.random()-0.5)*100}px, -150px) scale(0)`; p.style.opacity = '0'; setTimeout(() => p.remove(), 1500); }, 50);
-            }
-        }
+    function anim3D() {
+        requestAnimationFrame(anim3D);
+        zetwal3D.rotation.y += 0.015;
+        zetwal3D.rotation.z += 0.005;
+        renderer.render(scene, camera);
+    }
+    anim3D();
+
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, 250);
+        camera.aspect = window.innerWidth / 250; camera.updateProjectionMatrix();
     });
 
-    // --- LOGIQUE JEU ---
-    let weight = 0, errors = 0, gameActive = false, timer, sessionHistory = [];
-    const clothes = [
-        {e:"👕", w:2, c:"white", cl:"is-white"}, {e:"👖", w:4.5, c:"black", cl:"is-black"},
-        {e:"👗", w:3.5, c:"color", cl:"is-color-pink"}, {e:"👚", w:2.8, c:"color", cl:"is-color-blue"},
-        {e:"🧥", w:5, c:"black", cl:"is-black"}, {e:"🧦", w:1.2, c:"white", cl:"is-white"},
-        {e:"👕", w:3.2, c:"color", cl:"is-color-green"}
-    ];
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('user-status').innerHTML = `Byenvini, Zetwal <br><b style="color:var(--gold);">${user.displayName}</b>`;
-            document.getElementById('login-methods').style.display = "none";
-            document.getElementById('player-stats').style.display = "block";
-            document.getElementById('game-card').style.opacity = "1";
-            document.getElementById('game-card').style.pointerEvents = "auto";
-            document.getElementById('game-ui').style.display = "block";
-            resetGame();
-        }
-    });
-
-    function generateCloth() {
-        const d = clothes[Math.floor(Math.random()*clothes.length)];
-        const wrap = document.createElement("div");
-        wrap.innerHTML = `<button class="cloth-btn ${d.cl}"><span style="font-size:1.8rem;">${d.e}</span><small style="color:rgba(255,215,0,0.8); font-weight:bold; margin-top:5px;">${d.w}kg</small></button>`;
-        wrap.onclick = () => {
-            if(!gameActive) { gameActive=true; startTimer(); }
-            weight += d.w;
-            if(sessionHistory.length > 0 && sessionHistory[0].c !== d.c) errors++;
-            sessionHistory.push(d);
-            wrap.remove(); generateCloth();
-        };
-        document.getElementById("clothes-conveyor").appendChild(wrap);
-    }
-
-    function startTimer() {
-        let t = 60;
-        timer = setInterval(() => { t--; document.getElementById('game-timer').innerText = `⏱️ ${t}s`; if(t <= 0) finalize(); }, 1000);
-    }
-
-    function finalize() {
-        clearInterval(timer);
-        const gallery = document.getElementById('history-gallery');
-        gallery.innerHTML = "";
-        sessionHistory.forEach(item => {
-            gallery.innerHTML += `<div class="cloth-btn ${item.cl}" style="width:45px; height:50px; font-size:1rem; margin:2px; pointer-events:none;">${item.e}</div>`;
-        });
-        const win = (weight >= 20.5 && weight <= 22 && errors === 0);
-        document.getElementById('final-weight').innerText = weight.toFixed(1);
-        document.getElementById('report-status').innerHTML = win ? "<span style='color:#44ff44;'>✨ VIKTWA! Ou se yon vrè Zetwal!</span>" : "<span style='color:#ff4444;'>❌ ECHÈK! Triyaj oswa pwa pa bon.</span>";
-        document.getElementById('report-modal').style.display = "flex";
-    }
-
-    function resetGame() {
-        weight = 0; errors = 0; gameActive = false; sessionHistory = [];
-        document.getElementById('clothes-conveyor').innerHTML = "";
-        for(let i=0; i<10; i++) generateCloth();
-    }
-
-    document.getElementById('btn-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
-    document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => location.reload());
-    document.getElementById('finishBtn').onclick = () => finalize();
-
-    // --- GALAXIE ---
-    const canvas = document.getElementById('galaxy-bg'); const ctx = canvas.getContext('2d');
-    let stars = [];
-    function res() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.onresize = res; res();
-    for(let i=0; i<120; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2.5, color: Math.random()>0.4?'#ffd700':'#ffffff', v: Math.random()*0.3});
-    function anim() {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        stars.forEach(s => { ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill(); s.y += s.v; if(s.y > canvas.height) s.y = -5; });
-        requestAnimationFrame(anim);
-    }
-    anim();
+    // ==========================================
+    // LOGIK JWÈT & FIREBASE
+    // ==========================================
+    // (Mete kòd JavaScript Firebase ou a isit la jan nou te fè l la)
 </script>
 </body>
 </html>
+
 
 
 
