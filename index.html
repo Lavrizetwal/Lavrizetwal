@@ -56,232 +56,254 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 
 <style>
-    :root { --lò: #ffd700; --nwa: #010101; --glow: 0 0 20px rgba(255, 215, 0, 0.7); }
-    body { background: var(--nwa); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; user-select: none; }
-
+    :root { --lò: #ffd700; --solèy: #ff4500; --nwa: #020202; }
+    body { background: var(--nwa); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; touch-action: none; }
+    
     #galaxy-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 
-    /* UI ELEMENTS */
+    /* UI MODERNE */
     .game-ui { text-align: center; position: relative; z-index: 100; padding: 20px; display: none; }
     .stat-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-    .stat-card { background: rgba(0,0,0,0.85); border: 2px solid var(--lò); border-radius: 15px; padding: 10px 25px; box-shadow: var(--glow); transition: 0.3s; }
-    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 0 30px var(--lò); }
-
-    /* MATCH-3 GRID WITH SWIPE */
+    .stat-card { background: rgba(0,0,0,0.8); border: 1.5px solid var(--lò); border-radius: 15px; padding: 12px 25px; box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+    
+    /* GRID MATCH-3 AVANSE */
     #game-grid {
         display: grid; grid-template-columns: repeat(6, 60px); grid-template-rows: repeat(6, 60px);
-        gap: 10px; background: rgba(255, 215, 0, 0.08); padding: 20px;
+        gap: 10px; background: rgba(255, 215, 0, 0.05); padding: 20px;
         border-radius: 25px; border: 2px solid var(--lò); margin: 0 auto; width: fit-content;
-        touch-action: none; /* Bloke scroll pandan swipe */
+        backdrop-filter: blur(10px);
     }
     .tile {
-        width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center;
-        justify-content: center; font-size: 32px; cursor: grab; transition: transform 0.2s, box-shadow 0.2s;
-        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2);
+        width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center;
+        justify-content: center; font-size: 32px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.1);
     }
-    .tile:hover { transform: scale(1.1); box-shadow: var(--glow); background: rgba(255,215,0,0.1); }
-    .tile:active { cursor: grabbing; }
+    .tile:hover { transform: scale(1.15); box-shadow: 0 0 20px var(--lò); background: rgba(255,215,0,0.2); }
+    .tile.match-anim { animation: matchExplosion 0.5s forwards; }
 
-    /* SIMULATION & COMET CHASE CONTAINERS */
-    .canvas-container { width: 100%; height: 450px; position: relative; border-top: 2px solid var(--lò); background: #000; margin-top: 50px; }
-    .label-3d { position: absolute; top: 15px; left: 20px; color: var(--lò); font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 10px black; }
-
-    /* ZETWAL CORE (BOULE QUI VIT) - ULTRA GLOW */
-    #zetwal-core {
-        position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
-        background: radial-gradient(circle, #fff, #ffd700, #ff8c00); border-radius: 50%;
-        z-index: 9000; filter: drop-shadow(0 0 20px #ffd700);
-        animation: heartBeat 2s infinite ease-in-out;
+    @keyframes matchExplosion { 
+        0% { transform: scale(1); } 
+        50% { transform: scale(1.4); opacity: 0.7; filter: brightness(2); } 
+        100% { transform: scale(0); opacity: 0; } 
     }
-    @keyframes heartBeat { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.15); filter: brightness(1.6) drop-shadow(0 0 40px #fff); } }
 
-    footer { text-align: center; padding: 40px; background: #000; position: relative; z-index: 1000; border-top: 1px solid #222; }
+    /* 3D SCENES */
+    .viewport { width: 100%; height: 500px; position: relative; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); border-top: 2px solid var(--lò); }
+    .label-3d { position: absolute; top: 20px; left: 20px; color: var(--lò); font-weight: 900; letter-spacing: 3px; z-index: 10; font-size: 0.8rem; }
+
+    /* FOOTER VIZIB */
+    #prestige-footer {
+        position: relative; width: 100%; padding: 40px 0; background: #000; text-align: center; border-top: 1.5px solid #222;
+    }
+    .logo-zetwal { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--lò); letter-spacing: 8px; margin-bottom: 10px; text-shadow: 0 0 20px var(--lò); }
 </style>
 
 <canvas id="galaxy-bg"></canvas>
 
-<div id="login-screen" style="position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <h1 style="color:var(--lò); font-size:3rem; letter-spacing:15px; margin-bottom:30px;">LAVRI ZETWAL</h1>
-    <button onclick="bootSystem()" style="background:var(--lò); color:black; border:none; padding:20px 60px; border-radius:50px; font-weight:900; cursor:pointer; font-size:1.2rem; box-shadow: var(--glow);">INITE SISTÈM LAN</button>
+<div id="login-screen" style="position:fixed; inset:0; background:#000; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <div id="sun-container" style="width:300px; height:300px; margin-bottom:40px;"></div>
+    <button onclick="igniteEngine()" style="background:var(--lò); border:none; padding:18px 50px; border-radius:50px; font-weight:900; cursor:pointer; font-size:1.1rem; box-shadow: 0 0 30px var(--solèy);">KÒMANSE LAVRI A</button>
 </div>
-
-<div id="star-header-3d" style="width:100%; height:300px;"></div>
 
 <section id="game-ui" class="game-ui">
     <div class="stat-bar">
         <div class="stat-card"><small>SCORE</small><div id="score">0</div></div>
-        <div class="stat-card" style="border-color:#ff4500;"><small>MOUVMAN</small><div id="moves">20</div></div>
+        <div class="stat-card" style="border-color:var(--solèy);"><small>MOUVMAN</small><div id="moves">25</div></div>
         <div class="stat-card"><small>NIVO</small><div id="level">1</div></div>
     </div>
     <div id="game-grid"></div>
 </section>
 
-<div class="canvas-container">
-    <div class="label-3d">MISSION: COMÈTE CHASE</div>
-    <div id="comet-chase-render" style="width:100%; height:100%;"></div>
+<div class="viewport">
+    <div class="label-3d">SIMILASYON REYALIS & EKIPMAN</div>
+    <div id="char-render" style="width:100%; height:100%;"></div>
 </div>
 
-<div class="canvas-container" style="height:500px;">
-    <div class="label-3d">LAUNDRY SIMULATION 3D</div>
-    <div id="laundry-sim-render" style="width:100%; height:100%;"></div>
-</div>
-
-<footer>
-    <div style="width: 200px; height: 2px; background: linear-gradient(90deg, transparent, var(--lò), transparent); margin: 0 auto 20px;"></div>
-    <p style="color:var(--lò); font-weight:bold; letter-spacing:5px;">© 2026 • TOUT DWA REZÈVE</p>
+<footer id="prestige-footer">
+    <div class="logo-zetwal">ZETWAL</div>
+    <p style="color:var(--lò); opacity:0.8; letter-spacing:3px; font-size:0.7rem;">© 2026 • TOUT DWA REZÈVE</p>
 </footer>
 
-<div id="zetwal-core"></div>
-
 <script>
-// --- KONFIGIRASYON TEKNIK ---
-const items = ['👕', '👖', '👗', '🧥', '👚'];
-let state = { score: 0, moves: 20, level: 1, grid: [], isDragging: false };
+// --- CONFIGURASYON ---
+const radItems = ['👕', '👖', '👗', '🧥', '👚'];
+let gameState = { score: 0, moves: 25, level: 1, grid: [], isBusy: false };
 
-// --- 1. GALAXY ENGINE (BLAN & LÒ) ---
-const galCanvas = document.getElementById('galaxy-bg');
-const gctx = galCanvas.getContext('2d');
-let stars = [];
-function initGalaxy() {
-    galCanvas.width = window.innerWidth; galCanvas.height = window.innerHeight;
-    stars = Array(250).fill().map(() => ({
-        x: Math.random()*galCanvas.width, y: Math.random()*galCanvas.height,
-        r: Math.random()*1.5, color: Math.random() > 0.8 ? '#ffd700' : '#ffffff',
-        o: Math.random(), s: 0.005 + Math.random()*0.01
+// --- 1. SOLÈY 3D (CENTRE VISUEL) ---
+const sunScene = new THREE.Scene();
+const sunCam = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+const sunRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+sunRenderer.setSize(300, 300);
+document.getElementById('sun-container').appendChild(sunRenderer.domElement);
+
+const sunGeo = new THREE.SphereGeometry(1, 64, 64);
+const sunMat = new THREE.MeshStandardMaterial({ 
+    color: 0xff4500, emissive: 0xffaa00, emissiveIntensity: 2, roughness: 0.5 
+});
+const sunMesh = new THREE.Mesh(sunGeo, sunMat);
+sunScene.add(sunMesh);
+const sunLight = new THREE.PointLight(0xffaa00, 5, 50); sunScene.add(sunLight);
+sunCam.position.z = 3;
+
+// --- 2. CHARACTER SIMULATION (PBR) ---
+const charScene = new THREE.Scene();
+const charCam = new THREE.PerspectiveCamera(40, window.innerWidth/500, 0.1, 1000);
+const charRenderer = new THREE.WebGLRenderer({ antialias: true });
+charRenderer.setSize(window.innerWidth, 500);
+charRenderer.shadowMap.enabled = true;
+charRenderer.outputEncoding = THREE.sRGBEncoding;
+document.getElementById('char-render').appendChild(charRenderer.domElement);
+
+// Room & Lighting
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial({color: 0x111111, metalness: 0.8, roughness: 0.2}));
+ground.rotation.x = -Math.PI/2; ground.position.y = -2; ground.receiveShadow = true;
+charScene.add(ground);
+
+const charGroup = new THREE.Group();
+const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.4, 1.2, 8, 20), new THREE.MeshStandardMaterial({color: 0xffdbac, roughness: 0.3}));
+body.castShadow = true; charGroup.add(body);
+charScene.add(charGroup);
+
+const light = new THREE.SpotLight(0xffffff, 2); light.position.set(5, 10, 5); light.castShadow = true;
+charScene.add(light, new THREE.AmbientLight(0xffffff, 0.3));
+charCam.position.set(0, 1, 8);
+
+// --- 3. MATCH-3 LOGIC (CANDY CRUSH STYLE) ---
+function initGrid() {
+    const gridEl = document.getElementById('game-grid'); gridEl.innerHTML = '';
+    gameState.grid = Array(6).fill().map(() => Array(6).fill().map(() => Math.floor(Math.random()*radItems.length)));
+    renderGrid();
+}
+
+function renderGrid() {
+    const gridEl = document.getElementById('game-grid'); gridEl.innerHTML = '';
+    gameState.grid.forEach((row, r) => row.forEach((id, c) => {
+        const t = document.createElement('div'); t.className = 'tile';
+        t.id = `t-${r}-${c}`; t.innerHTML = radItems[id];
+        t.onclick = () => selectTile(r, c); gridEl.appendChild(t);
     }));
 }
-initGalaxy();
 
-// --- 2. COMETE CHASE (3D MINI GAME) ---
-const chaseScene = new THREE.Scene();
-const chaseCam = new THREE.PerspectiveCamera(50, window.innerWidth/450, 0.1, 1000);
-const chaseRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-chaseRenderer.setSize(window.innerWidth, 450);
-document.getElementById('comet-chase-render').appendChild(chaseRenderer.domElement);
-
-// Bato Espasyal (Prestige Style)
-const shipGeo = new THREE.ConeGeometry(0.5, 2, 32);
-const shipMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.9, roughness: 0.1 });
-const ship = new THREE.Mesh(shipGeo, shipMat);
-ship.rotation.x = Math.PI/2; chaseScene.add(ship);
-
-// Asteroid & Comet System
-let comets3D = [];
-function spawnComet() {
-    const geo = new THREE.SphereGeometry(0.3, 16, 16);
-    const mat = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 2 });
-    const comet = new THREE.Mesh(geo, mat);
-    comet.position.set(Math.random()*10 - 5, Math.random()*6 - 3, -20);
-    chaseScene.add(comet); comets3D.push(comet);
-}
-
-chaseCam.position.z = 10;
-const chaseLight = new THREE.PointLight(0xffffff, 2); chaseLight.position.set(5,5,5); chaseScene.add(chaseLight);
-chaseScene.add(new THREE.AmbientLight(0x444444));
-
-// --- 3. SWIPE LOGIC MATCH-3 ---
-let startX, startY, activeTile;
-
-function handleTouchStart(e) {
-    const touch = e.touches ? e.touches[0] : e;
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (el && el.classList.contains('tile')) {
-        startX = touch.clientX; startY = touch.clientY;
-        activeTile = el;
+let selected = null;
+async function selectTile(r, c) {
+    if(gameState.isBusy || gameState.moves <= 0) return;
+    const el = document.getElementById(`t-${r}-${c}`);
+    if(!selected) { selected = {r, c}; el.style.border = "2px solid white"; }
+    else {
+        const dist = Math.abs(selected.r - r) + Math.abs(selected.c - c);
+        if(dist === 1) await swap(selected.r, selected.c, r, c);
+        document.querySelectorAll('.tile').forEach(t => t.style.border = "");
+        selected = null;
     }
 }
 
-function handleTouchEnd(e) {
-    if (!activeTile) return;
-    const touch = e.changedTouches ? e.changedTouches[0] : e;
-    const diffX = touch.clientX - startX; const diffY = touch.clientY - startY;
-    if (Math.abs(diffX) > 30 || Math.abs(diffY) > 30) {
-        const r = parseInt(activeTile.id.split('-')[1]);
-        const c = parseInt(activeTile.id.split('-')[2]);
-        if (Math.abs(diffX) > Math.abs(diffY)) {
-            diffX > 0 ? swap(r, c, r, c + 1) : swap(r, c, r, c - 1);
-        } else {
-            diffY > 0 ? swap(r, c, r + 1, c) : swap(r, c, r - 1, c);
-        }
-    }
-    activeTile = null;
-}
-
-// --- MAIN LOOP ---
-function mainLoop() {
-    requestAnimationFrame(mainLoop);
+async function swap(r1, c1, r2, c2) {
+    gameState.isBusy = true;
+    [gameState.grid[r1][c1], gameState.grid[r2][c2]] = [gameState.grid[r2][c2], gameState.grid[r1][c1]];
+    renderGrid();
     
-    // Update Galaxy
-    gctx.fillStyle = '#010101'; gctx.fillRect(0,0,galCanvas.width, galCanvas.height);
-    stars.forEach(s => {
-        s.o += s.s; if(s.o > 1 || s.o < 0.2) s.s *= -1;
-        gctx.globalAlpha = Math.abs(s.o); gctx.fillStyle = s.color;
-        gctx.beginPath(); gctx.arc(s.x, s.y, s.r, 0, Math.PI*2); gctx.fill();
-    });
-
-    // Update Comet Chase
-    comets3D.forEach((c, i) => {
-        c.position.z += 0.2;
-        if(c.position.z > 10) { chaseScene.remove(c); comets3D.splice(i,1); }
-    });
-    if(Math.random() < 0.05) spawnComet();
-    
-    // Ship follow (Lerp)
-    ship.position.x += (targetX - ship.position.x) * 0.1;
-    ship.position.y += (targetY - ship.position.y) * 0.1;
-
-    chaseRenderer.render(chaseScene, chaseCam);
-}
-
-let targetX = 0, targetY = 0;
-window.addEventListener('mousemove', (e) => {
-    targetX = (e.clientX / window.innerWidth) * 10 - 5;
-    targetY = -(e.clientY / window.innerHeight) * 6 + 3;
-});
-
-function bootSystem() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('game-ui').style.display = 'block';
-    initBoard();
-    mainLoop();
-}
-
-function initBoard() {
-    const grid = document.getElementById('game-grid'); grid.innerHTML = '';
-    for(let r=0; r<6; r++) {
-        state.grid[r] = [];
-        for(let c=0; c<6; c++) {
-            let id = Math.floor(Math.random()*items.length);
-            state.grid[r][c] = id;
-            let t = document.createElement('div'); t.className = 'tile'; t.id = `t-${r}-${c}`;
-            t.innerHTML = items[id]; grid.appendChild(t);
-        }
+    let matches = checkMatches();
+    if(matches.length > 0) {
+        gameState.moves--;
+        await handleMatches(matches);
+    } else {
+        // Undo
+        [gameState.grid[r1][c1], gameState.grid[r2][c2]] = [gameState.grid[r2][c2], gameState.grid[r1][c1]];
+        setTimeout(renderGrid, 200);
     }
-    grid.addEventListener('touchstart', handleTouchStart);
-    grid.addEventListener('touchend', handleTouchEnd);
-    grid.addEventListener('mousedown', handleTouchStart);
-    grid.addEventListener('mouseup', handleTouchEnd);
-}
-
-function swap(r1, c1, r2, c2) {
-    if(r2 < 0 || r2 >= 6 || c2 < 0 || c2 >= 6 || state.moves <= 0) return;
-    [state.grid[r1][c1], state.grid[r2][c2]] = [state.grid[r2][c2], state.grid[r1][c1]];
-    state.score += 50; state.moves--;
+    gameState.isBusy = false;
     updateUI();
-    if(state.score >= state.level * 600) { state.level++; alert("LEVEL UP!"); }
+}
+
+function checkMatches() {
+    let matches = [];
+    // Horiz
+    for(let r=0; r<6; r++) {
+        for(let c=0; c<4; c++) {
+            if(gameState.grid[r][c] === gameState.grid[r][c+1] && gameState.grid[r][c] === gameState.grid[r][c+2])
+                matches.push({r,c}, {r,c:c+1}, {r,c:c+2});
+        }
+    }
+    // Vert
+    for(let c=0; c<6; c++) {
+        for(let r=0; r<4; r++) {
+            if(gameState.grid[r][c] === gameState.grid[r+1][c] && gameState.grid[r][c] === gameState.grid[r+2][c])
+                matches.push({r,c}, {r:r+1,c}, {r:r+2,c});
+        }
+    }
+    return matches;
+}
+
+async function handleMatches(matches) {
+    matches.forEach(m => {
+        const el = document.getElementById(`t-${m.r}-${m.c}`);
+        if(el) el.classList.add('match-anim');
+        gameState.grid[m.r][m.c] = -1;
+    });
+    gameState.score += matches.length * 20;
+    await new Promise(res => setTimeout(res, 500));
+    fillHoles();
+    renderGrid();
+    let nextMatches = checkMatches();
+    if(nextMatches.length > 0) await handleMatches(nextMatches);
+    
+    if(gameState.score >= gameState.level * 1000) levelUp();
+}
+
+function fillHoles() {
+    for(let c=0; c<6; c++) {
+        for(let r=5; r>=0; r--) {
+            if(gameState.grid[r][c] === -1) {
+                for(let kr=r-1; kr>=0; kr--) {
+                    if(gameState.grid[kr][c] !== -1) {
+                        gameState.grid[r][c] = gameState.grid[kr][c];
+                        gameState.grid[kr][c] = -1;
+                        break;
+                    }
+                }
+                if(gameState.grid[r][c] === -1) gameState.grid[r][c] = Math.floor(Math.random()*radItems.length);
+            }
+        }
+    }
+}
+
+function levelUp() {
+    gameState.level++;
+    gameState.moves += 10;
+    // Rekonpans vizyèl: Pèsonaj la chanje koulè rad
+    gsap.to(body.material.color, { r: Math.random(), g: Math.random(), b: Math.random(), duration: 2 });
+    gsap.to(charGroup.rotation, { y: charGroup.rotation.y + Math.PI*2, duration: 2, ease: "back.out" });
+    alert(`NIVO ${gameState.level} DEBLOKE! Pèsonaj la resevwa nouvo ekipman!`);
 }
 
 function updateUI() {
-    state.grid.forEach((row, r) => row.forEach((id, c) => {
-        document.getElementById(`t-${r}-${c}`).innerHTML = items[id];
-    }));
-    document.getElementById('score').innerText = state.score;
-    document.getElementById('moves').innerText = state.moves;
-    document.getElementById('level').innerText = state.level;
+    document.getElementById('score').innerText = gameState.score;
+    document.getElementById('moves').innerText = gameState.moves;
+    document.getElementById('level').innerText = gameState.level;
+}
+
+// --- ENGINE LOOP ---
+function igniteEngine() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('game-ui').style.display = 'block';
+    initGrid();
+    loop();
+}
+
+function loop() {
+    requestAnimationFrame(loop);
+    sunMesh.rotation.y += 0.01;
+    sunMesh.scale.setScalar(1 + Math.sin(Date.now()*0.002)*0.05);
+    
+    charGroup.rotation.y += 0.005;
+    
+    sunRenderer.render(sunScene, sunCam);
+    charRenderer.render(charScene, charCam);
 }
 </script>
 </body>
 </html>
+
 
 
 
