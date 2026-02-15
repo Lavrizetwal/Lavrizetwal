@@ -52,253 +52,243 @@
             </div>
         </div>
     </section>
-<!-- ================== STAR 3D FIX + MATCH 3 PRO + LAUNDRY SIMULATOR ================== -->
-
 <script>
-/* =========================================================
-   ⭐ 1) STAR 3D CORRIGÉE (VISIBLE + ULTRA BRILLANTE)
-========================================================= */
+/* =====================================================
+   FIX ÉTOILE INVISIBLE (UTILISE TA SCÈNE EXISTANTE)
+===================================================== */
 
-const starScene = new THREE.Scene();
-const starCamera = new THREE.PerspectiveCamera(50, window.innerWidth / 350, 0.1, 1000);
-const starRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-
-starRenderer.setSize(window.innerWidth, 350);
-starRenderer.physicallyCorrectLights = true;
-starRenderer.outputEncoding = THREE.sRGBEncoding;
-starRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-starRenderer.toneMappingExposure = 1.6;
-
-document.getElementById('star-3d-header').innerHTML = "";
-document.getElementById('star-3d-header').appendChild(starRenderer.domElement);
-
-const starShape = new THREE.Shape();
-const outer = 1.5, inner = 0.7;
-
-for(let i=0;i<10;i++){
-    let r = (i%2===0)?outer:inner;
-    let a = (i*Math.PI)/5 - Math.PI/2;
-    if(i===0) starShape.moveTo(Math.cos(a)*r, Math.sin(a)*r);
-    else starShape.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+if (typeof renderer !== "undefined") {
+    renderer.physicallyCorrectLights = true;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.6;
 }
 
-const starGeometry = new THREE.ExtrudeGeometry(starShape,{
-    depth:0.4,
-    bevelEnabled:true,
-    bevelSize:0.1
-});
-
-const starMaterial = new THREE.MeshPhysicalMaterial({
-    color:0xffd700,
-    metalness:1,
-    roughness:0.05,
-    clearcoat:1,
-    clearcoatRoughness:0,
-    emissive:0xffcc00,
-    emissiveIntensity:0.5
-});
-
-const starMesh = new THREE.Mesh(starGeometry, starMaterial);
-starScene.add(starMesh);
-
-const dirLight = new THREE.DirectionalLight(0xffffff,3);
-dirLight.position.set(3,5,2);
-starScene.add(dirLight);
-
-starScene.add(new THREE.AmbientLight(0xffffff,1.2));
-starCamera.position.z = 5;
-
-function animateStar(){
-    requestAnimationFrame(animateStar);
-    starMesh.rotation.y += 0.01;
-    starRenderer.render(starScene, starCamera);
-}
-animateStar();
-
-/* =========================================================
-   🎮 2) MATCH 3 PRO AVEC EXPLOSION + GRAVITÉ
-========================================================= */
-
-let gridSize = 6;
-let items = ['👕','👖','👗','🧥','👚','🌟'];
-let board = [];
-let selected = null;
-let score = 0;
-let moves = 20;
-let level = 1;
-
-function initBoard(){
-    const grid = document.getElementById("game-grid");
-    grid.innerHTML="";
-    board=[];
-    for(let r=0;r<gridSize;r++){
-        board[r]=[];
-        for(let c=0;c<gridSize;c++){
-            let val = Math.floor(Math.random()*5);
-            board[r][c]=val;
-            createTile(r,c,val);
-        }
-    }
+if (typeof starMesh !== "undefined") {
+    starMesh.material = new THREE.MeshPhysicalMaterial({
+        color: 0xffd700,
+        metalness: 1,
+        roughness: 0.05,
+        clearcoat: 1,
+        clearcoatRoughness: 0,
+        emissive: 0xffcc00,
+        emissiveIntensity: 0.6
+    });
 }
 
-function createTile(r,c,val){
-    const tile=document.createElement("div");
-    tile.className="tile";
-    tile.id=`t-${r}-${c}`;
-    tile.innerHTML=items[val];
-    tile.onclick=()=>selectTile(r,c);
-    document.getElementById("game-grid").appendChild(tile);
+if (typeof scene !== "undefined") {
+    const boostLight = new THREE.DirectionalLight(0xffffff, 3);
+    boostLight.position.set(3,5,2);
+    scene.add(boostLight);
 }
 
-function selectTile(r,c){
-    if(!selected){
-        selected={r,c};
-        document.getElementById(`t-${r}-${c}`).classList.add("selected");
-    }else{
-        swap(selected.r,selected.c,r,c);
-        document.getElementById(`t-${selected.r}-${selected.c}`).classList.remove("selected");
-        selected=null;
-        checkMatches();
-    }
-}
+/* =====================================================
+   MATCH-3 PROFESSIONNEL
+===================================================== */
 
-function swap(r1,c1,r2,c2){
-    let tmp=board[r1][c1];
-    board[r1][c1]=board[r2][c2];
-    board[r2][c2]=tmp;
-    renderBoard();
-}
+function checkMatchesAdvanced() {
+    let matches = [];
 
-function renderBoard(){
-    for(let r=0;r<gridSize;r++){
-        for(let c=0;c<gridSize;c++){
-            document.getElementById(`t-${r}-${c}`).innerHTML=items[board[r][c]];
-        }
-    }
-}
-
-function checkMatches(){
-    let matches=[];
-    for(let r=0;r<gridSize;r++){
-        for(let c=0;c<gridSize-2;c++){
-            let v=board[r][c];
-            if(v===board[r][c+1] && v===board[r][c+2]){
+    // Horizontal
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 4; c++) {
+            let v = board[r][c];
+            if (v === board[r][c+1] && v === board[r][c+2]) {
                 matches.push([r,c],[r,c+1],[r,c+2]);
             }
         }
     }
-    for(let c=0;c<gridSize;c++){
-        for(let r=0;r<gridSize-2;r++){
-            let v=board[r][c];
-            if(v===board[r+1][c] && v===board[r+2][c]){
+
+    // Vertical
+    for (let c = 0; c < 6; c++) {
+        for (let r = 0; r < 4; r++) {
+            let v = board[r][c];
+            if (v === board[r+1][c] && v === board[r+2][c]) {
                 matches.push([r,c],[r+1,c],[r+2,c]);
             }
         }
     }
-    if(matches.length>0) explode(matches);
+
+    if (matches.length > 0) explodeTiles(matches);
 }
 
-function explode(matches){
-    matches.forEach(([r,c])=>{
-        const tile=document.getElementById(`t-${r}-${c}`);
-        tile.style.transform="scale(1.5)";
-        tile.style.boxShadow="0 0 30px gold";
-        setTimeout(()=>{
-            board[r][c]=Math.floor(Math.random()*items.length);
-            tile.style.transform="scale(1)";
-            tile.style.boxShadow="none";
-            renderBoard();
-        },300);
+function explodeTiles(matches) {
+    matches.forEach(([r,c]) => {
+        const tile = document.getElementById(`t-${r}-${c}`);
+        tile.style.transition = "0.3s";
+        tile.style.transform = "scale(1.6)";
+        tile.style.boxShadow = "0 0 30px gold";
+        tile.style.opacity = "0";
+
+        setTimeout(() => {
+            board[r][c] = Math.floor(Math.random()*items.length);
+            tile.style.transform = "scale(1)";
+            tile.style.boxShadow = "none";
+            tile.style.opacity = "1";
+            render();
+        }, 300);
     });
-    score+=matches.length*50;
-    document.getElementById("score").innerText=score;
-    levelSystem();
+
+    score += matches.length * 70;
+    document.getElementById("score").innerText = score;
+
+    levelUpgrade();
 }
 
-function levelSystem(){
-    if(score>500 && level===1){
-        level=2;
-        moves+=10;
-        document.getElementById("level").innerText=2;
+function levelUpgrade() {
+    if (score >= 500 && level === 1) {
+        level = 2;
+        moves += 10;
+        document.getElementById("level").innerText = level;
+        document.getElementById("moves").innerText = moves;
     }
-    if(score>1200 && level===2){
-        level=3;
-        gridSize=7;
-        document.getElementById("level").innerText=3;
-        initBoard();
+
+    if (score >= 1200 && level === 2) {
+        level = 3;
+        moves += 15;
+        document.getElementById("level").innerText = level;
+        document.getElementById("moves").innerText = moves;
+        items.push("💎"); // objet rare
+    }
+
+    if (score >= 2500 && level === 3) {
+        level = 4;
+        moves += 20;
+        document.getElementById("level").innerText = level;
+        document.getElementById("moves").innerText = moves;
     }
 }
 
-/* =========================================================
-   🧺 3) SIMULATEUR 3D LAVERIE ULTRA RÉALISTE
-========================================================= */
+/* Hook après chaque swap */
 
-const simSection=document.createElement("section");
-simSection.style.height="600px";
-simSection.style.marginTop="100px";
-document.body.appendChild(simSection);
+const originalHandleSelect = handleSelect;
 
-const simScene=new THREE.Scene();
-const simCamera=new THREE.PerspectiveCamera(60,window.innerWidth/600,0.1,1000);
-const simRenderer=new THREE.WebGLRenderer({antialias:true});
-simRenderer.setSize(window.innerWidth,600);
-simRenderer.shadowMap.enabled=true;
-simRenderer.shadowMap.type=THREE.PCFSoftShadowMap;
-simRenderer.physicallyCorrectLights=true;
-simRenderer.toneMapping=THREE.ACESFilmicToneMapping;
+handleSelect = function(r,c){
+    originalHandleSelect(r,c);
+    setTimeout(checkMatchesAdvanced, 200);
+};
 
-simSection.appendChild(simRenderer.domElement);
+</script>
+    <script>
+/* =====================================================
+   FIX ÉTOILE INVISIBLE (UTILISE TA SCÈNE EXISTANTE)
+===================================================== */
 
-const floor=new THREE.Mesh(
-    new THREE.PlaneGeometry(50,50),
-    new THREE.MeshStandardMaterial({color:0x444444,roughness:0.3,metalness:0.2})
-);
-floor.rotation.x=-Math.PI/2;
-floor.receiveShadow=true;
-simScene.add(floor);
-
-const light=new THREE.DirectionalLight(0xffffff,2);
-light.position.set(5,10,5);
-light.castShadow=true;
-simScene.add(light);
-
-simScene.add(new THREE.AmbientLight(0xffffff,0.6));
-
-function createMachine(x){
-    const machine=new THREE.Mesh(
-        new THREE.BoxGeometry(2,2,2),
-        new THREE.MeshStandardMaterial({color:0xffffff,metalness:0.5,roughness:0.2})
-    );
-    machine.position.set(x,1,0);
-    machine.castShadow=true;
-    simScene.add(machine);
+if (typeof renderer !== "undefined") {
+    renderer.physicallyCorrectLights = true;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.6;
 }
 
-for(let i=-8;i<=8;i+=4) createMachine(i);
-
-const woman=new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.5,1.5,8,16),
-    new THREE.MeshStandardMaterial({color:0xffccaa,roughness:0.6})
-);
-woman.position.set(0,1,5);
-woman.castShadow=true;
-simScene.add(woman);
-
-simCamera.position.set(0,5,15);
-
-function animateSim(){
-    requestAnimationFrame(animateSim);
-    woman.position.x=Math.sin(Date.now()*0.001)*3;
-    simRenderer.render(simScene,simCamera);
+if (typeof starMesh !== "undefined") {
+    starMesh.material = new THREE.MeshPhysicalMaterial({
+        color: 0xffd700,
+        metalness: 1,
+        roughness: 0.05,
+        clearcoat: 1,
+        clearcoatRoughness: 0,
+        emissive: 0xffcc00,
+        emissiveIntensity: 0.6
+    });
 }
-animateSim();
 
-/* ========================================================= */
+if (typeof scene !== "undefined") {
+    const boostLight = new THREE.DirectionalLight(0xffffff, 3);
+    boostLight.position.set(3,5,2);
+    scene.add(boostLight);
+}
 
-initBoard();
+/* =====================================================
+   MATCH-3 PROFESSIONNEL
+===================================================== */
+
+function checkMatchesAdvanced() {
+    let matches = [];
+
+    // Horizontal
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 4; c++) {
+            let v = board[r][c];
+            if (v === board[r][c+1] && v === board[r][c+2]) {
+                matches.push([r,c],[r,c+1],[r,c+2]);
+            }
+        }
+    }
+
+    // Vertical
+    for (let c = 0; c < 6; c++) {
+        for (let r = 0; r < 4; r++) {
+            let v = board[r][c];
+            if (v === board[r+1][c] && v === board[r+2][c]) {
+                matches.push([r,c],[r+1,c],[r+2,c]);
+            }
+        }
+    }
+
+    if (matches.length > 0) explodeTiles(matches);
+}
+
+function explodeTiles(matches) {
+    matches.forEach(([r,c]) => {
+        const tile = document.getElementById(`t-${r}-${c}`);
+        tile.style.transition = "0.3s";
+        tile.style.transform = "scale(1.6)";
+        tile.style.boxShadow = "0 0 30px gold";
+        tile.style.opacity = "0";
+
+        setTimeout(() => {
+            board[r][c] = Math.floor(Math.random()*items.length);
+            tile.style.transform = "scale(1)";
+            tile.style.boxShadow = "none";
+            tile.style.opacity = "1";
+            render();
+        }, 300);
+    });
+
+    score += matches.length * 70;
+    document.getElementById("score").innerText = score;
+
+    levelUpgrade();
+}
+
+function levelUpgrade() {
+    if (score >= 500 && level === 1) {
+        level = 2;
+        moves += 10;
+        document.getElementById("level").innerText = level;
+        document.getElementById("moves").innerText = moves;
+    }
+
+    if (score >= 1200 && level === 2) {
+        level = 3;
+        moves += 15;
+        document.getElementById("level").innerText = level;
+        document.getElementById("moves").innerText = moves;
+        items.push("💎"); // objet rare
+    }
+
+    if (score >= 2500 && level === 3) {
+        level = 4;
+        moves += 20;
+        document.getElementById("level").innerText = level;
+        document.getElementById("moves").innerText = moves;
+    }
+}
+
+/* Hook après chaque swap */
+
+const originalHandleSelect = handleSelect;
+
+handleSelect = function(r,c){
+    originalHandleSelect(r,c);
+    setTimeout(checkMatchesAdvanced, 200);
+};
+
 </script>
 </body>
 </html>
+
 
 
 
