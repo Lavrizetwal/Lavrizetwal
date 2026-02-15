@@ -55,160 +55,196 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
-    :root { --lò: #ffd700; --nwa: #000000; }
-    
-    body { background: #000; margin: 0; overflow-x: hidden; color: white; font-family: 'Segoe UI', sans-serif; }
-    #galaxy-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
+    :root { --lò: #ffd700; --nwa: #050505; --blan: #ffffff; }
+    body { background-color: var(--nwa); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
 
-    /* ESTIL KAT YO */
-    .kat-entèaktif { 
-        background: rgba(10, 10, 10, 0.9); border: 1px solid rgba(255, 215, 0, 0.2); 
-        border-radius: 25px; transition: 0.5s; position: relative; z-index: 10;
+    /* ZETWAL CORE K AP RESPIRE */
+    #zetwal-core {
+        position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+        background: radial-gradient(circle, #fff, var(--lò)); border-radius: 50%;
+        z-index: 2000; display: flex; align-items: center; justify-content: center;
+        font-weight: 900; font-size: 10px; color: black;
+        animation: respire 3s infinite ease-in-out; box-shadow: 0 0 20px var(--lò);
     }
-    .kat-entèaktif:hover { border-color: var(--lò); box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); }
+    @keyframes respire { 0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 20px var(--lò); } 50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 40px #fff; } }
 
-    /* RAD YO AK EFÈ LIMYÈ */
-    .bouton-rad { 
-        background: rgba(255, 215, 0, 0.05); border: 2px solid rgba(255, 215, 0, 0.2); 
-        border-radius: 15px; width: 85px; height: 95px; cursor: pointer; transition: 0.3s;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
+    /* TABLO JWÈT LA (MATCH-3) */
+    #game-grid {
+        display: grid; grid-template-columns: repeat(6, 50px); grid-template-rows: repeat(6, 50px);
+        gap: 8px; background: rgba(255, 215, 0, 0.1); padding: 15px;
+        border-radius: 20px; border: 2px solid var(--lò); margin: 0 auto; width: fit-content;
     }
-    .rad-blan { box-shadow: inset 0 0 15px #fff; filter: drop-shadow(0 0 8px #fff); }
-    .rad-nwa { box-shadow: inset 0 0 15px #000; background: #000 !important; filter: drop-shadow(0 0 5px var(--lò)); }
-    .rad-koulè { box-shadow: inset 0 0 15px var(--lò); filter: drop-shadow(0 0 10px var(--lò)); }
-
-    /* EFÈ SOURIS */
-    .etensèl { position: fixed; pointer-events: none; width: 2px; height: 12px; background: var(--lò); z-index: 10000; }
-    .boul-kim { position: fixed; pointer-events: none; z-index: 9999; transition: 1.2s; opacity: 0.6; }
-
-    /* BOUTON GOOGLE KI REPARE */
-    #btn-google { 
-        background: #db4437 !important; color: white !important; border: none; 
-        padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; 
-        width: 100%; display: block; position: relative; z-index: 100;
+    .tile {
+        width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center;
+        justify-content: center; font-size: 25px; cursor: pointer; transition: 0.2s;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.1);
     }
+    .tile:hover { transform: scale(1.1); background: rgba(255,215,0,0.2); }
+    .selected { border: 2px solid white; box-shadow: 0 0 15px white; transform: scale(1.1); }
+
+    .stat-box { background: rgba(0,0,0,0.8); padding: 15px; border-radius: 15px; border: 1px solid var(--lò); min-width: 120px; }
 </style>
 
-<canvas id="galaxy-bg"></canvas>
+<div id="star-3d-header" style="width: 100%; height: 200px;"></div>
 
-<div id="zetwal-3d-container" style="width: 100%; height: 180px; z-index: 5;"></div>
-
-<section style="padding: 20px; text-align: center; position: relative;">
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
-
-        <div class="kat-entèaktif" style="flex: 1; min-width: 300px; padding: 25px;">
-            <h3 style="color: var(--lò);">🌟 ESPAS ZETWAL</h3>
-            <div id="user-status" style="margin: 15px 0;">N ap verifye...</div>
-            <div id="login-methods">
-                <button id="btn-google">KONEKSYON GOOGLE</button>
-            </div>
-            <div id="player-stats" style="display:none;">
-                <p style="font-size: 2rem;">💰 <span id="balance">0</span></p>
-                <button id="btn-logout" style="color: #666; background: none; border: none; cursor:pointer;">Dekonekte</button>
-            </div>
+<section style="text-align: center; padding: 20px; position: relative; z-index: 10;">
+    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+        <div class="stat-box">
+            <small style="color:var(--lò)">SCORE</small>
+            <div id="score-val" style="font-size: 1.5rem; font-weight: 900;">0</div>
         </div>
-
-        <div class="kat-entèaktif" id="game-card" style="flex: 2; min-width: 320px; padding: 25px; opacity: 0.3; pointer-events: none;">
-            <div id="rules-box" style="text-align: left; border-left: 4px solid var(--lò); padding-left: 15px; margin-bottom: 20px; font-size: 0.9rem; color: #bbb;">
-                <b style="color: var(--lò);">RÈG PWOFESYONÈL YO:</b><br>
-                Triye pa kategori epi kalkile ant <b>20.5kg ak 22kg</b> nan tèt ou.
-            </div>
-            <div id="game-ui" style="display:none;">
-                <div style="display:flex; justify-content: space-between; margin-bottom: 15px;">
-                    <span id="game-timer" style="font-size: 1.5rem; font-weight: bold;">⏱️ 60s</span>
-                    <span style="background: var(--lò); color: #000; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 0.8rem;">🎯 KALKIL MENTAL</span>
-                </div>
-                <div id="clothes-conveyor" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px;"></div>
-                <button id="finishBtn" style="background: linear-gradient(45deg, var(--lò), #ffa500); border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 900; margin-top: 20px; cursor: pointer;">KONPLETE LAVRI A</button>
-            </div>
+        <div class="stat-box">
+            <small style="color:var(--lò)">NIVO</small>
+            <div id="level-val" style="font-size: 1.5rem; font-weight: 900;">1</div>
         </div>
     </div>
+
+    <div id="game-grid"></div>
+    
+    <p style="margin-top: 20px; color: #888;"><i>Aligne 3 rad menm koulè pou genyen pwen!</i></p>
 </section>
 
-<footer style="text-align: center; padding: 40px; color: var(--lò); letter-spacing: 5px; font-weight: 900;">
-    © 2026 LAVRI ZETWAL
+<footer style="text-align: center; padding: 40px; border-top: 1px solid rgba(255,215,0,0.2); margin-top: 50px;">
+    <h2 style="color: var(--lò); letter-spacing: 5px; font-size: 1.2rem;">LAVRI ZETWAL SAGA</h2>
+    <p style="color: #444; font-size: 0.8rem;">TOUT DWA REZÈVE © 2026</p>
 </footer>
 
-<script type="module">
-    // REPARASYON FIREBASE AK SOURIS
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+<div id="zetwal-core">ZETWAL</div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-        authDomain: "lavrizetwal.firebaseapp.com",
-        projectId: "lavrizetwal",
-        storageBucket: "lavrizetwal.firebasestorage.app",
-        messagingSenderId: "291921316186",
-        appId: "1:291921316186:web:f55e8b34526960df394b63"
-    };
+<script>
+    // --- 1. VRÈ ZETWAL 3D (5 PWENT) ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 200, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, 200);
+    document.getElementById('star-3d-header').appendChild(renderer.domElement);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    function createStarShape() {
+        const shape = new THREE.Shape();
+        const outerRad = 1.2; const innerRad = 0.5;
+        for (let i = 0; i < 10; i++) {
+            let rad = (i % 2 === 0) ? outerRad : innerRad;
+            let angle = (i * Math.PI) / 5 - Math.PI / 2;
+            if (i === 0) shape.moveTo(Math.cos(angle) * rad, Math.sin(angle) * rad);
+            else shape.lineTo(Math.cos(angle) * rad, Math.sin(angle) * rad);
+        }
+        return new THREE.ExtrudeGeometry(shape, { depth: 0.4, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.1 });
+    }
 
-    // 1. EFÈ SOURIS (ETENSÈL AK KIM)
-    window.addEventListener('mousemove', (e) => {
-        const isInside = e.target.closest('.kat-entèaktif');
-        if (isInside) {
-            const s = document.createElement('div'); s.className = 'etensèl';
-            s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px';
-            document.body.appendChild(s);
-            s.animate([{ opacity: 1 }, { opacity: 0, transform: `translate(${(Math.random()-0.5)*50}px, 50px)` }], 600).onfinish = () => s.remove();
-        } else {
-            if(Math.random() > 0.9) {
-                const b = document.createElement('div'); b.className = 'boul-kim';
-                b.innerHTML = '🫧'; b.style.left = e.clientX + 'px'; b.style.top = e.clientY + 'px';
-                document.body.appendChild(b);
-                setTimeout(() => { b.style.transform = `translateY(-100px) scale(1.5)`; b.style.opacity = '0'; setTimeout(()=>b.remove(), 1000); }, 10);
+    const starGeo = createStarShape();
+    const starMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1, roughness: 0.2 });
+    const meshStar = new THREE.Mesh(starGeo, starMat);
+    scene.add(meshStar);
+
+    const light = new THREE.DirectionalLight(0xffffff, 1); light.position.set(1, 1, 2); scene.add(light);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    camera.position.z = 3;
+
+    function anim3D() {
+        requestAnimationFrame(anim3D);
+        meshStar.rotation.y += 0.02;
+        renderer.render(scene, camera);
+    }
+    anim3D();
+
+    // --- 2. LOGIK JWÈT MATCH-3 (CANDY CRUSH STYLE) ---
+    const grid = document.getElementById('game-grid');
+    const items = ['👕', '👖', '👗', '🧥', '👚']; // Rad yo
+    const colors = ['#ffffff', '#3498db', '#e74c3c', '#f1c40f', '#9b59b6']; // Koulè korespondan
+    let size = 6;
+    let board = [];
+    let score = 0;
+    let firstSelect = null;
+
+    function initBoard() {
+        grid.innerHTML = '';
+        board = [];
+        for (let r = 0; r < size; r++) {
+            board[r] = [];
+            for (let c = 0; c < size; c++) {
+                let rand = Math.floor(Math.random() * items.length);
+                board[r][c] = rand;
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.id = `tile-${r}-${c}`;
+                tile.innerHTML = items[rand];
+                tile.style.color = colors[rand];
+                tile.onclick = () => handleSelect(r, c);
+                grid.appendChild(tile);
             }
         }
-    });
-
-    // 2. FOND GALAKSI REPARE
-    const cvs = document.getElementById('galaxy-bg'); const ctx = cvs.getContext('2d');
-    let sts = [];
-    function res() { cvs.width = window.innerWidth; cvs.height = window.innerHeight; }
-    window.onresize = res; res();
-    for(let i=0; i<150; i++) sts.push({x:Math.random()*cvs.width, y:Math.random()*cvs.height, s:Math.random()*2, c:Math.random()>0.5?'#ffd700':'#fff'});
-    function draw() {
-        ctx.clearRect(0,0,cvs.width,cvs.height);
-        sts.forEach(s => { ctx.fillStyle = s.c; ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, 7); ctx.fill(); s.y+=0.3; if(s.y>cvs.height) s.y=0; });
-        requestAnimationFrame(draw);
     }
-    draw();
 
-    // 3. LOGO 3D (REPARE)
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 180, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, 180);
-    document.getElementById('zetwal-3d-container').appendChild(renderer.domElement);
-    const star = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshStandardMaterial({color:0xffd700, metalness:1, roughness:0.1}));
-    scene.add(star);
-    const light = new THREE.PointLight(0xffffff, 2); light.position.set(5,5,5); scene.add(light);
-    scene.add(new THREE.AmbientLight(0x404040, 2)); camera.position.z = 3;
-    function anim() { requestAnimationFrame(anim); star.rotation.y+=0.01; renderer.render(scene, camera); }
-    anim();
-
-    // 4. KONEKSYON GOOGLE
-    document.getElementById('btn-google').onclick = () => {
-        signInWithPopup(auth, new GoogleAuthProvider()).catch(err => alert("Erè: " + err.message));
-    };
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('user-status').innerHTML = `Byenvini, <b>${user.displayName}</b>`;
-            document.getElementById('login-methods').style.display = "none";
-            document.getElementById('player-stats').style.display = "block";
-            document.getElementById('game-card').style.opacity = "1";
-            document.getElementById('game-card').style.pointerEvents = "auto";
-            document.getElementById('game-ui').style.display = "block";
-            // Kòmanse jenerasyon rad yo isit la...
+    function handleSelect(r, c) {
+        if (!firstSelect) {
+            firstSelect = { r, c };
+            document.getElementById(`tile-${r}-${c}`).classList.add('selected');
+        } else {
+            let r2 = r, c2 = c;
+            let r1 = firstSelect.r, c1 = firstSelect.c;
+            
+            // Tcheke si yo kòt a kòt
+            if (Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1) {
+                swap(r1, c1, r2, c2);
+                checkMatch();
+            }
+            document.getElementById(`tile-${r1}-${c1}`).classList.remove('selected');
+            firstSelect = null;
         }
-    });
+    }
+
+    function swap(r1, c1, r2, c2) {
+        let temp = board[r1][c1];
+        board[r1][c1] = board[r2][c2];
+        board[r2][c2] = temp;
+        updateView();
+    }
+
+    function updateView() {
+        for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+                const tile = document.getElementById(`tile-${r}-${c}`);
+                tile.innerHTML = items[board[r][c]];
+                tile.style.color = colors[board[r][c]];
+            }
+        }
+    }
+
+    function checkMatch() {
+        let toRemove = new Set();
+        // Liy
+        for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size - 2; c++) {
+                if (board[r][c] === board[r][c+1] && board[r][c] === board[r][c+2]) {
+                    toRemove.add(`${r}-${c}`); toRemove.add(`${r}-${c+1}`); toRemove.add(`${r}-${c+2}`);
+                }
+            }
+        }
+        // Kolòn
+        for (let c = 0; c < size; c++) {
+            for (let r = 0; r < size - 2; r++) {
+                if (board[r][c] === board[r+1][c] && board[r][c] === board[r+2][c]) {
+                    toRemove.add(`${r}-${c}`); toRemove.add(`${r+1}-${c}`); toRemove.add(`${r+2}-${c}`);
+                }
+            }
+        }
+
+        if (toRemove.size > 0) {
+            score += toRemove.size * 10;
+            document.getElementById('score-val').innerText = score;
+            toRemove.forEach(id => {
+                let [r, c] = id.split('-').map(Number);
+                board[r][c] = Math.floor(Math.random() * items.length);
+            });
+            setTimeout(() => { updateView(); checkMatch(); }, 300);
+        }
+    }
+
+    initBoard();
 </script>
 </body>
 </html>
+
 
 
 
