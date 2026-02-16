@@ -56,253 +56,196 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 
 <style>
-    :root { --lò: #ffd700; --solèy: #ff4500; --nwa: #020202; }
-    body { background: var(--nwa); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; touch-action: none; }
-    
-    #galaxy-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
+    :root { --lò: #ffd700; --solèy: #ff4500; --nwa: #010101; }
+    body { background: var(--nwa); color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow-x: hidden; }
 
-    /* UI MODERNE */
+    /* UI & GRID EFFECTS */
     .game-ui { text-align: center; position: relative; z-index: 100; padding: 20px; display: none; }
-    .stat-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-    .stat-card { background: rgba(0,0,0,0.8); border: 1.5px solid var(--lò); border-radius: 15px; padding: 12px 25px; box-shadow: 0 0 15px rgba(255,215,0,0.2); }
-    
-    /* GRID MATCH-3 AVANSE */
     #game-grid {
         display: grid; grid-template-columns: repeat(6, 60px); grid-template-rows: repeat(6, 60px);
-        gap: 10px; background: rgba(255, 215, 0, 0.05); padding: 20px;
+        gap: 12px; background: rgba(255, 215, 0, 0.05); padding: 20px;
         border-radius: 25px; border: 2px solid var(--lò); margin: 0 auto; width: fit-content;
-        backdrop-filter: blur(10px);
+        box-shadow: 0 0 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
     }
     .tile {
         width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center;
-        justify-content: center; font-size: 32px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.1);
+        justify-content: center; font-size: 30px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.1);
     }
-    .tile:hover { transform: scale(1.15); box-shadow: 0 0 20px var(--lò); background: rgba(255,215,0,0.2); }
-    .tile.match-anim { animation: matchExplosion 0.5s forwards; }
+    /* ZOOM & GLOW EFÈ */
+    .tile:hover { transform: scale(1.2) rotate(5deg); background: rgba(255,215,0,0.2); box-shadow: 0 0 20px var(--lò); z-index: 10; }
 
-    @keyframes matchExplosion { 
-        0% { transform: scale(1); } 
-        50% { transform: scale(1.4); opacity: 0.7; filter: brightness(2); } 
-        100% { transform: scale(0); opacity: 0; } 
+    /* 3D VIEWPORTS - FÒSE VIZIBILITE */
+    .viewport-3d { width: 100%; position: relative; background: #000; overflow: hidden; border-top: 2px solid var(--lò); }
+    #sun-viewport { height: 350px; background: radial-gradient(circle at center, #200, #000); }
+    #char-viewport { height: 500px; }
+
+    /* ZETWAL CORE K AP RESPIRE */
+    #zetwal-core {
+        position: fixed; bottom: 80px; right: 30px; width: 65px; height: 65px;
+        background: radial-gradient(circle, #fff, var(--lò), var(--solèy)); border-radius: 50%;
+        z-index: 999; animation: respire 2s infinite ease-in-out; box-shadow: 0 0 30px var(--lò);
     }
+    @keyframes respire { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2); filter: brightness(1.5); } }
 
-    /* 3D SCENES */
-    .viewport { width: 100%; height: 500px; position: relative; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); border-top: 2px solid var(--lò); }
-    .label-3d { position: absolute; top: 20px; left: 20px; color: var(--lò); font-weight: 900; letter-spacing: 3px; z-index: 10; font-size: 0.8rem; }
-
-    /* FOOTER VIZIB */
-    #prestige-footer {
-        position: relative; width: 100%; padding: 40px 0; background: #000; text-align: center; border-top: 1.5px solid #222;
-    }
-    .logo-zetwal { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--lò); letter-spacing: 8px; margin-bottom: 10px; text-shadow: 0 0 20px var(--lò); }
+    /* FOOTER FIXE */
+    #prestige-footer { position: relative; padding: 50px 0; background: #000; text-align: center; z-index: 100; border-top: 1px solid #333; }
+    .logo-zetwal { font-size: 3rem; color: var(--lò); letter-spacing: 12px; text-shadow: 0 0 25px var(--lò); font-weight: 900; margin-bottom: 5px; }
 </style>
 
-<canvas id="galaxy-bg"></canvas>
+<canvas id="galaxy-bg" style="position:fixed; inset:0; z-index:-1;"></canvas>
 
 <div id="login-screen" style="position:fixed; inset:0; background:#000; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <div id="sun-container" style="width:300px; height:300px; margin-bottom:40px;"></div>
-    <button onclick="igniteEngine()" style="background:var(--lò); border:none; padding:18px 50px; border-radius:50px; font-weight:900; cursor:pointer; font-size:1.1rem; box-shadow: 0 0 30px var(--solèy);">KÒMANSE LAVRI A</button>
+    <div id="sun-viewport" class="viewport-3d" style="border:none; width:100%; max-width:500px;"></div>
+    <h1 style="color:var(--lò); letter-spacing:10px; margin: 20px 0;">LAVRI ZETWAL</h1>
+    <button onclick="igniteEngine()" style="background:var(--lò); border:none; padding:18px 60px; border-radius:50px; font-weight:900; cursor:pointer; font-size:1.2rem; box-shadow: 0 0 30px var(--solèy);">KÒMANSE SISTÈM LAN</button>
 </div>
 
 <section id="game-ui" class="game-ui">
-    <div class="stat-bar">
-        <div class="stat-card"><small>SCORE</small><div id="score">0</div></div>
-        <div class="stat-card" style="border-color:var(--solèy);"><small>MOUVMAN</small><div id="moves">25</div></div>
-        <div class="stat-card"><small>NIVO</small><div id="level">1</div></div>
+    <div style="display:flex; justify-content:center; gap:20px; margin-bottom:20px;">
+        <div style="border:1px solid var(--lò); padding:10px 25px; border-radius:15px; background:rgba(0,0,0,0.8);">
+            <small>SCORE</small><div id="score" style="font-size:1.5rem; color:var(--lò); font-weight:900;">0</div>
+        </div>
+        <div style="border:1px solid var(--solèy); padding:10px 25px; border-radius:15px; background:rgba(0,0,0,0.8);">
+            <small>MOVES</small><div id="moves" style="font-size:1.5rem; color:var(--solèy); font-weight:900;">25</div>
+        </div>
     </div>
     <div id="game-grid"></div>
 </section>
 
-<div class="viewport">
-    <div class="label-3d">SIMILASYON REYALIS & EKIPMAN</div>
-    <div id="char-render" style="width:100%; height:100%;"></div>
+<div id="char-viewport" class="viewport-3d">
+    <div style="position:absolute; top:20px; left:20px; color:var(--lò); font-weight:bold; letter-spacing:2px; z-index:10;">SIMILASYON EKIPMAN 3D REYALIS</div>
+    <div id="char-render-area" style="width:100%; height:100%;"></div>
 </div>
 
 <footer id="prestige-footer">
     <div class="logo-zetwal">ZETWAL</div>
-    <p style="color:var(--lò); opacity:0.8; letter-spacing:3px; font-size:0.7rem;">© 2026 • TOUT DWA REZÈVE</p>
+    <p style="color:var(--lò); letter-spacing:5px; font-size:0.8rem;">© 2026 • TOUT DWA REZÈVE</p>
 </footer>
 
+<div id="zetwal-core"></div>
+
 <script>
-// --- CONFIGURASYON ---
+// --- ENGINE STATE ---
 const radItems = ['👕', '👖', '👗', '🧥', '👚'];
-let gameState = { score: 0, moves: 25, level: 1, grid: [], isBusy: false };
+let state = { score: 0, moves: 25, level: 1, grid: [] };
 
-// --- 1. SOLÈY 3D (CENTRE VISUEL) ---
+// --- 1. GALAXY & COMÈTES ---
+const galCanvas = document.getElementById('galaxy-bg');
+const gctx = galCanvas.getContext('2d');
+let stars = [], comets = [];
+function initGalaxy() {
+    galCanvas.width = window.innerWidth; galCanvas.height = window.innerHeight;
+    stars = Array(200).fill().map(() => ({ x:Math.random()*galCanvas.width, y:Math.random()*galCanvas.height, r:Math.random()*1.5, o:Math.random(), s:0.01, c: Math.random()>0.8?'#ffd700':'#fff' }));
+}
+initGalaxy();
+
+// --- 2. THREE.JS BOILERPLATE (SUN & CHAR) ---
 const sunScene = new THREE.Scene();
-const sunCam = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-const sunRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-sunRenderer.setSize(300, 300);
-document.getElementById('sun-container').appendChild(sunRenderer.domElement);
+const sunCam = new THREE.PerspectiveCamera(45, window.innerWidth/350, 0.1, 1000);
+const sunRenderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+document.getElementById('sun-viewport').appendChild(sunRenderer.domElement);
 
-const sunGeo = new THREE.SphereGeometry(1, 64, 64);
+const charScene = new THREE.Scene();
+const charCam = new THREE.PerspectiveCamera(45, window.innerWidth/500, 0.1, 1000);
+const charRenderer = new THREE.WebGLRenderer({ antialias:true });
+charRenderer.setSize(window.innerWidth, 500);
+charRenderer.setClearColor(0x050505);
+charRenderer.shadowMap.enabled = true;
+document.getElementById('char-render-area').appendChild(charRenderer.domElement);
+
+// --- 3. KREYASYON SOLÈY (REALIS) ---
+const sunGeo = new THREE.SphereGeometry(1.5, 64, 64);
 const sunMat = new THREE.MeshStandardMaterial({ 
-    color: 0xff4500, emissive: 0xffaa00, emissiveIntensity: 2, roughness: 0.5 
+    color: 0xff4500, emissive: 0xffaa00, emissiveIntensity: 2, roughness: 0.2, metalness: 0.5 
 });
 const sunMesh = new THREE.Mesh(sunGeo, sunMat);
 sunScene.add(sunMesh);
-const sunLight = new THREE.PointLight(0xffaa00, 5, 50); sunScene.add(sunLight);
-sunCam.position.z = 3;
+sunScene.add(new THREE.PointLight(0xffaa00, 10, 50));
+sunCam.position.z = 5;
 
-// --- 2. CHARACTER SIMULATION (PBR) ---
-const charScene = new THREE.Scene();
-const charCam = new THREE.PerspectiveCamera(40, window.innerWidth/500, 0.1, 1000);
-const charRenderer = new THREE.WebGLRenderer({ antialias: true });
-charRenderer.setSize(window.innerWidth, 500);
-charRenderer.shadowMap.enabled = true;
-charRenderer.outputEncoding = THREE.sRGBEncoding;
-document.getElementById('char-render').appendChild(charRenderer.domElement);
-
-// Room & Lighting
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial({color: 0x111111, metalness: 0.8, roughness: 0.2}));
-ground.rotation.x = -Math.PI/2; ground.position.y = -2; ground.receiveShadow = true;
-charScene.add(ground);
-
+// --- 4. KREYASYON PÈSONAJ (PBR) ---
 const charGroup = new THREE.Group();
-const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.4, 1.2, 8, 20), new THREE.MeshStandardMaterial({color: 0xffdbac, roughness: 0.3}));
-body.castShadow = true; charGroup.add(body);
+const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.5, 1.5, 8, 20), new THREE.MeshStandardMaterial({color: 0xffdbac, roughness: 0.5}));
+torso.castShadow = true; charGroup.add(torso);
 charScene.add(charGroup);
+charScene.add(new THREE.AmbientLight(0xffffff, 0.4));
+const spot = new THREE.SpotLight(0xffffff, 2); spot.position.set(5, 10, 5); spot.castShadow = true;
+charScene.add(spot);
+charCam.position.set(0, 0.5, 8);
 
-const light = new THREE.SpotLight(0xffffff, 2); light.position.set(5, 10, 5); light.castShadow = true;
-charScene.add(light, new THREE.AmbientLight(0xffffff, 0.3));
-charCam.position.set(0, 1, 8);
+// --- 5. LOGIK JWÈT & GRID ---
+function igniteEngine() {
+    document.getElementById('login-screen').style.opacity = '0';
+    setTimeout(() => { 
+        document.getElementById('login-screen').style.display = 'none'; 
+        document.getElementById('game-ui').style.display = 'block'; 
+    }, 500);
+    initGrid();
+    animate();
+}
 
-// --- 3. MATCH-3 LOGIC (CANDY CRUSH STYLE) ---
 function initGrid() {
-    const gridEl = document.getElementById('game-grid'); gridEl.innerHTML = '';
-    gameState.grid = Array(6).fill().map(() => Array(6).fill().map(() => Math.floor(Math.random()*radItems.length)));
-    renderGrid();
-}
-
-function renderGrid() {
-    const gridEl = document.getElementById('game-grid'); gridEl.innerHTML = '';
-    gameState.grid.forEach((row, r) => row.forEach((id, c) => {
-        const t = document.createElement('div'); t.className = 'tile';
-        t.id = `t-${r}-${c}`; t.innerHTML = radItems[id];
-        t.onclick = () => selectTile(r, c); gridEl.appendChild(t);
-    }));
-}
-
-let selected = null;
-async function selectTile(r, c) {
-    if(gameState.isBusy || gameState.moves <= 0) return;
-    const el = document.getElementById(`t-${r}-${c}`);
-    if(!selected) { selected = {r, c}; el.style.border = "2px solid white"; }
-    else {
-        const dist = Math.abs(selected.r - r) + Math.abs(selected.c - c);
-        if(dist === 1) await swap(selected.r, selected.c, r, c);
-        document.querySelectorAll('.tile').forEach(t => t.style.border = "");
-        selected = null;
-    }
-}
-
-async function swap(r1, c1, r2, c2) {
-    gameState.isBusy = true;
-    [gameState.grid[r1][c1], gameState.grid[r2][c2]] = [gameState.grid[r2][c2], gameState.grid[r1][c1]];
-    renderGrid();
-    
-    let matches = checkMatches();
-    if(matches.length > 0) {
-        gameState.moves--;
-        await handleMatches(matches);
-    } else {
-        // Undo
-        [gameState.grid[r1][c1], gameState.grid[r2][c2]] = [gameState.grid[r2][c2], gameState.grid[r1][c1]];
-        setTimeout(renderGrid, 200);
-    }
-    gameState.isBusy = false;
-    updateUI();
-}
-
-function checkMatches() {
-    let matches = [];
-    // Horiz
+    const grid = document.getElementById('game-grid'); grid.innerHTML = '';
     for(let r=0; r<6; r++) {
-        for(let c=0; c<4; c++) {
-            if(gameState.grid[r][c] === gameState.grid[r][c+1] && gameState.grid[r][c] === gameState.grid[r][c+2])
-                matches.push({r,c}, {r,c:c+1}, {r,c:c+2});
-        }
-    }
-    // Vert
-    for(let c=0; c<6; c++) {
-        for(let r=0; r<4; r++) {
-            if(gameState.grid[r][c] === gameState.grid[r+1][c] && gameState.grid[r][c] === gameState.grid[r+2][c])
-                matches.push({r,c}, {r:r+1,c}, {r:r+2,c});
-        }
-    }
-    return matches;
-}
-
-async function handleMatches(matches) {
-    matches.forEach(m => {
-        const el = document.getElementById(`t-${m.r}-${m.c}`);
-        if(el) el.classList.add('match-anim');
-        gameState.grid[m.r][m.c] = -1;
-    });
-    gameState.score += matches.length * 20;
-    await new Promise(res => setTimeout(res, 500));
-    fillHoles();
-    renderGrid();
-    let nextMatches = checkMatches();
-    if(nextMatches.length > 0) await handleMatches(nextMatches);
-    
-    if(gameState.score >= gameState.level * 1000) levelUp();
-}
-
-function fillHoles() {
-    for(let c=0; c<6; c++) {
-        for(let r=5; r>=0; r--) {
-            if(gameState.grid[r][c] === -1) {
-                for(let kr=r-1; kr>=0; kr--) {
-                    if(gameState.grid[kr][c] !== -1) {
-                        gameState.grid[r][c] = gameState.grid[kr][c];
-                        gameState.grid[kr][c] = -1;
-                        break;
-                    }
-                }
-                if(gameState.grid[r][c] === -1) gameState.grid[r][c] = Math.floor(Math.random()*radItems.length);
-            }
+        state.grid[r] = [];
+        for(let c=0; c<6; c++) {
+            let id = Math.floor(Math.random()*radItems.length);
+            state.grid[r][c] = id;
+            let t = document.createElement('div'); t.className = 'tile';
+            t.id = `t-${r}-${c}`; t.innerHTML = radItems[id];
+            t.onclick = () => handleSwap(r,c); grid.appendChild(t);
         }
     }
 }
 
-function levelUp() {
-    gameState.level++;
-    gameState.moves += 10;
-    // Rekonpans vizyèl: Pèsonaj la chanje koulè rad
-    gsap.to(body.material.color, { r: Math.random(), g: Math.random(), b: Math.random(), duration: 2 });
-    gsap.to(charGroup.rotation, { y: charGroup.rotation.y + Math.PI*2, duration: 2, ease: "back.out" });
-    alert(`NIVO ${gameState.level} DEBLOKE! Pèsonaj la resevwa nouvo ekipman!`);
+let active = null;
+function handleSwap(r,c) {
+    if(!active) { active = {r,c}; document.getElementById(`t-${r}-${c}`).style.border = "2px solid white"; }
+    else {
+        if(Math.abs(active.r-r) + Math.abs(active.c-c) === 1) {
+            [state.grid[r][c], state.grid[active.r][active.c]] = [state.grid[active.r][active.c], state.grid[r][c]];
+            state.moves--; updateUI();
+        }
+        document.getElementById(`t-${active.r}-${active.c}`).style.border = ""; active = null;
+    }
 }
 
 function updateUI() {
-    document.getElementById('score').innerText = gameState.score;
-    document.getElementById('moves').innerText = gameState.moves;
-    document.getElementById('level').innerText = gameState.level;
+    state.grid.forEach((row, r) => row.forEach((id, c) => { document.getElementById(`t-${r}-${c}`).innerHTML = radItems[id]; }));
+    document.getElementById('score').innerText = state.score;
+    document.getElementById('moves').innerText = state.moves;
 }
 
-// --- ENGINE LOOP ---
-function igniteEngine() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('game-ui').style.display = 'block';
-    initGrid();
-    loop();
-}
+// --- 6. ANIMATION LOOP (LÒD FINAL) ---
+function animate() {
+    requestAnimationFrame(animate);
 
-function loop() {
-    requestAnimationFrame(loop);
+    // Galaxy Update
+    gctx.fillStyle = '#010101'; gctx.fillRect(0,0,galCanvas.width, galCanvas.height);
+    stars.forEach(s => {
+        s.o += s.s; if(s.o > 1 || s.o < 0.2) s.s *= -1;
+        gctx.globalAlpha = Math.abs(s.o); gctx.fillStyle = s.c;
+        gctx.beginPath(); gctx.arc(s.x, s.y, s.r, 0, Math.PI*2); gctx.fill();
+    });
+
+    // Sun Update
     sunMesh.rotation.y += 0.01;
     sunMesh.scale.setScalar(1 + Math.sin(Date.now()*0.002)*0.05);
-    
-    charGroup.rotation.y += 0.005;
-    
     sunRenderer.render(sunScene, sunCam);
+
+    // Char Update
+    charGroup.rotation.y += 0.005;
     charRenderer.render(charScene, charCam);
 }
+
+// Fòse rann nan kòmansman
+sunRenderer.setSize(window.innerWidth > 500 ? 500 : window.innerWidth, 350);
+animate();
 </script>
 </body>
 </html>
+
 
 
 
