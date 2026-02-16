@@ -46,15 +46,25 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* LIQUID BORDER + HALO LUMINEUX SOU CHAK BLÒK */
+        /* LIQUID BORDER + HALO LUMINEUX + ZOOM EFFECT */
         .liquid-border {
             position: relative;
             border: 1px solid transparent;
             background-clip: padding-box;
-            /* Halo or difize anba chak blòk */
             box-shadow: 0 10px 40px rgba(255, 215, 0, 0.15);
             filter: drop-shadow(0 0 10px var(--gold-glow));
+            /* EFÈ ZOOM SOU BLÒK YO */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer;
         }
+
+        .liquid-border:hover {
+            transform: scale(1.03); /* Zoom nan yon ti kras */
+            filter: drop-shadow(0 0 20px var(--gold));
+            box-shadow: 0 15px 50px rgba(255, 215, 0, 0.3);
+            z-index: 5;
+        }
+
         .liquid-border::before {
             content: "";
             position: absolute;
@@ -166,7 +176,6 @@
             background-size: 200% 100%; animation: liquidGold 15s linear infinite;
         }
 
-        /* LOGO FOOTER AJISTE */
         .footer-logo-img { width: 40px; height: 40px; margin-bottom: 15px; opacity: 0.9; }
 
         .footer-bottom { 
