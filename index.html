@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAVRI ZETWAL | Inivè Prestige</title>
+    <title>LAVRI ZETWAL | Ann pran plezi nan lave</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -12,6 +12,8 @@
     <style>
         :root {
             --gold: #ffd700;
+            --gold-deep: #b8860b;
+            --gold-light: #fff8dc;
             --gold-glow: rgba(255, 215, 0, 0.5);
             --bg: #010101;
             --text: #ffffff;
@@ -32,7 +34,44 @@
 
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
 
-        /* HEADER GLASSMORPHISM OPTIMISÉ (BLUR AUGMENTÉ) */
+        /* KEYFRAMES POU OR LIQUIDE */
+        @keyframes liquidGold {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* KLAS POU BORDURE OR LIQUIDE PREMIUM */
+        .liquid-border {
+            position: relative;
+            border: 1px solid transparent;
+            background-clip: padding-box;
+        }
+        .liquid-border::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            z-index: -1;
+            border-radius: inherit;
+            padding: 1px; /* Lajè bordure a */
+            background: linear-gradient(90deg, 
+                var(--gold-deep), 
+                var(--gold), 
+                var(--gold-light), 
+                var(--gold), 
+                var(--gold-deep)
+            );
+            background-size: 300% 300%;
+            animation: liquidGold 12s linear infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.8;
+            box-shadow: 0 0 15px rgba(218, 165, 32, 0.2);
+        }
+
+        /* HEADER */
         .nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
             background: rgba(0, 0, 0, 0.15); 
@@ -41,6 +80,14 @@
             border-bottom: 1px solid rgba(255, 215, 0, 0.3);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
+        /* Aplikasyon or liquide nan header */
+        .nav::after {
+            content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+            background-size: 200% 100%; animation: liquidGold 8s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
         .nav-content {
             display: flex; justify-content: space-between; align-items: center;
             max-width: 1200px; margin: 0 auto; padding: 12px 20px;
@@ -89,12 +136,13 @@
         }
         .btn-main-gold:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 15px 40px var(--gold); }
 
+        /* CARDS AK BOUTON AUTH AK EFFET LIQUIDE */
         .zoom-card {
             background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(15px); border: 1px solid rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(15px);
             border-radius: 30px; padding: 40px; transition: var(--transition);
         }
-        .zoom-card:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
+        .zoom-card:hover { transform: scale(1.05); box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
 
         .auth-input {
             width: 80%; padding: 15px; border-radius: 12px; border: 1px solid var(--gold);
@@ -107,13 +155,22 @@
             border-radius: 50%; z-index: 2000; box-shadow: 0 0 40px var(--gold);
             animation: coreRespire 3s infinite ease-in-out;
         }
-        @keyframes coreRespire { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2); filter: brightness(1.4); } }
 
+        /* FOOTER */
         footer {
             background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(40px);
-            padding: 80px 10% 40px; border-top: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 80px 10% 40px; 
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
+            position: relative;
         }
+        /* Aplikasyon or liquide nan footer */
+        footer::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-deep), var(--gold-light), var(--gold-deep), transparent);
+            background-size: 200% 100%; animation: liquidGold 15s linear infinite;
+        }
+
         .footer-logo-img { width: 50px; height: 50px; margin-bottom: 15px; }
         .footer-bottom { 
             grid-column: 1 / -1; text-align: center; border-top: 1px solid rgba(255,215,0,0.1); 
@@ -153,7 +210,7 @@
     </header>
 
     <main style="padding: 0 10% 100px; position: relative; z-index: 1;">
-        <section class="zoom-card" style="max-width: 450px; margin: 0 auto 80px; text-align:center;">
+        <section class="zoom-card liquid-border" style="max-width: 450px; margin: 0 auto 80px; text-align:center;">
             <h2 style="color:var(--gold);">Koneksyon</h2>
             <p style="font-size:0.9rem; opacity:0.8; margin-bottom:25px;">Konekte ak Google, Facebook oswa Nimewo w.</p>
             <button id="google-login" class="btn-main-gold" style="width:100%; margin-bottom:10px; background:#fff;">Google Login</button>
@@ -163,11 +220,11 @@
         </section>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
-            <div class="zoom-card" onclick="location.href='games.html'">
+            <div class="zoom-card liquid-border" onclick="location.href='games.html'">
                 <h3 style="color:var(--gold);">🕹️ JWÈT YO</h3>
                 <p>Eksplore inivè jwèt 3D nou yo.</p>
             </div>
-            <div class="zoom-card" onclick="location.href='simulation.html'">
+            <div class="zoom-card liquid-border" onclick="location.href='simulation.html'">
                 <h3 style="color:var(--gold);">👕 SIMILASYON</h3>
                 <p>Gade rezilta lavaj ou an dirèk.</p>
             </div>
@@ -205,19 +262,16 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Google Auth
         document.getElementById('google-login').onclick = () => {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider).then((res) => console.log("Google In")).catch(err => alert(err.message));
         };
 
-        // FB Auth
         document.getElementById('fb-login').onclick = () => {
             const provider = new FacebookAuthProvider();
             signInWithPopup(auth, provider).then((res) => console.log("FB In")).catch(err => alert(err.message));
         };
 
-        // Phone Auth (Simple placeholder logik)
         window.recaptchaVerifier = new RecaptchaVerifier('phone-login', { 'size': 'invisible' }, auth);
         document.getElementById('phone-login').onclick = () => {
             const num = document.getElementById('phone-number').value;
@@ -241,7 +295,6 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            // GALAXIE
             const starGeometry = new THREE.BufferGeometry();
             const starCoords = [], starColors = [];
             for(let i=0; i<4000; i++) {
@@ -254,12 +307,10 @@
             stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: 0.035, vertexColors: true, transparent: true, opacity: 0.9 }));
             scene.add(stars);
 
-            // SOLEIL
             sun = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
             sun.position.set(4, 3, -6);
             scene.add(sun);
 
-            // SYSTÈME DE PARTICULES FLUIDES
             const pGeo = new THREE.BufferGeometry();
             const positions = new Float32Array(particleCount * 3);
             const opacities = new Float32Array(particleCount);
@@ -307,7 +358,7 @@
             positions[pIdx*3] = pos.x;
             positions[pIdx*3+1] = pos.y;
             positions[pIdx*3+2] = pos.z;
-            particleData[pIdx].age = 0; // Reset age proprement
+            particleData[pIdx].age = 0;
             pIdx = (pIdx + 1) % particleCount;
         }
 
@@ -319,7 +370,6 @@
             const alphas = particleSystem.geometry.attributes.alpha.array;
             for(let i=0; i<particleCount; i++) {
                 particleData[i].age += 1;
-                // Dissipation fluide : l'alpha descend doucement vers 0
                 alphas[i] = Math.max(0, 1.0 - (particleData[i].age / particleData[i].life));
             }
             particleSystem.geometry.attributes.alpha.needsUpdate = true;
