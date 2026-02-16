@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LAVRI ZETWAL | Inivè Prestige</title>
+    <title>LAVRI ZETWAL | Lave rad ou pi fasil, pi rapid</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -34,7 +34,6 @@
 
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
 
-        /* ANIMASYON RESPIRASYON PREMIUM */
         @keyframes pulse-premium {
             0% { transform: scale(1); box-shadow: 0 0 20px var(--gold-glow); }
             50% { transform: scale(1.1); box-shadow: 0 0 45px var(--gold); }
@@ -47,13 +46,14 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* LIQUID BORDER + HALO LUMINEUX */
+        /* LIQUID BORDER + HALO LUMINEUX SOU CHAK BLÒK */
         .liquid-border {
             position: relative;
             border: 1px solid transparent;
             background-clip: padding-box;
-            /* Halo Diffus */
-            filter: drop-shadow(0 0 12px var(--gold-glow));
+            /* Halo or difize anba chak blòk */
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.15);
+            filter: drop-shadow(0 0 10px var(--gold-glow));
         }
         .liquid-border::before {
             content: "";
@@ -71,14 +71,13 @@
             mask-composite: exclude;
         }
 
-        /* HEADER AVÈK HALO */
         .nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
             background: rgba(0, 0, 0, 0.15); 
             backdrop-filter: blur(40px) saturate(180%);
             -webkit-backdrop-filter: blur(40px) saturate(180%);
             border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.15);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.2);
         }
         .nav::after {
             content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px;
@@ -101,7 +100,6 @@
         .logo-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
         .logo-text span { color: var(--gold); }
 
-        /* BOUTON THEME RESPIRANT */
         .theme-toggle {
             position: fixed; top: 100px; right: 20px; z-index: 2000;
             background: var(--gold); border: none; width: 45px; height: 45px;
@@ -147,7 +145,6 @@
             background: rgba(0,0,0,0.3); color: white; margin-bottom: 20px; outline: none;
         }
 
-        /* BOULE GEMINI RESPIRANTE */
         #zetwal-core {
             position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
             background: radial-gradient(circle, #fff, var(--gold), #ff4500);
@@ -155,14 +152,13 @@
             animation: pulse-premium 3s infinite ease-in-out;
         }
 
-        /* FOOTER AK HALO */
         footer {
             background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(40px);
             padding: 80px 10% 40px; 
             border-top: 1px solid rgba(255, 215, 0, 0.3);
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
             position: relative;
-            box-shadow: 0 -10px 40px rgba(255, 215, 0, 0.1);
+            box-shadow: 0 -10px 40px rgba(255, 215, 0, 0.2);
         }
         footer::before {
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 1px;
@@ -170,12 +166,14 @@
             background-size: 200% 100%; animation: liquidGold 15s linear infinite;
         }
 
+        /* LOGO FOOTER AJISTE */
+        .footer-logo-img { width: 40px; height: 40px; margin-bottom: 15px; opacity: 0.9; }
+
         .footer-bottom { 
             grid-column: 1 / -1; text-align: center; border-top: 1px solid rgba(255,215,0,0.1); 
             padding-top: 30px; color: var(--gold); font-weight: 800; letter-spacing: 3px;
         }
         
-        /* AUTH UI STATES */
         #user-info { display: none; }
         #auth-form { display: block; }
     </style>
@@ -277,13 +275,11 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // UI Elements
         const authForm = document.getElementById('auth-form');
         const userInfo = document.getElementById('user-info');
         const welcomeMsg = document.getElementById('welcome-msg');
         const userDisplayName = document.getElementById('user-display-name');
 
-        // Listen for Auth State
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 authForm.style.display = 'none';
@@ -291,7 +287,6 @@
                 const name = user.displayName || user.phoneNumber || "Zetwal";
                 welcomeMsg.innerText = `Bonjou ${name.split(' ')[0]}.`;
                 userDisplayName.innerText = name;
-                // Similasyon pwen (ka konekte ak Firestore apre)
                 document.getElementById('points-display').innerHTML = `Ou genyen 150 pwen pou kounye a.<br><span style="font-size:0.8rem; opacity:0.7;">1 pwen egal 1 goud.</span>`;
             } else {
                 authForm.style.display = 'block';
@@ -301,13 +296,11 @@
         });
 
         window.logout = () => signOut(auth);
-
         document.getElementById('google-login').onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
         document.getElementById('fb-login').onclick = () => signInWithPopup(auth, new FacebookAuthProvider());
     </script>
 
     <script>
-        // WEBGL ENGINE (STABLE & IDENTICAL)
         let scene, camera, renderer, stars, sun, particleSystem;
         let particleCount = 1000;
         let pIdx = 0;
@@ -317,12 +310,10 @@
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 5;
-
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), antialias: true, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            // GALAXIE
             const starGeometry = new THREE.BufferGeometry();
             const starCoords = [], starColors = [];
             for(let i=0; i<4000; i++) {
@@ -339,7 +330,6 @@
             sun.position.set(4, 3, -6);
             scene.add(sun);
 
-            // PARTICULES SOURIS
             const pGeo = new THREE.BufferGeometry();
             const positions = new Float32Array(particleCount * 3);
             const opacities = new Float32Array(particleCount);
