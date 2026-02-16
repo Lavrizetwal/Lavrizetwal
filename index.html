@@ -9,6 +9,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+      import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+        authDomain: "lavrizetwal.firebaseapp.com",
+        projectId: "lavrizetwal",
+        storageBucket: "lavrizetwal.firebasestorage.app",
+        messagingSenderId: "291921316186",
+        appId: "1:291921316186:web:f55e8b34526960df394b63",
+        measurementId: "G-65R9V5MRBV"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const auth = getAuth(app);
+    </script>
+
     <style>
         :root {
             --gold: #ffd700;
@@ -18,23 +38,14 @@
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* MODE CLAIRE SUPPORT */
-        .light-mode {
-            --bg: #fdfdfd;
-            --text: #1a1a1a;
-        }
-
         body { 
             background: var(--bg); color: var(--text); margin: 0; 
             font-family: 'Montserrat', sans-serif; overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            transition: background 0.5s ease, color 0.5s ease;
         }
 
-        /* WEBGL CONTAINER */
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
 
-        /* HEADER GLASSMORPHISM AVANCÉ */
         .nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
             background: rgba(0, 0, 0, 0.2); 
@@ -59,15 +70,6 @@
         .logo-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
         .logo-text span { color: var(--gold); }
 
-        /* THEME TOGGLE BUTTON */
-        .theme-toggle {
-            position: fixed; top: 100px; right: 20px; z-index: 2000;
-            background: var(--gold); border: none; width: 45px; height: 45px;
-            border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow);
-            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
-        }
-
-        /* HERO SECTION */
         .hero { padding: 180px 0 80px; text-align: center; position: relative; }
         .location-badge-gold {
             background: var(--gold); color: #000; padding: 6px 18px;
@@ -85,7 +87,6 @@
         }
         @keyframes shimmer { to { background-position: 200% center; } }
 
-        /* BUTTONS & CARDS (ZOOM GLOBAL) */
         .btn-main-gold {
             display: inline-block; padding: 18px 45px; background: var(--gold);
             color: #000; text-decoration: none; border-radius: 50px;
@@ -101,13 +102,12 @@
         }
         .zoom-card:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
 
-        /* AUTH INPUTS */
         .auth-input {
             width: 80%; padding: 15px; border-radius: 12px; border: 1px solid var(--gold);
-            background: rgba(0,0,0,0.3); color: white; margin-bottom: 20px; outline: none;
+            background: rgba(0,0,0,0.3); color: var(--gold); margin-bottom: 20px; outline: none;
+            font-weight: 600; text-align: center;
         }
 
-        /* CORE SPHERE */
         #zetwal-core {
             position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
             background: radial-gradient(circle, #fff, var(--gold), #ff4500);
@@ -116,7 +116,6 @@
         }
         @keyframes coreRespire { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2); filter: brightness(1.4); } }
 
-        /* FOOTER GLASS */
         footer {
             background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(30px);
             padding: 80px 10% 40px; border-top: 1px solid rgba(255, 215, 0, 0.3);
@@ -133,7 +132,6 @@
 
     <canvas id="webgl-canvas"></canvas>
     <div id="zetwal-core"></div>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 
     <nav class="nav">
         <div class="nav-content">
@@ -199,7 +197,7 @@
     <script>
         let scene, camera, renderer, stars, sun, particleSystem;
         let mouse = new THREE.Vector2();
-        const particleCount = window.innerWidth < 768 ? 400 : 1000;
+        const particleCount = window.innerWidth < 768 ? 500 : 1500;
         let pIdx = 0;
 
         function initWebGL() {
@@ -211,46 +209,37 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            // 1. GALAXIE AVEC PLUS D'OR (30% GOLD)
             const starGeometry = new THREE.BufferGeometry();
             const starCoords = [];
             const starColors = [];
-            for(let i=0; i<4000; i++) {
-                starCoords.push((Math.random()-0.5)*25, (Math.random()-0.5)*25, (Math.random()-0.5)*25);
-                const isGold = Math.random() > 0.7; // 30% d'or
+            for(let i=0; i<3000; i++) {
+                starCoords.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
+                const isGold = Math.random() > 0.8;
                 starColors.push(isGold ? 1 : 1, isGold ? 0.84 : 1, isGold ? 0 : 1);
             }
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
             starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
-            const starMaterial = new THREE.PointsMaterial({ size: 0.035, vertexColors: true, transparent: true, opacity: 0.9 });
+            const starMaterial = new THREE.PointsMaterial({ size: 0.03, vertexColors: true, transparent: true, opacity: 0.8 });
             stars = new THREE.Points(starGeometry, starMaterial);
             scene.add(stars);
 
-            // 2. SOLEIL RESPIRANT PLUS FORT
             const sunGeometry = new THREE.SphereGeometry(0.8, 32, 32);
             const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700 });
             sun = new THREE.Mesh(sunGeometry, sunMaterial);
-            sun.position.set(4, 3, -6);
+            sun.position.set(3, 2, -5);
             scene.add(sun);
 
-            // 3. SYSTÈME DE PARTICULES (DISPARITION RAPIDE)
+            // PARTIKIL KI KLINYOTE (Twinkling)
             const partGeo = new THREE.BufferGeometry();
             const partPos = new Float32Array(particleCount * 3);
-            const partAlpha = new Float32Array(particleCount);
             partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
-            partGeo.setAttribute('alpha', new THREE.BufferAttribute(partAlpha, 1));
-            
-            const partMat = new THREE.PointsMaterial({ 
-                color: 0xffd700, 
-                size: 0.04, 
-                transparent: true, 
-                blending: THREE.AdditiveBlending 
-            });
+            const partMat = new THREE.PointsMaterial({ color: 0xffd700, size: 0.03, transparent: true, blending: THREE.AdditiveBlending });
             particleSystem = new THREE.Points(partGeo, partMat);
             scene.add(particleSystem);
 
             window.addEventListener('mousemove', (e) => updateParticles(e.clientX, e.clientY));
             window.addEventListener('touchmove', (e) => updateParticles(e.touches[0].clientX, e.touches[0].clientY));
+
             animate();
         }
 
@@ -269,21 +258,16 @@
             particleSystem.geometry.attributes.position.needsUpdate = true;
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-        }
-
         function animate() {
             requestAnimationFrame(animate);
-            stars.rotation.y += 0.0004;
+            stars.rotation.y += 0.0005;
+            stars.rotation.x += 0.0002;
             
-            // RESPIRATION SOLEIL FORTE
-            const time = Date.now() * 0.002;
-            const scale = 1.1 + Math.sin(time) * 0.25; 
-            sun.scale.set(scale, scale, 1);
+            const time = Date.now() * 0.001;
+            sun.scale.set(1.1 + Math.sin(time*2)*0.15, 1.1 + Math.sin(time*2)*0.15, 1);
             
-            // DISPARITION TRACES (On réduit l'opacité globale très vite)
-            particleSystem.material.opacity > 0 ? particleSystem.material.opacity -= 0.01 : particleSystem.material.opacity = 1;
+            // EFÈ KLINYOTE (Twinkle effect) pou patikil yo
+            particleSystem.material.opacity = 0.5 + Math.sin(time * 10) * 0.5;
 
             renderer.render(scene, camera);
         }
