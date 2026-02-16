@@ -9,26 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-      import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-        authDomain: "lavrizetwal.firebaseapp.com",
-        projectId: "lavrizetwal",
-        storageBucket: "lavrizetwal.firebasestorage.app",
-        messagingSenderId: "291921316186",
-        appId: "1:291921316186:web:f55e8b34526960df394b63",
-        measurementId: "G-65R9V5MRBV"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-      const auth = getAuth(app);
-    </script>
-
     <style>
         :root {
             --gold: #ffd700;
@@ -38,19 +18,26 @@
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
+        .light-mode {
+            --bg: #fdfdfd;
+            --text: #1a1a1a;
+        }
+
         body { 
             background: var(--bg); color: var(--text); margin: 0; 
             font-family: 'Montserrat', sans-serif; overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            transition: background 0.5s ease, color 0.5s ease;
         }
 
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
 
+        /* HEADER GLASSMORPHISM OPTIMISÉ (BLUR AUGMENTÉ) */
         .nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
-            background: rgba(0, 0, 0, 0.2); 
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            background: rgba(0, 0, 0, 0.15); 
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
             border-bottom: 1px solid rgba(255, 215, 0, 0.3);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
@@ -69,6 +56,13 @@
         .nav-logo-img { width: 35px; height: 35px; object-fit: contain; }
         .logo-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
         .logo-text span { color: var(--gold); }
+
+        .theme-toggle {
+            position: fixed; top: 100px; right: 20px; z-index: 2000;
+            background: var(--gold); border: none; width: 45px; height: 45px;
+            border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow);
+            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+        }
 
         .hero { padding: 180px 0 80px; text-align: center; position: relative; }
         .location-badge-gold {
@@ -104,8 +98,7 @@
 
         .auth-input {
             width: 80%; padding: 15px; border-radius: 12px; border: 1px solid var(--gold);
-            background: rgba(0,0,0,0.3); color: var(--gold); margin-bottom: 20px; outline: none;
-            font-weight: 600; text-align: center;
+            background: rgba(0,0,0,0.3); color: white; margin-bottom: 20px; outline: none;
         }
 
         #zetwal-core {
@@ -117,7 +110,7 @@
         @keyframes coreRespire { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2); filter: brightness(1.4); } }
 
         footer {
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(30px);
+            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(40px);
             padding: 80px 10% 40px; border-top: 1px solid rgba(255, 215, 0, 0.3);
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
         }
@@ -132,6 +125,7 @@
 
     <canvas id="webgl-canvas"></canvas>
     <div id="zetwal-core"></div>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 
     <nav class="nav">
         <div class="nav-content">
@@ -162,10 +156,10 @@
         <section class="zoom-card" style="max-width: 450px; margin: 0 auto 80px; text-align:center;">
             <h2 style="color:var(--gold);">Koneksyon</h2>
             <p style="font-size:0.9rem; opacity:0.8; margin-bottom:25px;">Konekte ak Google, Facebook oswa Nimewo w.</p>
-            <button class="btn-main-gold" style="width:100%; margin-bottom:10px; background:#fff;">Google Login</button>
-            <button class="btn-main-gold" style="width:100%; margin-bottom:10px; background:#1877F2; color:#fff; border:none;">Facebook</button>
-            <input type="text" class="auth-input" placeholder="Nimewo Telefòn">
-            <button class="btn-main-gold" style="width:100%;">Antre</button>
+            <button id="google-login" class="btn-main-gold" style="width:100%; margin-bottom:10px; background:#fff;">Google Login</button>
+            <button id="fb-login" class="btn-main-gold" style="width:100%; margin-bottom:10px; background:#1877F2; color:#fff; border:none;">Facebook</button>
+            <input type="text" id="phone-number" class="auth-input" placeholder="Nimewo Telefòn">
+            <button id="phone-login" class="btn-main-gold" style="width:100%;">Antre</button>
         </section>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
@@ -194,11 +188,49 @@
         <div class="footer-bottom">ZETWAL 2026 – TOUT DWA REZÈVE</div>
     </footer>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+            authDomain: "lavrizetwal.firebaseapp.com",
+            projectId: "lavrizetwal",
+            storageBucket: "lavrizetwal.firebasestorage.app",
+            messagingSenderId: "291921316186",
+            appId: "1:291921316186:web:f55e8b34526960df394b63",
+            measurementId: "G-65R9V5MRBV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Google Auth
+        document.getElementById('google-login').onclick = () => {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).then((res) => console.log("Google In")).catch(err => alert(err.message));
+        };
+
+        // FB Auth
+        document.getElementById('fb-login').onclick = () => {
+            const provider = new FacebookAuthProvider();
+            signInWithPopup(auth, provider).then((res) => console.log("FB In")).catch(err => alert(err.message));
+        };
+
+        // Phone Auth (Simple placeholder logik)
+        window.recaptchaVerifier = new RecaptchaVerifier('phone-login', { 'size': 'invisible' }, auth);
+        document.getElementById('phone-login').onclick = () => {
+            const num = document.getElementById('phone-number').value;
+            if(num) console.log("Inisyalize SMS pou: " + num);
+        };
+    </script>
+
     <script>
         let scene, camera, renderer, stars, sun, particleSystem;
         let mouse = new THREE.Vector2();
-        const particleCount = window.innerWidth < 768 ? 500 : 1500;
+        const particleCount = 1000;
         let pIdx = 0;
+        let particleData = [];
 
         function initWebGL() {
             scene = new THREE.Scene();
@@ -209,37 +241,59 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.setSize(window.innerWidth, window.innerHeight);
 
+            // GALAXIE
             const starGeometry = new THREE.BufferGeometry();
-            const starCoords = [];
-            const starColors = [];
-            for(let i=0; i<3000; i++) {
-                starCoords.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
-                const isGold = Math.random() > 0.8;
+            const starCoords = [], starColors = [];
+            for(let i=0; i<4000; i++) {
+                starCoords.push((Math.random()-0.5)*25, (Math.random()-0.5)*25, (Math.random()-0.5)*25);
+                const isGold = Math.random() > 0.7;
                 starColors.push(isGold ? 1 : 1, isGold ? 0.84 : 1, isGold ? 0 : 1);
             }
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
             starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
-            const starMaterial = new THREE.PointsMaterial({ size: 0.03, vertexColors: true, transparent: true, opacity: 0.8 });
-            stars = new THREE.Points(starGeometry, starMaterial);
+            stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: 0.035, vertexColors: true, transparent: true, opacity: 0.9 }));
             scene.add(stars);
 
-            const sunGeometry = new THREE.SphereGeometry(0.8, 32, 32);
-            const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-            sun = new THREE.Mesh(sunGeometry, sunMaterial);
-            sun.position.set(3, 2, -5);
+            // SOLEIL
+            sun = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
+            sun.position.set(4, 3, -6);
             scene.add(sun);
 
-            // PARTIKIL KI KLINYOTE (Twinkling)
-            const partGeo = new THREE.BufferGeometry();
-            const partPos = new Float32Array(particleCount * 3);
-            partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
-            const partMat = new THREE.PointsMaterial({ color: 0xffd700, size: 0.03, transparent: true, blending: THREE.AdditiveBlending });
-            particleSystem = new THREE.Points(partGeo, partMat);
+            // SYSTÈME DE PARTICULES FLUIDES
+            const pGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const opacities = new Float32Array(particleCount);
+            pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            pGeo.setAttribute('alpha', new THREE.BufferAttribute(opacities, 1));
+            
+            for(let i=0; i<particleCount; i++) {
+                particleData.push({ age: 0, life: 100 + Math.random() * 100 });
+            }
+
+            particleSystem = new THREE.Points(pGeo, new THREE.ShaderMaterial({
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                uniforms: { color: { value: new THREE.Color(0xffd700) } },
+                vertexShader: `
+                    attribute float alpha;
+                    varying float vAlpha;
+                    void main() {
+                        vAlpha = alpha;
+                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                        gl_PointSize = 4.0;
+                        gl_Position = projectionMatrix * mvPosition;
+                    }`,
+                fragmentShader: `
+                    uniform vec3 color;
+                    varying float vAlpha;
+                    void main() {
+                        if (length(gl_PointCoord - vec2(0.5)) > 0.5) discard;
+                        gl_FragColor = vec4(color, vAlpha);
+                    }`
+            }));
             scene.add(particleSystem);
 
             window.addEventListener('mousemove', (e) => updateParticles(e.clientX, e.clientY));
-            window.addEventListener('touchmove', (e) => updateParticles(e.touches[0].clientX, e.touches[0].clientY));
-
             animate();
         }
 
@@ -247,31 +301,34 @@
             const vector = new THREE.Vector3((x/window.innerWidth)*2-1, -(y/window.innerHeight)*2+1, 0.5);
             vector.unproject(camera);
             const dir = vector.sub(camera.position).normalize();
-            const distance = -camera.position.z / dir.z;
-            const pos = camera.position.clone().add(dir.multiplyScalar(distance));
+            const pos = camera.position.clone().add(dir.multiplyScalar(-camera.position.z / dir.z));
 
             const positions = particleSystem.geometry.attributes.position.array;
-            positions[pIdx] = pos.x;
-            positions[pIdx+1] = pos.y;
-            positions[pIdx+2] = pos.z;
-            pIdx = (pIdx + 3) % (particleCount * 3);
-            particleSystem.geometry.attributes.position.needsUpdate = true;
+            positions[pIdx*3] = pos.x;
+            positions[pIdx*3+1] = pos.y;
+            positions[pIdx*3+2] = pos.z;
+            particleData[pIdx].age = 0; // Reset age proprement
+            pIdx = (pIdx + 1) % particleCount;
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            stars.rotation.y += 0.0005;
-            stars.rotation.x += 0.0002;
-            
-            const time = Date.now() * 0.001;
-            sun.scale.set(1.1 + Math.sin(time*2)*0.15, 1.1 + Math.sin(time*2)*0.15, 1);
-            
-            // EFÈ KLINYOTE (Twinkle effect) pou patikil yo
-            particleSystem.material.opacity = 0.5 + Math.sin(time * 10) * 0.5;
+            stars.rotation.y += 0.0004;
+            sun.scale.setScalar(1.1 + Math.sin(Date.now() * 0.002) * 0.25);
+
+            const alphas = particleSystem.geometry.attributes.alpha.array;
+            for(let i=0; i<particleCount; i++) {
+                particleData[i].age += 1;
+                // Dissipation fluide : l'alpha descend doucement vers 0
+                alphas[i] = Math.max(0, 1.0 - (particleData[i].age / particleData[i].life));
+            }
+            particleSystem.geometry.attributes.alpha.needsUpdate = true;
+            particleSystem.geometry.attributes.position.needsUpdate = true;
 
             renderer.render(scene, camera);
         }
 
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
