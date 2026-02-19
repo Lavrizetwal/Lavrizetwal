@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZETWAL GAMES | Duel Mental</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-deep: #b8860b;
+            --gold-light: #fff8dc;
+            --gold-glow: rgba(255, 215, 0, 0.4);
+            --bg: #010101;
+            --text: #ffffff;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        body { 
+            background: var(--bg); color: var(--text); margin: 0; 
+            font-family: 'Montserrat', sans-serif; overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
+
+        /* REPRIS DU STYLE ACCUEIL */
+        .liquid-border {
+            position: relative; border: 1px solid transparent; background-clip: padding-box;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.15);
+            filter: drop-shadow(0 0 10px var(--gold-glow));
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 30px;
+        }
+
+        .liquid-border::before {
+            content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1px;
+            background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light), var(--gold), var(--gold-deep));
+            background-size: 300% 300%; animation: liquidGold 12s linear infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+        }
+
+        @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(0, 0, 0, 0.15); backdrop-filter: blur(40px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .nav-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 12px 20px; }
+        
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+        .logo-text span { color: var(--gold); }
+
+        .game-container { padding: 120px 5% 50px; max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        
+        .zoom-card {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
+            padding: 40px; text-align: center;
+        }
+
+        .gold-shimmer {
+            color: var(--gold); background: linear-gradient(90deg, #fff, var(--gold), #fff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-size: 200% auto; animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer { to { background-position: 200% center; } }
+
+        /* BOUTONS ET INPUTS */
+        .btn-gold {
+            display: inline-block; padding: 15px 35px; background: var(--gold);
+            color: #000; text-decoration: none; border-radius: 50px;
+            font-weight: 800; text-transform: uppercase; cursor: pointer;
+            border: none; transition: var(--transition); margin: 10px;
+        }
+        .btn-gold:hover { transform: scale(1.05); box-shadow: 0 10px 30px var(--gold); }
+        .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+        
+        .answerBtn {
+            background: rgba(255,215,0,0.1); border: 1px solid var(--gold);
+            color: white; padding: 20px; border-radius: 15px; cursor: pointer;
+            font-weight: 600; transition: var(--transition);
+        }
+        .answerBtn:hover { background: var(--gold); color: black; transform: translateY(-5px); }
+
+        #timer { font-size: 1.5rem; font-weight: 800; color: var(--gold); margin-bottom: 20px; }
+        
+        .hidden { display: none; }
+        
+        .radio-group { margin: 20px 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .radio-item { background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 50px; border: 1px solid rgba(255,215,0,0.3); cursor: pointer; }
+        .radio-item input { margin-right: 10px; accent-color: var(--gold); }
+    </style>
+</head>
+<body>
+
+    <canvas id="webgl-canvas"></canvas>
+
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="index.html" style="color:white; text-decoration:none;">← Tounen</a>
+            <div class="logo-text">DUEL <span>MENTAL</span></div>
+            <div id="user-points-nav" style="color:var(--gold); font-weight:800;">... pwen</div>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        
+        <div id="game-intro" class="zoom-card liquid-border">
+            <h1 class="gold-shimmer">DUEL MENTAL</h1>
+            <p>Antrene sèvo ou epi genyen pwen.</p>
+            <div style="background: rgba(255,215,0,0.1); padding: 15px; border-radius: 15px; margin: 20px 0;">
+                <p>💰 Antre: <strong>10 pwen</strong></p>
+                <p>🏆 Max genyen: <strong>27.5 pwen</strong></p>
+            </div>
+            
+            <h3 style="color:var(--gold);">Chwazi Tip Kesyon:</h3>
+            <div class="radio-group" id="gameOptions">
+                <label class="radio-item"><input type="radio" name="gameType" value="calcul" checked> Kalkil</label>
+                <label class="radio-item"><input type="radio" name="gameType" value="memoire"> Memwa</label>
+                <label class="radio-item"><input type="radio" name="gameType" value="logique"> Logik</label>
+                <label class="radio-item"><input type="radio" name="gameType" value="all"> Tout Melanje</label>
+            </div>
+            
+            <button id="startBtn" class="btn-gold">KÒMANSE JWÈT LA</button>
+        </div>
+
+        <div id="game-play" class="zoom-card liquid-border hidden">
+            <div id="timer">⏱ 5s</div>
+            <div id="question-progress" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 10px;">Kesyon 1/10</div>
+            <h2 id="questionText" style="min-height: 80px;">Chaje kesyon...</h2>
+            <div id="options" class="answer-grid"></div>
+        </div>
+
+        <div id="game-results" class="zoom-card liquid-border hidden">
+            <h2 class="gold-shimmer">REZILTA</h2>
+            <div id="final-stats" style="font-size: 1.2rem; margin: 30px 0;"></div>
+            <button onclick="location.reload()" class="btn-gold">REJWE</button>
+            <a href="index.html" class="btn-gold" style="background:transparent; border:1px solid var(--gold); color:var(--gold);">SOTI</a>
+        </div>
+
+    </div>
+
+    <script>
+        // FIREBASE CONFIGURATION (Copied from your home page)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+            authDomain: "lavrizetwal.firebaseapp.com",
+            projectId: "lavrizetwal",
+            storageBucket: "lavrizetwal.firebasestorage.app",
+            messagingSenderId: "291921316186",
+            appId: "1:291921316186:web:f55e8b34526960df394b63"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // GAME LOGIC
+        const TOTAL_QUESTIONS = 10;
+        const TIMER_SECONDS = 5;
+        const POINTS_PER_QUESTION = [1.5, 2, 2, 2.5, 2.5, 2.5, 3, 3, 3, 4];
+
+        let userPoints = 0;
+        let currentQuestionIndex = 0;
+        let selectedQuestions = [];
+        let questionTimer;
+        let currentUID = null;
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUID = user.uid;
+                updateNavPoints();
+            } else {
+                window.location.href = "index.html"; // Redirige si pa konekte
+            }
+        });
+
+        async function updateNavPoints() {
+            const doc = await db.collection("users").doc(currentUID).get();
+            const points = doc.data()?.points || 0;
+            document.getElementById("user-points-nav").innerText = `${points} pwen`;
+        }
+
+        document.getElementById("startBtn").onclick = async () => {
+            const type = document.querySelector('input[name="gameType"]:checked').value;
+            
+            // 1. Tcheke pwen
+            const userDoc = await db.collection("users").doc(currentUID).get();
+            const points = userDoc.data()?.points || 0;
+
+            if (points < 10) {
+                alert("Ou bezwen omwen 10 pwen pou w jwe.");
+                return;
+            }
+
+            // 2. Retire 10 pwen
+            await db.collection("users").doc(currentUID).update({ points: points - 10 });
+            
+            // 3. Chaje Kesyon
+            let query = db.collection("questions");
+            if(type !== 'all') query = query.where("type", "==", type);
+            
+            const snapshot = await query.orderBy("level").limit(TOTAL_QUESTIONS).get();
+            
+            if (snapshot.empty) {
+                alert("Pa gen kesyon disponib pou tip sa.");
+                return;
+            }
+
+            selectedQuestions = snapshot.docs.map(doc => doc.data());
+            
+            // 4. Chanje Ekran
+            document.getElementById("game-intro").classList.add("hidden");
+            document.getElementById("game-play").classList.remove("hidden");
+            
+            showQuestion();
+        };
+
+        function showQuestion() {
+            if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+                endGame();
+                return;
+            }
+
+            const q = selectedQuestions[currentQuestionIndex];
+            document.getElementById("question-progress").innerText = `Kesyon ${currentQuestionIndex + 1}/${TOTAL_QUESTIONS}`;
+            document.getElementById("questionText").innerText = q.question;
+
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = "";
+
+            q.options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.className = "answerBtn";
+                btn.onclick = () => selectAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            let timeLeft = TIMER_SECONDS;
+            document.getElementById("timer").innerText = `⏱ ${timeLeft}s`;
+            
+            clearInterval(questionTimer);
+            questionTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timer").innerText = `⏱ ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(questionTimer);
+                    selectAnswer(null);
+                }
+            }, 1000);
+        }
+
+        function selectAnswer(answer) {
+            clearInterval(questionTimer);
+            const q = selectedQuestions[currentQuestionIndex];
+
+            if (answer === q.answer) {
+                userPoints += POINTS_PER_QUESTION[currentQuestionIndex];
+                // Efè son oswa vizyèl siksè ka ajoute isit la
+            }
+
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        async function endGame() {
+            document.getElementById("game-play").classList.add("hidden");
+            document.getElementById("game-results").classList.remove("hidden");
+
+            // Update Firebase
+            const userDoc = await db.collection("users").doc(currentUID).get();
+            const oldPoints = userDoc.data()?.points || 0;
+            const newTotal = oldPoints + userPoints;
+
+            await db.collection("users").doc(currentUID).update({ points: newTotal });
+            
+            document.getElementById("final-stats").innerHTML = `
+                Bravo!<br>Ou fè <strong>${userPoints}</strong> pwen nan pati sa.<br>
+                Nouvo balans ou se: <strong>${newTotal.toFixed(1)} pwen</strong>.
+            `;
+            updateNavPoints();
+        }
+
+        // WEBGL BACKGROUND (Identique à l'accueil)
+        // ... (Kòd Three.js la menm jan ak paj akèy pou kenbe inivè a)
+        // [Mwen kite pati sa a kout pou espas, men li se menm WebGL la]
+    </script>
+    
+    <script>
+        // WEBGL SCRIPT (Kopi rapid soti nan akèy pou background zetwal la mache)
+        let scene, camera, renderer, stars;
+        function initWebGL() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const starGeometry = new THREE.BufferGeometry();
+            const starCoords = [];
+            for(let i=0; i<3000; i++) starCoords.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
+            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
+            stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: 0.03, color: 0xffd700, transparent: true }));
+            scene.add(stars);
+            animate();
+        }
+        function animate() {
+            requestAnimationFrame(animate);
+            stars.rotation.y += 0.0005;
+            renderer.render(scene, camera);
+        }
+        initWebGL();
+    </script>
+</body>
+</html>
