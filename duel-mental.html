@@ -12,25 +12,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* TOUT STYLE ACCUEIL REPRIS */
         :root { --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc; --bg: #010101; --text: #ffffff; }
         body { background: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; overflow: hidden; }
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
-        
         .game-overlay { position: relative; z-index: 1; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .liquid-border { position: relative; border-radius: 30px; background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); border: 1px solid transparent; width: 100%; max-width: 500px; padding: 40px; text-align: center; }
+        .liquid-border { position: relative; border-radius: 30px; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); border: 1px solid transparent; width: 100%; max-width: 500px; padding: 40px; text-align: center; }
         .liquid-border::before { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 2px; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light), var(--gold), var(--gold-deep)); background-size: 300% 300%; animation: liquidGold 8s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
-        
         @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        
-        .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 20px; transition: 0.3s; }
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 20px; transition: 0.3s; width: 100%; }
         .btn-gold:hover { transform: scale(1.05); filter: brightness(1.2); }
-        
-        .answer-btn { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); color: white; padding: 15px; margin: 10px 0; border-radius: 12px; cursor: pointer; width: 100%; font-weight: 600; transition: 0.3s; }
+        .answer-btn { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); color: white; padding: 15px; margin: 10px 0; border-radius: 12px; cursor: pointer; width: 100%; font-weight: 600; transition: 0.3s; font-size: 1.1rem; }
         .answer-btn:hover { background: var(--gold); color: black; }
-        
-        #timer { font-size: 2rem; font-weight: 800; color: var(--gold); margin-bottom: 20px; text-shadow: 0 0 10px var(--gold); }
+        #timer { font-size: 2.5rem; font-weight: 800; color: var(--gold); margin-bottom: 20px; text-shadow: 0 0 15px var(--gold); }
         .hidden { display: none; }
+        select { width: 100%; padding: 15px; border-radius: 12px; background: #111; color: white; border: 1px solid var(--gold); margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -38,38 +33,40 @@
 
     <div class="game-overlay">
         <div id="intro-screen" class="liquid-border">
-            <h1 style="color:var(--gold); font-family:'Playfair Display';">DUEL MENTAL</h1>
-            <p>Ou pral gen 10 kesyon rapid. Chak kesyon gen yon limit 5 segonn. Plis nivo a moute, plis pwen yo moute.</p>
-            <p style="font-size: 0.8rem; opacity: 0.7;">Frè antre: 10 Pwen | Max Genyen: 27.5 Pwen</p>
+            <h1 style="color:var(--gold); font-family:'Playfair Display'; font-size: 2.5rem;">DUEL MENTAL</h1>
+            <p>10 kestyon rapid. 5 segonn pa kestyon.</p>
+            <p style="background: rgba(255,215,0,0.2); padding: 10px; border-radius: 10px; font-weight: 600;">
+                🎟️ Antre: 10 Pwen | 🏆 Max Genyen: 27.5 Pwen
+            </p>
             
-            <div id="gameOptions" style="margin-top:20px;">
-                <select id="gameType" style="padding:10px; border-radius:10px; background:black; color:white; border:1px solid var(--gold);">
-                    <option value="calcul">Kalkil Mental</option>
-                    <option value="memoire">Memwa Vizyèl</option>
-                    <option value="logique">Pattern Logique</option>
-                </select>
-            </div>
-            <button id="startBtn" class="btn-gold">PAYE 10 PWEN & JWE</button>
+            <select id="gameType">
+                <option value="calcul_mental">Kalkil Mental</option>
+                <option value="memoire_visuelle">Memwa Vizyèl</option>
+                <option value="pattern_logique">Pattern Logique</option>
+            </select>
+            
+            <button id="startBtn" class="btn-gold">PAYE 10 PWEN & KÒMANSE</button>
             <br><br>
-            <a href="games.html" style="color:var(--gold); font-size: 0.8rem;">Anile / Tounen</a>
+            <a href="games.html" style="color:var(--gold); text-decoration: none; font-size: 0.9rem;">← Tounen</a>
         </div>
 
         <div id="play-screen" class="liquid-border hidden">
             <div id="timer">05</div>
-            <h2 id="questionText">...</h2>
+            <p id="qCount" style="color:var(--gold); font-weight: 800;"></p>
+            <h2 id="questionText" style="min-height: 60px;">Chajman...</h2>
             <div id="options"></div>
         </div>
 
         <div id="result-screen" class="liquid-border hidden">
-            <h1 style="color:var(--gold);">FINI!</h1>
-            <p id="final-result-text"></p>
+            <h1 style="color:var(--gold);">MATCH FINI!</h1>
+            <p id="final-result-text" style="font-size: 1.2rem;"></p>
+            <p id="new-balance-text" style="opacity: 0.8;"></p>
             <button onclick="location.reload()" class="btn-gold">REJWE</button>
-            <a href="games.html" class="btn-gold" style="display:block; text-decoration:none; background:transparent; border:1px solid var(--gold); color:var(--gold);">TOUNEN NAN LOBBY</a>
+            <a href="games.html" class="btn-gold" style="display:block; text-decoration:none; background:transparent; border:1px solid var(--gold); color:var(--gold); margin-top: 10px;">LOBBY</a>
         </div>
     </div>
 
     <script>
-        // INITIALISATION FIREBASE (V8 pour compatibilité script rapide)
         const firebaseConfig = {
             apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
             authDomain: "lavrizetwal.firebaseapp.com",
@@ -82,35 +79,55 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // LOGIQUE JS DUEL MENTAL (Ton code)
-        const POINTS_PER_QUESTION = [1.5, 2, 2, 2.5, 2.5, 2.5, 3, 3, 3, 4];
-        let currentIdx = 0, userPoints = 0, questions = [], timer;
+        let currentIdx = 0, pointsGained = 0, questions = [], timer, selectedCategory;
+        const POINTS_PER_QUESTION = [1.5, 2, 2, 2.5, 2.5, 2.5, 3, 3, 3, 4.5]; // Total = 27.5
 
         document.getElementById('startBtn').onclick = async () => {
             const user = auth.currentUser;
             if(!user) return alert("Konekte avan!");
             
-            const type = document.getElementById('gameType').value;
-            const doc = await db.collection("users").doc(user.uid).get();
-            const points = doc.data().points || 0;
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            btn.innerText = "Y AP VERIFYE...";
 
-            if(points < 10) return alert("Pwen pa ase!");
+            selectedCategory = document.getElementById('gameType').value;
+            const userRef = db.collection("users").doc(user.uid);
 
-            await db.collection("users").doc(user.uid).update({ points: points - 10 });
-            
-            const snap = await db.collection("questions").where("type", "==", type).limit(10).get();
-            questions = snap.docs.map(d => d.data());
-            
-            document.getElementById('intro-screen').classList.add('hidden');
-            document.getElementById('play-screen').classList.remove('hidden');
-            showQ();
+            try {
+                // 1. Nou rale kesyon yo anvan pou n sèten yo la
+                const snap = await db.collection(selectedCategory).limit(40).get();
+                if(snap.empty) throw "Pa gen kesyon nan kategori sa a!";
+                
+                const allFetched = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                questions = allFetched.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+                // 2. Transaction pou retire 10 pwen
+                await db.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    const currentPoints = userDoc.data().points || 0;
+                    if(currentPoints < 10) throw "Pwen ou pa ase!";
+                    transaction.update(userRef, { points: currentPoints - 10 });
+                });
+
+                document.getElementById('intro-screen').classList.add('hidden');
+                document.getElementById('play-screen').classList.remove('hidden');
+                showQ();
+
+            } catch (e) {
+                alert(e);
+                btn.disabled = false;
+                btn.innerText = "PAYE 10 PWEN & KÒMANSE";
+            }
         };
 
         function showQ() {
             if(currentIdx >= 10) return end();
             clearInterval(timer);
+            
             const q = questions[currentIdx];
+            document.getElementById('qCount').innerText = `KESTYON ${currentIdx + 1} / 10`;
             document.getElementById('questionText').innerText = q.question;
+            
             const optDiv = document.getElementById('options');
             optDiv.innerHTML = "";
             
@@ -118,7 +135,10 @@
                 const b = document.createElement('button');
                 b.className = "answer-btn";
                 b.innerText = o;
-                b.onclick = () => { if(o === q.answer) userPoints += POINTS_PER_QUESTION[currentIdx]; next(); };
+                b.onclick = () => { 
+                    if(o.toString() === q.answer.toString()) pointsGained += POINTS_PER_QUESTION[currentIdx];
+                    next(); 
+                };
                 optDiv.appendChild(b);
             });
 
@@ -136,44 +156,46 @@
         async function end() {
             clearInterval(timer);
             const user = auth.currentUser;
-            const doc = await db.collection("users").doc(user.uid).get();
-            await db.collection("users").doc(user.uid).update({ points: (doc.data().points || 0) + userPoints });
+            const userRef = db.collection("users").doc(user.uid);
             
-            document.getElementById('play-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
-            document.getElementById('final-result-text').innerText = `Ou genyen ${userPoints} pwen!`;
+            try {
+                let finalBalans = 0;
+                await db.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    finalBalans = (userDoc.data().points || 0) + pointsGained;
+                    transaction.update(userRef, { points: finalBalans });
+                });
+
+                document.getElementById('play-screen').classList.add('hidden');
+                document.getElementById('result-screen').classList.remove('hidden');
+                document.getElementById('final-result-text').innerText = `Ou genyen ${pointsGained.toFixed(1)} pwen!`;
+                document.getElementById('new-balance-text').innerText = `Nouvo balans: ${finalBalans.toFixed(1)} Pwen`;
+            } catch (e) { alert("Erè save: " + e); }
         }
     </script>
-
+    
     <script>
-        let scene, camera, renderer, stars, sun;
-        function init() {
+        let scene, camera, renderer, stars;
+        function initGL() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
             camera.position.z = 5;
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            
             const geo = new THREE.BufferGeometry();
             const pos = [];
             for(let i=0; i<3000; i++) pos.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
             stars = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.03, color: 0xffd700 }));
             scene.add(stars);
-
-            sun = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
-            sun.position.set(4, 3, -6);
-            scene.add(sun);
-            
-            animate();
+            animateGL();
         }
-        function animate() {
-            requestAnimationFrame(animate);
+        function animateGL() {
+            requestAnimationFrame(animateGL);
             stars.rotation.y += 0.0005;
-            sun.scale.setScalar(1.1 + Math.sin(Date.now()*0.002)*0.1);
             renderer.render(scene, camera);
         }
-        init();
+        initGL();
     </script>
 </body>
 </html>
