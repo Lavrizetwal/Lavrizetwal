@@ -16,16 +16,23 @@
         body { background: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; margin: 0; overflow: hidden; }
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
         .game-overlay { position: relative; z-index: 1; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .liquid-border { position: relative; border-radius: 30px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border: 1px solid transparent; width: 100%; max-width: 500px; padding: 40px; text-align: center; }
+        .liquid-border { position: relative; border-radius: 30px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border: 1px solid transparent; width: 100%; max-width: 500px; padding: 40px; text-align: center; }
         .liquid-border::before { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 2px; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light), var(--gold), var(--gold-deep)); background-size: 300% 300%; animation: liquidGold 8s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
         @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
         .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 20px; transition: 0.3s; width: 100%; }
         .btn-gold:hover { transform: scale(1.05); filter: brightness(1.2); }
-        .answer-btn { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); color: white; padding: 15px; margin: 10px 0; border-radius: 12px; cursor: pointer; width: 100%; font-weight: 600; transition: 0.3s; font-size: 1.1rem; }
-        .answer-btn:hover { background: var(--gold); color: black; }
-        #timer { font-size: 3rem; font-weight: 800; color: var(--gold); margin-bottom: 20px; text-shadow: 0 0 15px var(--gold); }
+        .btn-gold:disabled { background: #555; cursor: not-allowed; }
+
+        /* 1️⃣ PWOTEKSYON REPONS: Koulè net pou bouton yo */
+        .answer-btn { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); color: white; padding: 15px; margin: 10px 0; border-radius: 12px; cursor: pointer; width: 100%; font-weight: 600; transition: 0.2s; font-size: 1.1rem; outline: none; }
+        .answer-btn:hover { background: rgba(255,215,0,0.3); border-color: var(--gold-light); }
+        .answer-btn:active { background: var(--gold); color: black; }
+
+        #timer { font-size: 3.5rem; font-weight: 800; color: var(--gold); margin-bottom: 10px; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        .points-live { color: var(--gold); font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; }
         .hidden { display: none; }
-        select { width: 100%; padding: 15px; border-radius: 12px; background: #111; color: white; border: 1px solid var(--gold); margin: 15px 0; }
+        select { width: 100%; padding: 15px; border-radius: 12px; background: #111; color: white; border: 1px solid var(--gold); margin: 15px 0; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -33,9 +40,10 @@
 
     <div class="game-overlay">
         <div id="intro-screen" class="liquid-border">
-            <h1 style="color:var(--gold); font-family:'Playfair Display'; font-size: 2.5rem;">DUEL MENTAL</h1>
-            <p>10 kestyon. 10 segonn pa kestyon.</p>
-            <p style="background: rgba(255,215,0,0.2); padding: 10px; border-radius: 10px; font-weight: 600;">
+            <h1 style="color:var(--gold); font-family:'Playfair Display'; font-size: 2.5rem; margin-bottom: 10px;">DUEL MENTAL</h1>
+            <div id="liveBalans" style="margin-bottom: 15px; font-weight: 600; color: var(--gold-light);">Chajman pwen...</div>
+            <p>10 kestyon progresif. 10 segonn pa kestyon.</p>
+            <p style="background: rgba(255,215,0,0.2); padding: 10px; border-radius: 10px; font-weight: 600; margin: 15px 0;">
                 🎟️ Frè: 10 Pwen | 🏆 Max: 27.5 Pwen
             </p>
             
@@ -47,22 +55,23 @@
             
             <button id="startBtn" class="btn-gold">PAYE 10 PWEN & KÒMANSE</button>
             <br><br>
-            <a href="games.html" style="color:var(--gold); text-decoration: none; font-size: 0.9rem;">← Tounen nan Lobby</a>
+            <a href="games.html" style="color:var(--gold); text-decoration: none; font-size: 0.9rem; opacity: 0.8;">← Tounen nan Lobby</a>
         </div>
 
         <div id="play-screen" class="liquid-border hidden">
             <div id="timer">10</div>
-            <p id="qCount" style="color:var(--gold); font-weight: 800; font-size: 0.8rem;"></p>
-            <h2 id="questionText" style="min-height: 80px; font-size: 1.5rem; margin: 20px 0;">Chajman...</h2>
+            <div id="liveScore" class="points-live">Pwen: 0.0</div>
+            <p id="qCount" style="color:var(--gold); font-weight: 800; font-size: 0.8rem; letter-spacing: 1px;"></p>
+            <h2 id="questionText" style="min-height: 80px; font-size: 1.6rem; margin: 20px 0; line-height: 1.4;">...</h2>
             <div id="options"></div>
         </div>
 
         <div id="result-screen" class="liquid-border hidden">
-            <h1 style="color:var(--gold);">MATCH FINI!</h1>
-            <p id="final-result-text" style="font-size: 1.2rem; margin: 10px 0;"></p>
-            <p id="new-balance-text" style="color: var(--gold-light); font-weight: 600; margin-bottom: 20px;"></p>
+            <h1 style="color:var(--gold); font-size: 2.5rem;">MATCH FINI!</h1>
+            <p id="final-result-text" style="font-size: 1.4rem; margin: 20px 0;"></p>
+            <p id="new-balance-text" style="color: var(--gold-light); font-weight: 600; margin-bottom: 25px; font-size: 1.1rem;"></p>
             <button onclick="location.reload()" class="btn-gold">REJWE</button>
-            <a href="games.html" class="btn-gold" style="display:block; text-decoration:none; background:transparent; border:1px solid var(--gold); color:var(--gold); margin-top: 10px;">LOBBY</a>
+            <a href="games.html" class="btn-gold" style="display:block; text-decoration:none; background:transparent; border:1px solid var(--gold); color:var(--gold); margin-top: 15px;">TOUNEN NAN LOBBY</a>
         </div>
     </div>
 
@@ -81,33 +90,52 @@
 
         let currentIdx = 0, pointsGained = 0, questions = [], timer, selectedCategory;
 
+        // 3️⃣ PWEN AN TAN REYÈL: Koute balans lan depi paj la louvri
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.collection("users").doc(user.uid).onSnapshot(doc => {
+                    if (doc.exists) {
+                        const p = doc.data().points || 0;
+                        document.getElementById('liveBalans').innerText = `Balans ou: ${p.toFixed(1)} Pwen`;
+                    }
+                });
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // 2️⃣ PROGRESSYON STRIK: Rale kesyon nivo pa nivo
         document.getElementById('startBtn').onclick = async () => {
             const user = auth.currentUser;
-            if(!user) return alert("Ou dwe konekte avan!");
-            
             const btn = document.getElementById('startBtn');
             btn.disabled = true;
-            btn.innerText = "Y AP VERIFYE PWEN...";
+            btn.innerText = "Y AP PREPARE NIVO YO...";
 
             selectedCategory = document.getElementById('gameType').value;
             const userRef = db.collection("users").doc(user.uid);
 
             try {
-                // 1. Rale tout kesyon yo nan kategori a, triye yo pa nivo (level)
-                const snap = await db.collection(selectedCategory).orderBy("level", "asc").get();
-                if(snap.empty) throw "Database la vid pou kategori sa a!";
-                
-                // Filtre pou n pran kesyon yo nan lòd
-                const allData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                
-                // Nou pran 10 kesyon nan diferan nivo (si genyen ase)
-                questions = allData.slice(0, 10); 
+                let fetchedQuestions = [];
+                // N ap boukle pou n rale yon kesyon o aza pou chak nivo nan 1 rive 10
+                for (let i = 1; i <= 10; i++) {
+                    const snap = await db.collection(selectedCategory)
+                                          .where("level", "==", i)
+                                          .limit(10) // rale kèk pou n ka randomize
+                                          .get();
+                    
+                    if (snap.empty) throw `Pa gen kesyon nivo ${i} nan database la!`;
+                    
+                    const randomDoc = snap.docs[Math.floor(Math.random() * snap.docs.length)];
+                    fetchedQuestions.push({ id: randomDoc.id, ...randomDoc.data() });
+                }
 
-                // 2. Transaction Sekirize: Retire 10 pwen
+                questions = fetchedQuestions;
+
+                // 🎟️ Transaction: Retire 10 pwen pou antre a
                 await db.runTransaction(async (transaction) => {
                     const userDoc = await transaction.get(userRef);
                     const currentPoints = userDoc.data().points || 0;
-                    if(currentPoints < 10) throw "Ou bezwen omwen 10 pwen!";
+                    if (currentPoints < 10) throw "Ou pa gen ase pwen (10 nesesè)!";
                     transaction.update(userRef, { points: currentPoints - 10 });
                 });
 
@@ -116,52 +144,46 @@
                 showQ();
 
             } catch (e) {
-                alert(e);
+                alert("Erè: " + e);
                 btn.disabled = false;
                 btn.innerText = "PAYE 10 PWEN & KÒMANSE";
             }
         };
 
         function showQ() {
-            if(currentIdx >= 10) return end();
+            if (currentIdx >= 10) return end();
             clearInterval(timer);
             
             const q = questions[currentIdx];
-            
-            // Debugging: gade si data a rive
-            console.log("Kesyon aktyèl:", q);
-
-            document.getElementById('qCount').innerText = `KESTYON ${currentIdx + 1} / 10 (Nivo ${q.level || 1})`;
-            
-            // VERIFIKASYON: Atansyon si jaden an rele 'question' oswa 'text' nan DB ou a
-            document.getElementById('questionText').innerText = q.question || "Kesyon pa disponib";
+            document.getElementById('liveScore').innerText = `Pwen: ${pointsGained.toFixed(1)}`;
+            document.getElementById('qCount').innerText = `ETAP ${currentIdx + 1} / 10 • NIVO ${q.level}`;
+            document.getElementById('questionText').innerText = q.question;
             
             const optDiv = document.getElementById('options');
             optDiv.innerHTML = "";
             
-            if(q.options && Array.isArray(q.options)) {
-                q.options.forEach(o => {
-                    const b = document.createElement('button');
-                    b.className = "answer-btn";
-                    b.innerText = o;
-                    b.onclick = () => { 
-                        if(o.toString() === q.answer.toString()) {
-                            // Kalkile pwen selon sa k nan DB a
-                            pointsGained += parseFloat(q.points || 0);
-                        }
-                        next(); 
-                    };
-                    optDiv.appendChild(b);
-                });
-            }
+            // 1️⃣ KACHE REPONS: Bouton yo net, pèsonn pa konn kiyès ki bon an
+            q.options.forEach(o => {
+                const b = document.createElement('button');
+                b.className = "answer-btn";
+                b.innerText = o;
+                b.onclick = () => { 
+                    // Verifikasyon fèt sèlman apre klik
+                    if (o.toString() === q.answer.toString()) {
+                        pointsGained += parseFloat(q.points || 0);
+                    }
+                    next(); 
+                };
+                optDiv.appendChild(b);
+            });
 
-            // COMPTEUR À 10 SECONDES
+            // 5️⃣ 10 SEGOND PA KESTYON
             let sec = 10;
-            document.getElementById('timer').innerText = sec < 10 ? "0" + sec : sec;
+            document.getElementById('timer').innerText = sec;
             timer = setInterval(() => {
                 sec--;
-                document.getElementById('timer').innerText = sec < 10 ? "0" + sec : sec;
-                if(sec <= 0) next();
+                document.getElementById('timer').innerText = sec;
+                if (sec <= 0) next();
             }, 1000);
         }
 
@@ -172,15 +194,14 @@
             const user = auth.currentUser;
             const userRef = db.collection("users").doc(user.uid);
             
-            // Limitasyon sekirite bò kliyan
-            if(pointsGained > 27.5) pointsGained = 27.5;
+            // Limit sekirite
+            if (pointsGained > 27.5) pointsGained = 27.5;
 
             try {
                 let finalBalans = 0;
                 await db.runTransaction(async (transaction) => {
                     const userDoc = await transaction.get(userRef);
-                    const currentBalans = userDoc.data().points || 0;
-                    finalBalans = currentBalans + pointsGained;
+                    finalBalans = (userDoc.data().points || 0) + pointsGained;
                     transaction.update(userRef, { points: finalBalans });
                 });
 
@@ -193,7 +214,7 @@
     </script>
     
     <script>
-        // BACKGROUND STARFIELD
+        // BACKGROUND STARFIELD ANIMATION
         let scene, camera, renderer, stars;
         function initGL() {
             scene = new THREE.Scene();
