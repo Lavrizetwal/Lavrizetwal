@@ -54,6 +54,7 @@
             filter: drop-shadow(0 0 10px var(--gold-glow));
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease, box-shadow 0.4s ease;
             cursor: pointer;
+            border-radius: 30px;
         }
 
         .liquid-border:hover {
@@ -87,16 +88,12 @@
             border-bottom: 1px solid rgba(255, 215, 0, 0.3);
             box-shadow: 0 10px 40px rgba(255, 215, 0, 0.2);
         }
-        .nav::after {
-            content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
-            background-size: 200% 100%; animation: liquidGold 8s ease-in-out infinite;
-        }
 
         .nav-content {
             display: flex; justify-content: space-between; align-items: center;
             max-width: 1200px; margin: 0 auto; padding: 12px 20px;
         }
+        .nav-links { display: flex; list-style: none; gap: 20px; margin: 0; padding: 0; }
         .nav-links a { 
             color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.8rem; 
             letter-spacing: 1px; transition: var(--transition); text-transform: uppercase;
@@ -138,6 +135,7 @@
             color: #000; text-decoration: none; border-radius: 50px;
             font-weight: 800; text-transform: uppercase; transition: var(--transition);
             box-shadow: 0 10px 30px var(--gold-glow); border: none; cursor: pointer;
+            text-align: center;
         }
         .btn-main-gold:hover { transform: scale(1.05); box-shadow: 0 15px 40px var(--gold); }
 
@@ -149,7 +147,7 @@
         }
 
         .auth-input {
-            width: 80%; padding: 15px; border-radius: 12px; border: 1px solid var(--gold);
+            width: 90%; padding: 15px; border-radius: 12px; border: 1px solid var(--gold);
             background: rgba(0,0,0,0.3); color: white; margin-bottom: 20px; outline: none;
         }
 
@@ -166,15 +164,7 @@
             border-top: 1px solid rgba(255, 215, 0, 0.3);
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
             position: relative;
-            box-shadow: 0 -10px 40px rgba(255, 215, 0, 0.2);
         }
-        footer::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold-deep), var(--gold-light), var(--gold-deep), transparent);
-            background-size: 200% 100%; animation: liquidGold 15s linear infinite;
-        }
-
-        .footer-logo-img { width: 40px; height: 40px; margin-bottom: 15px; opacity: 0.9; }
 
         .footer-bottom { 
             grid-column: 1 / -1; text-align: center; border-top: 1px solid rgba(255,215,0,0.1); 
@@ -197,7 +187,7 @@
             <a href="https://wa.me/79961103506" class="wa-icon-btn">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" style="width:30px;">
             </a>
-            <ul class="nav-links" style="display: flex; list-style: none; gap: 20px;">
+            <ul class="nav-links">
                 <li><a href="index.html" class="active">Akèy</a></li>
                 <li><a href="services.html">Sèvis</a></li>
                 <li><a href="tarifs.html">Tarif</a></li>
@@ -221,17 +211,14 @@
         <section id="auth-section" class="zoom-card liquid-border" style="max-width: 450px; margin: 0 auto 80px; text-align:center;">
             <div id="auth-form">
                 <h2 style="color:var(--gold);">Koneksyon</h2>
-                <p style="font-size:0.9rem; opacity:0.8; margin-bottom:25px;">Konekte ak Google, Facebook oswa nimewo telefòn ou pouw ka konnen ki kantite pwen ou genyen.</p>
-                <button id="google-login" class="btn-main-gold" style="width:100%; margin-bottom:10px; background:#fff;">Google Login</button>
+                <p style="font-size:0.9rem; opacity:0.8; margin-bottom:25px;">Konekte ak Google oswa Facebook pouw ka konnen ki kantite pwen ou genyen.</p>
+                <button id="google-login" class="btn-main-gold" style="width:100%; margin-bottom:10px; background:#fff; color: #000;">Google Login</button>
                 <button id="fb-login" class="btn-main-gold" style="width:100%; margin-bottom:10px; background:#1877F2; color:#fff; border:none;">Facebook</button>
-                <input type="text" id="phone-number" class="auth-input" placeholder="Nimewo Telefòn">
-                <div id="recaptcha-container"></div>
-                <button id="phone-login" class="btn-main-gold" style="width:100%;">Antre</button>
             </div>
             
             <div id="user-info">
                 <h2 style="color:var(--gold);" id="welcome-msg">Bonjou!</h2>
-                <p id="points-display" style="font-size:1.1rem; font-weight:600; margin: 20px 0;">Chaje pwen...</p>
+                <div id="points-display" style="font-size:1.1rem; font-weight:600; margin: 20px 0; color: #fff;">Chaje pwen...</div>
                 <p style="font-size:0.9rem; margin-bottom:25px;">Pou w ka genyen plis pwen, ale nan paj jwèt nou an.</p>
                 <a href="games.html" class="btn-main-gold" style="width:80%;">ALE NAN JWÈT</a>
                 <br><br>
@@ -253,7 +240,6 @@
 
     <footer>
         <div class="footer-col">
-            <img src="logo.png" alt="Logo" class="footer-logo-img">
             <h3 style="color:var(--gold);">KONTAK</h3>
             <p>pwoduizetwal@gmail.com</p>
             <p>+7 996 110 3506</p>
@@ -293,25 +279,30 @@
             if (user) {
                 authForm.style.display = 'none';
                 userInfo.style.display = 'block';
-                const name = user.displayName || user.phoneNumber || "Zetwal";
+                const name = user.displayName || "Zetwal";
                 welcomeMsg.innerText = `Bonjou ${name.split(' ')[0]}.`;
                 userDisplayName.innerText = name;
 
                 const userRef = doc(db, "users", user.uid);
                 
-                // Senkronizasyon 1000 pwen tès
+                // 🛡️ MODIFIKASYON KRITIK: Tcheke si pwen yo egziste deja
                 try {
                     const docSnap = await getDoc(userRef);
-                    if (!docSnap.exists() || docSnap.data().points === undefined) {
+                    if (!docSnap.exists()) {
+                        // Se yon nouvo itilizatè nèt
                         await setDoc(userRef, { points: 1000, name: name }, { merge: true });
+                    } else if (docSnap.data().points === undefined) {
+                        // Itilizatè a te la men li pa t gen pwen, nou ba li 1000
+                        await setDoc(userRef, { points: 1000 }, { merge: true });
                     }
+                    // Si pwen yo te deja la (pa egzanp 950), nou PA manyen yo.
                 } catch (e) { console.error("Erreur pwen:", e); }
 
-                // Koute pwen yo an dirèk
+                // 🔄 Senkronizasyon pwen an dirèk
                 onSnapshot(userRef, (doc) => {
                     if (doc.exists()) {
-                        const p = doc.data().points || 0;
-                        document.getElementById('points-display').innerHTML = `Ou genyen ${p} pwen pou kounye a.<br><span style="font-size:0.8rem; opacity:0.7;">1 pwen egal 1 goud.</span>`;
+                        const p = doc.data().points !== undefined ? doc.data().points : 0;
+                        document.getElementById('points-display').innerHTML = `Ou genyen <strong>${Number(p).toFixed(1)}</strong> pwen pou kounye a.<br><span style="font-size:0.8rem; opacity:0.7;">1 pwen egal 1 goud.</span>`;
                     }
                 });
             } else {
@@ -327,6 +318,7 @@
     </script>
 
     <script>
+        // WEBGL BACKGROUND (Kenbe menm lojik la)
         let scene, camera, renderer, stars, sun, particleSystem;
         let particleCount = 1000;
         let pIdx = 0;
@@ -344,57 +336,19 @@
             const starCoords = [], starColors = [];
             for(let i=0; i<4000; i++) {
                 starCoords.push((Math.random()-0.5)*25, (Math.random()-0.5)*25, (Math.random()-0.5)*25);
-                const isGold = Math.random() > 0.7;
-                starColors.push(isGold ? 1 : 1, isGold ? 0.84 : 1, isGold ? 0 : 1);
+                starColors.push(1, 0.84, 0);
             }
             starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
             starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
-            stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: 0.035, vertexColors: true, transparent: true, opacity: 0.9 }));
+            stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ size: 0.035, vertexColors: true, transparent: true, opacity: 0.8 }));
             scene.add(stars);
 
-            sun = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffd700 }));
-            sun.position.set(4, 3, -6);
-            scene.add(sun);
-
-            const pGeo = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            const opacities = new Float32Array(particleCount);
-            pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            pGeo.setAttribute('alpha', new THREE.BufferAttribute(opacities, 1));
-            for(let i=0; i<particleCount; i++) particleData.push({ age: 0, life: 100 + Math.random() * 100 });
-
-            particleSystem = new THREE.Points(pGeo, new THREE.ShaderMaterial({
-                transparent: true, blending: THREE.AdditiveBlending,
-                uniforms: { color: { value: new THREE.Color(0xffd700) } },
-                vertexShader: `attribute float alpha; varying float vAlpha; void main() { vAlpha = alpha; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_PointSize = 4.0; gl_Position = projectionMatrix * mvPosition; }`,
-                fragmentShader: `uniform vec3 color; varying float vAlpha; void main() { if (length(gl_PointCoord - vec2(0.5)) > 0.5) discard; gl_FragColor = vec4(color, vAlpha); }`
-            }));
-            scene.add(particleSystem);
-
-            window.addEventListener('mousemove', (e) => {
-                const vector = new THREE.Vector3((e.clientX/window.innerWidth)*2-1, -(e.clientY/window.innerHeight)*2+1, 0.5);
-                vector.unproject(camera);
-                const dir = vector.sub(camera.position).normalize();
-                const pos = camera.position.clone().add(dir.multiplyScalar(-camera.position.z / dir.z));
-                const positions = particleSystem.geometry.attributes.position.array;
-                positions[pIdx*3] = pos.x; positions[pIdx*3+1] = pos.y; positions[pIdx*3+2] = pos.z;
-                particleData[pIdx].age = 0;
-                pIdx = (pIdx + 1) % particleCount;
-            });
             animate();
         }
 
         function animate() {
             requestAnimationFrame(animate);
             stars.rotation.y += 0.0004;
-            sun.scale.setScalar(1.1 + Math.sin(Date.now() * 0.002) * 0.25);
-            const alphas = particleSystem.geometry.attributes.alpha.array;
-            for(let i=0; i<particleCount; i++) {
-                particleData[i].age += 1;
-                alphas[i] = Math.max(0, 1.0 - (particleData[i].age / particleData[i].life));
-            }
-            particleSystem.geometry.attributes.alpha.needsUpdate = true;
-            particleSystem.geometry.attributes.position.needsUpdate = true;
             renderer.render(scene, camera);
         }
 
