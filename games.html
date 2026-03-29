@@ -6,87 +6,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZETWAL GAMES | Chwazi Jwèt ou</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
+
     <style>
-        /* CSS REPRIS EXACTEMENT DE L'ACCUEIL */
-        :root { --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc; --gold-glow: rgba(255, 215, 0, 0.4); --bg: #010101; --text: #ffffff; --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
-        .light-mode { --bg: #fdfdfd; --text: #1a1a1a; }
-        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
+        :root {
+            --gold: #ffd700;
+            --gold-deep: #b8860b;
+            --gold-light: #fff8dc;
+            --gold-glow: rgba(255, 215, 0, 0.4);
+            --bg: #010101;
+            --text: #ffffff;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        body { 
+            background: var(--bg); color: var(--text); margin: 0; 
+            font-family: 'Montserrat', sans-serif; overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
 
-        /* HEADER & NAV */
-        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.15); backdrop-filter: blur(40px); border-bottom: 1px solid rgba(255, 215, 0, 0.3); }
+        /* NAV STYLE */
+        .nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(30px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
         .nav-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 12px 20px; }
-        .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: white; text-decoration: none; }
         .logo-text span { color: var(--gold); }
+        .points-badge { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); padding: 5px 15px; border-radius: 20px; color: var(--gold); font-weight: 800; font-size: 0.8rem; box-shadow: 0 0 15px var(--gold-glow); }
 
-        /* CARDS STYLE */
-        .liquid-border { position: relative; border: 1px solid transparent; border-radius: 30px; transition: var(--transition); cursor: pointer; }
-        .liquid-border:hover { transform: scale(1.03); filter: drop-shadow(0 0 20px var(--gold)); }
-        .liquid-border::before { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1px; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light), var(--gold), var(--gold-deep)); background-size: 300% 300%; animation: liquidGold 12s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
+        /* TABS SYSTEM */
+        .game-selection { padding: 120px 5% 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .tab-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.3);
+            color: white; padding: 12px 25px; border-radius: 50px; cursor: pointer;
+            font-weight: 600; text-transform: uppercase; transition: var(--transition);
+        }
+        .tab-btn.active { background: var(--gold); color: black; border-color: var(--gold); box-shadow: 0 0 20px var(--gold-glow); }
+
+        /* GAME CONTAINERS */
+        .game-view { display: none; padding: 20px 5% 100px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.5s ease; }
+        .game-view.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .zoom-card {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
+            border-radius: 35px; padding: 40px; text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .liquid-border { position: relative; }
+        .liquid-border::before {
+            content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1px;
+            background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light), var(--gold), var(--gold-deep));
+            background-size: 300% 300%; animation: liquidGold 12s linear infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+        }
         @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .zoom-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); padding: 40px; }
-        .btn-main-gold { display: inline-block; padding: 15px 35px; background: var(--gold); color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; transition: var(--transition); box-shadow: 0 10px 30px var(--gold-glow); border: none; cursor: pointer; }
-        
-        .points-badge { background: rgba(255,215,0,0.2); border: 1px solid var(--gold); padding: 5px 15px; border-radius: 20px; color: var(--gold); font-weight: 800; font-size: 0.9rem; }
-        
-        /* FOOTER */
-        footer { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(40px); padding: 60px 10%; border-top: 1px solid rgba(255, 215, 0, 0.3); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-top: 100px; }
-        .theme-toggle { position: fixed; top: 100px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        /* DUEL MENTAL SPECIFIC */
+        .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .btn-game { background: var(--gold); color: black; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .option-btn { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); color: white; padding: 15px; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .option-btn:hover { background: var(--gold); color: black; }
+
+        /* MAZE SPECIFIC */
+        #maze-canvas { background: #000; border-radius: 15px; border: 1px solid var(--gold); margin: 20px auto; display: block; touch-action: none; }
+        .maze-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 150px; margin: 20px auto; }
+        .ctrl-btn { background: rgba(255,215,0,0.2); border: 1px solid var(--gold); color: white; padding: 15px; border-radius: 10px; }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
+
     <canvas id="webgl-canvas"></canvas>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 
     <nav class="nav">
         <div class="nav-content">
-            <div class="logo-container" style="display:flex; align-items:center; gap:10px;">
-                <img src="logo.png" style="width:35px;">
-                <div class="logo-text">JWÈT <span>ZETWAL</span></div>
-            </div>
-            <div id="user-points-display" class="points-badge">Chaje pwen...</div>
-            <ul class="nav-links" style="display: flex; list-style: none; gap: 20px;">
-                <li><a href="index.html">Akèy</a></li>
-            </ul>
+            <a href="index.html" class="logo-text">LAVRI <span>ZETWAL</span></a>
+            <div id="nav-points" class="points-badge">... PWEN</div>
         </div>
     </nav>
 
-    <main style="padding: 150px 10% 100px; text-align: center;">
-        <h1 style="font-family: 'Playfair Display', serif; font-size: 3rem; margin-bottom: 50px;">Bibliyotèk <span style="color:var(--gold);">Prestige</span></h1>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px;">
-            <div class="zoom-card liquid-border">
-                <h2 style="color:var(--gold);">🧠 DUEL MENTAL</h2>
-                <p style="font-size: 0.9rem; opacity: 0.8; line-height: 1.6;">Defye tèt ou ak kalkil rapid, memwa vizyèl, ak lojik. Genyen jiska 27.5 pwen nan 10 kesyon!</p>
-                <div style="margin: 20px 0; font-weight: 600;">Pri: 10 pwen</div>
-                <a href="duel-mental.html" class="btn-main-gold">JWE KOUNYE A</a>
+    <div class="game-selection">
+        <button class="tab-btn active" onclick="showGame('duel')">🧠 Duel Mental</button>
+        <button class="tab-btn" onclick="showGame('maze')">🌀 Labirent</button>
+        <button class="tab-btn" style="opacity:0.5; cursor:default;">🚀 Talè konsa...</button>
+    </div>
+
+    <section id="view-duel" class="game-view active">
+        <div class="zoom-card liquid-border">
+            <div id="duel-intro">
+                <h1 style="color:var(--gold); font-family:'Playfair Display';">Duel Mental</h1>
+                <p>Reponn 10 kesyon rapid pou genyen jiska 27.5 pwen.</p>
+                <p style="font-size:0.8rem; margin-bottom:20px;">💰 Antre: 10 pwen</p>
+                <button class="btn-game" onclick="startDuel()">Kòmanse Duel la</button>
+            </div>
+            
+            <div id="duel-play" class="hidden">
+                <div id="duel-timer" style="color:var(--gold); font-size:1.5rem; font-weight:800;">5s</div>
+                <h2 id="duel-question" style="margin:20px 0;">...</h2>
+                <div id="duel-options" class="answer-grid"></div>
             </div>
 
-            <div class="zoom-card liquid-border" style="opacity: 0.6; cursor: not-allowed;">
-                <h2 style="color:gray;">🚀 PLIS JWÈT...</h2>
-                <p>Nouvo jwèt ap vini talè konsa pou plis plezi.</p>
-                <button class="btn-main-gold" style="background:gray; box-shadow:none;" disabled>AN ATTANTE</button>
+            <div id="duel-results" class="hidden">
+                <h2 style="color:var(--gold);">Rezilta</h2>
+                <p id="duel-score-text"></p>
+                <button class="btn-game" onclick="showGame('duel')">Rejwe</button>
             </div>
         </div>
-    </main>
+    </section>
 
-    <footer>
-        <div class="footer-col">
-            <img src="logo.png" style="width:40px; margin-bottom:15px;">
-            <h3 style="color:var(--gold);">KONTAK</h3>
-            <p>pwoduizetwal@gmail.com</p>
+    <section id="view-maze" class="game-view">
+        <div class="zoom-card liquid-border">
+            <h1 style="color:var(--gold); font-family:'Playfair Display';">Labirent Zetwal</h1>
+            <p>Mennen chemiz la nan machin nan (Nivo 1-10)</p>
+            <div id="maze-stats" style="color:var(--gold); font-weight:800; margin-bottom:10px;">Nivo 1</div>
+            <canvas id="maze-canvas"></canvas>
+            <div class="maze-controls">
+                <div></div><button class="ctrl-btn" onclick="moveMaze('up')">▲</button><div></div>
+                <button class="ctrl-btn" onclick="moveMaze('left')">◀</button>
+                <button class="ctrl-btn" onclick="moveMaze('down')">▼</button>
+                <button class="ctrl-btn" onclick="moveMaze('right')">▶</button>
+            </div>
         </div>
-        <div class="footer-bottom" style="grid-column: 1/-1; text-align:center; color:var(--gold); letter-spacing:3px; padding-top:20px;">ZETWAL 2026</div>
-    </footer>
+    </section>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
@@ -100,28 +156,149 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        let userUID = null;
+        let points = 0;
 
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                // TEST SCRIPT: Ajoute 1000 pwen otomatikman
-                const userRef = doc(db, "users", user.uid);
-                await updateDoc(userRef, { points: 1000 }); // SÈLMAN POU TÈS
-
-                // Listen points an tan reyèl
-                onSnapshot(userRef, (doc) => {
-                    const p = doc.data()?.points || 0;
-                    document.getElementById('user-points-display').innerText = `${p} pwen`;
+                userUID = user.uid;
+                onSnapshot(doc(db, "users", user.uid), (d) => {
+                    points = d.data()?.points || 0;
+                    document.getElementById('nav-points').innerText = `${points.toFixed(1)} PWEN`;
                 });
-            } else {
-                window.location.href = 'index.html';
-            }
+            } else { window.location.href = 'index.html'; }
         });
-    </script>
 
-    <script>
-        // Copy-paste de ton code WebGL d'accueil ici (stars, sun, particles)
-        // ... (Mwen mete lojik WebGL la menm jan ak paj akèy la pou solèy la ak zetwal yo parèt)
-        // [Gade kòd nan paj duel-mental pou vèsyon konplè a]
+        // TABS LOGIC
+        window.showGame = (game) => {
+            document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            if(game === 'duel') {
+                document.getElementById('view-duel').classList.add('active');
+                document.querySelector('[onclick="showGame(\'duel\')"]').classList.add('active');
+                resetDuelUI();
+            } else {
+                document.getElementById('view-maze').classList.add('active');
+                document.querySelector('[onclick="showGame(\'maze\')"]').classList.add('active');
+                initMaze();
+            }
+        };
+
+        // --- DUEL MENTAL LOGIC ---
+        let duelIndex = 0;
+        let duelScore = 0;
+        let duelTimer;
+        const duelPointsMap = [1.5, 2, 2, 2.5, 2.5, 2.5, 3, 3, 3, 4];
+
+        window.startDuel = async () => {
+            if(points < 10) return alert("Ou bezwen 10 pwen!");
+            await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
+            document.getElementById('duel-intro').classList.add('hidden');
+            document.getElementById('duel-play').classList.remove('hidden');
+            duelIndex = 0; duelScore = 0;
+            nextDuelQuestion();
+        };
+
+        function nextDuelQuestion() {
+            if(duelIndex >= 10) return endDuel();
+            clearInterval(duelTimer);
+            const a = Math.floor(Math.random() * 20), b = Math.floor(Math.random() * 20);
+            const ans = a + b;
+            document.getElementById('duel-question').innerText = `Konbe ${a} + ${b} bay?`;
+            const opts = [ans, ans+2, ans-1, ans+5].sort(() => Math.random() - 0.5);
+            const container = document.getElementById('duel-options');
+            container.innerHTML = '';
+            opts.forEach(o => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = o;
+                btn.onclick = () => { if(o === ans) duelScore += duelPointsMap[duelIndex]; duelIndex++; nextDuelQuestion(); };
+                container.appendChild(btn);
+            });
+            startTimer(5);
+        }
+
+        function startTimer(s) {
+            let t = s;
+            document.getElementById('duel-timer').innerText = `${t}s`;
+            duelTimer = setInterval(() => {
+                t--; document.getElementById('duel-timer').innerText = `${t}s`;
+                if(t <= 0) { duelIndex++; nextDuelQuestion(); }
+            }, 1000);
+        }
+
+        async function endDuel() {
+            clearInterval(duelTimer);
+            document.getElementById('duel-play').classList.add('hidden');
+            document.getElementById('duel-results').classList.remove('hidden');
+            document.getElementById('duel-score-text').innerText = `Ou genyen ${duelScore} pwen!`;
+            await updateDoc(doc(db, "users", userUID), { points: increment(duelScore) });
+        }
+
+        function resetDuelUI() {
+            document.getElementById('duel-intro').classList.remove('hidden');
+            document.getElementById('duel-play').classList.add('hidden');
+            document.getElementById('duel-results').classList.add('hidden');
+        }
+
+        // --- MAZE LOGIC ---
+        let mazeLvl = 1;
+        let mSize, mCell, mMaze, mPlayer, mGoal;
+        const mCtx = document.getElementById('maze-canvas').getContext('2d');
+
+        function initMaze() {
+            mSize = 5 + mazeLvl * 2;
+            mCell = Math.floor(300 / mSize);
+            document.getElementById('maze-canvas').width = mSize * mCell;
+            document.getElementById('maze-canvas').height = mSize * mCell;
+            mPlayer = {x:0, y:0}; mGoal = {x: mSize-1, y: mSize-1};
+            generateMaze(); drawMaze();
+        }
+
+        function generateMaze() { /* Senp vèsyon pou kounye a */
+            mMaze = Array(mSize).fill().map(() => Array(mSize).fill(0));
+        }
+
+        function drawMaze() {
+            mCtx.clearRect(0,0,400,400);
+            mCtx.strokeStyle = "#ffd700"; mCtx.lineWidth = 2;
+            for(let i=0; i<=mSize; i++) {
+                mCtx.moveTo(i*mCell, 0); mCtx.lineTo(i*mCell, mSize*mCell);
+                mCtx.moveTo(0, i*mCell); mCtx.lineTo(mSize*mCell, i*mCell);
+            }
+            mCtx.stroke();
+            mCtx.font = `${mCell*0.7}px serif`;
+            mCtx.fillText("👕", mPlayer.x*mCell+5, mPlayer.y*mCell+mCell-5);
+            mCtx.fillText("🧼", mGoal.x*mCell+5, mGoal.y*mCell+mCell-5);
+        }
+
+        window.moveMaze = async (d) => {
+            if(d==='up' && mPlayer.y>0) mPlayer.y--;
+            if(d==='down' && mPlayer.y<mSize-1) mPlayer.y++;
+            if(d==='left' && mPlayer.x>0) mPlayer.x--;
+            if(d==='right' && mPlayer.x<mSize-1) mPlayer.x++;
+            drawMaze();
+            if(mPlayer.x === mGoal.x && mPlayer.y === mGoal.y) {
+                await updateDoc(doc(db, "users", userUID), { points: increment(mazeLvl) });
+                alert(`Bravo! Ou genyen ${mazeLvl} pwen.`);
+                mazeLvl++; initMaze();
+            }
+        };
+
+        // THREE.JS STARFIELD (Identique à l'accueil)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        const starGeo = new THREE.BufferGeometry();
+        const starCoords = [];
+        for(let i=0; i<3000; i++) starCoords.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
+        starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
+        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.02 }));
+        scene.add(stars); camera.position.z = 5;
+        function anim() { requestAnimationFrame(anim); stars.rotation.y += 0.0005; renderer.render(scene, camera); }
+        anim();
     </script>
 </body>
 </html>
