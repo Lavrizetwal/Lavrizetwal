@@ -39,7 +39,7 @@
             border-bottom: 1px solid var(--gold-glow);
         }
         .nav-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 12px 20px; }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); text-decoration: none; cursor: pointer; }
         .logo-text span { color: var(--gold); }
         
         .nav-right { display: flex; align-items: center; gap: 15px; }
@@ -81,6 +81,16 @@
             max-width: 100%;
         }
 
+        /* MOBILE CONTROLS FOR MAZE */
+        .maze-mobile-ctrl { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
+            width: 150px; margin: 15px auto; 
+        }
+        .m-btn { 
+            background: rgba(255, 215, 0, 0.2); border: 1px solid var(--gold); 
+            color: var(--gold); padding: 15px; border-radius: 10px; font-weight: bold;
+        }
+
         .btn-gold { background: var(--gold); color: black; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; margin-top: 10px;}
         
         .hidden { display: none; }
@@ -93,7 +103,7 @@
 
     <nav class="nav">
         <div class="nav-content">
-            <a href="#" class="logo-text">LAVRI <span>ZETWAL</span></a>
+            <a href="index.html" class="logo-text">LAVRI <span>ZETWAL</span></a>
             <div class="nav-right">
                 <button class="theme-toggle" onclick="toggleTheme()">🌓 MODE</button>
                 <div id="nav-points" style="color:var(--gold); font-weight:800;">... PWEN</div>
@@ -121,7 +131,12 @@
         <div class="zoom-card">
             <h1 style="color:var(--gold); margin:5px;">Labirent</h1>
             <canvas id="maze-canvas"></canvas>
-            <p>Sèvi ak flèch klavye yo ⌨️</p>
+            <div class="maze-mobile-ctrl">
+                <div></div><button class="m-btn" onclick="moveMaze('up')">↑</button><div></div>
+                <button class="m-btn" onclick="moveMaze('left')">←</button>
+                <button class="m-btn" onclick="moveMaze('down')">↓</button>
+                <button class="m-btn" onclick="moveMaze('right')">→</button>
+            </div>
         </div>
     </section>
 
@@ -178,7 +193,8 @@
 
         function initFlappy() {
             fCanvas.width = 320; fCanvas.height = 400;
-            bird = { x: 50, y: 150, v: 0, gravity: 0.25, jump: -4.5, size: 20 };
+            // Redwi yon ti kras gravite pou l pa tonbe twò vit sou PC
+            bird = { x: 50, y: 150, v: 0, gravity: 0.22, jump: -4.2, size: 20 };
             pipes = []; fScore = 0; fGameOver = true; fSpeed = 2;
             drawFlappyStatic();
         }
@@ -200,23 +216,22 @@
             bird.v += bird.gravity;
             bird.y += bird.v;
 
-            // Pipes spawn
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < 180) {
-                let gap = Math.max(100 - (fScore * 0.5), 70); // Difficulty increase
+            // Pipes spawn ak plis espasman nan kòmansman an (300px olye de 180)
+            let spawnDist = pipes.length === 0 ? 300 : 180;
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < fCanvas.width - spawnDist) {
+                let gap = Math.max(105 - (fScore * 0.5), 75); 
                 let pipeY = Math.random() * (fCanvas.height - gap - 100) + 50;
                 pipes.push({ x: fCanvas.width, y: pipeY, gap: gap, passed: false });
             }
 
             pipes.forEach((p, i) => {
-                p.x -= fSpeed + (fScore * 0.05); // Speed increase
+                p.x -= fSpeed + (fScore * 0.04); 
 
-                // Collision
                 if (bird.x + bird.size > p.x && bird.x < p.x + 40) {
                     if (bird.y < p.y || bird.y + bird.size > p.y + p.gap) {
                         endFlappy();
                     }
                 }
-                // Point
                 if (!p.passed && p.x + 40 < bird.x) {
                     p.passed = true; fScore++;
                 }
@@ -237,16 +252,13 @@
 
         function drawFlappy() {
             fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
-            // Draw Bird
             fCtx.font = "24px Arial";
             fCtx.fillText("⭐", bird.x, bird.y + bird.size);
-            // Draw Pipes
             fCtx.fillStyle = "#ffd700";
             pipes.forEach(p => {
                 fCtx.fillRect(p.x, 0, 40, p.y);
                 fCtx.fillRect(p.x, p.y + p.gap, 40, fCanvas.height);
             });
-            // Score
             fCtx.fillStyle = "white";
             fCtx.font = "bold 20px Montserrat";
             fCtx.fillText(`Score: ${fScore}`, 10, 30);
@@ -256,22 +268,22 @@
             fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
             fCtx.fillStyle = "white";
             fCtx.textAlign = "center";
-            fCtx.fillText("Pare?", fCanvas.width/2, fCanvas.height/2);
+            fCtx.font = "20px Montserrat";
+            fCtx.fillText("Pare pou vole?", fCanvas.width/2, fCanvas.height/2);
         }
 
-        // Controls
         const jumpAction = () => { if(!fGameOver) bird.v = bird.jump; };
         window.addEventListener('keydown', (e) => { if(e.code === 'Space') jumpAction(); });
         fCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); jumpAction(); });
         fCanvas.addEventListener('mousedown', jumpAction);
 
-        // --- MAZE LOGIC (Klavye aktif) ---
+        // --- MAZE LOGIC ---
         let mazeLvl = 1, mSize, mCell, mWalls, mPlayer, mGoal;
         const mCanvas = document.getElementById('maze-canvas'), mCtx = mCanvas.getContext('2d');
 
         function initMaze() {
             mSize = 7 + (mazeLvl * 2); if(mSize > 25) mSize = 25;
-            mCell = Math.floor(300 / mSize);
+            mCell = Math.floor(280 / mSize);
             mCanvas.width = mSize * mCell; mCanvas.height = mSize * mCell;
             mPlayer = {x:0, y:0}; mGoal = {x:mSize-1, y:mSize-1};
             generateMaze(); drawMaze();
@@ -339,7 +351,7 @@
             }
         });
 
-        // --- THREE.JS ---
+        // --- THREE.JS BACKGROUND ---
         const sc = new THREE.Scene();
         const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const rend = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
