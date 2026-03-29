@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZETWAL GAMES | Mike Edition</title>
+    <title>ZETWAL GAMES | Flappy Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
@@ -19,7 +19,6 @@
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* LIGHT MODE OVERRIDE */
         body.light-mode {
             --bg: #f0f0f0;
             --card-bg: rgba(0, 0, 0, 0.05);
@@ -28,13 +27,12 @@
 
         body { 
             background: var(--bg); color: var(--text); margin: 0; 
-            font-family: 'Montserrat', sans-serif; overflow-x: hidden;
+            font-family: 'Montserrat', sans-serif; overflow: hidden;
             transition: background 0.5s ease;
         }
 
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
 
-        /* NAV */
         .nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
             background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(20px);
@@ -47,7 +45,6 @@
         .nav-right { display: flex; align-items: center; gap: 15px; }
         .theme-toggle { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
 
-        /* SUN BALL (BREATHING) */
         .sun-orb {
             position: fixed; bottom: 30px; right: 30px;
             width: 60px; height: 60px;
@@ -62,8 +59,7 @@
             50% { transform: scale(1.2); box-shadow: 0 0 50px #ffd700; }
         }
 
-        /* TAB SYSTEM */
-        .game-selection { padding: 120px 5% 20px; display: flex; justify-content: center; gap: 10px; }
+        .game-selection { padding: 100px 5% 10px; display: flex; justify-content: center; gap: 10px; }
         .tab-btn {
             background: var(--card-bg); border: 1px solid var(--gold-glow);
             color: var(--text); padding: 10px 20px; border-radius: 50px; cursor: pointer;
@@ -71,25 +67,22 @@
         }
         .tab-btn.active { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold-glow); }
 
-        /* GAME VIEWS */
-        .game-view { display: none; padding: 20px 5% 100px; max-width: 850px; margin: 0 auto; }
+        .game-view { display: none; padding: 10px 5%; max-width: 850px; margin: 0 auto; }
         .game-view.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .zoom-card {
             background: var(--card-bg); backdrop-filter: blur(15px);
-            border-radius: 30px; padding: 30px; text-align: center; border: 1px solid var(--gold-glow);
+            border-radius: 30px; padding: 20px; text-align: center; border: 1px solid var(--gold-glow);
         }
 
-        /* MAZE & CONTROLS */
-        #maze-canvas { background: #000; border-radius: 15px; border: 2px solid var(--gold); margin: 20px auto; display: block; touch-action: none; }
-        .maze-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 160px; margin: 20px auto; }
-        .ctrl-btn { background: rgba(255,215,0,0.2); border: 1px solid var(--gold); color: var(--gold); padding: 15px; border-radius: 10px; cursor: pointer; }
+        #flappy-canvas, #maze-canvas { 
+            background: #000; border-radius: 15px; border: 2px solid var(--gold); 
+            margin: 10px auto; display: block; touch-action: none;
+            max-width: 100%;
+        }
 
-        .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .btn-gold { background: var(--gold); color: black; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; }
-        .option-btn { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); color: var(--text); padding: 15px; border-radius: 12px; cursor: pointer; }
-
+        .btn-gold { background: var(--gold); color: black; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; margin-top: 10px;}
+        
         .hidden { display: none; }
     </style>
 </head>
@@ -109,42 +102,26 @@
     </nav>
 
     <div class="game-selection">
-        <button id="tab-duel" class="tab-btn active" onclick="showGame('duel')">🧠 Duel</button>
+        <button id="tab-flappy" class="tab-btn active" onclick="showGame('flappy')">🚀 Flappy Zetwal</button>
         <button id="tab-maze" class="tab-btn" onclick="showGame('maze')">🌀 Labirent</button>
     </div>
 
-    <section id="view-duel" class="game-view active">
+    <section id="view-flappy" class="game-view active">
         <div class="zoom-card">
-            <div id="duel-intro">
-                <h1 style="color:var(--gold);">Duel Mental</h1>
-                <p>Reponn 10 kalkil nan 5 segonn!</p>
-                <button class="btn-gold" onclick="startDuel()">KÒMANSE</button>
-            </div>
-            <div id="duel-play" class="hidden">
-                <div id="duel-timer" style="color:var(--gold); font-size:2rem; font-weight:800;">5s</div>
-                <h2 id="duel-question" style="font-size:2rem; margin:20px 0;">...</h2>
-                <div id="duel-options" class="answer-grid"></div>
-            </div>
-            <div id="duel-results" class="hidden">
-                <h2 style="color:var(--gold);">Rezilta</h2>
-                <p id="duel-score-text"></p>
-                <button class="btn-gold" onclick="showGame('duel')">REJWE</button>
+            <h1 style="color:var(--gold); margin:5px;">Flappy Zetwal</h1>
+            <p style="margin:5px;">Peze <b>Espas</b> oswa klike pou vole!</p>
+            <canvas id="flappy-canvas"></canvas>
+            <div id="flappy-ui">
+                <button id="start-flappy-btn" class="btn-gold" onclick="startFlappy()">KÒMANSE JWE</button>
             </div>
         </div>
     </section>
 
     <section id="view-maze" class="game-view">
         <div class="zoom-card">
-            <h1 style="color:var(--gold);">Labirent</h1>
-            <p>Sèvi ak flèch ⌨️ klavye ou!</p>
-            <div id="maze-stats" style="color:var(--gold); font-weight:800; margin-bottom:10px;">Nivo 1</div>
+            <h1 style="color:var(--gold); margin:5px;">Labirent</h1>
             <canvas id="maze-canvas"></canvas>
-            <div class="maze-controls">
-                <div></div><button class="ctrl-btn" onclick="moveMaze('up')">▲</button><div></div>
-                <button class="ctrl-btn" onclick="moveMaze('left')">◀</button>
-                <button class="ctrl-btn" onclick="moveMaze('down')">▼</button>
-                <button class="ctrl-btn" onclick="moveMaze('right')">▶</button>
-            </div>
+            <p>Sèvi ak flèch klavye yo ⌨️</p>
         </div>
     </section>
 
@@ -177,18 +154,16 @@
             } else { window.location.href = 'index.html'; }
         });
 
-        // --- THEME & NAV ---
-        window.toggleTheme = () => {
-            document.getElementById('main-body').classList.toggle('light-mode');
-        };
-
+        // --- UI & NAV ---
+        window.toggleTheme = () => document.getElementById('main-body').classList.toggle('light-mode');
+        
         window.showGame = (game) => {
             document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if(game === 'duel') {
-                document.getElementById('view-duel').classList.add('active');
-                document.getElementById('tab-duel').classList.add('active');
-                resetDuelUI();
+            if(game === 'flappy') {
+                document.getElementById('view-flappy').classList.add('active');
+                document.getElementById('tab-flappy').classList.add('active');
+                initFlappy();
             } else {
                 document.getElementById('view-maze').classList.add('active');
                 document.getElementById('tab-maze').classList.add('active');
@@ -196,74 +171,110 @@
             }
         };
 
-        // --- KEYBOARD SUPPORT ---
-        window.addEventListener('keydown', (e) => {
-            if (document.getElementById('view-maze').classList.contains('active')) {
-                if (e.key === "ArrowUp") moveMaze('up');
-                if (e.key === "ArrowDown") moveMaze('down');
-                if (e.key === "ArrowLeft") moveMaze('left');
-                if (e.key === "ArrowRight") moveMaze('right');
-            }
-        });
+        // --- FLAPPY ZETWAL LOGIC ---
+        const fCanvas = document.getElementById('flappy-canvas');
+        const fCtx = fCanvas.getContext('2d');
+        let bird, pipes, fScore, fGameOver, fAnimId, fSpeed;
 
-        // --- DUEL LOGIC ---
-        let dIdx = 0, dScore = 0, dTimer;
-        window.startDuel = async () => {
-            if(userPoints < 10) return alert("Ou bezwen 10 pwen!");
-            await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
-            document.getElementById('duel-intro').classList.add('hidden');
-            document.getElementById('duel-play').classList.remove('hidden');
-            dIdx = 0; dScore = 0; nextDuelQ();
+        function initFlappy() {
+            fCanvas.width = 320; fCanvas.height = 400;
+            bird = { x: 50, y: 150, v: 0, gravity: 0.25, jump: -4.5, size: 20 };
+            pipes = []; fScore = 0; fGameOver = true; fSpeed = 2;
+            drawFlappyStatic();
+        }
+
+        window.startFlappy = () => {
+            fGameOver = false;
+            document.getElementById('start-flappy-btn').classList.add('hidden');
+            gameLoopFlappy();
         };
 
-        function nextDuelQ() {
-            if(dIdx >= 10) return endDuel();
-            clearInterval(dTimer);
-            const a = Math.floor(Math.random() * 20), b = Math.floor(Math.random() * 15);
-            const ans = a + b;
-            document.getElementById('duel-question').innerText = `${a} + ${b} = ?`;
-            const opts = [ans, ans+2, ans-1, ans+5].sort(() => Math.random() - 0.5);
-            const container = document.getElementById('duel-options');
-            container.innerHTML = '';
-            opts.forEach(o => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerText = o;
-                btn.onclick = () => { if(o === ans) dScore += 2.5; dIdx++; nextDuelQ(); };
-                container.appendChild(btn);
+        function gameLoopFlappy() {
+            if (fGameOver) return;
+            updateFlappy();
+            drawFlappy();
+            fAnimId = requestAnimationFrame(gameLoopFlappy);
+        }
+
+        function updateFlappy() {
+            bird.v += bird.gravity;
+            bird.y += bird.v;
+
+            // Pipes spawn
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < 180) {
+                let gap = Math.max(100 - (fScore * 0.5), 70); // Difficulty increase
+                let pipeY = Math.random() * (fCanvas.height - gap - 100) + 50;
+                pipes.push({ x: fCanvas.width, y: pipeY, gap: gap, passed: false });
+            }
+
+            pipes.forEach((p, i) => {
+                p.x -= fSpeed + (fScore * 0.05); // Speed increase
+
+                // Collision
+                if (bird.x + bird.size > p.x && bird.x < p.x + 40) {
+                    if (bird.y < p.y || bird.y + bird.size > p.y + p.gap) {
+                        endFlappy();
+                    }
+                }
+                // Point
+                if (!p.passed && p.x + 40 < bird.x) {
+                    p.passed = true; fScore++;
+                }
             });
-            let t = 5;
-            dTimer = setInterval(() => {
-                t--; document.getElementById('duel-timer').innerText = `${t}s`;
-                if(t <= 0) { dIdx++; nextDuelQ(); }
-            }, 1000);
+
+            if (pipes[0] && pipes[0].x < -40) pipes.shift();
+            if (bird.y > fCanvas.height || bird.y < 0) endFlappy();
         }
 
-        async function endDuel() {
-            clearInterval(dTimer);
-            document.getElementById('duel-play').classList.add('hidden');
-            document.getElementById('duel-results').classList.remove('hidden');
-            document.getElementById('duel-score-text').innerText = `Ou genyen ${dScore} pwen!`;
-            await updateDoc(doc(db, "users", userUID), { points: increment(dScore) });
+        async function endFlappy() {
+            fGameOver = true;
+            cancelAnimationFrame(fAnimId);
+            if (fScore > 0) await updateDoc(doc(db, "users", userUID), { points: increment(fScore * 0.1) });
+            alert(`Game Over! Score: ${fScore}`);
+            document.getElementById('start-flappy-btn').classList.remove('hidden');
+            initFlappy();
         }
 
-        function resetDuelUI() {
-            document.getElementById('duel-intro').classList.remove('hidden');
-            document.getElementById('duel-play').classList.add('hidden');
-            document.getElementById('duel-results').classList.add('hidden');
+        function drawFlappy() {
+            fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+            // Draw Bird
+            fCtx.font = "24px Arial";
+            fCtx.fillText("⭐", bird.x, bird.y + bird.size);
+            // Draw Pipes
+            fCtx.fillStyle = "#ffd700";
+            pipes.forEach(p => {
+                fCtx.fillRect(p.x, 0, 40, p.y);
+                fCtx.fillRect(p.x, p.y + p.gap, 40, fCanvas.height);
+            });
+            // Score
+            fCtx.fillStyle = "white";
+            fCtx.font = "bold 20px Montserrat";
+            fCtx.fillText(`Score: ${fScore}`, 10, 30);
         }
 
-        // --- MAZE (Recursive Backtracking) ---
+        function drawFlappyStatic() {
+            fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+            fCtx.fillStyle = "white";
+            fCtx.textAlign = "center";
+            fCtx.fillText("Pare?", fCanvas.width/2, fCanvas.height/2);
+        }
+
+        // Controls
+        const jumpAction = () => { if(!fGameOver) bird.v = bird.jump; };
+        window.addEventListener('keydown', (e) => { if(e.code === 'Space') jumpAction(); });
+        fCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); jumpAction(); });
+        fCanvas.addEventListener('mousedown', jumpAction);
+
+        // --- MAZE LOGIC (Klavye aktif) ---
         let mazeLvl = 1, mSize, mCell, mWalls, mPlayer, mGoal;
         const mCanvas = document.getElementById('maze-canvas'), mCtx = mCanvas.getContext('2d');
 
         function initMaze() {
-            mSize = 5 + (mazeLvl * 2); if(mSize > 21) mSize = 21;
+            mSize = 7 + (mazeLvl * 2); if(mSize > 25) mSize = 25;
             mCell = Math.floor(300 / mSize);
             mCanvas.width = mSize * mCell; mCanvas.height = mSize * mCell;
             mPlayer = {x:0, y:0}; mGoal = {x:mSize-1, y:mSize-1};
             generateMaze(); drawMaze();
-            document.getElementById('maze-stats').innerText = `Nivo ${mazeLvl}`;
         }
 
         function generateMaze() {
@@ -274,7 +285,7 @@
                 let n = [], {x,y} = curr;
                 if(y>0 && !mWalls[x][y-1].v) n.push({x, y:y-1, d:'t'});
                 if(x<mSize-1 && !mWalls[x+1][y].v) n.push({x:x+1, y, d:'r'});
-                if(y<mSize-1 && !mWalls[x][y+1].v) n.push({x, y:y+1, d:'b'});
+                if(y<mSize-1 && !mWalls[x][y+1].v) n.push({x:x, y:y+1, d:'b'});
                 if(x>0 && !mWalls[x-1][y].v) n.push({x:x-1, y, d:'l'});
                 if(n.length > 0) {
                     let next = n[Math.floor(Math.random()*n.length)];
@@ -299,9 +310,9 @@
                 if(w.l){mCtx.moveTo(px,py); mCtx.lineTo(px,py+mCell);}
                 mCtx.stroke();
             }
-            mCtx.font=`${mCell*0.8}px Arial`; mCtx.textAlign="center"; mCtx.textBaseline="middle";
-            mCtx.fillText("👕", mPlayer.x*mCell+mCell/2, mPlayer.y*mCell+mCell/2);
-            mCtx.fillText("🧼", mGoal.x*mCell+mCell/2, mGoal.y*mCell+mCell/2);
+            mCtx.font=`${mCell*0.8}px Arial`;
+            mCtx.fillText("👕", mPlayer.x*mCell+2, mPlayer.y*mCell+mCell-2);
+            mCtx.fillText("🧼", mGoal.x*mCell+2, mGoal.y*mCell+mCell-2);
         }
 
         window.moveMaze = async (dir) => {
@@ -313,25 +324,35 @@
             if(mv) {
                 drawMaze();
                 if(mPlayer.x===mGoal.x && mPlayer.y===mGoal.y) {
-                    stars.material.size = 0.1; // Surprise effect
                     await updateDoc(doc(db, "users", userUID), { points: increment(mazeLvl) });
-                    setTimeout(() => { stars.material.size = 0.02; mazeLvl++; initMaze(); }, 500);
+                    alert("Bravo!"); mazeLvl++; initMaze();
                 }
             }
         };
 
-        // --- THREE.JS BACKGROUND ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        const starGeo = new THREE.BufferGeometry(); const starCoords = [];
-        for(let i=0; i<3000; i++) starCoords.push((Math.random()-0.5)*25, (Math.random()-0.5)*25, (Math.random()-0.5)*25);
-        starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
-        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.02 }));
-        scene.add(stars); camera.position.z = 5;
-        function anim() { requestAnimationFrame(anim); stars.rotation.y += 0.0003; renderer.render(scene, camera); }
-        anim();
+        window.addEventListener('keydown', (e) => {
+            if (document.getElementById('view-maze').classList.contains('active')) {
+                if (e.key === "ArrowUp") moveMaze('up');
+                if (e.key === "ArrowDown") moveMaze('down');
+                if (e.key === "ArrowLeft") moveMaze('left');
+                if (e.key === "ArrowRight") moveMaze('right');
+            }
+        });
+
+        // --- THREE.JS ---
+        const sc = new THREE.Scene();
+        const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const rend = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
+        rend.setSize(window.innerWidth, window.innerHeight);
+        const sGeo = new THREE.BufferGeometry(); const sCoords = [];
+        for(let i=0; i<2000; i++) sCoords.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
+        sGeo.setAttribute('position', new THREE.Float32BufferAttribute(sCoords, 3));
+        const st = new THREE.Points(sGeo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.02 }));
+        sc.add(st); cam.position.z = 5;
+        function animate() { requestAnimationFrame(animate); st.rotation.y += 0.0005; rend.render(sc, cam); }
+        animate();
+        
+        initFlappy();
     </script>
 </body>
 </html>
