@@ -19,19 +19,15 @@
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        body.light-mode {
-            --bg: #f0f0f0;
-            --card-bg: rgba(0, 0, 0, 0.05);
-            --text: #1a1a1a;
-        }
+        body.light-mode { --bg: #f0f0f0; --card-bg: rgba(0, 0, 0, 0.05); --text: #1a1a1a; }
 
         body { 
             background: var(--bg); color: var(--text); margin: 0; 
-            font-family: 'Montserrat', sans-serif; overflow: hidden;
+            font-family: 'Montserrat', sans-serif; overflow-x: hidden;
             transition: background 0.5s ease;
         }
 
-        #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
+        #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
 
         .nav {
             position: fixed; top: 0; width: 100%; z-index: 1000;
@@ -45,21 +41,7 @@
         .nav-right { display: flex; align-items: center; gap: 15px; }
         .theme-toggle { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
 
-        .sun-orb {
-            position: fixed; bottom: 30px; right: 30px;
-            width: 60px; height: 60px;
-            background: radial-gradient(circle, #fff700, #ff8c00);
-            border-radius: 50%;
-            box-shadow: 0 0 30px #ff8c00;
-            z-index: 999;
-            animation: breathe 3s ease-in-out infinite;
-        }
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px #ff8c00; }
-            50% { transform: scale(1.2); box-shadow: 0 0 50px #ffd700; }
-        }
-
-        .game-selection { padding: 100px 5% 10px; display: flex; justify-content: center; gap: 10px; }
+        .game-selection { padding: 100px 5% 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .tab-btn {
             background: var(--card-bg); border: 1px solid var(--gold-glow);
             color: var(--text); padding: 10px 20px; border-radius: 50px; cursor: pointer;
@@ -73,33 +55,39 @@
         .zoom-card {
             background: var(--card-bg); backdrop-filter: blur(15px);
             border-radius: 30px; padding: 20px; text-align: center; border: 1px solid var(--gold-glow);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         #flappy-canvas, #maze-canvas { 
-            background: #000; border-radius: 15px; border: 2px solid var(--gold); 
-            margin: 10px auto; display: block; touch-action: none;
-            max-width: 100%;
+            background: rgba(0,0,0,0.6); border-radius: 15px; border: 2px solid var(--gold); 
+            margin: 10px auto; display: block; touch-action: none; max-width: 100%;
         }
 
-        /* MOBILE CONTROLS FOR MAZE */
+        .leaderboard {
+            margin-top: 20px; background: rgba(255, 215, 0, 0.05);
+            border-radius: 15px; padding: 15px; text-align: left;
+        }
+        .leaderboard h3 { color: var(--gold); margin-top: 0; font-size: 0.9rem; text-transform: uppercase; }
+        .leader-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,215,0,0.1); font-size: 0.85rem; }
+
         .maze-mobile-ctrl { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
             width: 150px; margin: 15px auto; 
         }
         .m-btn { 
             background: rgba(255, 215, 0, 0.2); border: 1px solid var(--gold); 
-            color: var(--gold); padding: 15px; border-radius: 10px; font-weight: bold;
+            color: var(--gold); padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer;
         }
 
-        .btn-gold { background: var(--gold); color: black; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; margin-top: 10px;}
-        
+        .btn-gold { background: var(--gold); color: black; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-gold:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--gold-glow); }
         .hidden { display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body id="main-body">
 
     <canvas id="webgl-canvas"></canvas>
-    <div class="sun-orb"></div>
 
     <nav class="nav">
         <div class="nav-content">
@@ -119,10 +107,14 @@
     <section id="view-flappy" class="game-view active">
         <div class="zoom-card">
             <h1 style="color:var(--gold); margin:5px;">Flappy Zetwal</h1>
-            <p style="margin:5px;">Peze <b>Espas</b> oswa klike pou vole!</p>
+            <p style="margin:5px; font-size: 0.8rem;">Koute: <b>10 pwen</b> pou chak pati</p>
             <canvas id="flappy-canvas"></canvas>
             <div id="flappy-ui">
-                <button id="start-flappy-btn" class="btn-gold" onclick="startFlappy()">KÒMANSE JWE</button>
+                <button id="start-flappy-btn" class="btn-gold" onclick="startFlappy()">KÒMANSE (10 PWEN)</button>
+            </div>
+            <div class="leaderboard" id="lb-flappy">
+                <h3>🏆 KLASMAN ZETWAL</h3>
+                <div id="list-flappy">Chajman...</div>
             </div>
         </div>
     </section>
@@ -137,13 +129,14 @@
                 <button class="m-btn" onclick="moveMaze('down')">↓</button>
                 <button class="m-btn" onclick="moveMaze('right')">→</button>
             </div>
+            <button id="start-maze-btn" class="btn-gold" onclick="deductPointsMaze()">REKÒMANSE (10 PWEN)</button>
         </div>
     </section>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
@@ -166,8 +159,20 @@
                     userPoints = d.data()?.points || 0;
                     document.getElementById('nav-points').innerText = `${userPoints.toFixed(1)} PWEN`;
                 });
+                loadLeaderboard();
             } else { window.location.href = 'index.html'; }
         });
+
+        async function loadLeaderboard() {
+            const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
+            const snap = await getDocs(q);
+            let html = "";
+            snap.forEach((doc, i) => {
+                const data = doc.data();
+                html += `<div class="leader-item"><span>${i+1}. ${data.username || 'Jwè'}</span> <b>${data.points.toFixed(0)}</b></div>`;
+            });
+            document.getElementById('list-flappy').innerHTML = html;
+        }
 
         // --- UI & NAV ---
         window.toggleTheme = () => document.getElementById('main-body').classList.toggle('light-mode');
@@ -193,13 +198,15 @@
 
         function initFlappy() {
             fCanvas.width = 320; fCanvas.height = 400;
-            // Redwi yon ti kras gravite pou l pa tonbe twò vit sou PC
-            bird = { x: 50, y: 150, v: 0, gravity: 0.22, jump: -4.2, size: 20 };
-            pipes = []; fScore = 0; fGameOver = true; fSpeed = 2;
+            // Redwi vitès kòmansman an (Gravity ak jump pi dous)
+            bird = { x: 50, y: 150, v: 0, gravity: 0.18, jump: -3.8, size: 20 };
+            pipes = []; fScore = 0; fGameOver = true; fSpeed = 1.8;
             drawFlappyStatic();
         }
 
-        window.startFlappy = () => {
+        window.startFlappy = async () => {
+            if(userPoints < 10) { alert("Ou bezwen omwen 10 pwen!"); return; }
+            await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
             fGameOver = false;
             document.getElementById('start-flappy-btn').classList.add('hidden');
             gameLoopFlappy();
@@ -216,25 +223,20 @@
             bird.v += bird.gravity;
             bird.y += bird.v;
 
-            // Pipes spawn ak plis espasman nan kòmansman an (300px olye de 180)
-            let spawnDist = pipes.length === 0 ? 300 : 180;
+            let spawnDist = pipes.length === 0 ? 350 : 200; // Ogmante espas kòmansman an
             if (pipes.length === 0 || pipes[pipes.length - 1].x < fCanvas.width - spawnDist) {
-                let gap = Math.max(105 - (fScore * 0.5), 75); 
+                let gap = Math.max(110 - (fScore * 0.4), 80); 
                 let pipeY = Math.random() * (fCanvas.height - gap - 100) + 50;
                 pipes.push({ x: fCanvas.width, y: pipeY, gap: gap, passed: false });
             }
 
-            pipes.forEach((p, i) => {
-                p.x -= fSpeed + (fScore * 0.04); 
+            pipes.forEach((p) => {
+                p.x -= fSpeed + (fScore * 0.03); // Akselerasyon pi dous
 
                 if (bird.x + bird.size > p.x && bird.x < p.x + 40) {
-                    if (bird.y < p.y || bird.y + bird.size > p.y + p.gap) {
-                        endFlappy();
-                    }
+                    if (bird.y < p.y || bird.y + bird.size > p.y + p.gap) { endFlappy(); }
                 }
-                if (!p.passed && p.x + 40 < bird.x) {
-                    p.passed = true; fScore++;
-                }
+                if (!p.passed && p.x + 40 < bird.x) { p.passed = true; fScore++; if(fScore%5===0) burst(); }
             });
 
             if (pipes[0] && pipes[0].x < -40) pipes.shift();
@@ -244,35 +246,39 @@
         async function endFlappy() {
             fGameOver = true;
             cancelAnimationFrame(fAnimId);
-            if (fScore > 0) await updateDoc(doc(db, "users", userUID), { points: increment(fScore * 0.1) });
-            alert(`Game Over! Score: ${fScore}`);
+            if (fScore > 0) await updateDoc(doc(db, "users", userUID), { points: increment(fScore * 2) });
+            alert(`Pati Fini! Ou fè ${fScore} pwen.`);
             document.getElementById('start-flappy-btn').classList.remove('hidden');
+            loadLeaderboard();
             initFlappy();
         }
 
         function drawFlappy() {
             fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+            fCtx.shadowBlur = 15; fCtx.shadowColor = "gold";
             fCtx.font = "24px Arial";
             fCtx.fillText("⭐", bird.x, bird.y + bird.size);
-            fCtx.fillStyle = "#ffd700";
+            fCtx.shadowBlur = 0;
+            fCtx.fillStyle = "rgba(255, 215, 0, 0.8)";
             pipes.forEach(p => {
                 fCtx.fillRect(p.x, 0, 40, p.y);
                 fCtx.fillRect(p.x, p.y + p.gap, 40, fCanvas.height);
             });
             fCtx.fillStyle = "white";
             fCtx.font = "bold 20px Montserrat";
-            fCtx.fillText(`Score: ${fScore}`, 10, 30);
+            fCtx.fillText(`Score: ${fScore}`, 15, 30);
         }
 
         function drawFlappyStatic() {
             fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
-            fCtx.fillStyle = "white";
+            fCtx.fillStyle = "gold";
             fCtx.textAlign = "center";
-            fCtx.font = "20px Montserrat";
-            fCtx.fillText("Pare pou vole?", fCanvas.width/2, fCanvas.height/2);
+            fCtx.font = "bold 18px Montserrat";
+            fCtx.fillText("PRE PARE?", fCanvas.width/2, fCanvas.height/2);
+            fCtx.textAlign = "start";
         }
 
-        const jumpAction = () => { if(!fGameOver) bird.v = bird.jump; };
+        const jumpAction = () => { if(!fGameOver) { bird.v = bird.jump; burst(); } };
         window.addEventListener('keydown', (e) => { if(e.code === 'Space') jumpAction(); });
         fCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); jumpAction(); });
         fCanvas.addEventListener('mousedown', jumpAction);
@@ -280,6 +286,12 @@
         // --- MAZE LOGIC ---
         let mazeLvl = 1, mSize, mCell, mWalls, mPlayer, mGoal;
         const mCanvas = document.getElementById('maze-canvas'), mCtx = mCanvas.getContext('2d');
+
+        window.deductPointsMaze = async () => {
+            if(userPoints < 10) { alert("Ou bezwen 10 pwen!"); return; }
+            await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
+            mazeLvl = 1; initMaze();
+        };
 
         function initMaze() {
             mSize = 7 + (mazeLvl * 2); if(mSize > 25) mSize = 25;
@@ -334,10 +346,10 @@
             if(dir==='left' && !mWalls[x][y].l){mPlayer.x--; mv=true;}
             if(dir==='right' && !mWalls[x][y].r){mPlayer.x++; mv=true;}
             if(mv) {
-                drawMaze();
+                drawMaze(); burst();
                 if(mPlayer.x===mGoal.x && mPlayer.y===mGoal.y) {
-                    await updateDoc(doc(db, "users", userUID), { points: increment(mazeLvl) });
-                    alert("Bravo!"); mazeLvl++; initMaze();
+                    await updateDoc(doc(db, "users", userUID), { points: increment(mazeLvl * 5) });
+                    alert("Bravo! Nivo an ogmante."); mazeLvl++; initMaze();
                 }
             }
         };
@@ -351,18 +363,57 @@
             }
         });
 
-        // --- THREE.JS BACKGROUND ---
+        // --- THREE.JS EPIC BACKGROUND ---
         const sc = new THREE.Scene();
         const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const rend = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
+        const rend = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true, antialias: true });
         rend.setSize(window.innerWidth, window.innerHeight);
-        const sGeo = new THREE.BufferGeometry(); const sCoords = [];
-        for(let i=0; i<2000; i++) sCoords.push((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
-        sGeo.setAttribute('position', new THREE.Float32BufferAttribute(sCoords, 3));
-        const st = new THREE.Points(sGeo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.02 }));
-        sc.add(st); cam.position.z = 5;
-        function animate() { requestAnimationFrame(animate); st.rotation.y += 0.0005; rend.render(sc, cam); }
+
+        const starGeo = new THREE.BufferGeometry();
+        const starCoords = [];
+        for(let i=0; i<5000; i++) {
+            starCoords.push((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50);
+        }
+        starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
+        const starMat = new THREE.PointsMaterial({ color: 0xffd700, size: 0.03, transparent: true, opacity: 0.8 });
+        const stars = new THREE.Points(starGeo, starMat);
+        sc.add(stars);
+
+        // Sistèm Burst (Sipriz la)
+        let burstParticles = [];
+        function burst() {
+            const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+            const material = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+            for(let i=0; i<10; i++){
+                const p = new THREE.Mesh(geometry, material);
+                p.position.set((Math.random()-0.5)*2, (Math.random()-0.5)*2, 0);
+                p.userData.velocity = new THREE.Vector3((Math.random()-0.5)*0.1, (Math.random()-0.5)*0.1, (Math.random()-0.5)*0.1);
+                sc.add(p);
+                burstParticles.push(p);
+            }
+        }
+
+        cam.position.z = 10;
+        function animate() { 
+            requestAnimationFrame(animate); 
+            stars.rotation.y += 0.001;
+            stars.rotation.x += 0.0005;
+            
+            burstParticles.forEach((p, i) => {
+                p.position.add(p.userData.velocity);
+                p.scale.multiplyScalar(0.95);
+                if(p.scale.x < 0.01) { sc.remove(p); burstParticles.splice(i, 1); }
+            });
+
+            rend.render(sc, cam); 
+        }
         animate();
+
+        window.addEventListener('resize', () => {
+            cam.aspect = window.innerWidth / window.innerHeight;
+            cam.updateProjectionMatrix();
+            rend.setSize(window.innerWidth, window.innerHeight);
+        });
         
         initFlappy();
     </script>
