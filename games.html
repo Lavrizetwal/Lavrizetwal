@@ -1,324 +1,837 @@
 <!DOCTYPE html>
+
 <html lang="ht">
+
 <head>
-    <link rel="icon" type="image/png" href="logo.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZETWAL GAMES | Suite Complète</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --gold: #ffd700; --gold-deep: #b8860b; --gold-glow: rgba(255, 215, 0, 0.4);
-            --bg: #010101; --card-bg: rgba(255, 255, 255, 0.03); --text: #ffffff;
-            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
-        #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
+<link rel="icon" type="image/png" href="logo.png">
 
-        /* Navigation */
-        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(20px); border-bottom: 1px solid var(--gold-glow); }
-        .nav-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 12px 20px; }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); text-decoration: none; }
-        .logo-text span { color: var(--gold); }
+<meta charset="UTF-8">
 
-        /* Game Selection Tabs */
-        .game-selection { padding: 100px 5% 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-        .tab-btn { background: var(--card-bg); border: 1px solid var(--gold-glow); color: var(--text); padding: 8px 15px; border-radius: 50px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
-        .tab-btn.active { background: var(--gold); color: black; font-weight: 800; }
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        /* Game Views */
-        .game-view { display: none; padding: 20px 5%; max-width: 500px; margin: 0 auto; }
-        .game-view.active { display: block; animation: fadeIn 0.4s ease; }
-        .zoom-card { background: var(--card-bg); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; text-align: center; border: 1px solid var(--gold-glow); }
+<title>ZETWAL GAMES | Flappy Edition</title>
 
-        /* Match 3 Grid */
-        #match-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 10px; margin: 10px auto; width: 300px; height: 300px; }
-        .tile { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; border-radius: 5px; transition: 0.2s; background: rgba(255,255,255,0.05); }
-        .tile.selected { background: var(--gold-glow); transform: scale(1.1); }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        /* Shop & UI */
-        .shop { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-        .shop-item { background: rgba(255,215,0,0.1); border: 1px solid var(--gold); padding: 5px 10px; border-radius: 10px; font-size: 0.7rem; cursor: pointer; }
-        
-        #flappy-canvas, #maze-canvas { background: #000; border: 2px solid var(--gold); border-radius: 15px; width: 100%; max-width: 320px; }
-        .btn-gold { background: var(--gold); color: black; border: none; padding: 10px 20px; border-radius: 50px; font-weight: 800; cursor: pointer; margin-top: 10px; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+
+
+<style>
+
+:root {
+
+--gold: #ffd700;
+
+--gold-deep: #b8860b;
+
+--gold-glow: rgba(255, 215, 0, 0.4);
+
+--bg: #010101;
+
+--card-bg: rgba(255, 255, 255, 0.03);
+
+--text: #ffffff;
+
+--transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+}
+
+
+
+body.light-mode { --bg: #f0f0f0; --card-bg: rgba(0, 0, 0, 0.05); --text: #1a1a1a; }
+
+
+
+body {
+
+background: var(--bg); color: var(--text); margin: 0;
+
+font-family: 'Montserrat', sans-serif; overflow-x: hidden;
+
+transition: background 0.5s ease;
+
+}
+
+
+
+#webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
+
+
+
+.nav {
+
+position: fixed; top: 0; width: 100%; z-index: 1000;
+
+background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(20px);
+
+border-bottom: 1px solid var(--gold-glow);
+
+}
+
+.nav-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 12px 20px; }
+
+.logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); text-decoration: none; cursor: pointer; }
+
+.logo-text span { color: var(--gold); }
+
+
+.nav-right { display: flex; align-items: center; gap: 15px; }
+
+.theme-toggle { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+
+
+
+.game-selection { padding: 100px 5% 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+.tab-btn {
+
+background: var(--card-bg); border: 1px solid var(--gold-glow);
+
+color: var(--text); padding: 10px 20px; border-radius: 50px; cursor: pointer;
+
+font-weight: 600; transition: var(--transition);
+
+}
+
+.tab-btn.active { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold-glow); }
+
+
+
+.game-view { display: none; padding: 10px 5%; max-width: 850px; margin: 0 auto; }
+
+.game-view.active { display: block; animation: fadeIn 0.4s ease; }
+
+
+
+.zoom-card {
+
+background: var(--card-bg); backdrop-filter: blur(15px);
+
+border-radius: 30px; padding: 20px; text-align: center; border: 1px solid var(--gold-glow);
+
+box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
+}
+
+
+
+#flappy-canvas, #maze-canvas {
+
+background: rgba(0,0,0,0.6); border-radius: 15px; border: 2px solid var(--gold);
+
+margin: 10px auto; display: block; touch-action: none; max-width: 100%;
+
+}
+
+
+
+.leaderboard {
+
+margin-top: 20px; background: rgba(255, 215, 0, 0.05);
+
+border-radius: 15px; padding: 15px; text-align: left;
+
+}
+
+.leaderboard h3 { color: var(--gold); margin-top: 0; font-size: 0.9rem; text-transform: uppercase; }
+
+.leader-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,215,0,0.1); font-size: 0.85rem; }
+
+
+
+.maze-mobile-ctrl {
+
+display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+
+width: 150px; margin: 15px auto;
+
+}
+
+.m-btn {
+
+background: rgba(255, 215, 0, 0.2); border: 1px solid var(--gold);
+
+color: var(--gold); padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer;
+
+}
+
+
+
+.btn-gold { background: var(--gold); color: black; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+
+.btn-gold:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--gold-glow); }
+
+.hidden { display: none; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+</style>
+
 </head>
-<body>
 
-    <canvas id="webgl-canvas"></canvas>
+<body id="main-body">
 
-    <nav class="nav">
-        <div class="nav-content">
-            <a href="#" class="logo-text">LAVRI <span>ZETWAL</span></a>
-            <div id="nav-points" style="color:var(--gold); font-weight:800;">... PWEN</div>
-        </div>
-    </nav>
 
-    <div class="game-selection">
-        <button id="btn-flappy" class="tab-btn active" onclick="switchGame('flappy')">🚀 FLAPPY</button>
-        <button id="btn-maze" class="tab-btn" onclick="switchGame('maze')">🌀 LABIRENT</button>
-        <button id="btn-match" class="tab-btn" onclick="switchGame('match')">⭐ MATCH</button>
-    </div>
 
-    <section id="view-flappy" class="game-view active">
-        <div class="zoom-card">
-            <h2>Flappy Zetwal</h2>
-            <canvas id="flappy-canvas"></canvas>
-            <br>
-            <button class="btn-gold" onclick="startFlappy()">JWE (10 PWEN)</button>
-        </div>
-    </section>
+<canvas id="webgl-canvas"></canvas>
 
-    <section id="view-maze" class="game-view">
-        <div class="zoom-card">
-            <h2>Labirent</h2>
-            <canvas id="maze-canvas"></canvas>
-            <div style="margin-top:10px;">
-                <button class="btn-gold" onclick="startMaze()">REMANSE (10 PWEN)</button>
-            </div>
-        </div>
-    </section>
 
-    <section id="view-match" class="game-view">
-        <div class="zoom-card">
-            <h2 id="match-objective">Objektif: 500 Pwen</h2>
-            <div id="match-grid"></div>
-            
-            <div class="shop">
-                <div class="shop-item" onclick="buyPowerUp('bomb')">💣 BOM (50 Pwen)</div>
-                <div class="shop-item" onclick="buyPowerUp('line')">📏 LIY (30 Pwen)</div>
-            </div>
-            <p id="match-status" style="font-size:0.8rem; margin-top:10px;">Pwen: 0 | Nivo: 1</p>
-        </div>
-    </section>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+<nav class="nav">
 
-        // CONFIG FIREBASE (Idantik ak pa w la)
-        const firebaseConfig = {
-            apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-            authDomain: "lavrizetwal.firebaseapp.com",
-            projectId: "lavrizetwal",
-            storageBucket: "lavrizetwal.firebasestorage.app",
-            appId: "1:291921316186:web:f55e8b34526960df394b63"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        let userUID = null, userPoints = 0;
+<div class="nav-content">
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userUID = user.uid;
-                onSnapshot(doc(db, "users", user.uid), (d) => {
-                    userPoints = d.data()?.points || 0;
-                    document.getElementById('nav-points').innerText = `${Math.floor(userPoints)} PWEN`;
-                });
-            }
-        });
+<a href="index.html" class="logo-text">LAVRI <span>ZETWAL</span></a>
 
-        // --- NAVIGATION ---
-        window.switchGame = (game) => {
-            document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`view-${game}`).classList.add('active');
-            document.getElementById(`btn-${game}`).classList.add('active');
-            if(game === 'match') initMatch();
-            if(game === 'maze') initMaze();
-            if(game === 'flappy') initFlappy();
-        }
+<div class="nav-right">
 
-        // --- GAME: ZETWAL MATCH (MATCH-3) ---
-        let matchScore = 0, matchLevel = 1, matchTarget = 500;
-        const gridEl = document.getElementById('match-grid');
-        const items = ['⭐', '🧼', '👕', '🧺', '✨'];
-        let grid = [], selectedTile = null;
+<button class="theme-toggle" onclick="toggleTheme()">🌓 MODE</button>
 
-        function initMatch() {
-            gridEl.innerHTML = '';
-            grid = [];
-            matchScore = 0;
-            matchTarget = 500 * matchLevel;
-            document.getElementById('match-objective').innerText = `Objektif: ${matchTarget} Pwen`;
-            
-            for(let i=0; i<49; i++) {
-                const tile = document.createElement('div');
-                tile.className = 'tile';
-                tile.dataset.id = i;
-                const type = items[Math.floor(Math.random() * items.length)];
-                tile.innerText = type;
-                tile.onclick = () => handleTileClick(i);
-                gridEl.appendChild(tile);
-                grid.push(type);
-            }
-        }
+<div id="nav-points" style="color:var(--gold); font-weight:800;">... PWEN</div>
 
-        async function handleTileClick(index) {
-            if (selectedTile === null) {
-                selectedTile = index;
-                gridEl.children[index].classList.add('selected');
-            } else {
-                const prev = selectedTile;
-                selectedTile = null;
-                gridEl.children[prev].classList.remove('selected');
-                
-                if (isAdjacent(prev, index)) {
-                    swap(prev, index);
-                    if (!checkMatches()) {
-                        setTimeout(() => swap(prev, index), 300); // Back if no match
-                    }
-                }
-            }
-        }
+</div>
 
-        function isAdjacent(a, b) {
-            const r1 = Math.floor(a/7), c1 = a%7, r2 = Math.floor(b/7), c2 = b%7;
-            return (Math.abs(r1-r2) + Math.abs(c1-c2)) === 1;
-        }
+</div>
 
-        function swap(a, b) {
-            const temp = grid[a];
-            grid[a] = grid[b];
-            grid[b] = temp;
-            renderGrid();
-        }
+</nav>
 
-        function renderGrid() {
-            grid.forEach((type, i) => { gridEl.children[i].innerText = type; });
-        }
 
-        function checkMatches() {
-            let matched = false;
-            let toRemove = new Set();
 
-            // Horizontal & Vertical
-            for(let i=0; i<49; i++) {
-                // Check Row
-                if (i%7 < 5 && grid[i] === grid[i+1] && grid[i] === grid[i+2]) {
-                    let count = 3;
-                    toRemove.add(i); toRemove.add(i+1); toRemove.add(i+2);
-                    if (i%7 < 4 && grid[i] === grid[i+3]) { toRemove.add(i+3); count=4; }
-                    if (i%7 < 3 && grid[i] === grid[i+4]) { toRemove.add(i+4); count=5; }
-                    applyBonus(i, count, 'h');
-                    matched = true;
-                }
-                // Check Column
-                if (i < 35 && grid[i] === grid[i+7] && grid[i] === grid[i+14]) {
-                    let count = 3;
-                    toRemove.add(i); toRemove.add(i+7); toRemove.add(i+14);
-                    if (i < 28 && grid[i] === grid[i+21]) { toRemove.add(i+21); count=4; }
-                    if (i < 21 && grid[i] === grid[i+28]) { toRemove.add(i+28); count=5; }
-                    applyBonus(i, count, 'v');
-                    matched = true;
-                }
-            }
+<div class="game-selection">
 
-            if (matched) {
-                matchScore += toRemove.size * 10;
-                toRemove.forEach(idx => grid[idx] = '');
-                setTimeout(fillGrid, 300);
-            }
-            updateMatchStatus();
-            return matched;
-        }
+<button id="tab-flappy" class="tab-btn active" onclick="showGame('flappy')">🚀 Flappy Zetwal</button>
 
-        function applyBonus(idx, count, dir) {
-            if (count === 4) { // Liy Suppresseur
-                const row = Math.floor(idx/7);
-                for(let c=0; c<7; c++) { grid[row*7 + c] = ''; matchScore += 5; }
-            }
-            if (count >= 5) { // Explosion 20 cases
-                for(let r=-2; r<=2; r++) {
-                    for(let c=-2; c<=2; c++) {
-                        let target = idx + (r*7) + c;
-                        if(target >= 0 && target < 49) { grid[target] = ''; matchScore += 5; }
-                    }
-                }
-            }
-        }
+<button id="tab-maze" class="tab-btn" onclick="showGame('maze')">🌀 Labirent</button>
 
-        function fillGrid() {
-            grid.forEach((type, i) => {
-                if (type === '') grid[i] = items[Math.floor(Math.random() * items.length)];
-            });
-            renderGrid();
-            setTimeout(checkMatches, 300);
-        }
+</div>
 
-        async function updateMatchStatus() {
-            document.getElementById('match-status').innerText = `Pwen: ${matchScore} | Nivo: ${matchLevel}`;
-            if (matchScore >= matchTarget) {
-                matchLevel++;
-                await updateDoc(doc(db, "users", userUID), { points: increment(50) });
-                alert("Nivo Pase! Ou gen 50 pwen kado.");
-                initMatch();
-            }
-        }
 
-        window.buyPowerUp = async (type) => {
-            let cost = type === 'bomb' ? 50 : 30;
-            if (userPoints < cost) return alert("Pwen ensifizan!");
-            await updateDoc(doc(db, "users", userUID), { points: increment(-cost) });
-            
-            if (type === 'bomb') {
-                for(let i=14; i<35; i++) grid[i] = ''; // Boom central
-            } else {
-                for(let i=21; i<28; i++) grid[i] = ''; // Liy central
-            }
-            fillGrid();
-        };
 
-        // --- MAZE & FLAPPY (VERSION STABLE) ---
-        // (Isit la ou ka remete fonksyon initMaze ak initFlappy ki te nan kòd ou a, yo te bon)
-        // Mwen sèlman ajiste Labirent pou li pa bug ankò.
+<section id="view-flappy" class="game-view active">
 
-        let mazeLvl = 1;
-        const mCanvas = document.getElementById('maze-canvas'), mCtx = mCanvas.getContext('2d');
-        
-        window.startMaze = async () => {
-            if(userPoints < 10) return alert("Bezwen 10 pwen");
-            await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
-            mazeLvl = 1; initMaze();
-        };
+<div class="zoom-card">
 
-        function initMaze() {
-            let mSize = 10 + mazeLvl;
-            let mCell = Math.floor(300 / mSize);
-            mCanvas.width = 300; mCanvas.height = 300;
-            mCtx.fillStyle = "gold";
-            mCtx.fillRect(10, 10, 20, 20); // Player initial
-            mCtx.fillText("Sòti la 👉", 240, 290);
-        }
+<h1 style="color:var(--gold); margin:5px;">Flappy Zetwal</h1>
 
-        // --- THREE.JS BACKGROUND ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        
-        const stars = new THREE.Points(
-            new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(Array.from({length:3000}, () => (Math.random()-0.5)*50), 3)),
-            new THREE.PointsMaterial({ color: 0xffd700, size: 0.05 })
-        );
-        scene.add(stars);
-        camera.position.z = 5;
+<p style="margin:5px; font-size: 0.8rem;">Koute: <b>10 pwen</b> pou chak pati</p>
 
-        function animate() {
-            requestAnimationFrame(animate);
-            stars.rotation.y += 0.001;
-            renderer.render(scene, camera);
-        }
-        animate();
-        
-        initFlappy();
-    </script>
+<canvas id="flappy-canvas"></canvas>
+
+<div id="flappy-ui">
+
+<button id="start-flappy-btn" class="btn-gold" onclick="startFlappy()">KÒMANSE (10 PWEN)</button>
+
+</div>
+
+<div class="leaderboard" id="lb-flappy">
+
+<h3>🏆 KLASMAN ZETWAL</h3>
+
+<div id="list-flappy">Chajman...</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<section id="view-maze" class="game-view">
+
+<div class="zoom-card">
+
+<h1 style="color:var(--gold); margin:5px;">Labirent</h1>
+
+<canvas id="maze-canvas"></canvas>
+
+<div class="maze-mobile-ctrl">
+
+<div></div><button class="m-btn" onclick="moveMaze('up')">↑</button><div></div>
+
+<button class="m-btn" onclick="moveMaze('left')">←</button>
+
+<button class="m-btn" onclick="moveMaze('down')">↓</button>
+
+<button class="m-btn" onclick="moveMaze('right')">→</button>
+
+</div>
+
+<button id="start-maze-btn" class="btn-gold" onclick="deductPointsMaze()">REKÒMANSE (10 PWEN)</button>
+
+</div>
+
+</section>
+
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+import { getFirestore, doc, onSnapshot, updateDoc, increment, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+
+authDomain: "lavrizetwal.firebaseapp.com",
+
+projectId: "lavrizetwal",
+
+storageBucket: "lavrizetwal.firebasestorage.app",
+
+messagingSenderId: "291921316186",
+
+appId: "1:291921316186:web:f55e8b34526960df394b63"
+
+};
+
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+let userUID = null, userPoints = 0;
+
+
+
+onAuthStateChanged(auth, (user) => {
+
+if (user) {
+
+userUID = user.uid;
+
+onSnapshot(doc(db, "users", user.uid), (d) => {
+
+userPoints = d.data()?.points || 0;
+
+document.getElementById('nav-points').innerText = `${userPoints.toFixed(1)} PWEN`;
+
+});
+
+loadLeaderboard();
+
+} else { window.location.href = 'index.html'; }
+
+});
+
+
+
+async function loadLeaderboard() {
+
+const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
+
+const snap = await getDocs(q);
+
+let html = "";
+
+snap.forEach((doc, i) => {
+
+const data = doc.data();
+
+html += `<div class="leader-item"><span>${i+1}. ${data.username || 'Jwè'}</span> <b>${data.points.toFixed(0)}</b></div>`;
+
+});
+
+document.getElementById('list-flappy').innerHTML = html;
+
+}
+
+
+
+// --- UI & NAV ---
+
+window.toggleTheme = () => document.getElementById('main-body').classList.toggle('light-mode');
+
+
+window.showGame = (game) => {
+
+document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
+
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+if(game === 'flappy') {
+
+document.getElementById('view-flappy').classList.add('active');
+
+document.getElementById('tab-flappy').classList.add('active');
+
+initFlappy();
+
+} else {
+
+document.getElementById('view-maze').classList.add('active');
+
+document.getElementById('tab-maze').classList.add('active');
+
+initMaze();
+
+}
+
+};
+
+
+
+// --- FLAPPY ZETWAL LOGIC ---
+
+const fCanvas = document.getElementById('flappy-canvas');
+
+const fCtx = fCanvas.getContext('2d');
+
+let bird, pipes, fScore, fGameOver, fAnimId, fSpeed;
+
+
+
+function initFlappy() {
+
+fCanvas.width = 320; fCanvas.height = 400;
+
+// Redwi vitès kòmansman an (Gravity ak jump pi dous)
+
+bird = { x: 50, y: 150, v: 0, gravity: 0.18, jump: -3.8, size: 20 };
+
+pipes = []; fScore = 0; fGameOver = true; fSpeed = 1.8;
+
+drawFlappyStatic();
+
+}
+
+
+
+window.startFlappy = async () => {
+
+if(userPoints < 10) { alert("Ou bezwen omwen 10 pwen!"); return; }
+
+await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
+
+fGameOver = false;
+
+document.getElementById('start-flappy-btn').classList.add('hidden');
+
+gameLoopFlappy();
+
+};
+
+
+
+function gameLoopFlappy() {
+
+if (fGameOver) return;
+
+updateFlappy();
+
+drawFlappy();
+
+fAnimId = requestAnimationFrame(gameLoopFlappy);
+
+}
+
+
+
+function updateFlappy() {
+
+bird.v += bird.gravity;
+
+bird.y += bird.v;
+
+
+
+let spawnDist = pipes.length === 0 ? 350 : 200; // Ogmante espas kòmansman an
+
+if (pipes.length === 0 || pipes[pipes.length - 1].x < fCanvas.width - spawnDist) {
+
+let gap = Math.max(110 - (fScore * 0.4), 80);
+
+let pipeY = Math.random() * (fCanvas.height - gap - 100) + 50;
+
+pipes.push({ x: fCanvas.width, y: pipeY, gap: gap, passed: false });
+
+}
+
+
+
+pipes.forEach((p) => {
+
+p.x -= fSpeed + (fScore * 0.03); // Akselerasyon pi dous
+
+
+
+if (bird.x + bird.size > p.x && bird.x < p.x + 40) {
+
+if (bird.y < p.y || bird.y + bird.size > p.y + p.gap) { endFlappy(); }
+
+}
+
+if (!p.passed && p.x + 40 < bird.x) { p.passed = true; fScore++; if(fScore%5===0) burst(); }
+
+});
+
+
+
+if (pipes[0] && pipes[0].x < -40) pipes.shift();
+
+if (bird.y > fCanvas.height || bird.y < 0) endFlappy();
+
+}
+
+
+
+async function endFlappy() {
+
+fGameOver = true;
+
+cancelAnimationFrame(fAnimId);
+
+if (fScore > 0) await updateDoc(doc(db, "users", userUID), { points: increment(fScore * 2) });
+
+alert(`Pati Fini! Ou fè ${fScore} pwen.`);
+
+document.getElementById('start-flappy-btn').classList.remove('hidden');
+
+loadLeaderboard();
+
+initFlappy();
+
+}
+
+
+
+function drawFlappy() {
+
+fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+
+fCtx.shadowBlur = 15; fCtx.shadowColor = "gold";
+
+fCtx.font = "24px Arial";
+
+fCtx.fillText("⭐", bird.x, bird.y + bird.size);
+
+fCtx.shadowBlur = 0;
+
+fCtx.fillStyle = "rgba(255, 215, 0, 0.8)";
+
+pipes.forEach(p => {
+
+fCtx.fillRect(p.x, 0, 40, p.y);
+
+fCtx.fillRect(p.x, p.y + p.gap, 40, fCanvas.height);
+
+});
+
+fCtx.fillStyle = "white";
+
+fCtx.font = "bold 20px Montserrat";
+
+fCtx.fillText(`Score: ${fScore}`, 15, 30);
+
+}
+
+
+
+function drawFlappyStatic() {
+
+fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+
+fCtx.fillStyle = "gold";
+
+fCtx.textAlign = "center";
+
+fCtx.font = "bold 18px Montserrat";
+
+fCtx.fillText("PRE PARE?", fCanvas.width/2, fCanvas.height/2);
+
+fCtx.textAlign = "start";
+
+}
+
+
+
+const jumpAction = () => { if(!fGameOver) { bird.v = bird.jump; burst(); } };
+
+window.addEventListener('keydown', (e) => { if(e.code === 'Space') jumpAction(); });
+
+fCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); jumpAction(); });
+
+fCanvas.addEventListener('mousedown', jumpAction);
+
+
+
+// --- MAZE LOGIC ---
+
+let mazeLvl = 1, mSize, mCell, mWalls, mPlayer, mGoal;
+
+const mCanvas = document.getElementById('maze-canvas'), mCtx = mCanvas.getContext('2d');
+
+
+
+window.deductPointsMaze = async () => {
+
+if(userPoints < 10) { alert("Ou bezwen 10 pwen!"); return; }
+
+await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
+
+mazeLvl = 1; initMaze();
+
+};
+
+
+
+function initMaze() {
+
+mSize = 7 + (mazeLvl * 2); if(mSize > 25) mSize = 25;
+
+mCell = Math.floor(280 / mSize);
+
+mCanvas.width = mSize * mCell; mCanvas.height = mSize * mCell;
+
+mPlayer = {x:0, y:0}; mGoal = {x:mSize-1, y:mSize-1};
+
+generateMaze(); drawMaze();
+
+}
+
+
+
+function generateMaze() {
+
+mWalls = Array(mSize).fill().map(() => Array(mSize).fill().map(() => ({t:1, r:1, b:1, l:1, v:0})));
+
+let stack = [], curr = {x:0, y:0}; mWalls[0][0].v = 1;
+
+let vCount = 1, total = mSize * mSize;
+
+while(vCount < total) {
+
+let n = [], {x,y} = curr;
+
+if(y>0 && !mWalls[x][y-1].v) n.push({x, y:y-1, d:'t'});
+
+if(x<mSize-1 && !mWalls[x+1][y].v) n.push({x:x+1, y, d:'r'});
+
+if(y<mSize-1 && !mWalls[x][y+1].v) n.push({x:x, y:y+1, d:'b'});
+
+if(x>0 && !mWalls[x-1][y].v) n.push({x:x-1, y, d:'l'});
+
+if(n.length > 0) {
+
+let next = n[Math.floor(Math.random()*n.length)];
+
+if(next.d==='t'){mWalls[x][y].t=0; mWalls[next.x][next.y].b=0;}
+
+else if(next.d==='r'){mWalls[x][y].r=0; mWalls[next.x][next.y].l=0;}
+
+else if(next.d==='b'){mWalls[x][y].b=0; mWalls[next.x][next.y].t=0;}
+
+else if(next.d==='l'){mWalls[x][y].l=0; mWalls[next.x][next.y].r=0;}
+
+mWalls[next.x][next.y].v=1; stack.push(curr); curr=next; vCount++;
+
+} else if(stack.length > 0) curr = stack.pop();
+
+}
+
+}
+
+
+
+function drawMaze() {
+
+mCtx.clearRect(0,0,mCanvas.width,mCanvas.height);
+
+mCtx.strokeStyle="#ffd700"; mCtx.lineWidth=2;
+
+for(let x=0;x<mSize;x++) for(let y=0;y<mSize;y++) {
+
+let w=mWalls[x][y], px=x*mCell, py=y*mCell;
+
+mCtx.beginPath();
+
+if(w.t){mCtx.moveTo(px,py); mCtx.lineTo(px+mCell,py);}
+
+if(w.r){mCtx.moveTo(px+mCell,py); mCtx.lineTo(px+mCell,py+mCell);}
+
+if(w.b){mCtx.moveTo(px,py+mCell); mCtx.lineTo(px+mCell,py+mCell);}
+
+if(w.l){mCtx.moveTo(px,py); mCtx.lineTo(px,py+mCell);}
+
+mCtx.stroke();
+
+}
+
+mCtx.font=`${mCell*0.8}px Arial`;
+
+mCtx.fillText("👕", mPlayer.x*mCell+2, mPlayer.y*mCell+mCell-2);
+
+mCtx.fillText("🧼", mGoal.x*mCell+2, mGoal.y*mCell+mCell-2);
+
+}
+
+
+
+window.moveMaze = async (dir) => {
+
+let {x,y} = mPlayer, mv = false;
+
+if(dir==='up' && !mWalls[x][y].t){mPlayer.y--; mv=true;}
+
+if(dir==='down' && !mWalls[x][y].b){mPlayer.y++; mv=true;}
+
+if(dir==='left' && !mWalls[x][y].l){mPlayer.x--; mv=true;}
+
+if(dir==='right' && !mWalls[x][y].r){mPlayer.x++; mv=true;}
+
+if(mv) {
+
+drawMaze(); burst();
+
+if(mPlayer.x===mGoal.x && mPlayer.y===mGoal.y) {
+
+await updateDoc(doc(db, "users", userUID), { points: increment(mazeLvl * 5) });
+
+alert("Bravo! Nivo an ogmante."); mazeLvl++; initMaze();
+
+}
+
+}
+
+};
+
+
+
+window.addEventListener('keydown', (e) => {
+
+if (document.getElementById('view-maze').classList.contains('active')) {
+
+if (e.key === "ArrowUp") moveMaze('up');
+
+if (e.key === "ArrowDown") moveMaze('down');
+
+if (e.key === "ArrowLeft") moveMaze('left');
+
+if (e.key === "ArrowRight") moveMaze('right');
+
+}
+
+});
+
+
+
+// --- THREE.JS EPIC BACKGROUND ---
+
+const sc = new THREE.Scene();
+
+const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+const rend = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true, antialias: true });
+
+rend.setSize(window.innerWidth, window.innerHeight);
+
+
+
+const starGeo = new THREE.BufferGeometry();
+
+const starCoords = [];
+
+for(let i=0; i<5000; i++) {
+
+starCoords.push((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50);
+
+}
+
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
+
+const starMat = new THREE.PointsMaterial({ color: 0xffd700, size: 0.03, transparent: true, opacity: 0.8 });
+
+const stars = new THREE.Points(starGeo, starMat);
+
+sc.add(stars);
+
+
+
+// Sistèm Burst (Sipriz la)
+
+let burstParticles = [];
+
+function burst() {
+
+const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+
+const material = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+
+for(let i=0; i<10; i++){
+
+const p = new THREE.Mesh(geometry, material);
+
+p.position.set((Math.random()-0.5)*2, (Math.random()-0.5)*2, 0);
+
+p.userData.velocity = new THREE.Vector3((Math.random()-0.5)*0.1, (Math.random()-0.5)*0.1, (Math.random()-0.5)*0.1);
+
+sc.add(p);
+
+burstParticles.push(p);
+
+}
+
+}
+
+
+
+cam.position.z = 10;
+
+function animate() {
+
+requestAnimationFrame(animate);
+
+stars.rotation.y += 0.001;
+
+stars.rotation.x += 0.0005;
+
+
+burstParticles.forEach((p, i) => {
+
+p.position.add(p.userData.velocity);
+
+p.scale.multiplyScalar(0.95);
+
+if(p.scale.x < 0.01) { sc.remove(p); burstParticles.splice(i, 1); }
+
+});
+
+
+
+rend.render(sc, cam);
+
+}
+
+animate();
+
+
+
+window.addEventListener('resize', () => {
+
+cam.aspect = window.innerWidth / window.innerHeight;
+
+cam.updateProjectionMatrix();
+
+rend.setSize(window.innerWidth, window.innerHeight);
+
+});
+
+
+initFlappy();
+
+</script>
+
 </body>
+
 </html>
