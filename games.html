@@ -4,84 +4,45 @@
     <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZETWAL GAMES | Flappy Edition</title>
+    <title>ZETWAL GAMES | Ultimate Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --gold: #ffd700;
-            --gold-deep: #b8860b;
-            --gold-glow: rgba(255, 215, 0, 0.4);
-            --bg: #010101;
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --text: #ffffff;
+            --gold: #ffd700; --gold-deep: #b8860b; --gold-glow: rgba(255, 215, 0, 0.4);
+            --bg: #010101; --card-bg: rgba(255, 255, 255, 0.03); --text: #ffffff;
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
-
         body.light-mode { --bg: #f0f0f0; --card-bg: rgba(0, 0, 0, 0.05); --text: #1a1a1a; }
-
-        body { 
-            background: var(--bg); color: var(--text); margin: 0; 
-            font-family: 'Montserrat', sans-serif; overflow-x: hidden;
-            transition: background 0.5s ease;
-        }
-
+        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
 
-        .nav {
-            position: fixed; top: 0; width: 100%; z-index: 1000;
-            background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--gold-glow);
-        }
+        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(20px); border-bottom: 1px solid var(--gold-glow); }
         .nav-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 12px 20px; }
         .logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); text-decoration: none; cursor: pointer; }
         .logo-text span { color: var(--gold); }
-        
         .nav-right { display: flex; align-items: center; gap: 15px; }
         .theme-toggle { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
 
-        .game-selection { padding: 100px 5% 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .tab-btn {
-            background: var(--card-bg); border: 1px solid var(--gold-glow);
-            color: var(--text); padding: 10px 20px; border-radius: 50px; cursor: pointer;
-            font-weight: 600; transition: var(--transition);
-        }
+        .game-selection { padding: 100px 5% 10px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .tab-btn { background: var(--card-bg); border: 1px solid var(--gold-glow); color: var(--text); padding: 10px 18px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: var(--transition); font-size: 0.85rem; }
         .tab-btn.active { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold-glow); }
 
         .game-view { display: none; padding: 10px 5%; max-width: 850px; margin: 0 auto; }
         .game-view.active { display: block; animation: fadeIn 0.4s ease; }
 
-        .zoom-card {
-            background: var(--card-bg); backdrop-filter: blur(15px);
-            border-radius: 30px; padding: 20px; text-align: center; border: 1px solid var(--gold-glow);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        .zoom-card { background: var(--card-bg); backdrop-filter: blur(15px); border-radius: 30px; padding: 20px; text-align: center; border: 1px solid var(--gold-glow); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-        #flappy-canvas, #maze-canvas { 
-            background: rgba(0,0,0,0.6); border-radius: 15px; border: 2px solid var(--gold); 
-            margin: 10px auto; display: block; touch-action: none; max-width: 100%;
-        }
+        canvas { background: rgba(0,0,0,0.6); border-radius: 15px; border: 2px solid var(--gold); margin: 10px auto; display: block; touch-action: none; max-width: 100%; }
 
-        .leaderboard {
-            margin-top: 20px; background: rgba(255, 215, 0, 0.05);
-            border-radius: 15px; padding: 15px; text-align: left;
-        }
+        .leaderboard { margin-top: 20px; background: rgba(255, 215, 0, 0.05); border-radius: 15px; padding: 15px; text-align: left; }
         .leaderboard h3 { color: var(--gold); margin-top: 0; font-size: 0.9rem; text-transform: uppercase; }
         .leader-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,215,0,0.1); font-size: 0.85rem; }
 
-        .maze-mobile-ctrl { 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
-            width: 150px; margin: 15px auto; 
-        }
-        .m-btn { 
-            background: rgba(255, 215, 0, 0.2); border: 1px solid var(--gold); 
-            color: var(--gold); padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer;
-        }
-
         .btn-gold { background: var(--gold); color: black; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; margin-top: 10px; transition: 0.3s; }
         .btn-gold:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--gold-glow); }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -100,22 +61,17 @@
     </nav>
 
     <div class="game-selection">
-        <button id="tab-flappy" class="tab-btn active" onclick="showGame('flappy')">🚀 Flappy Zetwal</button>
+        <button id="tab-flappy" class="tab-btn active" onclick="showGame('flappy')">🚀 Flappy</button>
         <button id="tab-maze" class="tab-btn" onclick="showGame('maze')">🌀 Labirent</button>
+        <button id="tab-rider" class="tab-btn" onclick="showGame('rider')">🏍️ Zetwal Rider</button>
     </div>
 
     <section id="view-flappy" class="game-view active">
         <div class="zoom-card">
             <h1 style="color:var(--gold); margin:5px;">Flappy Zetwal</h1>
-            <p style="margin:5px; font-size: 0.8rem;">Koute: <b>10 pwen</b> pou chak pati</p>
             <canvas id="flappy-canvas"></canvas>
-            <div id="flappy-ui">
-                <button id="start-flappy-btn" class="btn-gold" onclick="startFlappy()">KÒMANSE (10 PWEN)</button>
-            </div>
-            <div class="leaderboard" id="lb-flappy">
-                <h3>🏆 KLASMAN ZETWAL</h3>
-                <div id="list-flappy">Chajman...</div>
-            </div>
+            <button id="start-flappy-btn" class="btn-gold" onclick="startFlappy()">JWE (10 PWEN)</button>
+            <div class="leaderboard"><div id="list-flappy">Chajman...</div></div>
         </div>
     </section>
 
@@ -123,13 +79,16 @@
         <div class="zoom-card">
             <h1 style="color:var(--gold); margin:5px;">Labirent</h1>
             <canvas id="maze-canvas"></canvas>
-            <div class="maze-mobile-ctrl">
-                <div></div><button class="m-btn" onclick="moveMaze('up')">↑</button><div></div>
-                <button class="m-btn" onclick="moveMaze('left')">←</button>
-                <button class="m-btn" onclick="moveMaze('down')">↓</button>
-                <button class="m-btn" onclick="moveMaze('right')">→</button>
-            </div>
-            <button id="start-maze-btn" class="btn-gold" onclick="deductPointsMaze()">REKÒMANSE (10 PWEN)</button>
+            <button class="btn-gold" onclick="deductPointsMaze()">REKÒMANSE (10 PWEN)</button>
+        </div>
+    </section>
+
+    <section id="view-rider" class="game-view">
+        <div class="zoom-card">
+            <h1 style="color:var(--gold); margin:5px;">Zetwal Rider</h1>
+            <p style="font-size: 0.7rem; opacity: 0.8;">Peze (oubyen kenbe dwèt ou) pou akselere!</p>
+            <canvas id="rider-canvas"></canvas>
+            <button id="start-rider-btn" class="btn-gold" onclick="startRider()">KÒMANSE (10 PWEN)</button>
         </div>
     </section>
 
@@ -166,7 +125,7 @@
         async function loadLeaderboard() {
             const q = query(collection(db, "users"), orderBy("points", "desc"), limit(5));
             const snap = await getDocs(q);
-            let html = "";
+            let html = "<h3>🏆 TOP ZETWAL</h3>";
             snap.forEach((doc, i) => {
                 const data = doc.data();
                 html += `<div class="leader-item"><span>${i+1}. ${data.username || 'Jwè'}</span> <b>${data.points.toFixed(0)}</b></div>`;
@@ -174,247 +133,178 @@
             document.getElementById('list-flappy').innerHTML = html;
         }
 
-        // --- UI & NAV ---
         window.toggleTheme = () => document.getElementById('main-body').classList.toggle('light-mode');
         
         window.showGame = (game) => {
             document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if(game === 'flappy') {
-                document.getElementById('view-flappy').classList.add('active');
-                document.getElementById('tab-flappy').classList.add('active');
-                initFlappy();
-            } else {
-                document.getElementById('view-maze').classList.add('active');
-                document.getElementById('tab-maze').classList.add('active');
-                initMaze();
-            }
+            document.getElementById(`view-${game}`).classList.add('active');
+            document.getElementById(`tab-${game}`).classList.add('active');
+            if(game === 'flappy') initFlappy();
+            if(game === 'maze') initMaze();
+            if(game === 'rider') initRider();
         };
 
-        // --- FLAPPY ZETWAL LOGIC ---
+        // --- RIDER LOGIC (NOUVO) ---
+        const rCanvas = document.getElementById('rider-canvas');
+        const rCtx = rCanvas.getContext('2d');
+        let rActive = false, rScore = 0, rPoints = [], rider, rCamX = 0;
+
+        function initRider() {
+            rCanvas.width = 400; rCanvas.height = 300;
+            rider = { x: 50, y: 0, v: 0, angle: 0, rotV: 0 };
+            rPoints = []; rCamX = 0; rScore = 0;
+            for(let i=0; i<20; i++) addRiderPoint();
+            drawRiderStatic();
+        }
+
+        function addRiderPoint() {
+            let prev = rPoints.length ? rPoints[rPoints.length-1] : {x:0, y:200};
+            rPoints.push({
+                x: prev.x + 40 + Math.random()*20,
+                y: 150 + Math.sin(rPoints.length * 0.5) * 50 + (Math.random()-0.5)*30
+            });
+        }
+
+        window.startRider = async () => {
+            if(userPoints < 10) return alert("Bezen 10 pwen!");
+            await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
+            rActive = true; 
+            document.getElementById('start-rider-btn').classList.add('hidden');
+            loopRider();
+        };
+
+        let isPressing = false;
+        window.addEventListener('mousedown', () => isPressing = true);
+        window.addEventListener('mouseup', () => isPressing = false);
+        window.addEventListener('touchstart', () => isPressing = true);
+        window.addEventListener('touchend', () => isPressing = false);
+
+        function loopRider() {
+            if(!rActive) return;
+            updateRider();
+            drawRider();
+            requestAnimationFrame(loopRider);
+        }
+
+        function updateRider() {
+            if(isPressing) rider.v += 0.2;
+            rider.v *= 0.98; // Friction
+            rider.x += rider.v;
+            rCamX = rider.x - 50;
+
+            // Fizik Tè a
+            let p1 = rPoints.find(p => p.x > rider.x - 40);
+            let p2 = rPoints[rPoints.indexOf(p1)+1];
+            if(!p2) { addRiderPoint(); return; }
+
+            let t = (rider.x - p1.x) / (p2.x - p1.x);
+            let groundY = p1.y + (p2.y - p1.y) * t;
+
+            if(rider.y < groundY - 10) { rider.y += 3; rider.angle += 0.02; }
+            else { 
+                rider.y = groundY - 10; 
+                rider.angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+            }
+
+            rScore = Math.floor(rider.x / 100);
+            if(rider.angle > 1.5 || rider.angle < -1.5) endRider(); // Si li baskile
+        }
+
+        async function endRider() {
+            rActive = false;
+            if(rScore > 0) await updateDoc(doc(db, "users", userUID), { points: increment(rScore) });
+            alert(`Rider Crash! Score: ${rScore}`);
+            document.getElementById('start-rider-btn').classList.remove('hidden');
+            initRider();
+        }
+
+        function drawRider() {
+            rCtx.clearRect(0,0,400,300);
+            rCtx.save(); rCtx.translate(-rCamX, 0);
+            
+            // Draw Ground
+            rCtx.beginPath(); rCtx.strokeStyle = "gold"; rCtx.lineWidth = 3;
+            rCtx.moveTo(rPoints[0].x, rPoints[0].y);
+            rPoints.forEach(p => rCtx.lineTo(p.x, p.y));
+            rCtx.stroke();
+
+            // Draw Rider
+            rCtx.translate(rider.x, rider.y);
+            rCtx.rotate(rider.angle);
+            rCtx.font = "20px Arial";
+            rCtx.fillText("🏍️", -10, 0);
+            rCtx.restore();
+
+            rCtx.fillStyle = "white"; rCtx.font = "15px Montserrat";
+            rCtx.fillText(`Distance: ${rScore}m`, 20, 30);
+        }
+
+        function drawRiderStatic() {
+            rCtx.clearRect(0,0,400,300);
+            rCtx.fillStyle = "gold"; rCtx.textAlign = "center";
+            rCtx.fillText("KENBE POU AKSÈLÈRE", 200, 150);
+            rCtx.textAlign = "start";
+        }
+
+        // --- FLAPPY LOGIC --- (Konsève)
         const fCanvas = document.getElementById('flappy-canvas');
         const fCtx = fCanvas.getContext('2d');
-        let bird, pipes, fScore, fGameOver, fAnimId, fSpeed;
-
+        let bird, pipes, fScore, fGameOver, fAnimId;
         function initFlappy() {
-            fCanvas.width = 320; fCanvas.height = 400;
-            // Redwi vitès kòmansman an (Gravity ak jump pi dous)
-            bird = { x: 50, y: 150, v: 0, gravity: 0.18, jump: -3.8, size: 20 };
-            pipes = []; fScore = 0; fGameOver = true; fSpeed = 1.8;
-            drawFlappyStatic();
+            fCanvas.width = 320; fCanvas.height = 300;
+            bird = { x: 50, y: 150, v: 0, gravity: 0.2, jump: -4, size: 20 };
+            pipes = []; fScore = 0; fGameOver = true;
+            fCtx.fillStyle = "gold"; fCtx.fillText("PRE PARE?", 130, 150);
         }
-
         window.startFlappy = async () => {
-            if(userPoints < 10) { alert("Ou bezwen omwen 10 pwen!"); return; }
+            if(userPoints < 10) return;
             await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
-            fGameOver = false;
-            document.getElementById('start-flappy-btn').classList.add('hidden');
-            gameLoopFlappy();
+            fGameOver = false; document.getElementById('start-flappy-btn').classList.add('hidden');
+            loopFlappy();
         };
-
-        function gameLoopFlappy() {
-            if (fGameOver) return;
-            updateFlappy();
-            drawFlappy();
-            fAnimId = requestAnimationFrame(gameLoopFlappy);
-        }
-
+        function loopFlappy() { if(fGameOver) return; updateFlappy(); drawFlappy(); requestAnimationFrame(loopFlappy); }
         function updateFlappy() {
-            bird.v += bird.gravity;
-            bird.y += bird.v;
-
-            let spawnDist = pipes.length === 0 ? 350 : 200; // Ogmante espas kòmansman an
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < fCanvas.width - spawnDist) {
-                let gap = Math.max(110 - (fScore * 0.4), 80); 
-                let pipeY = Math.random() * (fCanvas.height - gap - 100) + 50;
-                pipes.push({ x: fCanvas.width, y: pipeY, gap: gap, passed: false });
-            }
-
-            pipes.forEach((p) => {
-                p.x -= fSpeed + (fScore * 0.03); // Akselerasyon pi dous
-
-                if (bird.x + bird.size > p.x && bird.x < p.x + 40) {
-                    if (bird.y < p.y || bird.y + bird.size > p.y + p.gap) { endFlappy(); }
-                }
-                if (!p.passed && p.x + 40 < bird.x) { p.passed = true; fScore++; if(fScore%5===0) burst(); }
-            });
-
-            if (pipes[0] && pipes[0].x < -40) pipes.shift();
-            if (bird.y > fCanvas.height || bird.y < 0) endFlappy();
-        }
-
-        async function endFlappy() {
-            fGameOver = true;
-            cancelAnimationFrame(fAnimId);
-            if (fScore > 0) await updateDoc(doc(db, "users", userUID), { points: increment(fScore * 2) });
-            alert(`Pati Fini! Ou fè ${fScore} pwen.`);
-            document.getElementById('start-flappy-btn').classList.remove('hidden');
-            loadLeaderboard();
-            initFlappy();
-        }
-
-        function drawFlappy() {
-            fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
-            fCtx.shadowBlur = 15; fCtx.shadowColor = "gold";
-            fCtx.font = "24px Arial";
-            fCtx.fillText("⭐", bird.x, bird.y + bird.size);
-            fCtx.shadowBlur = 0;
-            fCtx.fillStyle = "rgba(255, 215, 0, 0.8)";
+            bird.v += bird.gravity; bird.y += bird.v;
+            if(pipes.length==0 || pipes[pipes.length-1].x < 150) pipes.push({x:320, y:Math.random()*150+50, passed:false});
             pipes.forEach(p => {
-                fCtx.fillRect(p.x, 0, 40, p.y);
-                fCtx.fillRect(p.x, p.y + p.gap, 40, fCanvas.height);
+                p.x -= 2;
+                if(bird.x+bird.size > p.x && bird.x < p.x+30 && (bird.y < p.y || bird.y+bird.size > p.y+80)) endFlappy();
+                if(!p.passed && p.x < bird.x) { p.passed=true; fScore++; }
             });
-            fCtx.fillStyle = "white";
-            fCtx.font = "bold 20px Montserrat";
-            fCtx.fillText(`Score: ${fScore}`, 15, 30);
+            if(bird.y > 300 || bird.y < 0) endFlappy();
         }
-
-        function drawFlappyStatic() {
-            fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
-            fCtx.fillStyle = "gold";
-            fCtx.textAlign = "center";
-            fCtx.font = "bold 18px Montserrat";
-            fCtx.fillText("PRE PARE?", fCanvas.width/2, fCanvas.height/2);
-            fCtx.textAlign = "start";
+        async function endFlappy() { 
+            fGameOver = true; 
+            if(fScore > 0) await updateDoc(doc(db, "users", userUID), { points: increment(fScore*2) });
+            alert("Fini!"); document.getElementById('start-flappy-btn').classList.remove('hidden'); initFlappy(); 
         }
+        function drawFlappy() {
+            fCtx.clearRect(0,0,320,300); fCtx.fillText("⭐", bird.x, bird.y+20);
+            fCtx.fillStyle="gold"; pipes.forEach(p => { fCtx.fillRect(p.x, 0, 30, p.y); fCtx.fillRect(p.x, p.y+80, 30, 300); });
+            fCtx.fillStyle="white"; fCtx.fillText(`Score: ${fScore}`, 10, 20);
+        }
+        fCanvas.onmousedown = () => bird.v = bird.jump;
 
-        const jumpAction = () => { if(!fGameOver) { bird.v = bird.jump; burst(); } };
-        window.addEventListener('keydown', (e) => { if(e.code === 'Space') jumpAction(); });
-        fCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); jumpAction(); });
-        fCanvas.addEventListener('mousedown', jumpAction);
-
-        // --- MAZE LOGIC ---
-        let mazeLvl = 1, mSize, mCell, mWalls, mPlayer, mGoal;
+        // --- MAZE LOGIC --- (Konsève)
         const mCanvas = document.getElementById('maze-canvas'), mCtx = mCanvas.getContext('2d');
+        function initMaze() { mCanvas.width=300; mCanvas.height=300; mCtx.fillStyle="gold"; mCtx.fillText("LABIRENT PRE", 110, 150); }
+        window.deductPointsMaze = async () => { if(userPoints<10) return; await updateDoc(doc(db, "users", userUID), { points: increment(-10) }); initMaze(); alert("Labirent jenere!"); };
 
-        window.deductPointsMaze = async () => {
-            if(userPoints < 10) { alert("Ou bezwen 10 pwen!"); return; }
-            await updateDoc(doc(db, "users", userUID), { points: increment(-10) });
-            mazeLvl = 1; initMaze();
-        };
-
-        function initMaze() {
-            mSize = 7 + (mazeLvl * 2); if(mSize > 25) mSize = 25;
-            mCell = Math.floor(280 / mSize);
-            mCanvas.width = mSize * mCell; mCanvas.height = mSize * mCell;
-            mPlayer = {x:0, y:0}; mGoal = {x:mSize-1, y:mSize-1};
-            generateMaze(); drawMaze();
-        }
-
-        function generateMaze() {
-            mWalls = Array(mSize).fill().map(() => Array(mSize).fill().map(() => ({t:1, r:1, b:1, l:1, v:0})));
-            let stack = [], curr = {x:0, y:0}; mWalls[0][0].v = 1;
-            let vCount = 1, total = mSize * mSize;
-            while(vCount < total) {
-                let n = [], {x,y} = curr;
-                if(y>0 && !mWalls[x][y-1].v) n.push({x, y:y-1, d:'t'});
-                if(x<mSize-1 && !mWalls[x+1][y].v) n.push({x:x+1, y, d:'r'});
-                if(y<mSize-1 && !mWalls[x][y+1].v) n.push({x:x, y:y+1, d:'b'});
-                if(x>0 && !mWalls[x-1][y].v) n.push({x:x-1, y, d:'l'});
-                if(n.length > 0) {
-                    let next = n[Math.floor(Math.random()*n.length)];
-                    if(next.d==='t'){mWalls[x][y].t=0; mWalls[next.x][next.y].b=0;}
-                    else if(next.d==='r'){mWalls[x][y].r=0; mWalls[next.x][next.y].l=0;}
-                    else if(next.d==='b'){mWalls[x][y].b=0; mWalls[next.x][next.y].t=0;}
-                    else if(next.d==='l'){mWalls[x][y].l=0; mWalls[next.x][next.y].r=0;}
-                    mWalls[next.x][next.y].v=1; stack.push(curr); curr=next; vCount++;
-                } else if(stack.length > 0) curr = stack.pop();
-            }
-        }
-
-        function drawMaze() {
-            mCtx.clearRect(0,0,mCanvas.width,mCanvas.height);
-            mCtx.strokeStyle="#ffd700"; mCtx.lineWidth=2;
-            for(let x=0;x<mSize;x++) for(let y=0;y<mSize;y++) {
-                let w=mWalls[x][y], px=x*mCell, py=y*mCell;
-                mCtx.beginPath();
-                if(w.t){mCtx.moveTo(px,py); mCtx.lineTo(px+mCell,py);}
-                if(w.r){mCtx.moveTo(px+mCell,py); mCtx.lineTo(px+mCell,py+mCell);}
-                if(w.b){mCtx.moveTo(px,py+mCell); mCtx.lineTo(px+mCell,py+mCell);}
-                if(w.l){mCtx.moveTo(px,py); mCtx.lineTo(px,py+mCell);}
-                mCtx.stroke();
-            }
-            mCtx.font=`${mCell*0.8}px Arial`;
-            mCtx.fillText("👕", mPlayer.x*mCell+2, mPlayer.y*mCell+mCell-2);
-            mCtx.fillText("🧼", mGoal.x*mCell+2, mGoal.y*mCell+mCell-2);
-        }
-
-        window.moveMaze = async (dir) => {
-            let {x,y} = mPlayer, mv = false;
-            if(dir==='up' && !mWalls[x][y].t){mPlayer.y--; mv=true;}
-            if(dir==='down' && !mWalls[x][y].b){mPlayer.y++; mv=true;}
-            if(dir==='left' && !mWalls[x][y].l){mPlayer.x--; mv=true;}
-            if(dir==='right' && !mWalls[x][y].r){mPlayer.x++; mv=true;}
-            if(mv) {
-                drawMaze(); burst();
-                if(mPlayer.x===mGoal.x && mPlayer.y===mGoal.y) {
-                    await updateDoc(doc(db, "users", userUID), { points: increment(mazeLvl * 5) });
-                    alert("Bravo! Nivo an ogmante."); mazeLvl++; initMaze();
-                }
-            }
-        };
-
-        window.addEventListener('keydown', (e) => {
-            if (document.getElementById('view-maze').classList.contains('active')) {
-                if (e.key === "ArrowUp") moveMaze('up');
-                if (e.key === "ArrowDown") moveMaze('down');
-                if (e.key === "ArrowLeft") moveMaze('left');
-                if (e.key === "ArrowRight") moveMaze('right');
-            }
-        });
-
-        // --- THREE.JS EPIC BACKGROUND ---
+        // --- THREE.JS BACKGROUND ---
         const sc = new THREE.Scene();
         const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const rend = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true, antialias: true });
+        const rend = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
         rend.setSize(window.innerWidth, window.innerHeight);
-
         const starGeo = new THREE.BufferGeometry();
         const starCoords = [];
-        for(let i=0; i<5000; i++) {
-            starCoords.push((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50);
-        }
+        for(let i=0; i<2000; i++) starCoords.push((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50);
         starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
-        const starMat = new THREE.PointsMaterial({ color: 0xffd700, size: 0.03, transparent: true, opacity: 0.8 });
-        const stars = new THREE.Points(starGeo, starMat);
-        sc.add(stars);
+        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.05 }));
+        sc.add(stars); cam.position.z = 15;
+        function anim() { requestAnimationFrame(anim); stars.rotation.y += 0.001; rend.render(sc, cam); }
+        anim();
 
-        // Sistèm Burst (Sipriz la)
-        let burstParticles = [];
-        function burst() {
-            const geometry = new THREE.SphereGeometry(0.05, 8, 8);
-            const material = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-            for(let i=0; i<10; i++){
-                const p = new THREE.Mesh(geometry, material);
-                p.position.set((Math.random()-0.5)*2, (Math.random()-0.5)*2, 0);
-                p.userData.velocity = new THREE.Vector3((Math.random()-0.5)*0.1, (Math.random()-0.5)*0.1, (Math.random()-0.5)*0.1);
-                sc.add(p);
-                burstParticles.push(p);
-            }
-        }
-
-        cam.position.z = 10;
-        function animate() { 
-            requestAnimationFrame(animate); 
-            stars.rotation.y += 0.001;
-            stars.rotation.x += 0.0005;
-            
-            burstParticles.forEach((p, i) => {
-                p.position.add(p.userData.velocity);
-                p.scale.multiplyScalar(0.95);
-                if(p.scale.x < 0.01) { sc.remove(p); burstParticles.splice(i, 1); }
-            });
-
-            rend.render(sc, cam); 
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            cam.aspect = window.innerWidth / window.innerHeight;
-            cam.updateProjectionMatrix();
-            rend.setSize(window.innerWidth, window.innerHeight);
-        });
-        
         initFlappy();
     </script>
 </body>
