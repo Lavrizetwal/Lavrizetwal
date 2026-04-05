@@ -14,14 +14,26 @@
             --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc;
             --gold-glow: rgba(255, 215, 0, 0.4); --bg: #010101; --text: #ffffff;
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --glass-bg: rgba(255, 255, 255, 0.08); /* Ranfòse pou glassomorphisme */
         }
-        .light-mode { --bg: #fdfdfd; --text: #1a1a1a; }
+        .light-mode { --bg: #fdfdfd; --text: #1a1a1a; --glass-bg: rgba(0, 0, 0, 0.05); }
         body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
         
         .gold-particle {
             position: fixed; pointer-events: none; background: var(--gold);
             border-radius: 50%; z-index: 9999; opacity: 0.8;
+        }
+
+        /* --- ANIMASYON RESPIRASYON --- */
+        @keyframes breatheBox {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+            50% { transform: scale(1.02); box-shadow: 0 15px 45px 0 rgba(255, 215, 0, 0.15); }
+        }
+
+        @keyframes breatheSection {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.01); opacity: 0.95; }
         }
 
         /* --- NAVIGATION --- */
@@ -42,33 +54,33 @@
 
         .theme-toggle { position: fixed; top: 80px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); font-size: 1.2rem; }
 
-        /* --- HERO & CORE --- */
-        .hero { padding: 180px 5% 40px; text-align: center; }
+        /* --- HERO & CORE (Respire) --- */
+        .hero { padding: 180px 5% 40px; text-align: center; animation: breatheSection 6s infinite ease-in-out; }
         .breathing-core { width: 120px; height: 120px; margin: 0 auto 20px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; box-shadow: 0 0 40px var(--gold-glow); animation: breathe 4s infinite ease-in-out; }
         @keyframes breathe { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.15); filter: brightness(1.3); box-shadow: 0 0 60px var(--gold); } }
         .gold-shimmer { color: var(--gold); background: linear-gradient(90deg, #fff, var(--gold), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: shimmer 3s linear infinite; font-size: clamp(2.5rem, 10vw, 5rem); font-family: 'Playfair Display', serif; }
 
-        /* --- GIANT CAROUSEL MODIFIÉ --- */
-        .carousel-container { width: 100%; padding: 80px 0 100px; overflow: hidden; } /* Kad yo desann yon ti kras plis */
-        .hub-carousel { display: flex; gap: 40px; overflow-x: auto; padding: 0 10%; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        /* --- GIANT CAROUSEL --- */
+        .carousel-container { width: 100%; padding: 80px 0 100px; overflow: hidden; } 
+        .hub-carousel { display: flex; gap: 40px; overflow-x: auto; padding: 20px 10%; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .hub-carousel::-webkit-scrollbar { display: none; }
         
-        .carousel-item { flex: 0 0 90%; max-width: 550px; scroll-snap-align: center; transition: transform 0.5s; } /* Elaji yon ti kras */
+        .carousel-item { flex: 0 0 90%; max-width: 550px; scroll-snap-align: center; transition: transform 0.5s; }
         @media (min-width: 768px) { .carousel-item { flex: 0 0 500px; } }
 
         .liquid-border { 
             position: relative; border-radius: 35px; 
-            background: rgba(255, 255, 255, 0.05); /* Efè glas transparan */
-            backdrop-filter: blur(30px); 
-            -webkit-backdrop-filter: blur(30px);
+            background: var(--glass-bg); 
+            backdrop-filter: blur(40px); /* Flou pi fò */
+            -webkit-backdrop-filter: blur(40px);
             padding: 50px 35px; text-align: center; height: 520px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Bordure pi klere */
             transition: var(--transition);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            animation: breatheBox 5s infinite ease-in-out; /* Respire 4 kote */
         }
-        .liquid-border:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.1); border-color: var(--gold); }
-        .liquid-border::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,255,255,0.2), rgba(255,215,0,0.5)); background-size: 300% 300%; animation: liquidGold 5s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
+        .liquid-border:hover { transform: translateY(-15px) scale(1.03); background: rgba(255, 255, 255, 0.12); border-color: var(--gold); animation-play-state: paused; }
+        .liquid-border::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; background: linear-gradient(135deg, rgba(255,215,0,0.6), rgba(255,255,255,0.4), rgba(255,215,0,0.6)); background-size: 300% 300%; animation: liquidGold 5s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
         
         @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
@@ -80,8 +92,8 @@
         .btn-main-gold { padding: 16px 45px; background: var(--gold); color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; transition: 0.3s; }
         .btn-main-gold:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--gold); }
 
-        /* --- FOOTER --- */
-        footer { background: rgba(0,0,0,0.9); padding: 60px 5% 30px; border-top: 1px solid var(--gold); text-align: center; }
+        /* --- FOOTER (Respire) --- */
+        footer { background: rgba(0,0,0,0.9); padding: 60px 5% 30px; border-top: 1px solid var(--gold); text-align: center; animation: breatheSection 8s infinite ease-in-out; }
         .social-buttons { display: flex; justify-content: center; gap: 25px; margin: 20px 0; }
         .social-icon { width: 50px; height: 50px; transition: 0.4s; }
         .social-icon:hover { transform: scale(1.2); filter: drop-shadow(0 0 10px var(--gold)); }
