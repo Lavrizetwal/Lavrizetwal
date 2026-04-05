@@ -36,13 +36,17 @@
         }
         .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
         
+        /* Login Button & User Info */
+        .auth-container { position: absolute; right: 20px; top: 15px; display: flex; align-items: center; gap: 10px; }
         .login-btn {
-            position: absolute; right: 20px; top: 15px;
             padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px;
             color: var(--gold); text-decoration: none; font-size: 0.7rem;
-            font-weight: 600; text-transform: uppercase; transition: 0.3s;
+            font-weight: 600; text-transform: uppercase; transition: 0.3s; cursor: pointer; background: transparent;
         }
         .login-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold-glow); }
+        
+        #user-display { font-size: 0.65rem; color: var(--gold); text-align: right; line-height: 1.2; font-weight: 600; }
+        .logout-link { color: #ff4444; cursor: pointer; text-decoration: underline; font-size: 0.55rem; display: block; }
 
         .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
         .nav-logo-img { width: 25px; height: 25px; }
@@ -85,11 +89,10 @@
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             padding: 45px 35px; text-align: center; height: 480px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            border: 2px solid transparent; /* Epesè miltipliye pa 2 */
+            border: 2px solid transparent; 
             animation: breatheBox 5s infinite ease-in-out;
         }
         
-        /* Efè Shimmer nan tèks kad yo sèlman */
         .liquid-border h3, .liquid-border p:not(.btn-main-gold), .liquid-border .item-detail {
             background: linear-gradient(90deg, var(--text) 0%, var(--gold) 50%, var(--text) 100%);
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -111,7 +114,7 @@
 
         .btn-main-gold { 
             display: inline-block; padding: 14px 35px; background: var(--gold); color: #000 !important; 
-            -webkit-text-fill-color: #000 !important; /* Retire shimmer a la */
+            -webkit-text-fill-color: #000 !important; 
             text-decoration: none; border-radius: 50px; font-weight: 800; 
             text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s; 
         }
@@ -137,7 +140,15 @@
 
     <nav class="nav">
         <div class="nav-content">
-            <a href="login.html" class="login-btn">Login</a>
+            <div class="auth-container">
+                <button id="google-login" class="login-btn">Login</button>
+                <div id="user-display" style="display: none;">
+                    <span id="user-name"></span><br>
+                    <span id="user-points">0 Pwen</span>
+                    <span class="logout-link" onclick="logout()">Dekonekte</span>
+                </div>
+            </div>
+
             <div class="logo-container">
                 <img src="logo.png" alt="Zetwal" class="nav-logo-img">
                 <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
@@ -202,6 +213,50 @@
         </div>
         <div class="footer-bottom">ZETWAL ORGANISATION 2026 – MODÈNITE AK TRADISYON</div>
     </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+        // CONFIG (Mete enfòmasyon pwojè w la la a)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        const loginBtn = document.getElementById("google-login");
+        const userDisplay = document.getElementById("user-display");
+        const userNameSpan = document.getElementById("user-name");
+
+        loginBtn.onclick = async () => {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Erreur login:", error);
+            }
+        };
+
+        window.logout = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginBtn.style.display = "none";
+                userDisplay.style.display = "block";
+                userNameSpan.innerText = user.displayName;
+                // Pwen yo ka soti nan yon baz de done nan lavni, isit la nou mete 0 pa defo
+                document.getElementById("user-points").innerText = "0 Pwen"; 
+            } else {
+                loginBtn.style.display = "block";
+                userDisplay.style.display = "none";
+            }
+        });
+    </script>
 
     <script>
         function spawnParticle(x, y) {
