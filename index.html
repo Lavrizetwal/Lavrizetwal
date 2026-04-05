@@ -24,11 +24,12 @@
         .nav { 
             position: fixed; top: 0; width: 100%; z-index: 1000; 
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); 
-            border-bottom: 2px solid transparent; /* Bordi a sèlman anba */
+            border-bottom: 2px solid transparent;
             border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
         }
         .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
         
+        /* Bouton Login & Info */
         .auth-ui { position: absolute; right: 20px; top: 15px; text-align: right; }
         .login-btn {
             padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px;
@@ -76,14 +77,12 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             border: 2px solid transparent; 
         }
-        /* Bordi ogmante nan menm dimansyon ak liy navigasyon an (1px mask/2px border) */
         .liquid-border::before { 
             content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; 
-            background: linear-gradient(90deg, transparent, var(--gold), transparent); 
+            background: linear-gradient(135deg, var(--gold-deep), #fff, var(--gold-deep)); 
             background-size: 300% 300%; animation: liquidGold 4s linear infinite; 
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
             -webkit-mask-composite: xor; 
-            mask-composite: exclude;
         }
         @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
@@ -104,7 +103,7 @@
                 <button id="google-login" class="login-btn">Login</button>
                 <div id="user-info-nav">
                     <span id="nav-user-name"></span><br>
-                    <span id="nav-user-points">...</span>
+                    <span id="nav-user-points">...</span> Pwen
                     <span class="logout-text" onclick="logout()">Dekonekte</span>
                 </div>
             </div>
@@ -156,6 +155,7 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
+        // Mwen itilize config ou te voye a
         const firebaseConfig = {
             apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
             authDomain: "lavrizetwal.firebaseapp.com",
@@ -175,9 +175,11 @@
         const navUserName = document.getElementById('nav-user-name');
         const navUserPoints = document.getElementById('nav-user-points');
 
+        // Login fonksyon
         loginBtn.onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
         window.logout = () => signOut(auth);
 
+        // Koute chanjman koneksyon
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 loginBtn.style.display = 'none';
@@ -185,15 +187,17 @@
                 navUserName.innerText = user.displayName.split(' ')[0];
 
                 const userRef = doc(db, "users", user.uid);
+                
+                // Kreye kont nan Firestore si se premye fwa
                 const docSnap = await getDoc(userRef);
                 if (!docSnap.exists()) {
                     await setDoc(userRef, { points: 1000, name: user.displayName }, { merge: true });
                 }
 
+                // Mete pwen yo ajou an dirèk
                 onSnapshot(userRef, (doc) => {
                     if (doc.exists()) {
-                        // Afiche sèlman nimewo a ak mo pwen an yon sèl fwa
-                        navUserPoints.innerText = (doc.data().points || 0) + " Pwen";
+                        navUserPoints.innerText = doc.data().points || 0;
                     }
                 });
             } else {
@@ -204,6 +208,7 @@
     </script>
 
     <script>
+        // WEBGL BACKGROUND
         let scene, camera, renderer, stars;
         function initWebGL() {
             scene = new THREE.Scene();
