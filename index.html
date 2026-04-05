@@ -14,7 +14,7 @@
             --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc;
             --gold-glow: rgba(255, 215, 0, 0.4); --bg: #010101; --text: #ffffff;
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            --glass-bg: rgba(255, 255, 255, 0.08); /* Ranfòse pou glassomorphisme */
+            --glass-bg: rgba(255, 255, 255, 0.08);
         }
         .light-mode { --bg: #fdfdfd; --text: #1a1a1a; --glass-bg: rgba(0, 0, 0, 0.05); }
         body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
@@ -36,6 +36,12 @@
             50% { transform: scale(1.01); opacity: 0.95; }
         }
 
+        /* Lumière respirante latérale */
+        @keyframes sideGlow {
+            0%, 100% { box-shadow: -15px 0 30px -10px var(--gold-glow), 15px 0 30px -10px var(--gold-glow); }
+            50% { box-shadow: -25px 0 50px -5px var(--gold), 25px 0 50px -5px var(--gold); }
+        }
+
         /* --- NAVIGATION --- */
         .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 215, 0, 0.2); }
         .nav-content { display: flex; flex-direction: column; align-items: center; padding: 10px; }
@@ -54,7 +60,7 @@
 
         .theme-toggle { position: fixed; top: 80px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); font-size: 1.2rem; }
 
-        /* --- HERO & CORE (Respire) --- */
+        /* --- HERO & CORE --- */
         .hero { padding: 180px 5% 40px; text-align: center; animation: breatheSection 6s infinite ease-in-out; }
         .breathing-core { width: 120px; height: 120px; margin: 0 auto 20px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; box-shadow: 0 0 40px var(--gold-glow); animation: breathe 4s infinite ease-in-out; }
         @keyframes breathe { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.15); filter: brightness(1.3); box-shadow: 0 0 60px var(--gold); } }
@@ -65,21 +71,26 @@
         .hub-carousel { display: flex; gap: 40px; overflow-x: auto; padding: 20px 10%; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .hub-carousel::-webkit-scrollbar { display: none; }
         
-        .carousel-item { flex: 0 0 90%; max-width: 550px; scroll-snap-align: center; transition: transform 0.5s; }
+        .carousel-item { flex: 0 0 90%; max-width: 550px; scroll-snap-align: center; transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
         @media (min-width: 768px) { .carousel-item { flex: 0 0 500px; } }
 
         .liquid-border { 
             position: relative; border-radius: 35px; 
             background: var(--glass-bg); 
-            backdrop-filter: blur(40px); /* Flou pi fò */
+            backdrop-filter: blur(40px); 
             -webkit-backdrop-filter: blur(40px);
             padding: 50px 35px; text-align: center; height: 520px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.2); /* Bordure pi klere */
+            border: 1px solid rgba(255, 255, 255, 0.2); 
             transition: var(--transition);
-            animation: breatheBox 5s infinite ease-in-out; /* Respire 4 kote */
+            animation: breatheBox 5s infinite ease-in-out, sideGlow 4s infinite ease-in-out;
+            cursor: pointer;
         }
-        .liquid-border:hover { transform: translateY(-15px) scale(1.03); background: rgba(255, 255, 255, 0.12); border-color: var(--gold); animation-play-state: paused; }
+        
+        /* Zoom in au hover */
+        .carousel-item:hover { transform: scale(1.08) translateY(-10px); z-index: 10; }
+        .liquid-border:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--gold); animation-play-state: paused; }
+        
         .liquid-border::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; background: linear-gradient(135deg, rgba(255,215,0,0.6), rgba(255,255,255,0.4), rgba(255,215,0,0.6)); background-size: 300% 300%; animation: liquidGold 5s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
         
         @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -92,7 +103,6 @@
         .btn-main-gold { padding: 16px 45px; background: var(--gold); color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; transition: 0.3s; }
         .btn-main-gold:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--gold); }
 
-        /* --- FOOTER (Respire) --- */
         footer { background: rgba(0,0,0,0.9); padding: 60px 5% 30px; border-top: 1px solid var(--gold); text-align: center; animation: breatheSection 8s infinite ease-in-out; }
         .social-buttons { display: flex; justify-content: center; gap: 25px; margin: 20px 0; }
         .social-icon { width: 50px; height: 50px; transition: 0.4s; }
@@ -133,7 +143,7 @@
     <main>
         <div class="carousel-container">
             <div class="hub-carousel">
-                <div class="carousel-item">
+                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
                     <div class="liquid-border" onclick="location.href='lavri.html'">
                         <div class="item-icon">🧺</div>
                         <h3 class="item-title">Lavri Zetwal</h3>
@@ -142,7 +152,7 @@
                         <span class="btn-main-gold">Antre nan Lavri</span>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
                     <div class="liquid-border" onclick="location.href='shop.html'">
                         <div class="item-icon">🛒</div>
                         <h3 class="item-title">Shop Zetwal</h3>
@@ -151,7 +161,7 @@
                         <span class="btn-main-gold">Vizite Boutik la</span>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
                     <div class="liquid-border" onclick="location.href='mall.html'">
                         <div class="item-icon">🏢</div>
                         <h3 class="item-title">3D Mall Sim</h3>
@@ -160,7 +170,7 @@
                         <span class="btn-main-gold">Eksplore Mall la</span>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
                     <div class="liquid-border" onclick="location.href='cinema.html'">
                         <div class="item-icon">🎬</div>
                         <h3 class="item-title">Zetwal Sinema</h3>
@@ -169,7 +179,7 @@
                         <span class="btn-main-gold">Gade Kontni yo</span>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
                     <div class="liquid-border" onclick="location.href='technopark.html'">
                         <div class="item-icon">🤖</div>
                         <h3 class="item-title">Technopark</h3>
@@ -178,7 +188,7 @@
                         <span class="btn-main-gold">Dekouvri Inovasyon</span>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
                     <div class="liquid-border" onclick="location.href='association.html'">
                         <div class="item-icon">🤝</div>
                         <h3 class="item-title">Asosye Zetwal</h3>
@@ -187,7 +197,7 @@
                         <span class="btn-main-gold">Vin yon Patnè</span>
                     </div>
                 </div>
-                <div class="carousel-item">
+                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
                     <div class="liquid-border" onclick="location.href='games.html'">
                         <div class="item-icon">🎮</div>
                         <h3 class="item-title">Jwèt Zetwal</h3>
@@ -211,23 +221,39 @@
     </footer>
 
     <script>
+        // Poussière d'or globale (pour le corps)
         function createGoldDust(e) {
+            spawnParticle(e.clientX, e.clientY);
+        }
+
+        // Poussière d'or spécifique sur les côtés du cadre
+        function emitSideDust(e, element) {
+            const rect = element.getBoundingClientRect();
+            // On spawn quelques particules fines sur les bords gauche et droit
+            for(let i=0; i<2; i++) {
+                const sideX = Math.random() > 0.5 ? rect.left : rect.right;
+                const randomY = rect.top + Math.random() * rect.height;
+                spawnParticle(sideX, randomY, true);
+            }
+        }
+
+        function spawnParticle(x, y, isFine = false) {
             const particle = document.createElement('div');
             particle.className = 'gold-particle';
-            const size = Math.random() * 4 + 2;
+            const size = isFine ? (Math.random() * 2 + 1) : (Math.random() * 4 + 2);
             particle.style.width = size + 'px';
             particle.style.height = size + 'px';
-            particle.style.left = e.clientX + 'px';
-            particle.style.top = e.clientY + 'px';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
             document.body.appendChild(particle);
             
-            const destinationX = e.clientX + (Math.random() - 0.5) * 60;
-            const destinationY = e.clientY + (Math.random() - 0.5) * 60;
+            const destinationX = x + (Math.random() - 0.5) * (isFine ? 100 : 60);
+            const destinationY = y + (Math.random() - 0.5) * (isFine ? 100 : 60);
 
             gsap.to(particle, {
-                duration: 1 + Math.random(),
-                x: destinationX - e.clientX,
-                y: destinationY - e.clientY,
+                duration: 1.5,
+                x: destinationX - x,
+                y: destinationY - y,
                 opacity: 0,
                 scale: 0,
                 onComplete: () => particle.remove()
