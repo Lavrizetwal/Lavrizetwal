@@ -20,41 +20,31 @@
         body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
         
-        .gold-particle {
-            position: fixed; pointer-events: none; background: var(--gold);
-            border-radius: 50%; z-index: 9999; opacity: 0.8;
-        }
+        /* --- ANIMASYON --- */
+        @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes softTextGlow { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes breatheSection { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.005); } }
+        @keyframes breatheBox { 0%, 100% { transform: scale(1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); } 50% { transform: scale(1.01); box-shadow: 0 12px 40px 0 rgba(255, 215, 0, 0.1); } }
 
-        /* --- ANIMASYON RESPIRASYON --- */
-        @keyframes breatheBox {
-            0%, 100% { transform: scale(1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
-            50% { transform: scale(1.01); box-shadow: 0 12px 40px 0 rgba(255, 215, 0, 0.1); }
-        }
-
-        @keyframes breatheSection {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.005); }
-        }
-
-        @keyframes sideGlow {
-            0%, 100% { box-shadow: -10px 0 20px -10px var(--gold-glow), 10px 0 20px -10px var(--gold-glow); }
-            50% { box-shadow: -15px 0 30px -5px rgba(255, 215, 0, 0.15), 15px 0 30px -5px rgba(255, 215, 0, 0.15); }
-        }
-
-        @keyframes softTextGlow {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-        }
-
-        /* --- NAVIGATION (Respire) --- */
+        /* --- NAVIGATION --- */
         .nav { 
             position: fixed; top: 0; width: 100%; z-index: 1000; 
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); 
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            border-bottom: 2px solid transparent;
+            border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
             animation: breatheSection 4s infinite ease-in-out;
         }
-        .nav-content { display: flex; flex-direction: column; align-items: center; padding: 10px; }
-        .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
+        
+        .login-btn {
+            position: absolute; right: 20px; top: 15px;
+            padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px;
+            color: var(--gold); text-decoration: none; font-size: 0.7rem;
+            font-weight: 600; text-transform: uppercase; transition: 0.3s;
+        }
+        .login-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold-glow); }
+
+        .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
         .nav-logo-img { width: 25px; height: 25px; }
         .logo-text { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
         .logo-text span { color: var(--gold); }
@@ -67,81 +57,77 @@
         .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.6rem; text-transform: uppercase; padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.2); transition: 0.3s; }
         .nav-links a.active { background: var(--gold); color: #000; }
 
-        /* --- BUTTON MODE (Respire) --- */
-        .theme-toggle { 
-            position: fixed; top: 100px; right: 20px; z-index: 2000; 
-            background: var(--gold); border: none; width: 40px; height: 40px; 
-            border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); 
-            font-size: 1.2rem; animation: breathe 3s infinite ease-in-out;
-        }
+        .theme-toggle { position: fixed; top: 120px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); font-size: 1.2rem; }
 
-        /* --- HERO & TEXT GLOW --- */
-        .hero { padding: 220px 5% 60px; text-align: center; }
-        .breathing-core { width: 100px; height: 100px; margin: 0 auto 20px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; box-shadow: 0 0 30px var(--gold-glow); animation: breathe 4s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
-        
+        /* --- HERO --- */
+        .hero { padding: 240px 5% 60px; text-align: center; }
         .gold-shimmer { 
-            color: var(--text);
             background: linear-gradient(90deg, var(--text) 0%, var(--gold) 50%, var(--text) 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: softTextGlow 6s linear infinite;
-            font-size: clamp(2.5rem, 10vw, 5rem); 
-            font-family: 'Playfair Display', serif; 
-            margin: 0;
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: softTextGlow 6s linear infinite; font-size: clamp(2.5rem, 10vw, 5rem); font-family: 'Playfair Display', serif; margin: 0;
         }
         .hero p {
             background: linear-gradient(90deg, rgba(255,255,255,0.6) 0%, var(--gold) 50%, rgba(255,255,255,0.6) 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: softTextGlow 8s linear infinite;
-            letter-spacing: 3px; font-size: 0.85rem; font-weight: 600;
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: softTextGlow 8s linear infinite; letter-spacing: 3px; font-size: 0.85rem; font-weight: 600;
         }
 
-        /* --- CAROUSEL & CARDS --- */
-        .carousel-container { width: 100%; padding: 40px 0 120px; overflow: hidden; } 
-        .hub-carousel { display: flex; gap: 30px; overflow-x: auto; padding: 20px 10%; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        /* --- CARDS & LIQUID BORDER --- */
+        .carousel-container { width: 100%; padding: 40px 0 120px; }
+        .hub-carousel { display: flex; gap: 30px; overflow-x: auto; padding: 20px 10%; scroll-snap-type: x mandatory; }
         .hub-carousel::-webkit-scrollbar { display: none; }
         
         .carousel-item { flex: 0 0 85%; max-width: 500px; scroll-snap-align: center; transition: transform 0.6s var(--transition); }
         @media (min-width: 768px) { .carousel-item { flex: 0 0 450px; } }
 
         .liquid-border { 
-            position: relative; border-radius: 35px; 
-            background: var(--glass-bg); 
+            position: relative; border-radius: 35px; background: var(--glass-bg); 
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            padding: 40px 30px; text-align: center; height: 480px; 
+            padding: 45px 35px; text-align: center; height: 480px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            animation: breatheBox 5s infinite ease-in-out, sideGlow 4s infinite ease-in-out;
-            cursor: pointer;
+            border: 2px solid transparent; /* Epesè miltipliye pa 2 */
+            animation: breatheBox 5s infinite ease-in-out;
         }
         
-        .carousel-item:hover { transform: scale(1.05) translateY(-5px); z-index: 10; }
-        .liquid-border:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--gold); animation-play-state: paused; }
-        
-        .liquid-border::before { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1px; background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,255,255,0.2), rgba(255,215,0,0.3)); background-size: 300% 300%; animation: liquidGold 5s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
-        
-        @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        /* Efè Shimmer nan tèks kad yo sèlman */
+        .liquid-border h3, .liquid-border p:not(.btn-main-gold), .liquid-border .item-detail {
+            background: linear-gradient(90deg, var(--text) 0%, var(--gold) 50%, var(--text) 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: softTextGlow 10s linear infinite;
+        }
 
-        .item-icon { font-size: 4rem; filter: drop-shadow(0 0 10px var(--gold-glow)); margin-bottom: 10px; }
-        .item-title { font-size: 1.8rem; color: var(--gold); margin: 10px 0; font-family: 'Playfair Display', serif; }
-        .item-desc { font-size: 0.9rem; line-height: 1.5; opacity: 0.85; margin-bottom: 15px; }
-        .item-detail { font-size: 0.75rem; color: var(--gold); border-top: 1px solid rgba(255,215,0,0.2); padding-top: 15px; }
+        .liquid-border::before { 
+            content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; 
+            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,255,255,0.3), rgba(255,215,0,0.5)); 
+            background-size: 300% 300%; animation: liquidGold 4s linear infinite; 
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
+            -webkit-mask-composite: xor; 
+        }
 
-        .btn-main-gold { padding: 14px 35px; background: var(--gold); color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s; }
+        .item-icon { font-size: 4rem; filter: drop-shadow(0 0 10px var(--gold-glow)); }
+        .item-title { font-size: 1.8rem; font-family: 'Playfair Display', serif; margin: 10px 0; }
+        .item-desc { font-size: 0.9rem; line-height: 1.6; opacity: 0.9; }
+        .item-detail { font-size: 0.75rem; border-top: 1px solid rgba(255,215,0,0.2); padding-top: 15px; }
 
-        /* --- FOOTER (Respire) --- */
+        .btn-main-gold { 
+            display: inline-block; padding: 14px 35px; background: var(--gold); color: #000 !important; 
+            -webkit-text-fill-color: #000 !important; /* Retire shimmer a la */
+            text-decoration: none; border-radius: 50px; font-weight: 800; 
+            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s; 
+        }
+
+        /* --- FOOTER --- */
         footer { 
-            background: rgba(0,0,0,0.9); padding: 60px 5% 40px; 
-            border-top: 1px solid var(--gold); text-align: center; 
+            background: rgba(0,0,0,0.9); padding: 60px 5% 40px; text-align: center; 
+            border-top: 2px solid transparent;
+            border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
             animation: breatheSection 6s infinite ease-in-out;
         }
         .social-buttons { display: flex; justify-content: center; gap: 25px; margin: 20px 0; }
         .social-icon { width: 45px; height: 45px; transition: 0.4s; }
         .footer-bottom { margin-top: 20px; font-size: 0.7rem; color: var(--gold); letter-spacing: 1px; }
+
+        .gold-particle { position: fixed; pointer-events: none; background: var(--gold); border-radius: 50%; z-index: 9999; opacity: 0.8; }
     </style>
 </head>
 <body onmousemove="createGoldDust(event)" ontouchmove="createGoldDust(event.touches[0])">
@@ -151,6 +137,7 @@
 
     <nav class="nav">
         <div class="nav-content">
+            <a href="login.html" class="login-btn">Login</a>
             <div class="logo-container">
                 <img src="logo.png" alt="Zetwal" class="nav-logo-img">
                 <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
@@ -169,7 +156,6 @@
     </nav>
 
     <header class="hero">
-        <div class="breathing-core"></div>
         <h1 class="gold-shimmer">Inivè Zetwal</h1>
         <p>LIDÈ NAN INOVASYON TEKNOLOJIK AK PWOGRÈ SOSYAL</p>
     </header>
@@ -177,49 +163,31 @@
     <main>
         <div class="carousel-container">
             <div class="hub-carousel">
-                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
+                <div class="carousel-item">
                     <div class="liquid-border" onclick="location.href='lavri.html'">
                         <div class="item-icon">🧺</div>
                         <h3 class="item-title">Lavri Zetwal</h3>
-                        <p class="item-desc">Yon revolisyon nan fason w ap pran swen rad ou. Nou ofri yon sèvis pwofesyonèl ak yon livrezon ultra-rapid.</p>
+                        <p class="item-desc">Yon revolisyon nan fason w ap pran swen rad ou. Sèvis pwofesyonèl ak livrezon ultra-rapid.</p>
                         <div class="item-detail">Netwayaj Ekontolojik • Swen Premium</div>
                         <span class="btn-main-gold">Antre nan Lavri</span>
                     </div>
                 </div>
-                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
+                <div class="carousel-item">
                     <div class="liquid-border" onclick="location.href='shop.html'">
                         <div class="item-icon">🛒</div>
                         <h3 class="item-title">Shop Zetwal</h3>
-                        <p class="item-desc">Dekouvri yon boutik eksklizif kote kalite rankontre elegans. Pwodwi chwazi ak anpil swen.</p>
+                        <p class="item-desc">Boutik eksklizif kote kalite rankontre elegans. Pwodwi chwazi ak anpil swen pou ou.</p>
                         <div class="item-detail">Pwodwi Lokal • Gadget IA</div>
                         <span class="btn-main-gold">Vizite Boutik la</span>
                     </div>
                 </div>
-                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
-                    <div class="liquid-border" onclick="location.href='mall.html'">
-                        <div class="item-icon">🏢</div>
-                        <h3 class="item-title">3D Mall Sim</h3>
-                        <p class="item-desc">Plonje nan yon eksperyans vityèl san parèy. Mache nan sant komèsyal nou an dirèkteman.</p>
-                        <div class="item-detail">Imèsyon Total • Boutik Vityèl</div>
-                        <span class="btn-main-gold">Eksplore Mall la</span>
-                    </div>
-                </div>
-                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
-                    <div class="liquid-border" onclick="location.href='cinema.html'">
-                        <div class="item-icon">🎬</div>
-                        <h3 class="item-title">Zetwal Sinema</h3>
-                        <p class="item-desc">Antre nan yon monn vizyèl emovant. Gade pwojeksyon 3D ak kreyasyon orijinal nou yo.</p>
-                        <div class="item-detail">Kalite 4K • Animasyon 3D</div>
-                        <span class="btn-main-gold">Gade Kontni yo</span>
-                    </div>
-                </div>
-                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
+                <div class="carousel-item">
                     <div class="liquid-border" onclick="location.href='technopark.html'">
                         <div class="item-icon">🤖</div>
                         <h3 class="item-title">Technopark</h3>
-                        <p class="item-desc">Laboratwa inovasyon kote lavni ap bati. Devlopman IA ak solisyon teknolojik demen.</p>
-                        <div class="item-detail">Intelijans Atifisyèl • Kodaj</div>
-                        <span class="btn-main-gold">Dekouvri Inovasyon</span>
+                        <p class="item-desc">Laboratwa inovasyon kote lavni ap bati. Devlopman Mike-agent-IA ak robotik.</p>
+                        <div class="item-detail">AI • Kodaj • Rechèch</div>
+                        <span class="btn-main-gold">Eksplore Inovasyon</span>
                     </div>
                 </div>
             </div>
@@ -236,31 +204,19 @@
     </footer>
 
     <script>
+        function spawnParticle(x, y) {
+            const p = document.createElement('div'); p.className = 'gold-particle';
+            const s = Math.random() * 3 + 1; p.style.width = p.style.height = s + 'px';
+            p.style.left = x + 'px'; p.style.top = y + 'px';
+            document.body.appendChild(p);
+            gsap.to(p, { duration: 1, x: (Math.random()-0.5)*50, y: (Math.random()-0.5)*50, opacity: 0, onComplete: () => p.remove() });
+        }
         function createGoldDust(e) { spawnParticle(e.clientX, e.clientY); }
-        function emitSideDust(e, element) {
-            const rect = element.getBoundingClientRect();
-            for(let i=0; i<2; i++) {
-                const sideX = Math.random() > 0.5 ? rect.left : rect.right;
-                const randomY = rect.top + Math.random() * rect.height;
-                spawnParticle(sideX, randomY, true);
-            }
-        }
-        function spawnParticle(x, y, isFine = false) {
-            const particle = document.createElement('div');
-            particle.className = 'gold-particle';
-            const size = isFine ? (Math.random() * 2 + 0.5) : (Math.random() * 3 + 1);
-            particle.style.width = size + 'px'; particle.style.height = size + 'px';
-            particle.style.left = x + 'px'; particle.style.top = y + 'px';
-            document.body.appendChild(particle);
-            gsap.to(particle, {
-                duration: 1.2, x: (Math.random() - 0.5) * 80, y: (Math.random() - 0.5) * 80,
-                opacity: 0, scale: 0, onComplete: () => particle.remove()
-            });
-        }
         window.toggleTheme = () => {
             document.body.classList.toggle('light-mode');
             document.querySelector('.theme-toggle').innerHTML = document.body.classList.contains('light-mode') ? '🌙' : '🌓';
         };
+
         let scene, camera, renderer, stars;
         function init() {
             scene = new THREE.Scene();
@@ -268,12 +224,12 @@
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             const geo = new THREE.BufferGeometry(); const pos = [];
-            for(let i=0; i<2000; i++) pos.push((Math.random()-0.5)*35, (Math.random()-0.5)*35, (Math.random()-0.5)*35);
+            for(let i=0; i<1500; i++) pos.push((Math.random()-0.5)*40, (Math.random()-0.5)*40, (Math.random()-0.5)*40);
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
             stars = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.03 }));
             scene.add(stars); camera.position.z = 5; animate();
         }
-        function animate() { requestAnimationFrame(animate); stars.rotation.y += 0.0005; renderer.render(scene, camera); }
+        function animate() { requestAnimationFrame(animate); stars.rotation.y += 0.0004; renderer.render(scene, camera); }
         init();
     </script>
 </body>
