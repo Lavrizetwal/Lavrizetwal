@@ -12,7 +12,7 @@
     <style>
         :root {
             --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc;
-            --gold-glow: rgba(255, 215, 0, 0.4); --bg: #010101; --text: #ffffff;
+            --gold-glow: rgba(255, 215, 0, 0.2); --bg: #010101; --text: #ffffff;
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             --glass-bg: rgba(255, 255, 255, 0.08);
         }
@@ -27,23 +27,32 @@
 
         /* --- ANIMASYON RESPIRASYON --- */
         @keyframes breatheBox {
-            0%, 100% { transform: scale(1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
-            50% { transform: scale(1.02); box-shadow: 0 15px 45px 0 rgba(255, 215, 0, 0.15); }
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
+            50% { transform: scale(1.01); box-shadow: 0 12px 40px 0 rgba(255, 215, 0, 0.1); }
         }
 
         @keyframes breatheSection {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.01); opacity: 0.95; }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.005); }
         }
 
-        /* Lumière respirante latérale */
         @keyframes sideGlow {
-            0%, 100% { box-shadow: -15px 0 30px -10px var(--gold-glow), 15px 0 30px -10px var(--gold-glow); }
-            50% { box-shadow: -25px 0 50px -5px var(--gold), 25px 0 50px -5px var(--gold); }
+            0%, 100% { box-shadow: -10px 0 20px -10px var(--gold-glow), 10px 0 20px -10px var(--gold-glow); }
+            50% { box-shadow: -15px 0 30px -5px rgba(255, 215, 0, 0.15), 15px 0 30px -5px rgba(255, 215, 0, 0.15); }
         }
 
-        /* --- NAVIGATION --- */
-        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 215, 0, 0.2); }
+        @keyframes softTextGlow {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* --- NAVIGATION (Respire) --- */
+        .nav { 
+            position: fixed; top: 0; width: 100%; z-index: 1000; 
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); 
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            animation: breatheSection 4s infinite ease-in-out;
+        }
         .nav-content { display: flex; flex-direction: column; align-items: center; padding: 10px; }
         .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
         .nav-logo-img { width: 25px; height: 25px; }
@@ -58,56 +67,81 @@
         .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.6rem; text-transform: uppercase; padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.2); transition: 0.3s; }
         .nav-links a.active { background: var(--gold); color: #000; }
 
-        .theme-toggle { position: fixed; top: 80px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); font-size: 1.2rem; }
+        /* --- BUTTON MODE (Respire) --- */
+        .theme-toggle { 
+            position: fixed; top: 100px; right: 20px; z-index: 2000; 
+            background: var(--gold); border: none; width: 40px; height: 40px; 
+            border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); 
+            font-size: 1.2rem; animation: breathe 3s infinite ease-in-out;
+        }
 
-        /* --- HERO & CORE --- */
-        .hero { padding: 180px 5% 40px; text-align: center; animation: breatheSection 6s infinite ease-in-out; }
-        .breathing-core { width: 120px; height: 120px; margin: 0 auto 20px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; box-shadow: 0 0 40px var(--gold-glow); animation: breathe 4s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.15); filter: brightness(1.3); box-shadow: 0 0 60px var(--gold); } }
-        .gold-shimmer { color: var(--gold); background: linear-gradient(90deg, #fff, var(--gold), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: shimmer 3s linear infinite; font-size: clamp(2.5rem, 10vw, 5rem); font-family: 'Playfair Display', serif; }
+        /* --- HERO & TEXT GLOW --- */
+        .hero { padding: 220px 5% 60px; text-align: center; }
+        .breathing-core { width: 100px; height: 100px; margin: 0 auto 20px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; box-shadow: 0 0 30px var(--gold-glow); animation: breathe 4s infinite ease-in-out; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
+        
+        .gold-shimmer { 
+            color: var(--text);
+            background: linear-gradient(90deg, var(--text) 0%, var(--gold) 50%, var(--text) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: softTextGlow 6s linear infinite;
+            font-size: clamp(2.5rem, 10vw, 5rem); 
+            font-family: 'Playfair Display', serif; 
+            margin: 0;
+        }
+        .hero p {
+            background: linear-gradient(90deg, rgba(255,255,255,0.6) 0%, var(--gold) 50%, rgba(255,255,255,0.6) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: softTextGlow 8s linear infinite;
+            letter-spacing: 3px; font-size: 0.85rem; font-weight: 600;
+        }
 
-        /* --- GIANT CAROUSEL --- */
-        .carousel-container { width: 100%; padding: 80px 0 100px; overflow: hidden; } 
-        .hub-carousel { display: flex; gap: 40px; overflow-x: auto; padding: 20px 10%; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        /* --- CAROUSEL & CARDS --- */
+        .carousel-container { width: 100%; padding: 40px 0 120px; overflow: hidden; } 
+        .hub-carousel { display: flex; gap: 30px; overflow-x: auto; padding: 20px 10%; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .hub-carousel::-webkit-scrollbar { display: none; }
         
-        .carousel-item { flex: 0 0 90%; max-width: 550px; scroll-snap-align: center; transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
-        @media (min-width: 768px) { .carousel-item { flex: 0 0 500px; } }
+        .carousel-item { flex: 0 0 85%; max-width: 500px; scroll-snap-align: center; transition: transform 0.6s var(--transition); }
+        @media (min-width: 768px) { .carousel-item { flex: 0 0 450px; } }
 
         .liquid-border { 
             position: relative; border-radius: 35px; 
             background: var(--glass-bg); 
-            backdrop-filter: blur(40px); 
-            -webkit-backdrop-filter: blur(40px);
-            padding: 50px 35px; text-align: center; height: 520px; 
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            padding: 40px 30px; text-align: center; height: 480px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.15); 
             animation: breatheBox 5s infinite ease-in-out, sideGlow 4s infinite ease-in-out;
             cursor: pointer;
         }
         
-        /* Zoom in au hover */
-        .carousel-item:hover { transform: scale(1.08) translateY(-10px); z-index: 10; }
+        .carousel-item:hover { transform: scale(1.05) translateY(-5px); z-index: 10; }
         .liquid-border:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--gold); animation-play-state: paused; }
         
-        .liquid-border::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; background: linear-gradient(135deg, rgba(255,215,0,0.6), rgba(255,255,255,0.4), rgba(255,215,0,0.6)); background-size: 300% 300%; animation: liquidGold 5s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
+        .liquid-border::before { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1px; background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,255,255,0.2), rgba(255,215,0,0.3)); background-size: 300% 300%; animation: liquidGold 5s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
         
         @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .item-icon { font-size: 5rem; filter: drop-shadow(0 0 15px var(--gold-glow)); margin-bottom: 15px; }
-        .item-title { font-size: 2rem; color: var(--gold); margin: 10px 0; font-family: 'Playfair Display', serif; }
-        .item-desc { font-size: 0.95rem; line-height: 1.6; opacity: 0.9; margin-bottom: 20px; }
-        .item-detail { font-size: 0.8rem; color: var(--gold); border-top: 1px solid rgba(255,215,0,0.3); padding-top: 20px; font-weight: 400; }
+        .item-icon { font-size: 4rem; filter: drop-shadow(0 0 10px var(--gold-glow)); margin-bottom: 10px; }
+        .item-title { font-size: 1.8rem; color: var(--gold); margin: 10px 0; font-family: 'Playfair Display', serif; }
+        .item-desc { font-size: 0.9rem; line-height: 1.5; opacity: 0.85; margin-bottom: 15px; }
+        .item-detail { font-size: 0.75rem; color: var(--gold); border-top: 1px solid rgba(255,215,0,0.2); padding-top: 15px; }
 
-        .btn-main-gold { padding: 16px 45px; background: var(--gold); color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; transition: 0.3s; }
-        .btn-main-gold:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--gold); }
+        .btn-main-gold { padding: 14px 35px; background: var(--gold); color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s; }
 
-        footer { background: rgba(0,0,0,0.9); padding: 60px 5% 30px; border-top: 1px solid var(--gold); text-align: center; animation: breatheSection 8s infinite ease-in-out; }
+        /* --- FOOTER (Respire) --- */
+        footer { 
+            background: rgba(0,0,0,0.9); padding: 60px 5% 40px; 
+            border-top: 1px solid var(--gold); text-align: center; 
+            animation: breatheSection 6s infinite ease-in-out;
+        }
         .social-buttons { display: flex; justify-content: center; gap: 25px; margin: 20px 0; }
-        .social-icon { width: 50px; height: 50px; transition: 0.4s; }
-        .social-icon:hover { transform: scale(1.2); filter: drop-shadow(0 0 10px var(--gold)); }
-        .footer-bottom { margin-top: 20px; font-size: 0.75rem; color: var(--gold); letter-spacing: 1px; }
+        .social-icon { width: 45px; height: 45px; transition: 0.4s; }
+        .footer-bottom { margin-top: 20px; font-size: 0.7rem; color: var(--gold); letter-spacing: 1px; }
     </style>
 </head>
 <body onmousemove="createGoldDust(event)" ontouchmove="createGoldDust(event.touches[0])">
@@ -137,7 +171,7 @@
     <header class="hero">
         <div class="breathing-core"></div>
         <h1 class="gold-shimmer">Inivè Zetwal</h1>
-        <p style="letter-spacing: 3px; font-size: 0.85rem; opacity: 0.8; font-weight: 600;">LIDÈ NAN INOVASYON TEKNOLOJIK AK PWOGRÈ SOSYAL</p>
+        <p>LIDÈ NAN INOVASYON TEKNOLOJIK AK PWOGRÈ SOSYAL</p>
     </header>
 
     <main>
@@ -147,8 +181,8 @@
                     <div class="liquid-border" onclick="location.href='lavri.html'">
                         <div class="item-icon">🧺</div>
                         <h3 class="item-title">Lavri Zetwal</h3>
-                        <p class="item-desc">Yon revolisyon nan fason w ap pran swen rad ou. Nou ofri yon sèvis pwofesyonèl ak yon livrezon ultra-rapid pou rann lavi w pi senp chak jou.</p>
-                        <div class="item-detail">Netwayaj Ekontolojik • Swen Premium • Disponib 24/7</div>
+                        <p class="item-desc">Yon revolisyon nan fason w ap pran swen rad ou. Nou ofri yon sèvis pwofesyonèl ak yon livrezon ultra-rapid.</p>
+                        <div class="item-detail">Netwayaj Ekontolojik • Swen Premium</div>
                         <span class="btn-main-gold">Antre nan Lavri</span>
                     </div>
                 </div>
@@ -156,8 +190,8 @@
                     <div class="liquid-border" onclick="location.href='shop.html'">
                         <div class="item-icon">🛒</div>
                         <h3 class="item-title">Shop Zetwal</h3>
-                        <p class="item-desc">Dekouvri yon boutik eksklizif kote kalite rankontre elegans. Nou chwazi chak pwodwi ak anpil swen pou satisfè tout bezwen w yo.</p>
-                        <div class="item-detail">Pwodwi Lokal • Gadget IA • Rad ak Stil Modèn</div>
+                        <p class="item-desc">Dekouvri yon boutik eksklizif kote kalite rankontre elegans. Pwodwi chwazi ak anpil swen.</p>
+                        <div class="item-detail">Pwodwi Lokal • Gadget IA</div>
                         <span class="btn-main-gold">Vizite Boutik la</span>
                     </div>
                 </div>
@@ -165,8 +199,8 @@
                     <div class="liquid-border" onclick="location.href='mall.html'">
                         <div class="item-icon">🏢</div>
                         <h3 class="item-title">3D Mall Sim</h3>
-                        <p class="item-desc">Plonje nan yon eksperyans vityèl san parèy. Mache nan sant komèsyal nou an dirèkteman sou telefòn ou oswa òdinatè w.</p>
-                        <div class="item-detail">Imèsyon Total • Boutik Vityèl • Entèraksyon an Dirèk</div>
+                        <p class="item-desc">Plonje nan yon eksperyans vityèl san parèy. Mache nan sant komèsyal nou an dirèkteman.</p>
+                        <div class="item-detail">Imèsyon Total • Boutik Vityèl</div>
                         <span class="btn-main-gold">Eksplore Mall la</span>
                     </div>
                 </div>
@@ -174,8 +208,8 @@
                     <div class="liquid-border" onclick="location.href='cinema.html'">
                         <div class="item-icon">🎬</div>
                         <h3 class="item-title">Zetwal Sinema</h3>
-                        <p class="item-desc">Antre nan yon monn vizyèl emovant. Gade pwojeksyon 3D, kout fim orijinal, ak tout kreyasyon ultra-reyalis nou yo.</p>
-                        <div class="item-detail">Kalite 4K • Animasyon 3D • Atizay Digital</div>
+                        <p class="item-desc">Antre nan yon monn vizyèl emovant. Gade pwojeksyon 3D ak kreyasyon orijinal nou yo.</p>
+                        <div class="item-detail">Kalite 4K • Animasyon 3D</div>
                         <span class="btn-main-gold">Gade Kontni yo</span>
                     </div>
                 </div>
@@ -183,27 +217,9 @@
                     <div class="liquid-border" onclick="location.href='technopark.html'">
                         <div class="item-icon">🤖</div>
                         <h3 class="item-title">Technopark</h3>
-                        <p class="item-desc">Laboratwa inovasyon kote lavni ap bati. Se isit la nou devlope Mike-agent-IA ak tout solisyon teknolojik demen yo.</p>
-                        <div class="item-detail">Intelijans Atifisyèl • Kodaj • Robotik • Rechèch</div>
+                        <p class="item-desc">Laboratwa inovasyon kote lavni ap bati. Devlopman IA ak solisyon teknolojik demen.</p>
+                        <div class="item-detail">Intelijans Atifisyèl • Kodaj</div>
                         <span class="btn-main-gold">Dekouvri Inovasyon</span>
-                    </div>
-                </div>
-                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
-                    <div class="liquid-border" onclick="location.href='association.html'">
-                        <div class="item-icon">🤝</div>
-                        <h3 class="item-title">Asosye Zetwal</h3>
-                        <p class="item-desc">Fòs nou chita nan inyon. Vini rejwenn rezo patnè nou yo pou nou bati pwojè ki gen gwo enpak sou sosyete a ak ekonomi an.</p>
-                        <div class="item-detail">Networking • Sipò Kominotè • Kolaborasyon Estratejik</div>
-                        <span class="btn-main-gold">Vin yon Patnè</span>
-                    </div>
-                </div>
-                <div class="carousel-item" onmousemove="emitSideDust(event, this)">
-                    <div class="liquid-border" onclick="location.href='games.html'">
-                        <div class="item-icon">🎮</div>
-                        <h3 class="item-title">Jwèt Zetwal</h3>
-                        <p class="item-desc">Pran plezi w ak jwèt entèaktif nou yo. Defi zanmi w, amize w, epi genyen pwen rekonpans pou w sèvi nan tout sistèm nan.</p>
-                        <div class="item-detail">Konpetisyon • Rekonpans • Divètisman san limit</div>
-                        <span class="btn-main-gold">Kòmanse Jwe</span>
                     </div>
                 </div>
             </div>
@@ -216,77 +232,48 @@
             <a href="https://wa.me/79961103506"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="social-icon" alt="WhatsApp"></a>
             <a href="https://t.me/mikenestor14"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" class="social-icon" alt="Telegram"></a>
         </div>
-        <p style="font-size:0.85rem; opacity:0.7;">Email: pwoduizetwal@gmail.com | Tel: +7 996 110 3506</p>
-        <div class="footer-bottom">ZETWAL ORGANISATION 2026 – MODÈNITE AK TRADISYON POU YON PI BON LAVNI</div>
+        <div class="footer-bottom">ZETWAL ORGANISATION 2026 – MODÈNITE AK TRADISYON</div>
     </footer>
 
     <script>
-        // Poussière d'or globale (pour le corps)
-        function createGoldDust(e) {
-            spawnParticle(e.clientX, e.clientY);
-        }
-
-        // Poussière d'or spécifique sur les côtés du cadre
+        function createGoldDust(e) { spawnParticle(e.clientX, e.clientY); }
         function emitSideDust(e, element) {
             const rect = element.getBoundingClientRect();
-            // On spawn quelques particules fines sur les bords gauche et droit
             for(let i=0; i<2; i++) {
                 const sideX = Math.random() > 0.5 ? rect.left : rect.right;
                 const randomY = rect.top + Math.random() * rect.height;
                 spawnParticle(sideX, randomY, true);
             }
         }
-
         function spawnParticle(x, y, isFine = false) {
             const particle = document.createElement('div');
             particle.className = 'gold-particle';
-            const size = isFine ? (Math.random() * 2 + 1) : (Math.random() * 4 + 2);
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-            particle.style.left = x + 'px';
-            particle.style.top = y + 'px';
+            const size = isFine ? (Math.random() * 2 + 0.5) : (Math.random() * 3 + 1);
+            particle.style.width = size + 'px'; particle.style.height = size + 'px';
+            particle.style.left = x + 'px'; particle.style.top = y + 'px';
             document.body.appendChild(particle);
-            
-            const destinationX = x + (Math.random() - 0.5) * (isFine ? 100 : 60);
-            const destinationY = y + (Math.random() - 0.5) * (isFine ? 100 : 60);
-
             gsap.to(particle, {
-                duration: 1.5,
-                x: destinationX - x,
-                y: destinationY - y,
-                opacity: 0,
-                scale: 0,
-                onComplete: () => particle.remove()
+                duration: 1.2, x: (Math.random() - 0.5) * 80, y: (Math.random() - 0.5) * 80,
+                opacity: 0, scale: 0, onComplete: () => particle.remove()
             });
         }
-
         window.toggleTheme = () => {
             document.body.classList.toggle('light-mode');
-            const btn = document.querySelector('.theme-toggle');
-            btn.innerHTML = document.body.classList.contains('light-mode') ? '🌙' : '🌓';
+            document.querySelector('.theme-toggle').innerHTML = document.body.classList.contains('light-mode') ? '🌙' : '🌓';
         };
-
         let scene, camera, renderer, stars;
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            const geo = new THREE.BufferGeometry();
-            const pos = [];
-            for(let i=0; i<3000; i++) pos.push((Math.random()-0.5)*35, (Math.random()-0.5)*35, (Math.random()-0.5)*35);
+            const geo = new THREE.BufferGeometry(); const pos = [];
+            for(let i=0; i<2000; i++) pos.push((Math.random()-0.5)*35, (Math.random()-0.5)*35, (Math.random()-0.5)*35);
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            stars = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.04 }));
-            scene.add(stars);
-            camera.position.z = 5;
-            animate();
+            stars = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.03 }));
+            scene.add(stars); camera.position.z = 5; animate();
         }
-        function animate() { requestAnimationFrame(animate); stars.rotation.y += 0.0007; renderer.render(scene, camera); }
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        function animate() { requestAnimationFrame(animate); stars.rotation.y += 0.0005; renderer.render(scene, camera); }
         init();
     </script>
 </body>
