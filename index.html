@@ -40,15 +40,14 @@
             50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 70px var(--gold); }
         }
 
-        /* --- NAVIGATION & SEPARATEURS AVEC LIQUIDE --- */
+        /* --- NAVIGATION --- */
         .nav { 
             position: fixed; top: 0; width: 100%; z-index: 1000; 
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); 
             border-bottom: 3px solid transparent;
+            /* Koridò likid la sèlman nan bordi a kounye a */
             border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1;
-            background-image: linear-gradient(90deg, transparent, var(--gold), transparent);
-            background-size: 200% 100%;
-            animation: breatheSection 4s infinite ease-in-out, liquidGold 3s linear infinite;
+            animation: breatheSection 4s infinite ease-in-out;
         }
         .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
         
@@ -110,14 +109,13 @@
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             padding: 30px 20px; text-align: center; height: 420px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            border: 2px solid transparent; 
+            border: 3px solid transparent; /* Ogmante soti 2 rive 3 pou pi vizib */
             animation: breatheBox 5s infinite ease-in-out;
             overflow: hidden;
         }
 
-        /* EFFET LIQUIDE DANS LES BORDURES */
         .liquid-border::before { 
-            content: ""; position: absolute; inset: -4px; z-index: -1; border-radius: inherit; padding: 4px; 
+            content: ""; position: absolute; inset: -3px; z-index: -1; border-radius: inherit; padding: 3px; 
             background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); 
             background-size: 200% 100%; animation: liquidGold 2s linear infinite; 
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
@@ -167,7 +165,7 @@
                 <button id="google-login" class="login-btn">Login</button>
                 <div id="user-display" style="display: none;">
                     <span id="user-name"></span><br>
-                    <span id="user-points">...</span> Pwen
+                    <span id="user-points"></span>
                     <span class="logout-link" onclick="logout()">Dekonekte</span>
                 </div>
             </div>
@@ -313,6 +311,7 @@
                 }
                 onSnapshot(userRef, (doc) => {
                     if (doc.exists()) {
+                        // Korije: sèlman "Pwen" yon sèl fwa
                         userPointsSpan.innerText = (doc.data().points || 0) + " Pwen";
                     }
                 });
