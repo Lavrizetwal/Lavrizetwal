@@ -20,6 +20,17 @@
         body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
         
+        /* --- ANIMASYON --- */
+        @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes softTextGlow { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        @keyframes breatheSection { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.005); } }
+        @keyframes breatheBox { 0%, 100% { transform: scale(1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); } 50% { transform: scale(1.01); box-shadow: 0 12px 40px 0 rgba(255, 215, 0, 0.1); } }
+        @keyframes pulse-premium {
+            0% { transform: scale(1); box-shadow: 0 0 20px var(--gold-glow); }
+            50% { transform: scale(1.15); box-shadow: 0 0 45px var(--gold); }
+            100% { transform: scale(1); box-shadow: 0 0 20px var(--gold-glow); }
+        }
+
         /* --- NAVIGATION --- */
         .nav { 
             position: fixed; top: 0; width: 100%; z-index: 1000; 
@@ -29,18 +40,16 @@
         }
         .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
         
-        /* Bouton Login & Info */
-        .auth-ui { position: absolute; right: 20px; top: 15px; text-align: right; }
+        /* AUTH UI STYLES */
+        .auth-container { position: absolute; right: 20px; top: 15px; text-align: right; }
         .login-btn {
             padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px;
             color: var(--gold); text-decoration: none; font-size: 0.7rem;
-            font-weight: 600; text-transform: uppercase; transition: 0.3s;
-            background: transparent; cursor: pointer;
+            font-weight: 600; text-transform: uppercase; transition: 0.3s; cursor: pointer; background: transparent;
         }
         .login-btn:hover { background: var(--gold); color: #000; }
-        
-        #user-info-nav { display: none; color: var(--gold); font-size: 0.7rem; font-weight: 700; }
-        .logout-text { font-size: 0.5rem; color: #ff4444; cursor: pointer; text-decoration: underline; display: block; }
+        #user-display { display: none; color: var(--gold); font-size: 0.7rem; font-weight: 700; line-height: 1.2; }
+        .logout-link { color: #ff4444; cursor: pointer; text-decoration: underline; font-size: 0.55rem; display: block; }
 
         .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
         .nav-logo-img { width: 25px; height: 25px; }
@@ -49,62 +58,76 @@
         
         .nav-links { 
             display: flex; list-style: none; gap: 10px; margin: 0; padding: 5px; 
-            overflow-x: auto; width: 100%; white-space: nowrap;
+            overflow-x: auto; width: 100%; white-space: nowrap; -webkit-overflow-scrolling: touch;
         }
         .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.6rem; text-transform: uppercase; padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.2); }
         .nav-links a.active { background: var(--gold); color: #000; }
 
         .theme-toggle { position: fixed; top: 120px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
 
-        /* --- HERO --- */
-        .hero { padding: 240px 5% 60px; text-align: center; }
+        /* --- HERO & BREATHING BALL --- */
+        .hero { padding: 200px 5% 60px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        
+        .breathing-ball {
+            width: 50px; height: 50px;
+            background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep));
+            border-radius: 50%; margin-bottom: 20px;
+            animation: pulse-premium 3s infinite ease-in-out;
+            box-shadow: 0 0 30px var(--gold-glow);
+        }
+
         .gold-shimmer { 
             background: linear-gradient(90deg, var(--text) 0%, var(--gold) 50%, var(--text) 100%);
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: softTextGlow 6s linear infinite; font-size: clamp(2.5rem, 10vw, 5rem); font-family: 'Playfair Display', serif; margin: 0;
         }
-        @keyframes softTextGlow { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
 
         /* --- CARDS --- */
         .carousel-container { width: 100%; padding: 40px 0 120px; }
-        .hub-carousel { display: flex; gap: 30px; overflow-x: auto; padding: 20px 10%; }
-        .carousel-item { flex: 0 0 85%; max-width: 500px; }
+        .hub-carousel { display: flex; gap: 30px; overflow-x: auto; padding: 20px 10%; scroll-snap-type: x mandatory; }
+        .hub-carousel::-webkit-scrollbar { display: none; }
+        .carousel-item { flex: 0 0 85%; max-width: 500px; scroll-snap-align: center; }
         @media (min-width: 768px) { .carousel-item { flex: 0 0 450px; } }
 
         .liquid-border { 
             position: relative; border-radius: 35px; background: var(--glass-bg); 
-            backdrop-filter: blur(40px); padding: 45px 35px; text-align: center; height: 400px; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            border: 2px solid transparent; 
+            backdrop-filter: blur(40px); padding: 45px 35px; text-align: center; height: 480px; 
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+            border: 2px solid transparent; animation: breatheBox 5s infinite ease-in-out;
         }
         .liquid-border::before { 
             content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; 
-            background: linear-gradient(135deg, var(--gold-deep), #fff, var(--gold-deep)); 
+            background: linear-gradient(135deg, rgba(255,215,0,0.5), #fff, rgba(255,215,0,0.5)); 
             background-size: 300% 300%; animation: liquidGold 4s linear infinite; 
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
             -webkit-mask-composite: xor; 
         }
-        @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         .btn-main-gold { 
-            margin-top: 20px; display: inline-block; padding: 14px 35px; background: var(--gold); color: #000; 
+            display: inline-block; padding: 14px 35px; background: var(--gold); color: #000 !important; 
             text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; font-size: 0.8rem;
         }
+
+        footer { 
+            background: rgba(0,0,0,0.9); padding: 60px 5% 40px; text-align: center; 
+            border-top: 2px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
+        }
+        .gold-particle { position: fixed; pointer-events: none; background: var(--gold); border-radius: 50%; z-index: 9999; opacity: 0.8; }
     </style>
 </head>
-<body>
+<body onmousemove="createGoldDust(event)">
 
     <canvas id="webgl-canvas"></canvas>
     <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 
     <nav class="nav">
         <div class="nav-content">
-            <div class="auth-ui">
+            <div class="auth-container">
                 <button id="google-login" class="login-btn">Login</button>
-                <div id="user-info-nav">
+                <div id="user-display">
                     <span id="nav-user-name"></span><br>
                     <span id="nav-user-points">...</span> Pwen
-                    <span class="logout-text" onclick="logout()">Dekonekte</span>
+                    <span class="logout-link" onclick="logout()">Dekonekte</span>
                 </div>
             </div>
 
@@ -117,12 +140,16 @@
                 <li><a href="lavri.html">Lavri</a></li>
                 <li><a href="shop.html">Shop</a></li>
                 <li><a href="mall.html">Mall</a></li>
+                <li><a href="cinema.html">Sinema</a></li>
                 <li><a href="technopark.html">Technopark</a></li>
+                <li><a href="association.html">Asosye</a></li>
+                <li><a href="games.html">Jwèt</a></li>
             </ul>
         </div>
     </nav>
 
     <header class="hero">
+        <div class="breathing-ball"></div>
         <h1 class="gold-shimmer">Inivè Zetwal</h1>
         <p>LIDÈ NAN INOVASYON TEKNOLOJIK AK PWOGRÈ SOSYAL</p>
     </header>
@@ -131,31 +158,42 @@
         <div class="carousel-container">
             <div class="hub-carousel">
                 <div class="carousel-item">
-                    <div class="liquid-border">
-                        <div style="font-size:3rem;">🧺</div>
-                        <h3 style="color:var(--gold);">Lavri Zetwal</h3>
-                        <p>Sèvis pwofesyonèl pou rad ou ak livrezon rapid.</p>
-                        <a href="lavri.html" class="btn-main-gold">Antre</a>
+                    <div class="liquid-border" onclick="location.href='lavri.html'">
+                        <div style="font-size:4rem;">🧺</div>
+                        <h3 class="item-title">Lavri Zetwal</h3>
+                        <p class="item-desc">Yon revolisyon nan fason w ap pran swen rad ou. Sèvis pwofesyonèl ak livrezon ultra-rapid.</p>
+                        <span class="btn-main-gold">Antre nan Lavri</span>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <div class="liquid-border">
-                        <div style="font-size:3rem;">🤖</div>
-                        <h3 style="color:var(--gold);">Technopark</h3>
-                        <p>Laboratwa inovasyon kote lavni ap bati.</p>
-                        <a href="technopark.html" class="btn-main-gold">Eksplore</a>
+                    <div class="liquid-border" onclick="location.href='shop.html'">
+                        <div style="font-size:4rem;">🛒</div>
+                        <h3 class="item-title">Shop Zetwal</h3>
+                        <p class="item-desc">Boutik eksklizif kote kalite rankontre elegans. Pwodwi chwazi ak anpil swen pou ou.</p>
+                        <span class="btn-main-gold">Vizite Boutik la</span>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="liquid-border" onclick="location.href='technopark.html'">
+                        <div style="font-size:4rem;">🤖</div>
+                        <h3 class="item-title">Technopark</h3>
+                        <p class="item-desc">Laboratwa inovasyon kote lavni ap bati. Devlopman Mike-agent-IA ak robotik.</p>
+                        <span class="btn-main-gold">Eksplore Inovasyon</span>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <footer>
+        <div class="footer-bottom">ZETWAL ORGANISATION 2026 – MODÈNITE AK TRADISYON</div>
+    </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-        // Mwen itilize config ou te voye a
         const firebaseConfig = {
             apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
             authDomain: "lavrizetwal.firebaseapp.com",
@@ -170,70 +208,67 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const loginBtn = document.getElementById('google-login');
-        const userInfoNav = document.getElementById('user-info-nav');
-        const navUserName = document.getElementById('nav-user-name');
-        const navUserPoints = document.getElementById('nav-user-points');
+        const loginBtn = document.getElementById("google-login");
+        const userDisplay = document.getElementById("user-display");
+        const navUserName = document.getElementById("nav-user-name");
+        const navUserPoints = document.getElementById("nav-user-points");
 
-        // Login fonksyon
         loginBtn.onclick = () => signInWithPopup(auth, new GoogleAuthProvider());
         window.logout = () => signOut(auth);
 
-        // Koute chanjman koneksyon
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                loginBtn.style.display = 'none';
-                userInfoNav.style.display = 'block';
+                loginBtn.style.display = "none";
+                userDisplay.style.display = "block";
                 navUserName.innerText = user.displayName.split(' ')[0];
 
                 const userRef = doc(db, "users", user.uid);
-                
-                // Kreye kont nan Firestore si se premye fwa
                 const docSnap = await getDoc(userRef);
                 if (!docSnap.exists()) {
                     await setDoc(userRef, { points: 1000, name: user.displayName }, { merge: true });
                 }
 
-                // Mete pwen yo ajou an dirèk
                 onSnapshot(userRef, (doc) => {
                     if (doc.exists()) {
                         navUserPoints.innerText = doc.data().points || 0;
                     }
                 });
             } else {
-                loginBtn.style.display = 'block';
-                userInfoNav.style.display = 'none';
+                loginBtn.style.display = "block";
+                userDisplay.style.display = "none";
             }
         });
     </script>
 
     <script>
-        // WEBGL BACKGROUND
-        let scene, camera, renderer, stars;
-        function initWebGL() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        // Particles & WebGL
+        function spawnParticle(x, y) {
+            const p = document.createElement('div'); p.className = 'gold-particle';
+            const s = Math.random() * 3 + 1; p.style.width = p.style.height = s + 'px';
+            p.style.left = x + 'px'; p.style.top = y + 'px';
+            document.body.appendChild(p);
+            gsap.to(p, { duration: 1, x: (Math.random()-0.5)*50, y: (Math.random()-0.5)*50, opacity: 0, onComplete: () => p.remove() });
+        }
+        function createGoldDust(e) { spawnParticle(e.clientX, e.clientY); }
+        window.toggleTheme = () => {
+            document.body.classList.toggle('light-mode');
+            document.querySelector('.theme-toggle').innerHTML = document.body.classList.contains('light-mode') ? '🌙' : '🌓';
+        };
 
-            const starGeometry = new THREE.BufferGeometry();
-            const starCoords = [];
-            for(let i=0; i<2000; i++) {
-                starCoords.push((Math.random()-0.5)*30, (Math.random()-0.5)*30, (Math.random()-0.5)*30);
-            }
-            starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
-            stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0xffd700, size: 0.05 }));
-            scene.add(stars);
-            animate();
+        let scene, camera, renderer, stars;
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            const geo = new THREE.BufferGeometry(); const pos = [];
+            for(let i=0; i<1500; i++) pos.push((Math.random()-0.5)*40, (Math.random()-0.5)*40, (Math.random()-0.5)*40);
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            stars = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.03 }));
+            scene.add(stars); camera.position.z = 5; animate();
         }
-        function animate() {
-            requestAnimationFrame(animate);
-            stars.rotation.y += 0.0005;
-            renderer.render(scene, camera);
-        }
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
-        initWebGL();
+        function animate() { requestAnimationFrame(animate); stars.rotation.y += 0.0004; renderer.render(scene, camera); }
+        init();
     </script>
 </body>
 </html>
