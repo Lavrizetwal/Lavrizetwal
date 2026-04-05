@@ -40,17 +40,18 @@
             50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 70px var(--gold); }
         }
 
-        /* --- NAVIGATION --- */
+        /* --- NAVIGATION & SEPARATEURS AVEC LIQUIDE --- */
         .nav { 
             position: fixed; top: 0; width: 100%; z-index: 1000; 
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); 
-            border-bottom: 2px solid transparent;
-            border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
-            animation: breatheSection 4s infinite ease-in-out;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1;
+            background-image: linear-gradient(90deg, transparent, var(--gold), transparent);
+            background-size: 200% 100%;
+            animation: breatheSection 4s infinite ease-in-out, liquidGold 3s linear infinite;
         }
         .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
         
-        /* Auth UI Fix */
         .auth-container { position: absolute; right: 20px; top: 15px; text-align: right; }
         .login-btn {
             padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px;
@@ -94,19 +95,33 @@
 
         /* --- CARDS & LIQUID BORDER --- */
         .carousel-container { width: 100%; padding: 40px 0 120px; }
-        .hub-carousel { display: flex; gap: 30px; overflow-x: auto; padding: 20px 10%; scroll-snap-type: x mandatory; }
+        .hub-carousel { display: flex; gap: 30px; overflow-x: auto; padding: 20px 5%; scroll-snap-type: x mandatory; flex-wrap: nowrap; }
         .hub-carousel::-webkit-scrollbar { display: none; }
         
-        .carousel-item { flex: 0 0 85%; max-width: 500px; scroll-snap-align: center; transition: transform 0.6s var(--transition); }
-        @media (min-width: 768px) { .carousel-item { flex: 0 0 450px; } }
+        .carousel-item { 
+            flex: 0 0 320px; scroll-snap-align: center; 
+            transition: transform 0.5s var(--transition); 
+            cursor: pointer;
+        }
+        .carousel-item:hover { transform: scale(1.08); z-index: 10; }
 
         .liquid-border { 
             position: relative; border-radius: 35px; background: var(--glass-bg); 
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            padding: 45px 35px; text-align: center; height: 480px; 
+            padding: 30px 20px; text-align: center; height: 420px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
             border: 2px solid transparent; 
             animation: breatheBox 5s infinite ease-in-out;
+            overflow: hidden;
+        }
+
+        /* EFFET LIQUIDE DANS LES BORDURES */
+        .liquid-border::before { 
+            content: ""; position: absolute; inset: -4px; z-index: -1; border-radius: inherit; padding: 4px; 
+            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); 
+            background-size: 200% 100%; animation: liquidGold 2s linear infinite; 
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
+            -webkit-mask-composite: xor; 
         }
         
         .liquid-border h3, .liquid-border p:not(.btn-main-gold), .liquid-border .item-detail {
@@ -115,31 +130,23 @@
             animation: softTextGlow 10s linear infinite;
         }
 
-        .liquid-border::before { 
-            content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; 
-            background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,255,255,0.3), rgba(255,215,0,0.5)); 
-            background-size: 300% 300%; animation: liquidGold 4s linear infinite; 
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
-            -webkit-mask-composite: xor; 
-        }
-
-        .item-icon { font-size: 4rem; filter: drop-shadow(0 0 10px var(--gold-glow)); }
-        .item-title { font-size: 1.8rem; font-family: 'Playfair Display', serif; margin: 10px 0; }
-        .item-desc { font-size: 0.9rem; line-height: 1.6; opacity: 0.9; }
-        .item-detail { font-size: 0.75rem; border-top: 1px solid rgba(255,215,0,0.2); padding-top: 15px; }
+        .item-icon { font-size: 3rem; filter: drop-shadow(0 0 10px var(--gold-glow)); }
+        .item-title { font-size: 1.5rem; font-family: 'Playfair Display', serif; margin: 10px 0; }
+        .item-desc { font-size: 0.85rem; line-height: 1.4; opacity: 0.9; }
+        .item-detail { font-size: 0.7rem; border-top: 1px solid rgba(255,215,0,0.2); padding-top: 10px; width: 100%; }
 
         .btn-main-gold { 
-            display: inline-block; padding: 14px 35px; background: var(--gold); color: #000 !important; 
+            display: inline-block; padding: 10px 25px; background: var(--gold); color: #000 !important; 
             -webkit-text-fill-color: #000 !important; 
             text-decoration: none; border-radius: 50px; font-weight: 800; 
-            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; transition: 0.3s; 
+            text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; transition: 0.3s; 
         }
 
         /* --- FOOTER --- */
         footer { 
             background: rgba(0,0,0,0.9); padding: 60px 5% 40px; text-align: center; 
-            border-top: 2px solid transparent;
-            border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
+            border-top: 3px solid transparent;
+            border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1;
             animation: breatheSection 6s infinite ease-in-out;
         }
         .social-buttons { display: flex; justify-content: center; gap: 25px; margin: 20px 0; }
@@ -209,12 +216,48 @@
                     </div>
                 </div>
                 <div class="carousel-item">
+                    <div class="liquid-border" onclick="location.href='mall.html'">
+                        <div class="item-icon">🏢</div>
+                        <h3 class="item-title">Mall Zetwal</h3>
+                        <p class="item-desc">Eksperyans yon sant komèsyal vityèl 3D. Tout sa ou bezwen nan yon sèl plas.</p>
+                        <div class="item-detail">Shopping 3D • Eksperyans Immèsif</div>
+                        <span class="btn-main-gold">Antre nan Mall la</span>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="liquid-border" onclick="location.href='cinema.html'">
+                        <div class="item-icon">🎬</div>
+                        <h3 class="item-title">Sinema</h3>
+                        <p class="item-desc">Gade pi bèl fim ak kreyasyon vizyèl nou yo nan yon kalite siperyè.</p>
+                        <div class="item-detail">Streaming 4K • Pwodiksyon Lokal</div>
+                        <span class="btn-main-gold">Gade Fim yo</span>
+                    </div>
+                </div>
+                <div class="carousel-item">
                     <div class="liquid-border" onclick="location.href='technopark.html'">
                         <div class="item-icon">🤖</div>
                         <h3 class="item-title">Technopark</h3>
                         <p class="item-desc">Laboratwa inovasyon kote lavni ap bati. Devlopman Mike-agent-IA ak robotik.</p>
                         <div class="item-detail">AI • Kodaj • Rechèch</div>
                         <span class="btn-main-gold">Eksplore Inovasyon</span>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="liquid-border" onclick="location.href='association.html'">
+                        <div class="item-icon">🤝</div>
+                        <h3 class="item-title">Asosye</h3>
+                        <p class="item-desc">Rejwenn kominote a epi vin yon pati nan chanjman an. Ann bati ansanm.</p>
+                        <div class="item-detail">Patenarya • Filantropi</div>
+                        <span class="btn-main-gold">Vin yon Asosye</span>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="liquid-border" onclick="location.href='games.html'">
+                        <div class="item-icon">🎮</div>
+                        <h3 class="item-title">Jwèt</h3>
+                        <p class="item-desc">Diveti w ak jwèt videyo eksklizif nou devlope pou plezi ou.</p>
+                        <div class="item-detail">Gaming • Defi • Rekonpans</div>
+                        <span class="btn-main-gold">Kòmanse Jwe</span>
                     </div>
                 </div>
             </div>
@@ -235,7 +278,6 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-        // CONFIG MIKE NESTOR
         const firebaseConfig = {
             apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
             authDomain: "lavrizetwal.firebaseapp.com",
@@ -264,16 +306,11 @@
                 loginBtn.style.display = "none";
                 userDisplay.style.display = "block";
                 userNameSpan.innerText = user.displayName.split(' ')[0];
-
                 const userRef = doc(db, "users", user.uid);
-                
-                // Tcheke/Kreye pwen
                 const docSnap = await getDoc(userRef);
                 if (!docSnap.exists()) {
                     await setDoc(userRef, { points: 1000, name: user.displayName }, { merge: true });
                 }
-
-                // Senkronizasyon Pwen an dirèk
                 onSnapshot(userRef, (doc) => {
                     if (doc.exists()) {
                         userPointsSpan.innerText = (doc.data().points || 0) + " Pwen";
