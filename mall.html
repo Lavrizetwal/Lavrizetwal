@@ -1,188 +1,78 @@
-<!DOCTYPE html>
-<html lang="ht">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZETWAL MALL | 3D Experience</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
-        #overlay {
-            position: absolute; inset: 0; background: radial-gradient(circle, #1a1a1a, #000);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 10; transition: opacity 1.5s;
+// Remplace ton script actuel par celui-ci pour corriger l'écran noir
+
+function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x020205);
+    scene.fog = new THREE.Fog(0x020205, 10, 70);
+
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    // On place la caméra un peu plus haut et on la fait regarder le centre
+    camera.position.set(0, 40, 80);
+    camera.lookAt(0, 0, 0); 
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+    
+    clock = new THREE.Clock();
+
+    // LUMIÈRES
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6); // Augmenté un peu
+    scene.add(ambient);
+
+    const spot = new THREE.PointLight(0xffd700, 1, 100); // Changé en PointLight pour tester
+    spot.position.set(0, 20, 0);
+    scene.add(spot);
+
+    // SOL
+    const floorGeo = new THREE.PlaneGeometry(150, 150);
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.2, metalness: 0.5 });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    scene.add(floor);
+
+    // Initialiser les éléments
+    createFountain(0, 0);
+    createShop(-20, -30, 0xffd700, "LAVRI");
+    createShop(20, -30, 0x00ffff, "TECH");
+
+    for(let i=0; i<15; i++) createNPC();
+
+    // CRITIQUE : Forcer un premier rendu immédiatement
+    renderer.render(scene, camera);
+    
+    // Lancer la boucle
+    animate();
+}
+
+// Assure-toi que la fonction de démarrage est bien liée
+function startApp() {
+    const overlay = document.getElementById('overlay');
+    overlay.style.opacity = '0';
+    
+    // On laisse le temps à la transition CSS avant de supprimer
+    setTimeout(() => {
+        overlay.style.display = 'none';
+    }, 1500);
+    
+    // ZOOM CINEMATIQUE
+    gsap.to(camera.position, { 
+        x: 0, 
+        y: 1.7, 
+        z: 30, 
+        duration: 3, 
+        ease: "power2.inOut",
+        onUpdate: () => {
+            camera.lookAt(0, 1.7, 0); // Garder le focus pendant le zoom
         }
-        button {
-            padding: 15px 40px; border: 2px solid #ffd700; background: transparent;
-            color: #ffd700; cursor: pointer; font-weight: bold; letter-spacing: 2px;
-            border-radius: 5px; transition: 0.3s;
-        }
-        button:hover { background: #ffd700; color: black; }
-        #instructions {
-            position: absolute; bottom: 20px; left: 20px; color: white;
-            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; pointer-events: none;
-        }
-    </style>
-</head>
-<body>
-
-    <div id="overlay">
-        <h1 style="color: #ffd700; margin-bottom: 30px;">ZETWAL MALL</h1>
-        <button onclick="startApp()">ANTRE</button>
-    </div>
-
-    <div id="instructions">Z,Q,S,D pou mache | Sourit pou gade alantou</div>
-
-    <script>
-        let scene, camera, renderer, clock, particles = [];
-        let people = [], move = { f: false, b: false, l: false, r: false };
-        let velocity = new THREE.Vector3();
-
-        function init() {
-            // SCÈNE & CAMÉRA
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x020205);
-            scene.fog = new THREE.Fog(0x020205, 10, 70);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 40, 80); // Position de départ pour le zoom
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.shadowMap.enabled = true; // Activer les ombres
-            document.body.appendChild(renderer.domElement);
-            clock = new THREE.Clock();
-
-            // LUMIÈRES PRO
-            const ambient = new THREE.AmbientLight(0xffffff, 0.4);
-            scene.add(ambient);
-
-            const spot = new THREE.SpotLight(0xffd700, 1);
-            spot.position.set(0, 20, 0);
-            spot.castShadow = true;
-            scene.add(spot);
-
-            // SOL MIROIR (Mall Style)
-            const floorGeo = new THREE.PlaneGeometry(150, 150);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1, metalness: 0.6 });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI/2;
-            floor.receiveShadow = true;
-            scene.add(floor);
-
-            // FONTAINE
-            createFountain(0, 0);
-
-            // BOUTIQUES
-            createShop(-20, -30, 0xffd700, "LAVRI");
-            createShop(20, -30, 0x00ffff, "TECH");
-
-            // PNJ
-            for(let i=0; i<15; i++) createNPC();
-
-            animate();
-        }
-
-        function createShop(x, z, color, label) {
-            const group = new THREE.Group();
-            const frame = new THREE.Mesh(new THREE.BoxGeometry(15, 10, 2), new THREE.MeshStandardMaterial({color: 0x111111}));
-            const light = new THREE.PointLight(color, 2, 15);
-            light.position.set(0, 5, 2);
-            group.add(frame, light);
-            group.position.set(x, 5, z);
-            scene.add(group);
-        }
-
-        function createFountain(x, z) {
-            for(let i=0; i<80; i++) {
-                const p = new THREE.Mesh(new THREE.SphereGeometry(0.08), new THREE.MeshBasicMaterial({color: 0x44aaff}));
-                p.position.set(x, 0.5, z);
-                p.userData = { vy: Math.random()*0.2, vx: (Math.random()-0.5)*0.05, vz: (Math.random()-0.5)*0.05 };
-                particles.push(p);
-                scene.add(p);
-            }
-        }
-
-        function createNPC() {
-            const g = new THREE.Group();
-            const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.8, 4, 8), new THREE.MeshStandardMaterial({color: Math.random()*0xffffff}));
-            body.position.y = 0.8;
-            g.add(body);
-            g.position.set((Math.random()-0.5)*40, 0, (Math.random()-0.5)*40);
-            g.userData = { dir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(), speed: 0.02 + Math.random()*0.03 };
-            people.push(g);
-            scene.add(g);
-        }
-
-        function startApp() {
-            document.getElementById('overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('overlay').remove(), 1500);
-            
-            // ZOOM CINEMATIQUE
-            gsap.to(camera.position, { x: 0, y: 1.7, z: 30, duration: 3, ease: "power2.inOut" });
-            
-            document.body.requestPointerLock();
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const delta = clock.getDelta();
-
-            // FONTAINE ANIMATION
-            particles.forEach(p => {
-                p.position.y += p.userData.vy;
-                p.position.x += p.userData.vx;
-                p.position.z += p.userData.vz;
-                p.userData.vy -= 0.005; 
-                if(p.position.y < 0.2) {
-                    p.position.set(0, 0.5, 0);
-                    p.userData.vy = Math.random()*0.15 + 0.05;
-                }
-            });
-
-            // PNJ MOUVMAN
-            people.forEach(p => {
-                p.position.addScaledVector(p.userData.dir, p.userData.speed);
-                if(p.position.length() > 50) p.position.set(0,0,0);
-                p.rotation.y = Math.atan2(p.userData.dir.x, p.userData.dir.z);
-            });
-
-            // MOUVMAN JWÈ
-            if (document.pointerLockElement) {
-                velocity.z -= velocity.z * 10 * delta;
-                velocity.x -= velocity.x * 10 * delta;
-                if(move.f) velocity.z -= 150 * delta;
-                if(move.b) velocity.z += 150 * delta;
-                if(move.l) velocity.x -= 150 * delta;
-                if(move.r) velocity.x += 150 * delta;
-                camera.translateZ(velocity.z * delta);
-                camera.translateX(velocity.x * delta);
-                camera.position.y = 1.7;
-            }
-
-            renderer.render(scene, camera);
-        }
-
-        // CONTROLES
-        window.onkeydown = (e) => { 
-            if(e.key === 'z' || e.key === 'w') move.f = true;
-            if(e.key === 's') move.b = true;
-            if(e.key === 'q' || e.key === 'a') move.l = true;
-            if(e.key === 'd') move.r = true;
-        };
-        window.onkeyup = (e) => { 
-            if(e.key === 'z' || e.key === 'w') move.f = false;
-            if(e.key === 's') move.b = false;
-            if(e.key === 'q' || e.key === 'a') move.l = false;
-            if(e.key === 'd') move.r = false;
-        };
-        window.onmousemove = (e) => {
-            if(document.pointerLockElement) camera.rotation.y -= e.movementX * 0.002;
-        };
-
-        window.onload = init;
-    </script>
-</body>
-</html>
+    });
+    
+    // Lock le pointeur seulement après le premier mouvement pour éviter les erreurs navigateur
+    try {
+        document.body.requestPointerLock();
+    } catch(e) {
+        console.log("Pointer lock nécessite un clic utilisateur direct");
+    }
+}
