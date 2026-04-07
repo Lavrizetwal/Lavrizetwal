@@ -1,0 +1,17 @@
+{
+  "name": "zetwal-mall-ultra-sim",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "gsap": "^3.12.5",
+    "three": "^0.160.1"
+  },
+  "devDependencies": {
+    "vite": "^5.1.0"
+  }
+}
