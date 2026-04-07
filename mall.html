@@ -2,273 +2,187 @@
 <html lang="ht">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZETWAL MALL | Inivès Immèsif</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZETWAL MALL | 3D Experience</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Montserrat', sans-serif; background: #000; color: white; overflow: hidden; }
-        #container { position: relative; width: 100vw; height: 100vh; }
-        #scene { width: 100%; height: 100%; display: block; }
-        
-        #ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; border: 1px solid #ffd700; border-radius: 50%; opacity: 0; }
-        
-        .instructions {
-            position: absolute; bottom: 20px; left: 20px;
-            background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px;
-            border-left: 4px solid #ffd700; font-size: 0.75rem; pointer-events: auto;
-            opacity: 0; transition: 1s;
-        }
-
-        #intro-overlay {
-            position: absolute; inset: 0; background: black;
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
+        #overlay {
+            position: absolute; inset: 0; background: radial-gradient(circle, #1a1a1a, #000);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 100; transition: 2s;
+            z-index: 10; transition: opacity 1.5s;
         }
-
-        .start-btn {
-            padding: 15px 40px; background: #ffd700; color: black;
-            border: none; font-weight: 800; cursor: pointer; border-radius: 50px;
-            text-transform: uppercase; letter-spacing: 2px;
+        button {
+            padding: 15px 40px; border: 2px solid #ffd700; background: transparent;
+            color: #ffd700; cursor: pointer; font-weight: bold; letter-spacing: 2px;
+            border-radius: 5px; transition: 0.3s;
+        }
+        button:hover { background: #ffd700; color: black; }
+        #instructions {
+            position: absolute; bottom: 20px; left: 20px; color: white;
+            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <div id="intro-overlay">
-        <h1 style="margin-bottom: 20px; color: #ffd700; letter-spacing: 5px;">ZETWAL MALL</h1>
-        <button class="start-btn" onclick="startExperience()">Antre nan Mall la</button>
+    <div id="overlay">
+        <h1 style="color: #ffd700; margin-bottom: 30px;">ZETWAL MALL</h1>
+        <button onclick="startApp()">ANTRE</button>
     </div>
 
-    <div id="container">
-        <canvas id="scene"></canvas>
-        <div id="ui">
-            <div id="crosshair"></div>
-            <div class="instructions" id="inst">
-                <strong>KONTWÒL:</strong> Z,Q,S,D: Mache | Sourit: Gade
-            </div>
-        </div>
-    </div>
+    <div id="instructions">Z,Q,S,D pou mache | Sourit pou gade alantou</div>
 
     <script>
-        let scene, camera, renderer, clock;
-        let people = [], particles = [];
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let velocity = new THREE.Vector3(), direction = new THREE.Vector3();
-        let audioContext, ambience;
+        let scene, camera, renderer, clock, particles = [];
+        let people = [], move = { f: false, b: false, l: false, r: false };
+        let velocity = new THREE.Vector3();
 
         function init() {
+            // SCÈNE & CAMÉRA
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x020205);
-            scene.fog = new THREE.Fog(0x020205, 10, 80);
+            scene.fog = new THREE.Fog(0x020205, 10, 70);
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            // Pozisyon kòmansman pou Zoom an (Deyò mall la)
-            camera.position.set(0, 30, 100); 
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 40, 80); // Position de départ pour le zoom
 
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene'), antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true; // Activer les ombres
+            document.body.appendChild(renderer.domElement);
             clock = new THREE.Clock();
 
-            // LIMYÈ
-            scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-            const mainLight = new THREE.PointLight(0xffd700, 1.5, 100);
-            mainLight.position.set(0, 15, 0);
-            scene.add(mainLight);
+            // LUMIÈRES PRO
+            const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambient);
 
-            // PLANCHE BRIYAN
-            const floorGeo = new THREE.PlaneGeometry(200, 200);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.05, metalness: 0.8 });
+            const spot = new THREE.SpotLight(0xffd700, 1);
+            spot.position.set(0, 20, 0);
+            spot.castShadow = true;
+            scene.add(spot);
+
+            // SOL MIROIR (Mall Style)
+            const floorGeo = new THREE.PlaneGeometry(150, 150);
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1, metalness: 0.6 });
             const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
+            floor.rotation.x = -Math.PI/2;
+            floor.receiveShadow = true;
             scene.add(floor);
 
-            // JET DLO (Fountain) nan mitan an
-            createFountain(0, 0, 0);
+            // FONTAINE
+            createFountain(0, 0);
 
-            // BOUTIK YO
-            createShop(0, 0, -30, 0xffd700); // Lavri
-            createShop(25, 0, -20, 0xff00ff);
-            createShop(-25, 0, -20, 0x00ffff);
+            // BOUTIQUES
+            createShop(-20, -30, 0xffd700, "LAVRI");
+            createShop(20, -30, 0x00ffff, "TECH");
 
-            // PNJ ENTÈLIJAN
-            for(let i = 0; i < 12; i++) {
-                createSmartPerson((Math.random()-0.5)*60, 0, (Math.random()-0.5)*60);
-            }
+            // PNJ
+            for(let i=0; i<15; i++) createNPC();
 
-            setupControls();
+            animate();
         }
 
-        function createFountain(x, y, z) {
-            const baseGeo = new THREE.CylinderGeometry(5, 5, 0.5, 32);
-            const baseMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-            const base = new THREE.Mesh(baseGeo, baseMat);
-            base.position.set(x, 0.25, z);
-            scene.add(base);
+        function createShop(x, z, color, label) {
+            const group = new THREE.Group();
+            const frame = new THREE.Mesh(new THREE.BoxGeometry(15, 10, 2), new THREE.MeshStandardMaterial({color: 0x111111}));
+            const light = new THREE.PointLight(color, 2, 15);
+            light.position.set(0, 5, 2);
+            group.add(frame, light);
+            group.position.set(x, 5, z);
+            scene.add(group);
+        }
 
-            // Patikil dlo yo
-            for(let i = 0; i < 100; i++) {
-                const p = new THREE.Mesh(new THREE.SphereGeometry(0.05), new THREE.MeshBasicMaterial({ color: 0x00aaff }));
+        function createFountain(x, z) {
+            for(let i=0; i<80; i++) {
+                const p = new THREE.Mesh(new THREE.SphereGeometry(0.08), new THREE.MeshBasicMaterial({color: 0x44aaff}));
                 p.position.set(x, 0.5, z);
-                p.userData = { 
-                    v: new THREE.Vector3((Math.random()-0.5)*0.1, 0.2 + Math.random()*0.2, (Math.random()-0.5)*0.1),
-                    originalY: 0.5 
-                };
+                p.userData = { vy: Math.random()*0.2, vx: (Math.random()-0.5)*0.05, vz: (Math.random()-0.5)*0.05 };
                 particles.push(p);
                 scene.add(p);
             }
         }
 
-        function createSmartPerson(x, y, z) {
-            const group = new THREE.Group();
-            const skin = new THREE.MeshStandardMaterial({ color: 0x8D5524 });
-            const shirt = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+        function createNPC() {
+            const g = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.8, 4, 8), new THREE.MeshStandardMaterial({color: Math.random()*0xffffff}));
+            body.position.y = 0.8;
+            g.add(body);
+            g.position.set((Math.random()-0.5)*40, 0, (Math.random()-0.5)*40);
+            g.userData = { dir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(), speed: 0.02 + Math.random()*0.03 };
+            people.push(g);
+            scene.add(g);
+        }
 
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.6, 0.2), shirt);
-            body.position.y = 1.05;
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.25, 0.25), skin);
-            head.position.y = 1.5;
+        function startApp() {
+            document.getElementById('overlay').style.opacity = '0';
+            setTimeout(() => document.getElementById('overlay').remove(), 1500);
             
-            const lLeg = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.7, 0.15), shirt);
-            lLeg.position.set(-0.1, 0.35, 0);
-            const rLeg = lLeg.clone();
-            rLeg.position.x = 0.1;
-
-            group.add(body, head, lLeg, rLeg);
-            group.position.set(x, y, z);
-
-            group.userData = {
-                state: 'walking', // 'walking' oswa 'looking'
-                timer: Math.random() * 5,
-                targetDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(),
-                speed: 0.03 + Math.random()*0.02
-            };
-
-            scene.add(group);
-            people.push(group);
-        }
-
-        function createShop(x, y, z, color) {
-            const shop = new THREE.Mesh(new THREE.BoxGeometry(15, 10, 2), new THREE.MeshStandardMaterial({ color: 0x111111 }));
-            shop.position.set(x, 5, z);
-            const light = new THREE.RectAreaLight(color, 5, 12, 8);
-            light.position.set(x, 5, z + 1.1);
-            scene.add(shop, light);
-        }
-
-        function startExperience() {
-            document.getElementById('intro-overlay').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('intro-overlay').style.display = 'none';
-                document.getElementById('inst').style.opacity = '1';
-                document.getElementById('crosshair').style.opacity = '1';
-            }, 2000);
-
-            // ZOOM CINEMATIC
-            gsap.to(camera.position, { z: 20, y: 1.7, duration: 4, ease: "power2.inOut" });
-
-            // SON (Ambience)
-            initAudio();
-        }
-
-        function initAudio() {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.type = 'brown'; // Simulation bruit de foule/vent
-            gainNode.gain.value = 0.01;
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            // Nòt: Nan yon vrè pwojè, ou ta mete yon file .mp3 isit la.
-        }
-
-        function updateNPCs(delta) {
-            people.forEach(p => {
-                const d = p.userData;
-                d.timer -= delta;
-
-                if (d.state === 'walking') {
-                    p.position.addScaledVector(d.targetDir, d.speed);
-                    p.rotation.y = Math.atan2(d.targetDir.x, d.targetDir.z);
-                    // Animasyon mach
-                    p.children[2].rotation.x = Math.sin(Date.now()*0.01) * 0.5;
-                    p.children[3].rotation.x = -Math.sin(Date.now()*0.01) * 0.5;
-
-                    if (d.timer <= 0) {
-                        d.state = 'looking';
-                        d.timer = 2 + Math.random() * 3;
-                    }
-                } else {
-                    // PNJ an kanpe ap gade alantou (entèlijans)
-                    if (d.timer <= 0) {
-                        d.state = 'walking';
-                        d.timer = 4 + Math.random() * 6;
-                        d.targetDir.set(Math.random()-0.5, 0, Math.random()-0.5).normalize();
-                    }
-                }
-                
-                if (p.position.length() > 40) p.position.set(0,0,0);
-            });
+            // ZOOM CINEMATIQUE
+            gsap.to(camera.position, { x: 0, y: 1.7, z: 30, duration: 3, ease: "power2.inOut" });
+            
+            document.body.requestPointerLock();
         }
 
         function animate() {
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
 
-            // Update Dlo (Fountain)
+            // FONTAINE ANIMATION
             particles.forEach(p => {
-                p.position.add(p.userData.v);
-                p.userData.v.y -= 0.01; // Gravite
-                if (p.position.y < 0.5) {
-                    p.position.y = 0.5;
-                    p.userData.v.y = 0.2 + Math.random()*0.1;
+                p.position.y += p.userData.vy;
+                p.position.x += p.userData.vx;
+                p.position.z += p.userData.vz;
+                p.userData.vy -= 0.005; 
+                if(p.position.y < 0.2) {
+                    p.position.set(0, 0.5, 0);
+                    p.userData.vy = Math.random()*0.15 + 0.05;
                 }
             });
 
-            updateNPCs(delta);
+            // PNJ MOUVMAN
+            people.forEach(p => {
+                p.position.addScaledVector(p.userData.dir, p.userData.speed);
+                if(p.position.length() > 50) p.position.set(0,0,0);
+                p.rotation.y = Math.atan2(p.userData.dir.x, p.userData.dir.z);
+            });
 
+            // MOUVMAN JWÈ
             if (document.pointerLockElement) {
-                velocity.x -= velocity.x * 10 * delta;
                 velocity.z -= velocity.z * 10 * delta;
-                direction.z = Number(moveForward) - Number(moveBackward);
-                direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize();
-                if (moveForward || moveBackward) velocity.z -= direction.z * 200 * delta;
-                if (moveLeft || moveRight) velocity.x -= direction.x * 200 * delta;
-                camera.translateX(-velocity.x * delta);
-                camera.translateZ(-velocity.z * delta);
+                velocity.x -= velocity.x * 10 * delta;
+                if(move.f) velocity.z -= 150 * delta;
+                if(move.b) velocity.z += 150 * delta;
+                if(move.l) velocity.x -= 150 * delta;
+                if(move.r) velocity.x += 150 * delta;
+                camera.translateZ(velocity.z * delta);
+                camera.translateX(velocity.x * delta);
                 camera.position.y = 1.7;
             }
 
             renderer.render(scene, camera);
         }
 
-        function setupControls() {
-            document.addEventListener('keydown', (e) => {
-                if(e.code === 'KeyW') moveForward = true;
-                if(e.code === 'KeyS') moveBackward = true;
-                if(e.code === 'KeyA') moveLeft = true;
-                if(e.code === 'KeyD') moveRight = true;
-            });
-            document.addEventListener('keyup', (e) => {
-                if(e.code === 'KeyW') moveForward = false;
-                if(e.code === 'KeyS') moveBackward = false;
-                if(e.code === 'KeyA') moveLeft = false;
-                if(e.code === 'KeyD') moveRight = false;
-            });
-            document.addEventListener('mousemove', (e) => {
-                if (document.pointerLockElement) {
-                    camera.rotation.y -= e.movementX * 0.002;
-                }
-            });
-            document.body.onclick = () => { if(camera.position.z < 50) document.body.requestPointerLock(); };
-        }
+        // CONTROLES
+        window.onkeydown = (e) => { 
+            if(e.key === 'z' || e.key === 'w') move.f = true;
+            if(e.key === 's') move.b = true;
+            if(e.key === 'q' || e.key === 'a') move.l = true;
+            if(e.key === 'd') move.r = true;
+        };
+        window.onkeyup = (e) => { 
+            if(e.key === 'z' || e.key === 'w') move.f = false;
+            if(e.key === 's') move.b = false;
+            if(e.key === 'q' || e.key === 'a') move.l = false;
+            if(e.key === 'd') move.r = false;
+        };
+        window.onmousemove = (e) => {
+            if(document.pointerLockElement) camera.rotation.y -= e.movementX * 0.002;
+        };
 
-        init();
-        animate();
+        window.onload = init;
     </script>
 </body>
 </html>
