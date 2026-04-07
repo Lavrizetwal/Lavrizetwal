@@ -3,72 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZETWAL MALL | Eksperyans 3D</title>
+    <title>ZETWAL MALL | Inivès Immèsif</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Montserrat', sans-serif; background: #000; color: white; overflow: hidden; }
         #container { position: relative; width: 100vw; height: 100vh; }
         #scene { width: 100%; height: 100%; display: block; }
         
-        /* UI OVERLAY */
         #ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; border: 1px solid #ffd700; border-radius: 50%; }
+        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; border: 1px solid #ffd700; border-radius: 50%; opacity: 0; }
         
         .instructions {
             position: absolute; bottom: 20px; left: 20px;
             background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px;
             border-left: 4px solid #ffd700; font-size: 0.75rem; pointer-events: auto;
+            opacity: 0; transition: 1s;
         }
 
-        .back-btn {
-            position: absolute; top: 20px; left: 20px;
-            padding: 10px 20px; background: #ffd700; color: #000;
-            text-decoration: none; border-radius: 20px; font-weight: 800;
-            font-size: 0.7rem; pointer-events: auto;
+        #intro-overlay {
+            position: absolute; inset: 0; background: black;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; transition: 2s;
         }
 
-        #interaction-msg {
-            position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(255, 215, 0, 0.9); color: black; padding: 5px 15px;
-            border-radius: 5px; font-weight: bold; display: none;
+        .start-btn {
+            padding: 15px 40px; background: #ffd700; color: black;
+            border: none; font-weight: 800; cursor: pointer; border-radius: 50px;
+            text-transform: uppercase; letter-spacing: 2px;
         }
     </style>
 </head>
 <body>
 
+    <div id="intro-overlay">
+        <h1 style="margin-bottom: 20px; color: #ffd700; letter-spacing: 5px;">ZETWAL MALL</h1>
+        <button class="start-btn" onclick="startExperience()">Antre nan Mall la</button>
+    </div>
+
     <div id="container">
         <canvas id="scene"></canvas>
         <div id="ui">
-            <a href="index.html" class="back-btn">RETOUNEN</a>
             <div id="crosshair"></div>
-            <div id="interaction-msg">KLIKE POU ANTRE</div>
-            <div class="instructions">
-                <strong>KONTWÒL:</strong><br>
-                Z,Q,S,D oswa Flèch: Mache<br>
-                Sourit: Gade tout kote<br>
-                E: Entèrakte ak boutik
+            <div class="instructions" id="inst">
+                <strong>KONTWÒL:</strong> Z,Q,S,D: Mache | Sourit: Gade
             </div>
         </div>
     </div>
 
     <script>
         let scene, camera, renderer, clock;
-        let people = [];
+        let people = [], particles = [];
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let velocity = new THREE.Vector3();
-        let direction = new THREE.Vector3();
-        let controlsEnabled = false;
-        let raycaster = new THREE.Raycaster();
-        let mouse = new THREE.Vector2();
+        let velocity = new THREE.Vector3(), direction = new THREE.Vector3();
+        let audioContext, ambience;
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x050505);
-            scene.fog = new THREE.Fog(0x050505, 0, 50);
+            scene.background = new THREE.Color(0x020205);
+            scene.fog = new THREE.Fog(0x020205, 10, 80);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.y = 1.7; // Wotè je moun
+            // Pozisyon kòmansman pou Zoom an (Deyò mall la)
+            camera.position.set(0, 30, 100); 
 
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene'), antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -76,157 +74,143 @@
             clock = new THREE.Clock();
 
             // LIMYÈ
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-            scene.add(ambientLight);
-            
-            const sunLight = new THREE.PointLight(0xffd700, 1, 100);
-            sunLight.position.set(0, 20, 0);
-            scene.add(sunLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+            const mainLight = new THREE.PointLight(0xffd700, 1.5, 100);
+            mainLight.position.set(0, 15, 0);
+            scene.add(mainLight);
 
-            // PLANCHE (Mall Floor)
-            const floorGeo = new THREE.PlaneGeometry(100, 100);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.5 });
+            // PLANCHE BRIYAN
+            const floorGeo = new THREE.PlaneGeometry(200, 200);
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.05, metalness: 0.8 });
             const floor = new THREE.Mesh(floorGeo, floorMat);
             floor.rotation.x = -Math.PI / 2;
             scene.add(floor);
 
-            // KREYE BOUTIK YO
-            createShop(0, 0, -20, "LAVRI ZETWAL", 0xffd700);
-            createShop(15, 0, -15, "BOUTIK MOD", 0xffffff);
-            createShop(-15, 0, -15, "TECH HUB", 0x00aaff);
+            // JET DLO (Fountain) nan mitan an
+            createFountain(0, 0, 0);
 
-            // KREYE MOUN YO (PNJ)
-            for(let i = 0; i < 15; i++) {
-                createPerson(
-                    (Math.random() - 0.5) * 40,
-                    0,
-                    (Math.random() - 0.5) * 40,
-                    Math.random() * 0xffffff,
-                    "client"
-                );
+            // BOUTIK YO
+            createShop(0, 0, -30, 0xffd700); // Lavri
+            createShop(25, 0, -20, 0xff00ff);
+            createShop(-25, 0, -20, 0x00ffff);
+
+            // PNJ ENTÈLIJAN
+            for(let i = 0; i < 12; i++) {
+                createSmartPerson((Math.random()-0.5)*60, 0, (Math.random()-0.5)*60);
             }
 
             setupControls();
-            animate();
         }
 
-        function createShop(x, y, z, name, color) {
-            const shopGroup = new THREE.Group();
+        function createFountain(x, y, z) {
+            const baseGeo = new THREE.CylinderGeometry(5, 5, 0.5, 32);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.set(x, 0.25, z);
+            scene.add(base);
+
+            // Patikil dlo yo
+            for(let i = 0; i < 100; i++) {
+                const p = new THREE.Mesh(new THREE.SphereGeometry(0.05), new THREE.MeshBasicMaterial({ color: 0x00aaff }));
+                p.position.set(x, 0.5, z);
+                p.userData = { 
+                    v: new THREE.Vector3((Math.random()-0.5)*0.1, 0.2 + Math.random()*0.2, (Math.random()-0.5)*0.1),
+                    originalY: 0.5 
+                };
+                particles.push(p);
+                scene.add(p);
+            }
+        }
+
+        function createSmartPerson(x, y, z) {
+            const group = new THREE.Group();
+            const skin = new THREE.MeshStandardMaterial({ color: 0x8D5524 });
+            const shirt = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.6, 0.2), shirt);
+            body.position.y = 1.05;
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.25, 0.25), skin);
+            head.position.y = 1.5;
             
-            // Estrikti
-            const geo = new THREE.BoxGeometry(10, 8, 1);
-            const mat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-            const wall = new THREE.Mesh(geo, mat);
-            wall.position.y = 4;
-            shopGroup.add(wall);
+            const lLeg = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.7, 0.15), shirt);
+            lLeg.position.set(-0.1, 0.35, 0);
+            const rLeg = lLeg.clone();
+            rLeg.position.x = 0.1;
 
-            // Vitrin (Glass)
-            const glassGeo = new THREE.PlaneGeometry(8, 4);
-            const glassMat = new THREE.MeshStandardMaterial({ color: color, transparent: true, opacity: 0.3, emissive: color, emissiveIntensity: 0.5 });
-            const glass = new THREE.Mesh(glassGeo, glassMat);
-            glass.position.set(0, 3, 0.6);
-            shopGroup.add(glass);
+            group.add(body, head, lLeg, rLeg);
+            group.position.set(x, y, z);
 
-            shopGroup.position.set(x, y, z);
-            scene.add(shopGroup);
-        }
-
-        // --- SISTÈM PNJ HUMANOÏDES ---
-        function createPerson(x, y, z, color, type) {
-            const personGroup = new THREE.Group();
-            const skinMat = new THREE.MeshStandardMaterial({ color: 0xFFDBAC });
-            const clothesMat = new THREE.MeshStandardMaterial({ color: color });
-
-            // Jambes
-            const legGeo = new THREE.BoxGeometry(0.15, 0.7, 0.15);
-            const leftLeg = new THREE.Mesh(legGeo, clothesMat);
-            leftLeg.position.set(-0.12, 0.35, 0);
-            const rightLeg = new THREE.Mesh(legGeo, clothesMat);
-            rightLeg.position.set(0.12, 0.35, 0);
-            personGroup.add(leftLeg, rightLeg); // Index 0, 1
-
-            // Tronc
-            const bodyGeo = new THREE.BoxGeometry(0.4, 0.6, 0.2);
-            const body = new THREE.Mesh(bodyGeo, clothesMat);
-            body.position.y = 1.0;
-            personGroup.add(body); // Index 2
-
-            // Tête
-            const headGeo = new THREE.BoxGeometry(0.25, 0.25, 0.25);
-            const head = new THREE.Mesh(headGeo, skinMat);
-            head.position.y = 1.45;
-            personGroup.add(head); // Index 3
-
-            // Bras
-            const armGeo = new THREE.BoxGeometry(0.12, 0.5, 0.12);
-            const leftArm = new THREE.Mesh(armGeo, skinMat);
-            leftArm.position.set(-0.28, 1.1, 0);
-            const rightArm = new THREE.Mesh(armGeo, skinMat);
-            rightArm.position.set(0.28, 1.1, 0);
-            personGroup.add(leftArm, rightArm); // Index 4, 5
-
-            personGroup.position.set(x, y, z);
-            personGroup.userData = {
-                speed: 0.015 + Math.random() * 0.02,
-                direction: new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize(),
-                bobbing: Math.random() * Math.PI
+            group.userData = {
+                state: 'walking', // 'walking' oswa 'looking'
+                timer: Math.random() * 5,
+                targetDir: new THREE.Vector3(Math.random()-0.5, 0, Math.random()-0.5).normalize(),
+                speed: 0.03 + Math.random()*0.02
             };
 
-            scene.add(personGroup);
-            people.push(personGroup);
+            scene.add(group);
+            people.push(group);
         }
 
-        function updateNPCs() {
-            people.forEach(person => {
-                const data = person.userData;
-                person.position.addScaledVector(data.direction, data.speed);
+        function createShop(x, y, z, color) {
+            const shop = new THREE.Mesh(new THREE.BoxGeometry(15, 10, 2), new THREE.MeshStandardMaterial({ color: 0x111111 }));
+            shop.position.set(x, 5, z);
+            const light = new THREE.RectAreaLight(color, 5, 12, 8);
+            light.position.set(x, 5, z + 1.1);
+            scene.add(shop, light);
+        }
+
+        function startExperience() {
+            document.getElementById('intro-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('intro-overlay').style.display = 'none';
+                document.getElementById('inst').style.opacity = '1';
+                document.getElementById('crosshair').style.opacity = '1';
+            }, 2000);
+
+            // ZOOM CINEMATIC
+            gsap.to(camera.position, { z: 20, y: 1.7, duration: 4, ease: "power2.inOut" });
+
+            // SON (Ambience)
+            initAudio();
+        }
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.type = 'brown'; // Simulation bruit de foule/vent
+            gainNode.gain.value = 0.01;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            // Nòt: Nan yon vrè pwojè, ou ta mete yon file .mp3 isit la.
+        }
+
+        function updateNPCs(delta) {
+            people.forEach(p => {
+                const d = p.userData;
+                d.timer -= delta;
+
+                if (d.state === 'walking') {
+                    p.position.addScaledVector(d.targetDir, d.speed);
+                    p.rotation.y = Math.atan2(d.targetDir.x, d.targetDir.z);
+                    // Animasyon mach
+                    p.children[2].rotation.x = Math.sin(Date.now()*0.01) * 0.5;
+                    p.children[3].rotation.x = -Math.sin(Date.now()*0.01) * 0.5;
+
+                    if (d.timer <= 0) {
+                        d.state = 'looking';
+                        d.timer = 2 + Math.random() * 3;
+                    }
+                } else {
+                    // PNJ an kanpe ap gade alantou (entèlijans)
+                    if (d.timer <= 0) {
+                        d.state = 'walking';
+                        d.timer = 4 + Math.random() * 6;
+                        d.targetDir.set(Math.random()-0.5, 0, Math.random()-0.5).normalize();
+                    }
+                }
                 
-                // Rotasyon pou gade kote l prale
-                person.rotation.y = Math.atan2(data.direction.x, data.direction.z);
-
-                // Animasyon mache
-                data.bobbing += 0.1;
-                person.children[0].rotation.x = Math.sin(data.bobbing) * 0.5;
-                person.children[1].rotation.x = -Math.sin(data.bobbing) * 0.5;
-                person.children[4].rotation.x = -Math.sin(data.bobbing) * 0.5;
-                person.children[5].rotation.x = Math.sin(data.bobbing) * 0.5;
-
-                // Limit miray
-                if (Math.abs(person.position.x) > 45 || Math.abs(person.position.z) > 45) {
-                    data.direction.multiplyScalar(-1);
-                }
-            });
-        }
-
-        function setupControls() {
-            document.addEventListener('keydown', (e) => {
-                switch(e.code) {
-                    case 'KeyW': case 'ArrowUp': moveForward = true; break;
-                    case 'KeyS': case 'ArrowDown': moveBackward = true; break;
-                    case 'KeyA': case 'ArrowLeft': moveLeft = true; break;
-                    case 'KeyD': case 'ArrowRight': moveRight = true; break;
-                }
-            });
-            document.addEventListener('keyup', (e) => {
-                switch(e.code) {
-                    case 'KeyW': case 'ArrowUp': moveForward = false; break;
-                    case 'KeyS': case 'ArrowDown': moveBackward = false; break;
-                    case 'KeyA': case 'ArrowLeft': moveLeft = false; break;
-                    case 'KeyD': case 'ArrowRight': moveRight = false; break;
-                }
-            });
-
-            // Pointer Lock pou kontwòl sourit
-            document.body.addEventListener('click', () => {
-                document.body.requestPointerLock();
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (document.pointerLockElement === document.body) {
-                    camera.rotation.y -= e.movementX * 0.002;
-                    let newX = camera.rotation.x - e.movementY * 0.002;
-                    camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, newX));
-                }
+                if (p.position.length() > 40) p.position.set(0,0,0);
             });
         }
 
@@ -234,32 +218,57 @@
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
 
-            // Mouvman Jwè
-            velocity.x -= velocity.x * 10.0 * delta;
-            velocity.z -= velocity.z * 10.0 * delta;
+            // Update Dlo (Fountain)
+            particles.forEach(p => {
+                p.position.add(p.userData.v);
+                p.userData.v.y -= 0.01; // Gravite
+                if (p.position.y < 0.5) {
+                    p.position.y = 0.5;
+                    p.userData.v.y = 0.2 + Math.random()*0.1;
+                }
+            });
 
-            direction.z = Number(moveForward) - Number(moveBackward);
-            direction.x = Number(moveRight) - Number(moveLeft);
-            direction.normalize();
+            updateNPCs(delta);
 
-            if (moveForward || moveBackward) velocity.z -= direction.z * 150.0 * delta;
-            if (moveLeft || moveRight) velocity.x -= direction.x * 150.0 * delta;
+            if (document.pointerLockElement) {
+                velocity.x -= velocity.x * 10 * delta;
+                velocity.z -= velocity.z * 10 * delta;
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+                if (moveForward || moveBackward) velocity.z -= direction.z * 200 * delta;
+                if (moveLeft || moveRight) velocity.x -= direction.x * 200 * delta;
+                camera.translateX(-velocity.x * delta);
+                camera.translateZ(-velocity.z * delta);
+                camera.position.y = 1.7;
+            }
 
-            camera.translateX(-velocity.x * delta);
-            camera.translateZ(-velocity.z * delta);
-            camera.position.y = 1.7; // Kenbe wotè
-
-            updateNPCs();
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        function setupControls() {
+            document.addEventListener('keydown', (e) => {
+                if(e.code === 'KeyW') moveForward = true;
+                if(e.code === 'KeyS') moveBackward = true;
+                if(e.code === 'KeyA') moveLeft = true;
+                if(e.code === 'KeyD') moveRight = true;
+            });
+            document.addEventListener('keyup', (e) => {
+                if(e.code === 'KeyW') moveForward = false;
+                if(e.code === 'KeyS') moveBackward = false;
+                if(e.code === 'KeyA') moveLeft = false;
+                if(e.code === 'KeyD') moveRight = false;
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (document.pointerLockElement) {
+                    camera.rotation.y -= e.movementX * 0.002;
+                }
+            });
+            document.body.onclick = () => { if(camera.position.z < 50) document.body.requestPointerLock(); };
+        }
 
         init();
+        animate();
     </script>
 </body>
 </html>
