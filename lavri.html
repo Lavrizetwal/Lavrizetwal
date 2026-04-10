@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAVRI ZÈTWAL | Pi Pwòp, Pi Santi Bòn</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #ffd700;
+            --gold-deep: #b8860b;
+            --gold-light: #fff8dc;
+            --bg: #010101;
+            --text: #ffffff;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
+
+        /* --- EFFET TYPING & SHIMMER --- */
+        .hero { padding: 150px 5% 50px; text-align: center; }
+        
+        .typing-container {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 12vw, 6rem);
+            font-weight: 900;
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 4px solid var(--gold);
+            width: 0;
+            animation: typing 2.5s steps(12) forwards, blink 0.8s infinite;
+        }
+
+        .gold-shimmer {
+            background: linear-gradient(90deg, #fff 0%, var(--gold) 50%, #fff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 5s linear infinite;
+        }
+
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink { 50% { border-color: transparent } }
+        @keyframes shimmer { to { background-position: 200% center; } }
+
+        /* --- SPHÈRE ANIMÉE --- */
+        .big-sphere {
+            width: 130px; height: 130px;
+            background: radial-gradient(circle at 30% 30%, #fff, var(--gold), var(--gold-deep));
+            border-radius: 50%; margin: 0 auto 30px;
+            box-shadow: 0 0 60px var(--gold);
+            animation: breathe 4s infinite ease-in-out;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 40px var(--gold); }
+            50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 80px var(--gold); }
+        }
+
+        /* --- PLANS (NOUVELLE PAGE AU SCROLL) --- */
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 50px 10%;
+        }
+
+        .plan-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 35px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid transparent;
+            position: relative;
+            opacity: 0; transform: translateY(50px);
+            transition: 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .plan-card.visible { opacity: 1; transform: translateY(0); }
+
+        .plan-card::before {
+            content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), #fff, var(--gold), transparent);
+            background-size: 200% 100%; animation: liquidGold 3s linear infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+        }
+
+        @keyframes liquidGold { to { background-position: 200% center; } }
+
+        /* --- CALCULATEUR --- */
+        .calc-section {
+            background: rgba(0,0,0,0.5); padding: 80px 10%; margin-top: 50px;
+        }
+
+        .calc-box {
+            max-width: 600px; margin: 0 auto;
+            background: var(--glass); padding: 40px; border-radius: 40px;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        input[type="number"] {
+            width: 100%; background: transparent; border: none; border-bottom: 3px solid var(--gold);
+            color: var(--gold); font-size: 4rem; text-align: center; outline: none; margin: 20px 0;
+        }
+
+        .price-display { font-size: 5rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 30px var(--gold); }
+
+        /* --- FOOTER --- */
+        footer { padding: 60px 5%; text-align: center; border-top: 1px solid rgba(255,215,0,0.1); }
+        .social-icons { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .social-icons img { width: 50px; height: 50px; filter: drop-shadow(0 0 10px var(--gold)); transition: 0.3s; }
+        .social-icons img:hover { transform: scale(1.2) rotate(10deg); }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="webgl-canvas"></canvas>
+
+    <header class="hero">
+        <div class="big-sphere"></div>
+        <div>
+            <span class="typing-container gold-shimmer">Lavri Zètwal</span>
+        </div>
+        <p style="letter-spacing: 5px; font-weight: 300; margin-top: 20px; opacity: 0.8;">PI PWÒP, PI SANTI BÒN</p>
+    </header>
+
+    <main>
+        <section class="plans-grid">
+            <div class="plan-card">
+                <h2 style="color:var(--gold)">Ti Zetwal</h2>
+                <div style="font-size: 3rem; font-weight: 800;">650 <span style="font-size: 1rem;">HTG</span></div>
+                <p>1 jiska 10 Kilo rad</p>
+                <button style="background:var(--gold); border:none; padding:15px 30px; border-radius:30px; font-weight:bold; cursor:pointer; margin-top:20px;">CHWAZI SA A</button>
+            </div>
+
+            <div class="plan-card">
+                <h2 style="color:var(--gold)">Zetwal VIP</h2>
+                <div style="font-size: 3rem; font-weight: 800;">850 <span style="font-size: 1rem;">HTG</span></div>
+                <p>11 jiska 15 Kilo rad</p>
+                <button style="background:var(--gold); border:none; padding:15px 30px; border-radius:30px; font-weight:bold; cursor:pointer; margin-top:20px;">CHWAZI SA A</button>
+            </div>
+
+            <div class="plan-card">
+                <h2 style="color:var(--gold)">Gwo Zetwal</h2>
+                <div style="font-size: 3rem; font-weight: 800;">1200 <span style="font-size: 1rem;">HTG</span></div>
+                <p>20 Kilo rad ak plis</p>
+                <button style="background:var(--gold); border:none; padding:15px 30px; border-radius:30px; font-weight:bold; cursor:pointer; margin-top:20px;">CHWAZI SA A</button>
+            </div>
+        </section>
+
+        <section class="calc-section">
+            <div class="calc-box">
+                <h3 style="text-align: center; letter-spacing: 2px;">KALKILE PRI OU</h3>
+                <input type="number" id="kgInput" placeholder="0" oninput="updatePrice()">
+                <div style="text-align: center;">
+                    <span class="price-display" id="totalPrice">0</span> <span style="color:var(--gold)">HTG</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="social-icons">
+            <a href="https://wa.me/79961103506"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></a>
+            <a href="https://t.me/mikenestor14"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="TG"></a>
+        </div>
+        <p style="color:var(--gold); font-size: 0.8rem; letter-spacing: 2px;">ÉTOILES ORGANIZATION, 2026 — MODERNITÉ ET TRADITION</p>
+    </footer>
+
+    <script>
+        // 🌌 GALAXIE (Exactement comme index.html)
+        let scene, camera, renderer, stars;
+        function initGalaxy() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            const geo = new THREE.BufferGeometry(); const pos = [];
+            for(let i=0; i<1500; i++) pos.push((Math.random()-0.5)*40, (Math.random()-0.5)*40, (Math.random()-0.5)*40);
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            stars = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.03 }));
+            scene.add(stars); camera.position.z = 5; animate();
+        }
+        function animate() { requestAnimationFrame(animate); stars.rotation.y += 0.0004; renderer.render(scene, camera); }
+        initGalaxy();
+
+        // 💰 CALCULATEUR
+        function updatePrice() {
+            const kg = document.getElementById('kgInput').value;
+            let price = 0;
+            if (kg > 0) {
+                price = kg <= 10 ? 650 : 650 + (kg - 10) * 50;
+            }
+            document.getElementById('totalPrice').innerText = price;
+        }
+
+        // 🎬 EFFET SCROLL (Nouvelle page)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.plan-card').forEach(card => observer.observe(card));
+    </script>
+</body>
+</html>
