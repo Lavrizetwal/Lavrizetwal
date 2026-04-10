@@ -7,55 +7,71 @@
     <title>ZETWAL ORGANISATION | Inovasyon ak Ekselans</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/TextPlugin.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc;
             --gold-glow: rgba(255, 215, 0, 0.2); --bg: #010101; --text: #ffffff;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             --glass-bg: rgba(255, 255, 255, 0.08);
         }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; overflow-x: hidden; height: 100%; }
-        
+        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
         #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
-
-        /* Effet de défilement par page */
-        section { height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; scroll-snap-align: start; }
-        main { scroll-snap-type: y mandatory; overflow-y: auto; height: 100vh; }
-
-        /* --- NAVIGATION --- */
-        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border-bottom: 3px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1; }
-        .nav-content { display: flex; flex-direction: column; align-items: center; padding: 10px; }
+        
+        /* --- NAVIGATION (REPRISE INDEX) --- */
+        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); border-bottom: 3px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1; }
+        .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
         .auth-container { position: absolute; right: 20px; top: 15px; text-align: right; }
-        .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-        .nav-logo-img { width: 20px; height: 20px; }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; }
-        .nav-links { display: flex; list-style: none; gap: 8px; margin: 0; padding: 5px; overflow-x: auto; width: 95%; white-space: nowrap; scrollbar-width: none; }
-        .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.55rem; text-transform: uppercase; padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.3); transition: 0.3s; }
-        .nav-links a.active, .nav-links a:hover { background: var(--gold); color: #000; }
+        .login-btn { padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px; color: var(--gold); text-decoration: none; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; transition: 0.3s; cursor: pointer; background: transparent; }
+        .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .nav-logo-img { width: 25px; height: 25px; }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+        .logo-text span { color: var(--gold); }
+        .nav-links { display: flex; list-style: none; gap: 10px; margin: 0; padding: 5px; overflow-x: auto; width: 100%; white-space: nowrap; }
+        .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.6rem; text-transform: uppercase; padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.4); }
+        .nav-links a.active { background: var(--gold); color: #000; }
 
-        /* --- HERO --- */
-        .gold-shimmer { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 8vw, 4.5rem); background: linear-gradient(90deg, #fff, var(--gold), #fff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 5s linear infinite; }
+        /* --- HERO & SUNCORP --- */
+        .hero-container { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .sun-core { width: 150px; height: 150px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; box-shadow: 0 0 80px var(--gold); filter: blur(1px); }
+        
+        .gold-shimmer {
+            font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 5rem);
+            background: linear-gradient(90deg, #fff, var(--gold), #fff);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmer 5s linear infinite; margin: 20px 0 0;
+        }
         @keyframes shimmer { to { background-position: 200% center; } }
 
-        .glass-info { background: rgba(255, 215, 0, 0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 20px; padding: 15px 30px; margin-top: 20px; text-align: center; width: 80%; max-width: 400px; }
-        .slogan-text { letter-spacing: 3px; font-weight: 600; font-size: 0.8rem; height: 1.2rem; }
+        /* --- GLASSMORPHISM FLOU --- */
+        .glass-info {
+            background: rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 15px 40px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .slogan-text { letter-spacing: 5px; font-weight: 600; font-size: 0.9rem; margin: 0; }
 
-        /* --- MACHINE STATUS & ADDRESS --- */
-        .status-box { margin-top: 15px; text-align: center; color: var(--gold); font-size: 0.75rem; }
-        .address-text { color: #ccc; font-size: 0.65rem; margin-top: 10px; font-style: italic; }
+        /* --- SIMULATION MACHINES --- */
+        .machine-status { margin-top: 20px; font-size: 0.8rem; color: var(--gold); font-weight: bold; }
 
-        /* --- CARDS --- */
-        .pricing-wrapper { display: flex; flex-direction: column; gap: 20px; width: 90%; max-width: 500px; }
-        .magic-card { width: 100%; background: linear-gradient(90deg, #D4AF37, #5c4b1a, #D4AF37); background-size: 300% 300%; border-radius: 20px; padding: 2px; animation: liquidGold 4s linear infinite; }
-        .card-inner { background: #0f0f0f; border-radius: 18px; padding: 25px; text-align: center; }
+        /* --- TARIFS & CALCULATEUR (MAGIC CARDS) --- */
+        .pricing-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; padding: 60px 20px; max-width: 1200px; margin: 0 auto; }
+        .magic-card { flex: 1; min-width: 300px; max-width: 350px; background: linear-gradient(90deg, #D4AF37, #5c4b1a, #D4AF37); background-size: 300% 300%; border-radius: 20px; padding: 3px; animation: liquidGold 4s linear infinite; transition: transform 0.4s; }
+        .magic-card:hover { transform: scale(1.05); }
+        .card-inner { background: #0f0f0f; border-radius: 17px; padding: 30px 20px; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        
         @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .calc-input { width: 100%; padding: 12px; margin: 8px 0; background: #1a1a1a; border: 1px solid var(--gold); color: gold; border-radius: 8px; box-sizing: border-box; }
-        .login-btn { padding: 10px 20px; border: 1px solid var(--gold); border-radius: 20px; color: var(--gold); text-decoration: none; font-size: 0.7rem; font-weight: 600; cursor: pointer; background: transparent; transition: 0.3s; }
-        .login-btn:hover { background: var(--gold); color: #000; }
+        /* --- CALCULATEUR STYLE --- */
+        .calc-input { width: 100%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid var(--gold); color: gold; border-radius: 8px; }
+        
+        footer { background: #000; padding: 60px 5%; text-align: center; border-top: 3px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1; }
     </style>
 </head>
 <body>
@@ -66,197 +82,150 @@
         <div class="nav-content">
             <div class="auth-container">
                 <div id="user-display">
-                    <span id="user-name" style="font-size: 0.7rem; color: var(--gold);">Salut Kliyan</span><br>
-                    <span id="user-points" style="font-size: 0.5rem;">1000 Pwen</span>
+                    <span id="user-name">Salut Mike</span><br>
+                    <span id="user-points" style="font-size: 0.6rem;">1000 Pwen</span>
                 </div>
             </div>
             <div class="logo-container">
                 <img src="logo.png" alt="Zetwal" class="nav-logo-img">
-                <div class="logo-text">ZETWAL <span style="color:var(--gold)">ORGANISATION</span></div>
+                <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
             </div>
             <ul class="nav-links">
-                <li><a href="#">Akey</a></li>
-                <li><a href="#" class="active">Lavri</a></li>
-                <li><a href="#">Shop</a></li>
-                <li><a href="#">Mall</a></li>
-                <li><a href="#">Sinema</a></li>
-                <li><a href="#">Technopark</a></li>
-                <li><a href="#">Asosye</a></li>
-                <li><a href="#">Jwet</a></li>
+                <li><a href="index.html">Akèy</a></li>
+                <li><a href="lavri.html" class="active">Lavri</a></li>
+                <li><a href="shop.html">Shop</a></li>
             </ul>
         </div>
     </nav>
 
-    <main id="main-scroll">
-        <section>
-            <h1 class="gold-shimmer" id="typed-title"></h1>
+    <main>
+        <section class="hero-container">
+            <div class="sun-core"></div>
+            <h1 class="gold-shimmer">Lavri Zetwal</h1>
+            
             <div class="glass-info">
-                <p class="slogan-text" id="typed-slogan"></p>
+                <p class="slogan-text gold-shimmer">Pi Pwop, Pi Santi Bon</p>
             </div>
-            <div class="status-box">
-                <span id="available-count">--</span>/10 Machin Disponib <br>
-                <span id="timer-text" style="font-weight: 300;">Kalkile disponiblite...</span>
-                <div class="address-text">Gonaives, 3e Impasse Ruelle Yamoul #5; De 08h-19h</div>
+
+            <div class="machine-status">
+                <span id="available-machines">8</span>/10 Machin Disponib <br>
+                <span id="timer-simulation" style="font-weight: 300; font-style: italic;">Yon machin ap disponib nan 10 minit</span>
             </div>
         </section>
 
-        <section style="justify-content: flex-start; padding-top: 120px; height: auto; min-height: 100vh;">
-            <div class="pricing-wrapper">
-                <div class="magic-card">
-                    <div class="card-inner">
-                        <h3 style="color:var(--gold); margin:0;">LE PETIT</h3>
-                        <p style="font-size:0.8rem">5kg - 9kg</p>
-                        <div style="font-size:2rem; font-weight:900; color:var(--gold)">650 HTG</div>
-                        <button class="login-btn" style="margin-top:10px; width:100%">Chwazi</button>
-                    </div>
-                </div>
-                <div class="magic-card">
-                    <div class="card-inner">
-                        <h3 style="color:var(--gold); margin:0;">LE MALIN</h3>
-                        <p style="font-size:0.8rem">10kg - 14kg</p>
-                        <div style="font-size:2rem; font-weight:900; color:var(--gold)">850 HTG</div>
-                        <button class="login-btn" style="margin-top:10px; width:100%">Chwazi</button>
-                    </div>
-                </div>
-                <div class="magic-card">
-                    <div class="card-inner">
-                        <h3 style="color:var(--gold); margin:0;">LE GÉANT</h3>
-                        <p style="font-size:0.8rem">15kg - 22kg</p>
-                        <div style="font-size:2rem; font-weight:900; color:var(--gold)">1 000 HTG</div>
-                        <button class="login-btn" style="margin-top:10px; width:100%">Chwazi</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section>
-            <div class="magic-card" style="max-width: 400px; width: 90%;">
+        <div class="pricing-wrapper">
+            <div class="magic-card">
                 <div class="card-inner">
-                    <h3 style="color:var(--gold)">🧮 KALKILATRIS</h3>
+                    <h3 style="color:var(--gold)">LE PETIT</h3>
+                    <p>5kg - 9kg</p>
+                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">650<span style="font-size:1rem;">HTG</span></div>
+                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
+                        <li>⚡ Pi rapid</li>
+                        <li>💰 Mwens kòb</li>
+                    </ul>
+                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
+                </div>
+            </div>
+            <div class="magic-card">
+                <div class="card-inner">
+                    <h3 style="color:var(--gold)">LE MALIN</h3>
+                    <p>10kg - 14kg</p>
+                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">850<span style="font-size:1rem;">HTG</span></div>
+                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
+                        <li>✨ Balans pafè</li>
+                        <li>🏠 Ideyal pou fanmi</li>
+                    </ul>
+                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
+                </div>
+            </div>
+            <div class="magic-card">
+                <div class="card-inner">
+                    <h3 style="color:var(--gold)">LE GÉANT</h3>
+                    <p>15kg - 22kg</p>
+                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">1 000<span style="font-size:1rem;">HTG</span></div>
+                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
+                        <li>🧺 Tout ansanm</li>
+                        <li>🔥 Sechaj gratis</li>
+                    </ul>
+                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
+                </div>
+            </div>
+        </div>
+
+        <section style="padding: 40px 20px;">
+            <div class="magic-card" style="max-width: 600px; margin: 0 auto;">
+                <div class="card-inner">
+                    <h3 style="color:var(--gold)">🧮 KALKILE SÈVIS OU</h3>
                     <input type="number" id="user-kg" class="calc-input" placeholder="Konbyen Kilo rad?">
                     <select id="pliyaj-select" class="calc-input">
                         <option value="0">Pa gen pliyaj</option>
-                        <option value="150">Pliyaj rad (150 gourdes)</option>
-                        <option value="175">Pliyaj dra (175 gourdes)</option>
+                        <option value="150">Rad (150 HTG)</option>
                     </select>
-                    <button onclick="calculate()" class="login-btn" style="background:var(--gold); color:#000; margin-top:10px; width:100%">KALKILE</button>
-                    <div id="total-res" style="margin-top:15px; color:var(--gold); font-weight:800; font-size:1.2rem;"></div>
+                    <button onclick="alert('Kalkil an kous...')" class="login-btn" style="background:var(--gold); color:#000; margin-top:20px;">KALKILE</button>
                 </div>
             </div>
-            
-            <footer style="margin-top: 50px; text-align: center; font-size: 0.6rem; color: var(--gold);">
-                ZETWAL ORGANISATION 2026
-            </footer>
         </section>
     </main>
 
+    <footer>
+        <h4 style="color:var(--gold); margin:0; letter-spacing: 2px;">RETE KONEKTE AK NOU</h4>
+        <div style="display:flex; justify-content:center; gap:25px; margin:20px 0;">
+            <a href="https://wa.me/79961103506"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:45px;" alt="WhatsApp"></a>
+            <a href="https://t.me/mikenestor14"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" style="width:45px;" alt="Telegram"></a>
+        </div>
+        <div style="margin-top:20px; font-size:0.7rem; color:var(--gold); letter-spacing: 1px;">ZETWAL ORGANISATION 2026 – MODÈNITE AK TRADISYON</div>
+    </footer>
+
     <script>
-        gsap.registerPlugin(TextPlugin, ScrollTrigger);
-
-        // --- THREE.JS: SOLEIL RESPIRANT & GALAXIE ---
-        let scene, camera, renderer, sunParticles, energyParticles;
-        const particleCount = 2000;
-
-        function initScene() {
+        // 4. BACKGROUND (SOLEIL + GALAXIE CORRIGÉ)
+        let scene, camera, renderer, stars, galaxy;
+        function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true, antialias: true });
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            // Création du soleil (2 parties qui se rejoignent)
-            const sunGeo = new THREE.BufferGeometry();
-            const posLeft = []; const posRight = [];
-            for(let i=0; i<particleCount/2; i++) {
-                posLeft.push((Math.random()-2)*10, (Math.random()-0.5)*10, (Math.random()-0.5)*10);
-                posRight.push((Math.random()+2)*10, (Math.random()-0.5)*10, (Math.random()-0.5)*10);
+            // Couche 1 : Étoiles fixes (Fond)
+            const starGeo = new THREE.BufferGeometry();
+            const starPos = [];
+            for(let i=0; i<2000; i++) starPos.push((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*100);
+            starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+            stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.05 }));
+            scene.add(stars);
+
+            // Couche 2 : Galaxie (Groupes d'étoiles dorées en rotation)
+            const galGeo = new THREE.BufferGeometry();
+            const galPos = [];
+            for(let i=0; i<1000; i++) {
+                const r = Math.random() * 20 + 5;
+                const theta = Math.random() * Math.PI * 2;
+                galPos.push(Math.cos(theta)*r, (Math.random()-0.5)*2, Math.sin(theta)*r);
             }
-            const combinedPos = new Float32Array([...posLeft, ...posRight]);
-            sunGeo.setAttribute('position', new THREE.BufferAttribute(combinedPos, 3));
-            
-            const sunMat = new THREE.PointsMaterial({ color: 0xffd700, size: 0.1, transparent: true, opacity: 0.8 });
-            sunParticles = new THREE.Points(sunGeo, sunMat);
-            scene.add(sunParticles);
+            galGeo.setAttribute('position', new THREE.Float32BufferAttribute(galPos, 3));
+            galaxy = new THREE.Points(galGeo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.08, transparent: true, opacity: 0.6 }));
+            scene.add(galaxy);
 
-            // Particules d'énergie
-            const energyGeo = new THREE.BufferGeometry();
-            const energyPos = new Float32Array(1000 * 3);
-            energyGeo.setAttribute('position', new THREE.BufferAttribute(energyPos, 3));
-            energyParticles = new THREE.Points(energyGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.05, transparent: true, opacity: 0 }));
-            scene.add(energyParticles);
-
-            camera.position.z = 15;
-            
-            // Animation de formation
-            gsap.to(sunParticles.geometry.attributes.position.array, {
-                duration: 2,
-                onUpdate: () => sunParticles.geometry.attributes.position.needsUpdate = true,
-                // Logique simplifiée pour l'exemple : convergence vers le centre
-                endArray: new Float32Array(particleCount * 3).map(() => (Math.random() - 0.5) * 5)
-            });
-
+            camera.position.z = 30;
             animate();
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            const time = Date.now() * 0.002;
-            
-            // Respiration
-            const scale = 1 + Math.sin(time) * 0.1;
-            sunParticles.scale.set(scale, scale, scale);
-
-            // Éjection d'énergie (quand le soleil expire / rétrécit)
-            if(Math.sin(time) < -0.9) {
-                energyParticles.material.opacity = 1;
-                gsap.to(energyParticles.material, { opacity: 0, duration: 1 });
-            }
-
-            sunParticles.rotation.y += 0.005;
+            stars.rotation.y += 0.0002;
+            galaxy.rotation.y += 0.001; // La galaxie tourne plus vite pour la profondeur
             renderer.render(scene, camera);
         }
 
-        // --- TYPING ANIMATION ---
-        function startTyping() {
-            gsap.to("#typed-title", { duration: 1.5, text: "Lavri Zetwal", delay: 0.5 });
-            gsap.to("#typed-slogan", { duration: 2, text: "Pi pwòp, Pi santi bon", delay: 2 });
-        }
+        // SIMULATION DYNAMIQUE MACHINES
+        setInterval(() => {
+            const available = Math.floor(Math.random() * 3) + 7;
+            document.getElementById('available-machines').innerText = available;
+        }, 10000);
 
-        // --- MACHINE SIMULATOR ---
-        function updateMachines() {
-            const count = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
-            const timer = Math.floor(Math.random() * 15) + 1;
-            document.getElementById('available-count').innerText = count;
-            document.getElementById('timer-text').innerText = `Yon machin ap lib nan ${timer} minit`;
-        }
-
-        // --- CALCULATRICE ---
-        function calculate() {
-            const kg = document.getElementById('user-kg').value;
-            const pliyaj = parseInt(document.getElementById('pliyaj-select').value);
-            if(!kg) return;
-            
-            let base = 0;
-            if(kg <= 9) base = 650;
-            else if(kg <= 14) base = 850;
-            else base = 1000;
-
-            const total = base + pliyaj;
-            document.getElementById('total-res').innerText = `TOTAL: ${total} HTG`;
-        }
-
-        window.onload = () => {
-            initScene();
-            startTyping();
-            setInterval(updateMachines, 5000);
-            updateMachines();
-        };
-
-        // Resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        init();
+        
+        // Animation Respiration Soleil
+        gsap.to(".sun-core", { scale: 1.1, duration: 2, repeat: -1, yoyo: true, ease: "sine.inOut" });
     </script>
 </body>
 </html>
