@@ -1,106 +1,77 @@
 <!DOCTYPE html>
 <html lang="ht">
 <head>
-    <link rel="icon" type="image/png" href="/assets/logo-Cu4lTfjk.png">
+    <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lavri Zètwal | Eksperyans Premium</title>
-    
+    <title>ZETWAL ORGANISATION | Inovasyon ak Ekselans</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- BASES DE L'INDEX --- */
         :root {
             --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc;
-            --bg: #010101; --text: #ffffff;
-            --glass: rgba(255, 255, 255, 0.05);
+            --gold-glow: rgba(255, 215, 0, 0.2); --bg: #010101; --text: #ffffff;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --glass-bg: rgba(255, 255, 255, 0.08);
         }
-        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
-        #webgl-canvas { position: fixed; inset: 0; z-index: -10; }
+        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
+        #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
+        
+        /* --- NAVIGATION (REPRISE INDEX) --- */
+        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); border-bottom: 3px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1; }
+        .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
+        .auth-container { position: absolute; right: 20px; top: 15px; text-align: right; }
+        .login-btn { padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px; color: var(--gold); text-decoration: none; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; transition: 0.3s; cursor: pointer; background: transparent; }
+        .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .nav-logo-img { width: 25px; height: 25px; }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+        .logo-text span { color: var(--gold); }
+        .nav-links { display: flex; list-style: none; gap: 10px; margin: 0; padding: 5px; overflow-x: auto; width: 100%; white-space: nowrap; }
+        .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.6rem; text-transform: uppercase; padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.4); }
+        .nav-links a.active { background: var(--gold); color: #000; }
 
-        /* --- 1. SPHÈRE : NAISSANCE & ÉNERGIE --- */
+        /* --- HERO & SUNCORP --- */
         .hero-container { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .sun-core { width: 150px; height: 150px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; box-shadow: 0 0 80px var(--gold); filter: blur(1px); }
         
-        .sphere-wrapper { position: relative; width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; }
-        
-        /* Les deux moitiés qui se rejoignent */
-        .sphere-part {
-            position: absolute; width: 75px; height: 150px;
-            background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep));
-            filter: blur(2px); z-index: 2;
-        }
-        .left-half { border-radius: 150px 0 0 150px; left: -200px; opacity: 0; }
-        .right-half { border-radius: 0 150px 150px 0; right: -200px; opacity: 0; }
-
-        .sun-core {
-            position: absolute; width: 150px; height: 150px;
-            background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep));
-            border-radius: 50%; box-shadow: 0 0 80px var(--gold);
-            opacity: 0; scale: 0.5; filter: blur(1px);
-        }
-
-        /* Particules d'expiration */
-        .energy-particle {
-            position: absolute; background: var(--gold); border-radius: 50%;
-            pointer-events: none; z-index: 1; filter: blur(1px);
-        }
-
-        /* --- 2. TITRE TYPING --- */
-        .typing-container { margin-top: 40px; min-height: 80px; }
         .gold-shimmer {
-            font-family: 'Playfair Display', serif; font-size: 5rem;
+            font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 5rem);
             background: linear-gradient(90deg, #fff, var(--gold), #fff);
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shimmer 5s linear infinite; margin: 0;
+            animation: shimmer 5s linear infinite; margin: 20px 0 0;
         }
         @keyframes shimmer { to { background-position: 200% center; } }
 
-        /* --- 3. SECTIONS PLANS (LARGEUR TOTALE) --- */
-        .section-plan {
-            min-height: 100vh; padding: 100px 10%; display: flex; align-items: center; justify-content: center;
-            opacity: 0; transform: translateY(100px) scale(0.9); filter: blur(20px);
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        /* --- GLASSMORPHISM FLOU --- */
+        .glass-info {
+            background: rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 15px 40px;
+            margin-top: 15px;
+            text-align: center;
         }
-        .section-plan.is-visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+        .slogan-text { letter-spacing: 5px; font-weight: 600; font-size: 0.9rem; margin: 0; }
 
-        .plan-card-wide {
-            width: 100%; max-width: 1200px; background: var(--glass);
-            backdrop-filter: blur(30px); border-radius: 40px; padding: 60px;
-            border: 2px solid rgba(255, 215, 0, 0.2); position: relative;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
-        }
+        /* --- SIMULATION MACHINES --- */
+        .machine-status { margin-top: 20px; font-size: 0.8rem; color: var(--gold); font-weight: bold; }
 
-        .plan-info h2 { font-size: 4rem; color: var(--gold); margin: 0; }
-        .plan-details { font-size: 1.2rem; line-height: 1.8; opacity: 0.8; }
+        /* --- TARIFS & CALCULATEUR (MAGIC CARDS) --- */
+        .pricing-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; padding: 60px 20px; max-width: 1200px; margin: 0 auto; }
+        .magic-card { flex: 1; min-width: 300px; max-width: 350px; background: linear-gradient(90deg, #D4AF37, #5c4b1a, #D4AF37); background-size: 300% 300%; border-radius: 20px; padding: 3px; animation: liquidGold 4s linear infinite; transition: transform 0.4s; }
+        .magic-card:hover { transform: scale(1.05); }
+        .card-inner { background: #0f0f0f; border-radius: 17px; padding: 30px 20px; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
         
-        .contact-actions { display: flex; gap: 20px; margin-top: 30px; }
-        .btn-order {
-            padding: 15px 35px; border-radius: 50px; text-decoration: none;
-            font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 10px;
-            transition: 0.3s;
-        }
-        .btn-whatsapp { background: #25D366; color: white; }
-        .btn-telegram { background: #0088cc; color: white; }
+        @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* --- 4. ESPACE CLIENT (MIKE-AGENT STYLE) --- */
-        .client-space { 
-            background: linear-gradient(180deg, transparent, rgba(255,215,0,0.05));
-            padding: 100px 5%; display: none; /* Apparaît si connecté */
-        }
-        .order-history { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .order-item { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border-left: 4px solid var(--gold); }
-
-        /* RÉCUPÉRATION DU NAV ET FOOTER DE L'INDEX */
-        /* (Styles identiques à ton index.html pour la cohérence totale) */
-        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 2px solid var(--gold); }
-        .nav-content { display: flex; flex-direction: column; align-items: center; padding: 15px; }
-        .nav-links { display: flex; list-style: none; gap: 20px; padding: 0; }
-        .nav-links a { color: white; text-decoration: none; font-size: 0.8rem; text-transform: uppercase; border: 1px solid rgba(255,215,0,0.3); padding: 8px 15px; border-radius: 20px; }
+        /* --- CALCULATEUR STYLE --- */
+        .calc-input { width: 100%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid var(--gold); color: gold; border-radius: 8px; }
         
-        footer { background: #000; padding: 60px 5%; text-align: center; border-top: 2px solid var(--gold); }
+        footer { background: #000; padding: 60px 5%; text-align: center; border-top: 3px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1; }
     </style>
 </head>
 <body>
@@ -109,13 +80,19 @@
 
     <nav class="nav">
         <div class="nav-content">
-            <div class="auth-container" style="position: absolute; right: 20px;">
-                <button id="login-btn" class="btn-order" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 0.7rem;">Login</button>
+            <div class="auth-container">
+                <div id="user-display">
+                    <span id="user-name">Salut Mike</span><br>
+                    <span id="user-points" style="font-size: 0.6rem;">1000 Pwen</span>
+                </div>
             </div>
-            <div style="font-family: 'Playfair Display'; font-size: 1.2rem;">ZETWAL <span style="color:var(--gold)">ORGANISATION</span></div>
+            <div class="logo-container">
+                <img src="logo.png" alt="Zetwal" class="nav-logo-img">
+                <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
+            </div>
             <ul class="nav-links">
                 <li><a href="index.html">Akèy</a></li>
-                <li><a href="lavri.html" style="background: var(--gold); color: black;">Lavri</a></li>
+                <li><a href="lavri.html" class="active">Lavri</a></li>
                 <li><a href="shop.html">Shop</a></li>
             </ul>
         </div>
@@ -123,136 +100,132 @@
 
     <main>
         <section class="hero-container">
-            <div class="sphere-wrapper">
-                <div class="sphere-part left-half"></div>
-                <div class="sphere-part right-half"></div>
-                <div class="sun-core"></div>
-            </div>
+            <div class="sun-core"></div>
+            <h1 class="gold-shimmer">Lavri Zetwal</h1>
             
-            <div class="typing-container">
-                <h1 id="typing-text" class="gold-shimmer"></h1>
+            <div class="glass-info">
+                <p class="slogan-text gold-shimmer">Pi Pwop, Pi Santi Bon</p>
             </div>
-            <p style="letter-spacing: 5px; opacity: 0.6; margin-top: 10px;">PI PWÒP, PI SANTI BÒN</p>
-        </section>
 
-        <section id="user-section" class="section-plan">
-            <div class="plan-card-wide" style="grid-template-columns: 1fr;">
-                <h2 style="font-size: 2rem;">Mwen salye w, <span id="client-name" style="color:var(--gold)">Asosye</span></h2>
-                <div class="order-history">
-                    <div class="order-item"><h4>Lavage Express - 12kg</h4><p>Statut: An kous...</p></div>
-                    <div class="order-item"><h4>Lavage Premium - 08kg</h4><p>Statut: Fin fini ✓</p></div>
-                </div>
+            <div class="machine-status">
+                <span id="available-machines">8</span>/10 Machin Disponib <br>
+                <span id="timer-simulation" style="font-weight: 300; font-style: italic;">Yon machin ap disponib nan 10 minit</span>
             </div>
         </section>
 
-        <section class="section-plan">
-            <div class="plan-card-wide">
-                <div class="plan-info">
-                    <div style="font-size: 3rem;">🧺</div>
-                    <h2>Ti Zetwal</h2>
-                    <p class="plan-details">
-                        Ideyal pou elèv ak moun ki viv pou kont yo. <br>
-                        • Jiska 10 Kilo rad <br>
-                        • Lavaj, Sechaj, Pliye <br>
-                        • Livrezon nan 24èdtan
-                    </p>
+        <div class="pricing-wrapper">
+            <div class="magic-card">
+                <div class="card-inner">
+                    <h3 style="color:var(--gold)">LE PETIT</h3>
+                    <p>5kg - 9kg</p>
+                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">650<span style="font-size:1rem;">HTG</span></div>
+                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
+                        <li>⚡ Pi rapid</li>
+                        <li>💰 Mwens kòb</li>
+                    </ul>
+                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
                 </div>
-                <div style="display:flex; flex-direction:column; justify-content:center; align-items:flex-end;">
-                    <div style="font-size: 4rem; font-weight: 900;">650 <span style="font-size: 1rem;">HTG</span></div>
-                    <div class="contact-actions">
-                        <a href="https://wa.me/79961103506?text=Mwen%20vle%20plan%20Ti%20Zetwal" class="btn-order btn-whatsapp">WhatsApp</a>
-                        <a href="https://t.me/mikenestor14" class="btn-order btn-telegram">Telegram</a>
-                    </div>
+            </div>
+            <div class="magic-card">
+                <div class="card-inner">
+                    <h3 style="color:var(--gold)">LE MALIN</h3>
+                    <p>10kg - 14kg</p>
+                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">850<span style="font-size:1rem;">HTG</span></div>
+                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
+                        <li>✨ Balans pafè</li>
+                        <li>🏠 Ideyal pou fanmi</li>
+                    </ul>
+                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
+                </div>
+            </div>
+            <div class="magic-card">
+                <div class="card-inner">
+                    <h3 style="color:var(--gold)">LE GÉANT</h3>
+                    <p>15kg - 22kg</p>
+                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">1 000<span style="font-size:1rem;">HTG</span></div>
+                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
+                        <li>🧺 Tout ansanm</li>
+                        <li>🔥 Sechaj gratis</li>
+                    </ul>
+                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
+                </div>
+            </div>
+        </div>
+
+        <section style="padding: 40px 20px;">
+            <div class="magic-card" style="max-width: 600px; margin: 0 auto;">
+                <div class="card-inner">
+                    <h3 style="color:var(--gold)">🧮 KALKILE SÈVIS OU</h3>
+                    <input type="number" id="user-kg" class="calc-input" placeholder="Konbyen Kilo rad?">
+                    <select id="pliyaj-select" class="calc-input">
+                        <option value="0">Pa gen pliyaj</option>
+                        <option value="150">Rad (150 HTG)</option>
+                    </select>
+                    <button onclick="alert('Kalkil an kous...')" class="login-btn" style="background:var(--gold); color:#000; margin-top:20px;">KALKILE</button>
                 </div>
             </div>
         </section>
-
-        </main>
+    </main>
 
     <footer>
-        <div style="color:var(--gold); letter-spacing: 2px; margin-bottom: 20px;">ZETWAL ORGANISATION 2026</div>
-        <div style="font-size: 0.7rem; opacity: 0.5;">Étoiles Organization, 2026 — modernité et tradition</div>
+        <h4 style="color:var(--gold); margin:0; letter-spacing: 2px;">RETE KONEKTE AK NOU</h4>
+        <div style="display:flex; justify-content:center; gap:25px; margin:20px 0;">
+            <a href="https://wa.me/79961103506"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:45px;" alt="WhatsApp"></a>
+            <a href="https://t.me/mikenestor14"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" style="width:45px;" alt="Telegram"></a>
+        </div>
+        <div style="margin-top:20px; font-size:0.7rem; color:var(--gold); letter-spacing: 1px;">ZETWAL ORGANISATION 2026 – MODÈNITE AK TRADISYON</div>
     </footer>
 
     <script>
-        // 1. ANIMATION DE NAISSANCE DU SOLEIL (GSAP)
-        const tl = gsap.timeline();
-        
-        tl.to(".left-half", { left: 0, opacity: 1, duration: 1.5, ease: "power4.out" })
-          .to(".right-half", { right: 0, opacity: 1, duration: 1.5, ease: "power4.out" }, "-=1.5")
-          .to(".sphere-part", { opacity: 0, duration: 0.3 })
-          .to(".sun-core", { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.7)" }, "-=0.2")
-          .add(() => {
-              startBreathing();
-              startTyping("Lavri Zètwal");
-          });
+        // 4. BACKGROUND (SOLEIL + GALAXIE CORRIGÉ)
+        let scene, camera, renderer, stars, galaxy;
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // 2. RESPIRATION ET PERTES D'ÉNERGIE
-        function startBreathing() {
-            const sun = document.querySelector('.sun-core');
-            const breatheTl = gsap.timeline({ repeat: -1, yoyo: true });
-            
-            breatheTl.to(sun, { 
-                scale: 1.2, 
-                boxShadow: "0 0 120px #ffd700", 
-                duration: 2, 
-                ease: "sine.inOut",
-                onUpdate: function() {
-                    if(this.progress() > 0.8) createEnergyLoss();
-                }
-            });
-        }
+            // Couche 1 : Étoiles fixes (Fond)
+            const starGeo = new THREE.BufferGeometry();
+            const starPos = [];
+            for(let i=0; i<2000; i++) starPos.push((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*100);
+            starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+            stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.05 }));
+            scene.add(stars);
 
-        function createEnergyLoss() {
-            const wrapper = document.querySelector('.sphere-wrapper');
-            for(let i=0; i<3; i++) {
-                const p = document.createElement('div');
-                p.className = 'energy-particle';
-                const size = Math.random() * 4 + 2;
-                p.style.width = p.style.height = size + 'px';
-                wrapper.appendChild(p);
-
-                gsap.to(p, {
-                    x: (Math.random() - 0.5) * 400,
-                    y: (Math.random() - 0.5) * 400,
-                    opacity: 0,
-                    duration: Math.random() * 2 + 1,
-                    onComplete: () => p.remove()
-                });
+            // Couche 2 : Galaxie (Groupes d'étoiles dorées en rotation)
+            const galGeo = new THREE.BufferGeometry();
+            const galPos = [];
+            for(let i=0; i<1000; i++) {
+                const r = Math.random() * 20 + 5;
+                const theta = Math.random() * Math.PI * 2;
+                galPos.push(Math.cos(theta)*r, (Math.random()-0.5)*2, Math.sin(theta)*r);
             }
+            galGeo.setAttribute('position', new THREE.Float32BufferAttribute(galPos, 3));
+            galaxy = new THREE.Points(galGeo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.08, transparent: true, opacity: 0.6 }));
+            scene.add(galaxy);
+
+            camera.position.z = 30;
+            animate();
         }
 
-        // 3. EFFET TYPING RÉALISTE
-        function startTyping(text) {
-            const target = document.getElementById('typing-text');
-            let i = 0;
-            const timer = setInterval(() => {
-                target.innerHTML += text.charAt(i);
-                i++;
-                if (i >= text.length) clearInterval(timer);
-            }, 150);
+        function animate() {
+            requestAnimationFrame(animate);
+            stars.rotation.y += 0.0002;
+            galaxy.rotation.y += 0.001; // La galaxie tourne plus vite pour la profondeur
+            renderer.render(scene, camera);
         }
 
-        // 4. SCROLL REVEAL "PAGE QUI APPARAIT"
-        const sections = document.querySelectorAll('.section-plan');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting) entry.target.classList.add('is-visible');
-            });
-        }, { threshold: 0.2 });
+        // SIMULATION DYNAMIQUE MACHINES
+        setInterval(() => {
+            const available = Math.floor(Math.random() * 3) + 7;
+            document.getElementById('available-machines').innerText = available;
+        }, 10000);
 
-        sections.forEach(s => observer.observe(s));
-
-        // 5. SIMULATION CONNEXION (Pour test)
-        document.getElementById('login-btn').addEventListener('click', () => {
-            const userSection = document.getElementById('user-section');
-            userSection.style.display = 'flex';
-            gsap.from(userSection, { height: 0, opacity: 0, duration: 1, ease: "power4.out" });
-            window.scrollTo({ top: userSection.offsetTop, behavior: 'smooth' });
-        });
-
-        // INIT THREE.JS (GALAXY)
-        // ... (Copie ici la fonction init() de ton index.html pour garder le fond étoilé)
+        init();
+        
+        // Animation Respiration Soleil
+        gsap.to(".sun-core", { scale: 1.1, duration: 2, repeat: -1, yoyo: true, ease: "sine.inOut" });
     </script>
 </body>
 </html>
