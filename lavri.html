@@ -564,6 +564,43 @@
       background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,215,0,0.01) 2px, rgba(255,215,0,0.01) 4px);
       pointer-events: none;
     }
+    /* Machine disponible = cliquable vers WhatsApp */
+    .machine-card.is-available {
+      cursor: pointer;
+    }
+    .machine-card.is-available:hover {
+      border-color: rgba(0,255,136,0.6);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 35px rgba(0,255,136,0.15);
+      transform: translateY(-6px) scale(1.01);
+    }
+    .machine-card.is-available:hover .machine-card-cta {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .machine-card-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 9px 16px;
+      background: linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,200,100,0.08));
+      border: 1px solid rgba(0,255,136,0.35);
+      border-radius: 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #00ff88;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: var(--transition);
+    }
+    /* Ripple au clic */
+    @keyframes machine-ripple {
+      from { transform: scale(0); opacity: 0.6; }
+      to   { transform: scale(3); opacity: 0; }
+    }
 
     /* ============================================================
        TARIFS (PRICING)
@@ -1210,13 +1247,13 @@
       </div>
       <!-- Liens (corrigés + complets) -->
       <ul class="nav-links" role="list">
-        <li><a href="index.html">Akèy</a></li>
-        <li><a href="lavri.html" class="active" aria-current="page">Lavri</a></li>
-        <li><a href="cinema.html">Sinema</a></li>
-        <li><a href="mall.html">Mall</a></li>
-        <li><a href="technopark.html">Technopark</a></li>
-        <li><a href="games.html">Jwèt</a></li>
-        <li><a href="association.html">Asosye</a></li>
+        <li><a href="https://zetwal.org/index.html">Akèy</a></li>
+        <li><a href="https://zetwal.org/lavri.html" class="active" aria-current="page">Lavri</a></li>
+        <li><a href="https://zetwal.org/cinema.html">Sinema</a></li>
+        <li><a href="https://zetwal.org/mall.html">Mall</a></li>
+        <li><a href="https://zetwal.org/technopark.html">Technopark</a></li>
+        <li><a href="https://zetwal.org/games.html">Jwèt</a></li>
+        <li><a href="https://zetwal.org/association.html">Asosye</a></li>
       </ul>
     </div>
   </nav>
@@ -1255,7 +1292,7 @@
         <div class="machine-status-row">
           <div class="machine-dot" aria-hidden="true"></div>
           <span class="machine-count-text">
-            <span id="available-machines">3</span> / 5 Machin Disponib
+            <span id="available-machines">3</span> / 10 Machin Disponib
           </span>
         </div>
         <div class="machine-timer-text" id="timer-simulation">
@@ -1656,48 +1693,78 @@
 
 
     /* ============================================================
-       4. MACHINES STATUS — HUD
+       4. MACHINES STATUS — 10 MACHINES SYNCHRONISÉES
+       Logique :
+       - 10 machines toujours affichées (X / 10)
+       - Les timers sont des vrais comptes à rebours JS en temps réel
+       - Le hero affiche EXACTEMENT le timer de la machine la plus proche
+       - Clic sur machine disponible → WhatsApp
     ============================================================ */
+    const WA_NUMBER = '79961103506'; /* Numéro WhatsApp existant */
+
+    /* Génère un temps entre 9 et 15 min en secondes */
+    function randTimer() { return (9 + Math.floor(Math.random() * 7)) * 60; }
+
+    /* Données initiales des 10 machines */
     const machinesData = [
-      { id: 'MCH-01', name: 'Machine 1',  status: 'available', progress: 100, kg: null  },
-      { id: 'MCH-02', name: 'Machine 2',  status: 'available', progress: 100, kg: null  },
-      { id: 'MCH-03', name: 'Machine 3',  status: 'available', progress: 100, kg: null  },
-      { id: 'MCH-04', name: 'Machine 4',  status: 'busy',      progress: 55,  kg: '8kg' },
-      { id: 'MCH-05', name: 'Machine 5',  status: 'soon',      progress: 78,  kg: '12kg' },
+      { id: 'MCH-01', name: 'Machine 1',  status: 'available', progress: 100, kg: null,  timer: 0 },
+      { id: 'MCH-02', name: 'Machine 2',  status: 'available', progress: 100, kg: null,  timer: 0 },
+      { id: 'MCH-03', name: 'Machine 3',  status: 'available', progress: 100, kg: null,  timer: 0 },
+      { id: 'MCH-04', name: 'Machine 4',  status: 'busy',      progress: 45,  kg: '8kg', timer: randTimer() },
+      { id: 'MCH-05', name: 'Machine 5',  status: 'busy',      progress: 62,  kg: '11kg',timer: randTimer() },
+      { id: 'MCH-06', name: 'Machine 6',  status: 'busy',      progress: 30,  kg: '6kg', timer: randTimer() },
+      { id: 'MCH-07', name: 'Machine 7',  status: 'soon',      progress: 82,  kg: '9kg', timer: randTimer() },
+      { id: 'MCH-08', name: 'Machine 8',  status: 'soon',      progress: 88,  kg: '14kg',timer: randTimer() },
+      { id: 'MCH-09', name: 'Machine 9',  status: 'busy',      progress: 20,  kg: '7kg', timer: randTimer() },
+      { id: 'MCH-10', name: 'Machine 10', status: 'busy',      progress: 55,  kg: '12kg',timer: randTimer() },
     ];
 
-    /* Compteurs pour les machines "soon" */
-    const soonTimers = {};
-    machinesData.forEach(m => {
-      if (m.status === 'soon') {
-        soonTimers[m.id] = (9 + Math.floor(Math.random() * 7)) * 60; // 9-15 min en secondes
-      }
-    });
-
+    /* Rend les 10 cartes machines */
     function renderMachines() {
       const grid = document.getElementById('machinesGrid');
       grid.innerHTML = '';
+
       machinesData.forEach((m, idx) => {
         const card = document.createElement('div');
-        card.className = 'machine-card reveal';
-        card.style.transitionDelay = (idx * 0.1) + 's';
+        const isAvail = m.status === 'available';
+        card.className = 'machine-card reveal' + (isAvail ? ' is-available' : '');
+        card.style.transitionDelay = (idx * 0.07) + 's';
+
+        /* Clic WhatsApp uniquement si disponible */
+        if (isAvail) {
+          card.setAttribute('role', 'button');
+          card.setAttribute('tabindex', '0');
+          card.setAttribute('aria-label', m.name + ' — Klike pou rezève sou WhatsApp');
+          card.onclick = () => openWhatsApp(m.name);
+          card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') openWhatsApp(m.name); };
+        }
 
         let badgeHTML, progressClass, bodyHTML;
-        if (m.status === 'available') {
+
+        if (isAvail) {
           badgeHTML     = '<span class="machine-status-badge badge-available">✓ Disponib</span>';
           progressClass = 'fill-green';
-          bodyHTML      = `<div class="machine-info-text">Prè pou itilize — Plas disponib</div>`;
+          bodyHTML      = `
+            <div class="machine-info-text">Prè pou itilize — Klike pou rezève</div>
+            <div class="machine-card-cta">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#00ff88"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.001-1.369l-.36-.213-3.735.861.879-3.638-.234-.375A9.788 9.788 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+              Rezève sou WhatsApp
+            </div>
+          `;
         } else if (m.status === 'busy') {
+          const pct = Math.round(m.progress);
           badgeHTML     = '<span class="machine-status-badge badge-busy">● Okipe</span>';
           progressClass = 'fill-orange';
-          bodyHTML      = `<div class="machine-info-text">Pwa aktyèl : <strong style="color:var(--gold)">${m.kg}</strong></div>`;
-        } else {
-          badgeHTML     = '<span class="machine-status-badge badge-soon">◎ Byento lib</span>';
-          progressClass = 'fill-gold';
-          const sec = soonTimers[m.id] || 0;
+          bodyHTML      = `
+            <div class="machine-info-text">Pwa : <strong style="color:var(--gold)">${m.kg}</strong></div>
+          `;
+        } else { /* soon */
+          const sec = m.timer;
           const mm  = String(Math.floor(sec / 60)).padStart(2, '0');
           const ss  = String(sec % 60).padStart(2, '0');
-          bodyHTML  = `
+          badgeHTML     = '<span class="machine-status-badge badge-soon">◎ Byento lib</span>';
+          progressClass = 'fill-gold';
+          bodyHTML      = `
             <div class="machine-info-text">Disponib nan :</div>
             <div class="machine-countdown" id="countdown-${m.id}">${mm}:${ss}</div>
           `;
@@ -1708,7 +1775,7 @@
             <span class="machine-id">${m.id}</span>
             ${badgeHTML}
           </div>
-          <div style="font-size:0.82rem; font-weight:600; margin-bottom:6px; color:rgba(255,255,255,0.85)">${m.name}</div>
+          <div style="font-size:0.82rem;font-weight:600;margin-bottom:6px;color:rgba(255,255,255,0.85)">${m.name}</div>
           <div class="machine-progress-bar">
             <div class="machine-progress-fill ${progressClass}" style="width:${m.progress}%"></div>
           </div>
@@ -1716,44 +1783,77 @@
         `;
         grid.appendChild(card);
       });
-      triggerReveal(); /* Met à jour les observers */
+
+      triggerReveal();
     }
     renderMachines();
 
-    /* --- Compte à rebours machines "soon" --- */
+    /* Ouvre WhatsApp avec un message pré-rempli */
+    function openWhatsApp(machineName) {
+      const msg = encodeURIComponent(
+        'Bonjou! Mwen vle rezève ' + machineName + ' ki disponib la. Kijan mwen ka fè sa?'
+      );
+      window.open('https://wa.me/' + WA_NUMBER + '?text=' + msg, '_blank');
+    }
+
+    /* ============================================================
+       MOTEUR PRINCIPAL — Compte à rebours synchronisé
+       Toutes les secondes :
+         1. Décrémente les timers des machines busy/soon
+         2. Passe "soon" → "available" quand timer = 0
+         3. Hero affiche EXACTEMENT le timer minimum (machine la + proche)
+    ============================================================ */
     setInterval(() => {
+      let needRender = false;
+
       machinesData.forEach(m => {
-        if (m.status === 'soon' && soonTimers[m.id] !== undefined) {
-          soonTimers[m.id]--;
-          if (soonTimers[m.id] <= 0) {
+        if (m.status === 'busy' || m.status === 'soon') {
+          m.timer--;
+
+          if (m.timer <= 0) {
+            /* La machine devient disponible */
             m.status   = 'available';
             m.progress = 100;
-            delete soonTimers[m.id];
-            renderMachines();
+            m.timer    = 0;
+            m.kg       = null;
+            needRender = true;
           } else {
-            const sec = soonTimers[m.id];
-            const mm  = String(Math.floor(sec / 60)).padStart(2, '0');
-            const ss  = String(sec % 60).padStart(2, '0');
-            const el  = document.getElementById('countdown-' + m.id);
-            if (el) el.textContent = mm + ':' + ss;
+            /* Mise à jour du countdown dans le DOM sans re-render */
+            if (m.status === 'soon') {
+              const el = document.getElementById('countdown-' + m.id);
+              if (el) {
+                const mm = String(Math.floor(m.timer / 60)).padStart(2, '0');
+                const ss = String(m.timer % 60).padStart(2, '0');
+                el.textContent = mm + ':' + ss;
+              }
+            }
+            /* Mise à jour progressive de la barre de progression */
+            m.progress = Math.min(100, m.progress + 0.1);
           }
         }
       });
-      /* Mise à jour hero */
+
+      if (needRender) renderMachines();
       updateHeroCounts();
     }, 1000);
 
-    /* --- Timer hero "yon machin pral disponib" --- */
-    let heroTimerSec = (9 + Math.floor(Math.random() * 7)) * 60;
+    /* Met à jour le hero : compteur disponibles + timer synchronisé */
     function updateHeroCounts() {
       const avail = machinesData.filter(m => m.status === 'available').length;
       document.getElementById('available-machines').textContent = avail;
-      heroTimerSec--;
-      if (heroTimerSec <= 0) heroTimerSec = (9 + Math.floor(Math.random() * 7)) * 60;
-      const mm = String(Math.floor(heroTimerSec / 60)).padStart(2, '0');
-      const ss = String(heroTimerSec % 60).padStart(2, '0');
-      document.getElementById('timer-simulation').textContent =
-        'Yon machine pral disponib nan ' + mm + ':' + ss;
+
+      /* Timer hero = machine la plus proche de devenir libre */
+      const notAvail = machinesData.filter(m => m.status !== 'available' && m.timer > 0);
+      if (notAvail.length > 0) {
+        const minTimer = Math.min(...notAvail.map(m => m.timer));
+        const mm = String(Math.floor(minTimer / 60)).padStart(2, '0');
+        const ss = String(minTimer % 60).padStart(2, '0');
+        document.getElementById('timer-simulation').textContent =
+          'Yon machine pral disponib nan ' + mm + ':' + ss;
+      } else {
+        document.getElementById('timer-simulation').textContent =
+          'Tout machin yo disponib!';
+      }
     }
     updateHeroCounts();
 
