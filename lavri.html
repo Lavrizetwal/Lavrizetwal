@@ -1,231 +1,1990 @@
 <!DOCTYPE html>
 <html lang="ht">
 <head>
-    <link rel="icon" type="image/png" href="logo.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZETWAL ORGANISATION | Inovasyon ak Ekselans</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc;
-            --gold-glow: rgba(255, 215, 0, 0.2); --bg: #010101; --text: #ffffff;
-            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            --glass-bg: rgba(255, 255, 255, 0.08);
-        }
-        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
-        #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
-        
-        /* --- NAVIGATION (REPRISE INDEX) --- */
-        .nav { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); border-bottom: 3px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1; }
-        .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
-        .auth-container { position: absolute; right: 20px; top: 15px; text-align: right; }
-        .login-btn { padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px; color: var(--gold); text-decoration: none; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; transition: 0.3s; cursor: pointer; background: transparent; }
-        .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        .nav-logo-img { width: 25px; height: 25px; }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
-        .logo-text span { color: var(--gold); }
-        .nav-links { display: flex; list-style: none; gap: 10px; margin: 0; padding: 5px; overflow-x: auto; width: 100%; white-space: nowrap; }
-        .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.6rem; text-transform: uppercase; padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.4); }
-        .nav-links a.active { background: var(--gold); color: #000; }
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LAVRI ZETWAL | Pi Pwòp, Pi Santi Bon</title>
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
 
-        /* --- HERO & SUNCORP --- */
-        .hero-container { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .sun-core { width: 150px; height: 150px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; box-shadow: 0 0 80px var(--gold); filter: blur(1px); }
-        
-        .gold-shimmer {
-            font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 5rem);
-            background: linear-gradient(90deg, #fff, var(--gold), #fff);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shimmer 5s linear infinite; margin: 20px 0 0;
-        }
-        @keyframes shimmer { to { background-position: 200% center; } }
+  <style>
+    /* ============================================================
+       ROOT VARIABLES
+    ============================================================ */
+    :root {
+      --gold:        #ffd700;
+      --gold-deep:   #b8860b;
+      --gold-light:  #fff8dc;
+      --gold-glow:   rgba(255,215,0,0.25);
+      --gold-glow2:  rgba(255,215,0,0.08);
+      --bg:          #010101;
+      --text:        #ffffff;
+      --glass-bg:    rgba(255,255,255,0.07);
+      --glass-border:rgba(255,215,0,0.25);
+      --transition:  all 0.45s cubic-bezier(0.165,0.84,0.44,1);
+      --neon-blue:   rgba(100,180,255,0.15);
+      --neon-purple: rgba(180,100,255,0.12);
+    }
 
-        /* --- GLASSMORPHISM FLOU --- */
-        .glass-info {
-            background: rgba(255, 215, 0, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 20px;
-            padding: 15px 40px;
-            margin-top: 15px;
-            text-align: center;
-        }
-        .slogan-text { letter-spacing: 5px; font-weight: 600; font-size: 0.9rem; margin: 0; }
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      cursor: default;
+    }
 
-        /* --- SIMULATION MACHINES --- */
-        .machine-status { margin-top: 20px; font-size: 0.8rem; color: var(--gold); font-weight: bold; }
+    /* ============================================================
+       CUSTOM SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: var(--gold-deep); border-radius: 2px; }
 
-        /* --- TARIFS & CALCULATEUR (MAGIC CARDS) --- */
-        .pricing-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; padding: 60px 20px; max-width: 1200px; margin: 0 auto; }
-        .magic-card { flex: 1; min-width: 300px; max-width: 350px; background: linear-gradient(90deg, #D4AF37, #5c4b1a, #D4AF37); background-size: 300% 300%; border-radius: 20px; padding: 3px; animation: liquidGold 4s linear infinite; transition: transform 0.4s; }
-        .magic-card:hover { transform: scale(1.05); }
-        .card-inner { background: #0f0f0f; border-radius: 17px; padding: 30px 20px; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        
-        @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    /* ============================================================
+       CANVAS BACKGROUND (THREE.JS)
+    ============================================================ */
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      pointer-events: none;
+    }
 
-        /* --- CALCULATEUR STYLE --- */
-        .calc-input { width: 100%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid var(--gold); color: gold; border-radius: 8px; }
-        
-        footer { background: #000; padding: 60px 5%; text-align: center; border-top: 3px solid transparent; border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1; }
-    </style>
+    /* ============================================================
+       NEBULA / BRUME LUMINEUSE MULTICOLORE (couche fixe)
+    ============================================================ */
+    .nebula-layer {
+      position: fixed;
+      inset: 0;
+      z-index: -9;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .nebula-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      animation: nebula-drift 18s ease-in-out infinite alternate;
+    }
+    .nebula-blob:nth-child(1) {
+      width: 500px; height: 500px;
+      top: -100px; left: -100px;
+      background: radial-gradient(circle, rgba(100,60,200,0.18) 0%, transparent 70%);
+      animation-duration: 20s;
+    }
+    .nebula-blob:nth-child(2) {
+      width: 600px; height: 400px;
+      top: 30%; right: -150px;
+      background: radial-gradient(circle, rgba(255,180,0,0.10) 0%, transparent 70%);
+      animation-duration: 25s; animation-delay: -8s;
+    }
+    .nebula-blob:nth-child(3) {
+      width: 450px; height: 450px;
+      bottom: 10%; left: 20%;
+      background: radial-gradient(circle, rgba(0,150,255,0.10) 0%, transparent 70%);
+      animation-duration: 22s; animation-delay: -5s;
+    }
+    .nebula-blob:nth-child(4) {
+      width: 350px; height: 350px;
+      top: 60%; right: 25%;
+      background: radial-gradient(circle, rgba(255,80,150,0.08) 0%, transparent 70%);
+      animation-duration: 30s; animation-delay: -12s;
+    }
+    @keyframes nebula-drift {
+      0%   { transform: translate(0,0) scale(1); }
+      50%  { transform: translate(40px,-30px) scale(1.08); }
+      100% { transform: translate(-20px,20px) scale(0.95); }
+    }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    .nav {
+      position: fixed;
+      top: 0; width: 100%;
+      z-index: 1000;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,215,0,0.2);
+    }
+    /* Ligne dorée animée sous la nav */
+    .nav::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%);
+      background-size: 200% 100%;
+      animation: nav-line 4s linear infinite;
+    }
+    @keyframes nav-line { to { background-position: 200% 0; } }
+
+    .nav-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 20px 10px;
+    }
+    .auth-container {
+      position: absolute;
+      right: 20px; top: 14px;
+      text-align: right;
+    }
+    #user-name    { font-size: 0.72rem; font-weight: 600; color: var(--gold); }
+    #user-points  { font-size: 0.58rem; color: rgba(255,215,0,0.7); }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .nav-logo-img { width: 28px; height: 28px; }
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .logo-text span { color: var(--gold); }
+
+    /* Nav links */
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 8px;
+      padding: 4px 0;
+      overflow-x: auto;
+      width: 100%;
+      justify-content: center;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-links li { flex-shrink: 0; }
+    .nav-links a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,215,0,0.25);
+      transition: var(--transition);
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Hover shimmer sweep */
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,215,0,0.18), transparent);
+      transition: left 0.5s ease;
+    }
+    .nav-links a:hover::before { left: 100%; }
+    .nav-links a:hover {
+      color: var(--gold);
+      border-color: rgba(255,215,0,0.7);
+      box-shadow: 0 0 12px rgba(255,215,0,0.2), inset 0 0 8px rgba(255,215,0,0.06);
+      transform: translateY(-1px);
+    }
+    /* État actif lumineux */
+    .nav-links a.active {
+      background: linear-gradient(135deg, var(--gold) 0%, #e8b800 100%);
+      color: #000;
+      border-color: var(--gold);
+      box-shadow: 0 0 18px rgba(255,215,0,0.45), 0 0 40px rgba(255,215,0,0.15);
+      font-weight: 800;
+    }
+    .nav-links a.active::before { display: none; }
+
+    /* Bouton login */
+    .login-btn {
+      padding: 9px 20px;
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: var(--transition);
+      cursor: pointer;
+      background: transparent;
+      display: inline-block;
+    }
+    .login-btn:hover {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 0 20px var(--gold-glow);
+    }
+
+    /* ============================================================
+       HERO SECTION
+    ============================================================ */
+    .hero-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 100px 20px 60px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* ------- BOULE (Sun Core) ------- */
+    .sun-wrapper {
+      position: relative;
+      width: 160px; height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 10px;
+    }
+    /* Les deux moitiés qui se rejoignent */
+    .sun-half {
+      position: absolute;
+      width: 80px; height: 160px;
+      overflow: hidden;
+      opacity: 0;
+    }
+    .sun-half.left  { left: 0;  transform: translateX(-120px); }
+    .sun-half.right { right: 0; transform: translateX(120px); }
+    .sun-half-inner {
+      width: 160px; height: 160px;
+      background: radial-gradient(circle at 50% 50%, #ffffff 0%, #ffe066 25%, var(--gold) 55%, var(--gold-deep) 100%);
+      border-radius: 50%;
+      box-shadow:
+        0 0 40px rgba(255,215,0,0.9),
+        0 0 80px rgba(255,215,0,0.5),
+        0 0 120px rgba(255,180,0,0.3);
+    }
+    .sun-half.right .sun-half-inner { margin-left: -80px; }
+    /* Boule finale après fusion */
+    .sun-core {
+      width: 160px; height: 160px;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ffe066 20%, var(--gold) 50%, var(--gold-deep) 100%);
+      border-radius: 50%;
+      box-shadow:
+        0 0 40px rgba(255,215,0,0.9),
+        0 0 80px rgba(255,215,0,0.5),
+        0 0 140px rgba(255,180,0,0.3),
+        inset 0 0 30px rgba(255,255,255,0.2);
+      position: relative;
+      opacity: 0;
+      filter: blur(1px);
+    }
+    /* Effet énergie interne – anneaux */
+    .sun-core::before {
+      content: '';
+      position: absolute;
+      inset: -15px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,215,0,0.35);
+      animation: ring-pulse 3s ease-in-out infinite;
+    }
+    .sun-core::after {
+      content: '';
+      position: absolute;
+      inset: -30px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,215,0,0.18);
+      animation: ring-pulse 3s ease-in-out infinite 0.8s;
+    }
+    @keyframes ring-pulse {
+      0%, 100% { transform: scale(1);   opacity: 1; }
+      50%       { transform: scale(1.12); opacity: 0.4; }
+    }
+
+    /* ------- TITRE PRINCIPAL avec effet machine à écrire ------- */
+    .title-wrapper {
+      position: relative;
+      display: inline-block;
+      margin: 28px 0 0;
+    }
+    /* Glassmorphism derrière le titre */
+    .title-glass-bg {
+      position: absolute;
+      inset: -20px -30px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,215,0,0.12);
+      overflow: hidden;
+    }
+    /* Lumière multicolore qui se déplace */
+    .title-glass-bg::before {
+      content: '';
+      position: absolute;
+      width: 60%; height: 200%;
+      top: -50%;
+      background: conic-gradient(from 0deg, transparent, rgba(255,215,0,0.15), rgba(100,150,255,0.10), rgba(255,80,200,0.10), transparent);
+      animation: aura-rotate 6s linear infinite;
+      transform-origin: center;
+    }
+    @keyframes aura-rotate { to { transform: rotate(360deg); } }
+
+    .gold-shimmer {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 8vw, 5rem);
+      background: linear-gradient(90deg, #c8950a 0%, var(--gold) 30%, #fffbe0 50%, var(--gold) 70%, #c8950a 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 5s linear infinite;
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    @keyframes shimmer { to { background-position: 200% center; } }
+
+    /* Curseur clignotant pour l'effet machine à écrire */
+    .typewriter-cursor {
+      display: inline-block;
+      width: 3px;
+      height: 0.85em;
+      background: var(--gold);
+      margin-left: 4px;
+      vertical-align: middle;
+      animation: blink-cursor 0.75s step-end infinite;
+      box-shadow: 0 0 8px var(--gold);
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes blink-cursor { 50% { opacity: 0; } }
+
+    /* ------- SLOGAN ------- */
+    .glass-info {
+      background: rgba(255,215,0,0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,215,0,0.25);
+      border-radius: 20px;
+      padding: 14px 40px;
+      margin-top: 18px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .glass-info::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+      animation: glass-sweep 4s ease-in-out infinite;
+    }
+    @keyframes glass-sweep { to { left: 140%; } }
+    .slogan-text {
+      letter-spacing: 5px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    /* ------- MACHINES STATUS ------- */
+    .machine-status-hero {
+      margin-top: 22px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 16px;
+      padding: 16px 28px;
+      text-align: center;
+    }
+    .machine-status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 6px;
+    }
+    .machine-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #00ff88;
+      box-shadow: 0 0 8px #00ff88;
+      animation: dot-pulse 2s ease-in-out infinite;
+    }
+    @keyframes dot-pulse {
+      0%,100% { box-shadow: 0 0 5px #00ff88; }
+      50%      { box-shadow: 0 0 18px #00ff88, 0 0 30px rgba(0,255,136,0.4); }
+    }
+    .machine-count-text {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+    #available-machines { font-size: 1.4rem; font-weight: 800; color: #00ff88; }
+    .machine-timer-text {
+      font-size: 0.72rem;
+      color: rgba(255,215,0,0.7);
+      font-style: italic;
+    }
+
+    /* ============================================================
+       SECTION MACHINES (HUD)
+    ============================================================ */
+    .section-machines {
+      padding: 80px 20px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-title {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      margin-bottom: 10px;
+    }
+    .section-subtitle {
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255,215,0,0.6);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 50px;
+    }
+    .machines-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .machine-card {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .machine-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .machine-card:hover {
+      border-color: rgba(255,215,0,0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255,215,0,0.08);
+    }
+    .machine-hud-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .machine-id {
+      font-size: 0.65rem;
+      color: rgba(255,215,0,0.5);
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+    .machine-status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .badge-available {
+      background: rgba(0,255,136,0.12);
+      color: #00ff88;
+      border: 1px solid rgba(0,255,136,0.3);
+    }
+    .badge-busy {
+      background: rgba(255,100,0,0.12);
+      color: #ff8844;
+      border: 1px solid rgba(255,100,0,0.3);
+    }
+    .badge-soon {
+      background: rgba(255,215,0,0.1);
+      color: var(--gold);
+      border: 1px solid rgba(255,215,0,0.3);
+    }
+    .machine-hud-body { margin: 12px 0; }
+    .machine-progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .machine-progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+    .fill-green  { background: linear-gradient(90deg, #00c866, #00ff88); box-shadow: 0 0 8px rgba(0,255,136,0.5); }
+    .fill-orange { background: linear-gradient(90deg, #ff6600, #ffaa00); box-shadow: 0 0 8px rgba(255,150,0,0.4); }
+    .fill-gold   { background: linear-gradient(90deg, var(--gold-deep), var(--gold)); box-shadow: 0 0 8px var(--gold-glow); }
+    .machine-info-text {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.6);
+    }
+    .machine-countdown {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--gold);
+      font-family: 'Montserrat', monospace;
+      margin: 8px 0;
+      text-shadow: 0 0 15px var(--gold-glow);
+    }
+    /* Scanline HUD effect */
+    .machine-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,215,0,0.01) 2px, rgba(255,215,0,0.01) 4px);
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       TARIFS (PRICING)
+    ============================================================ */
+    .pricing-section {
+      padding: 80px 20px;
+    }
+    .pricing-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    /* Carte dorée animée */
+    .magic-card {
+      flex: 1;
+      min-width: min(320px, 90vw);
+      max-width: 360px;
+      background: linear-gradient(135deg, #D4AF37, #7a5c0e, #D4AF37, #5c4000, #D4AF37);
+      background-size: 400% 400%;
+      border-radius: 22px;
+      padding: 3px;
+      animation: liquidGold 5s ease infinite;
+      transition: transform 0.45s cubic-bezier(0.165,0.84,0.44,1), box-shadow 0.45s ease;
+      position: relative;
+    }
+    .magic-card:hover {
+      transform: scale(1.04) translateY(-6px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 50px rgba(255,215,0,0.15);
+    }
+    @keyframes liquidGold {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .card-inner {
+      background: linear-gradient(160deg, #0d0d0d 0%, #111108 100%);
+      border-radius: 19px;
+      padding: 36px 24px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Effet lumière interne de la carte */
+    .card-inner::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(255,215,0,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .card-plan-label {
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      color: rgba(255,215,0,0.6);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 4px;
+      /* Shimmer sur le titre */
+      background: linear-gradient(90deg, #c8950a, var(--gold), #fffbe0, var(--gold), #c8950a);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+    .card-weight {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .card-price {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1;
+      /* Shimmer sur le prix */
+      background: linear-gradient(90deg, #c8950a, var(--gold), #fffbe0, var(--gold), #c8950a);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3.5s linear infinite;
+      filter: drop-shadow(0 0 15px rgba(255,215,0,0.4));
+    }
+    .card-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: rgba(255,215,0,0.6);
+      -webkit-text-fill-color: rgba(255,215,0,0.6);
+    }
+    .card-divider {
+      width: 60%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,215,0,0.4), transparent);
+      margin: 20px auto;
+    }
+    .card-features {
+      list-style: none;
+      width: 100%;
+      margin-bottom: 28px;
+    }
+    .card-features li {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.75);
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+    }
+    .card-features li:last-child { border-bottom: none; }
+    .card-features .feat-icon {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(255,215,0,0.12);
+      border: 1px solid rgba(255,215,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+    }
+    /* Description shimmer */
+    .card-desc-shimmer {
+      font-size: 0.72rem;
+      background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,215,0,0.9), rgba(255,255,255,0.6));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+
+    /* ============================================================
+       CALCULATEUR
+    ============================================================ */
+    .calc-section {
+      padding: 60px 20px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .calc-wrapper {
+      background: linear-gradient(135deg, #D4AF37, #7a5c0e, #D4AF37);
+      background-size: 400% 400%;
+      border-radius: 22px;
+      padding: 3px;
+      animation: liquidGold 5s ease infinite;
+    }
+    .calc-inner {
+      background: linear-gradient(160deg, #0b0b09, #111108);
+      border-radius: 19px;
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .calc-inner::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(255,215,0,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .calc-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 28px;
+      background: linear-gradient(90deg, #c8950a, var(--gold), #fffbe0, var(--gold), #c8950a);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 500px) { .calc-grid { grid-template-columns: 1fr; } }
+    .calc-field { display: flex; flex-direction: column; gap: 6px; }
+    .calc-field.full { grid-column: 1 / -1; }
+    .calc-label {
+      font-size: 0.65rem;
+      color: rgba(255,215,0,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+    .calc-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,215,0,0.25);
+      border-radius: 10px;
+      color: var(--gold);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      transition: var(--transition);
+      outline: none;
+    }
+    .calc-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(255,215,0,0.08), 0 0 15px rgba(255,215,0,0.1);
+    }
+    .calc-input option { background: #111; }
+    .calc-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .calc-checkbox {
+      width: 18px; height: 18px;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+    .calc-checkbox-label {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+    }
+    .calc-total-box {
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(255,215,0,0.06);
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 14px;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .calc-total-label {
+      font-size: 0.65rem;
+      color: rgba(255,215,0,0.6);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .calc-total-amount {
+      font-size: 2.4rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #c8950a, var(--gold), #fffbe0, var(--gold), #c8950a);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+      filter: drop-shadow(0 0 12px rgba(255,215,0,0.35));
+    }
+    .calc-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--gold) 0%, #e8b800 50%, var(--gold) 100%);
+      background-size: 200% auto;
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .calc-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    .calc-btn:hover::before { left: 100%; }
+    .calc-btn:hover {
+      box-shadow: 0 0 30px rgba(255,215,0,0.5), 0 8px 20px rgba(0,0,0,0.3);
+      transform: translateY(-2px);
+    }
+    .calc-btn:active { transform: scale(0.98); }
+
+    /* Fiche résultat */
+    .calc-receipt {
+      display: none;
+      margin-top: 24px;
+      padding: 24px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .calc-receipt.visible { display: block; animation: receipt-appear 0.5s ease; }
+    @keyframes receipt-appear {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .receipt-header {
+      text-align: center;
+      border-bottom: 1px dashed rgba(255,215,0,0.25);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+    .receipt-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--gold);
+      letter-spacing: 2px;
+    }
+    .receipt-date { font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      font-size: 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .receipt-row-key { color: rgba(255,255,255,0.6); }
+    .receipt-row-val { color: var(--gold); font-weight: 600; }
+    .receipt-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0 0;
+      font-weight: 800;
+    }
+    .receipt-total-key {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.9);
+    }
+    .receipt-total-val {
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, var(--gold-deep), var(--gold), #fffbe0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .receipt-print-btn {
+      display: block;
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px;
+      text-align: center;
+      background: transparent;
+      border: 1px solid rgba(255,215,0,0.35);
+      border-radius: 10px;
+      color: var(--gold);
+      font-size: 0.7rem;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .receipt-print-btn:hover {
+      background: rgba(255,215,0,0.1);
+      box-shadow: 0 0 15px rgba(255,215,0,0.15);
+    }
+
+    /* ============================================================
+       CAROUSEL MACHINES
+    ============================================================ */
+    .carousel-section {
+      padding: 80px 0 80px;
+      overflow: hidden;
+    }
+    .carousel-track-wrapper {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      padding: 20px 0;
+    }
+    .carousel-track {
+      display: flex;
+      gap: 20px;
+      padding: 10px 40px;
+      transition: transform 0.5s cubic-bezier(0.165,0.84,0.44,1);
+      will-change: transform;
+    }
+    .carousel-slide {
+      flex-shrink: 0;
+      width: clamp(200px, 28vw, 280px);
+      aspect-ratio: 4/3;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #1a1500, #0d0d0d);
+      border: 1px solid rgba(255,215,0,0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Glow léger gold */
+    .carousel-slide::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 17px;
+      background: linear-gradient(135deg, #D4AF37, transparent, #D4AF37, transparent);
+      background-size: 400% 400%;
+      animation: liquidGold 6s ease infinite;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .carousel-slide:hover::before { opacity: 1; }
+    .carousel-slide:hover {
+      transform: scale(1.04);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.1);
+    }
+    .carousel-slide-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+    }
+    .carousel-placeholder-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: rgba(255,215,0,0.08);
+      border: 1px solid rgba(255,215,0,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .carousel-img-name {
+      font-size: 0.65rem;
+      color: rgba(255,215,0,0.5);
+      letter-spacing: 1px;
+    }
+    .carousel-machine-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+    }
+    /* Boutons navigation */
+    .carousel-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .carousel-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,215,0,0.08);
+      border: 1px solid rgba(255,215,0,0.3);
+      color: var(--gold);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .carousel-btn:hover {
+      background: rgba(255,215,0,0.2);
+      box-shadow: 0 0 20px rgba(255,215,0,0.2);
+      transform: scale(1.1);
+    }
+    .carousel-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .carousel-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,215,0,0.3);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .carousel-dot.active {
+      width: 20px;
+      border-radius: 3px;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold-glow);
+    }
+
+    /* ============================================================
+       SCROLL REVEAL (SECTIONS)
+    ============================================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.8s cubic-bezier(0.165,0.84,0.44,1),
+                  transform 0.8s cubic-bezier(0.165,0.84,0.44,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: opacity 0.8s cubic-bezier(0.165,0.84,0.44,1),
+                  transform 0.8s cubic-bezier(0.165,0.84,0.44,1);
+    }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(60px);
+      transition: opacity 0.8s cubic-bezier(0.165,0.84,0.44,1),
+                  transform 0.8s cubic-bezier(0.165,0.84,0.44,1);
+    }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: #000;
+      padding: 60px 5%;
+      text-align: center;
+      border-top: 1px solid rgba(255,215,0,0.2);
+      position: relative;
+    }
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, #fffbe0 50%, var(--gold) 70%, transparent 100%);
+      background-size: 200% 100%;
+      animation: nav-line 5s linear infinite;
+    }
+    .footer-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      background: linear-gradient(90deg, var(--gold-deep), var(--gold), #fffbe0, var(--gold), var(--gold-deep));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 5s linear infinite;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .footer-socials {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 20px 0 30px;
+    }
+    .footer-socials a {
+      display: flex; align-items: center; justify-content: center;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: rgba(255,215,0,0.06);
+      border: 1px solid rgba(255,215,0,0.2);
+      transition: var(--transition);
+    }
+    .footer-socials a:hover {
+      background: rgba(255,215,0,0.15);
+      box-shadow: 0 0 20px rgba(255,215,0,0.2);
+      transform: translateY(-3px);
+    }
+    .footer-socials img { width: 28px; }
+    .footer-copy {
+      font-size: 0.65rem;
+      color: rgba(255,215,0,0.5);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 600px) {
+      .gold-shimmer { font-size: clamp(2.2rem, 9vw, 3rem); white-space: normal; }
+      .card-price { font-size: 2.4rem; }
+      .calc-inner { padding: 24px 18px; }
+      .section-machines { padding: 60px 16px 40px; }
+    }
+
+    /* ============================================================
+       MICRO-INTERACTIONS & MISC
+    ============================================================ */
+    /* Sélection de texte dorée */
+    ::selection { background: rgba(255,215,0,0.25); color: #fff; }
+    /* Focus global */
+    *:focus-visible { outline: 2px solid rgba(255,215,0,0.5); outline-offset: 3px; }
+  </style>
 </head>
 <body>
 
-    <canvas id="webgl-canvas"></canvas>
+  <!-- ============================================================
+       CANVAS THREE.JS (galaxies + étoiles)
+  ============================================================ -->
+  <canvas id="webgl-canvas"></canvas>
 
-    <nav class="nav">
-        <div class="nav-content">
-            <div class="auth-container">
-                <div id="user-display">
-                    <span id="user-name">Salut Mike</span><br>
-                    <span id="user-points" style="font-size: 0.6rem;">1000 Pwen</span>
-                </div>
-            </div>
-            <div class="logo-container">
-                <img src="logo.png" alt="Zetwal" class="nav-logo-img">
-                <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html">Akèy</a></li>
-                <li><a href="lavri.html" class="active">Lavri</a></li>
-                <li><a href="shop.html">Shop</a></li>
+  <!-- ============================================================
+       BRUME LUMINEUSE MULTICOLORE
+  ============================================================ -->
+  <div class="nebula-layer" aria-hidden="true">
+    <div class="nebula-blob"></div>
+    <div class="nebula-blob"></div>
+    <div class="nebula-blob"></div>
+    <div class="nebula-blob"></div>
+  </div>
+
+  <!-- ============================================================
+       NAVIGATION
+  ============================================================ -->
+  <nav class="nav" role="navigation" aria-label="Navigation principale">
+    <div class="nav-content">
+      <!-- User info -->
+      <div class="auth-container">
+        <div id="user-display">
+          <span id="user-name">Salut Mike</span><br>
+          <span id="user-points">1 000 Pwen</span>
+        </div>
+      </div>
+      <!-- Logo -->
+      <div class="logo-container">
+        <img src="logo.png" alt="Logo Zetwal" class="nav-logo-img">
+        <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
+      </div>
+      <!-- Liens (corrigés + complets) -->
+      <ul class="nav-links" role="list">
+        <li><a href="index.html">Akèy</a></li>
+        <li><a href="lavri.html" class="active" aria-current="page">Lavri</a></li>
+        <li><a href="cinema.html">Sinema</a></li>
+        <li><a href="mall.html">Mall</a></li>
+        <li><a href="technopark.html">Technopark</a></li>
+        <li><a href="games.html">Jwèt</a></li>
+        <li><a href="association.html">Asosye</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+  <main>
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero-container" aria-label="Accueil Lavri">
+      <!-- Boule animée (fusion 2 moitiés + respiration) -->
+      <div class="sun-wrapper" aria-hidden="true">
+        <div class="sun-half left">
+          <div class="sun-half-inner"></div>
+        </div>
+        <div class="sun-half right">
+          <div class="sun-half-inner"></div>
+        </div>
+        <div class="sun-core" id="sunCore"></div>
+      </div>
+
+      <!-- Titre avec effet machine à écrire + glassmorphism -->
+      <div class="title-wrapper">
+        <div class="title-glass-bg" aria-hidden="true"></div>
+        <h1 class="gold-shimmer" id="heroTitle" aria-label="Lavri Zetwal"></h1><span class="typewriter-cursor" id="typeCursor" aria-hidden="true"></span>
+      </div>
+
+      <!-- Slogan -->
+      <div class="glass-info">
+        <p class="slogan-text gold-shimmer">Pi Pwòp, Pi Santi Bon</p>
+      </div>
+
+      <!-- Status machines -->
+      <div class="machine-status-hero" aria-live="polite">
+        <div class="machine-status-row">
+          <div class="machine-dot" aria-hidden="true"></div>
+          <span class="machine-count-text">
+            <span id="available-machines">3</span> / 5 Machin Disponib
+          </span>
+        </div>
+        <div class="machine-timer-text" id="timer-simulation">
+          Yon machin pral disponib nan 12:00
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECTION MACHINES HUD ==================== -->
+    <section class="section-machines" aria-label="Statut des machines">
+      <div class="reveal">
+        <p class="section-subtitle">Sistèm Entèlijan</p>
+        <h2 class="section-title gold-shimmer">Machin yo</h2>
+      </div>
+      <div class="machines-grid" id="machinesGrid">
+        <!-- Les 5 machines seront générées par JS -->
+      </div>
+    </section>
+
+    <!-- ==================== TARIFS ==================== -->
+    <section class="pricing-section" aria-label="Tarifs">
+      <div class="reveal">
+        <p class="section-subtitle">Ofri nou</p>
+        <h2 class="section-title gold-shimmer">Chwa nou yo</h2>
+      </div>
+      <div class="pricing-wrapper">
+
+        <!-- LE PETIT -->
+        <div class="magic-card reveal-left">
+          <div class="card-inner">
+            <p class="card-plan-label">Plan Esansyèl</p>
+            <h3 class="card-title">LE PETIT</h3>
+            <p class="card-weight">5 kg – 9 kg</p>
+            <div class="card-price">650<span> HTG</span></div>
+            <div class="card-divider"></div>
+            <ul class="card-features">
+              <li>
+                <span class="feat-icon">⚡</span>
+                <span><span class="card-desc-shimmer">Pi rapid nan tout</span> — lave ak seche vit</span>
+              </li>
+              <li>
+                <span class="feat-icon">💰</span>
+                <span><span class="card-desc-shimmer">Pi ekonomik</span> — mwens depans</span>
+              </li>
+              <li>
+                <span class="feat-icon">✓</span>
+                <span>Pafè pou yon moun oswa koup</span>
+              </li>
             </ul>
-        </div>
-    </nav>
-
-    <main>
-        <section class="hero-container">
-            <div class="sun-core"></div>
-            <h1 class="gold-shimmer">Lavri Zetwal</h1>
-            
-            <div class="glass-info">
-                <p class="slogan-text gold-shimmer">Pi Pwop, Pi Santi Bon</p>
-            </div>
-
-            <div class="machine-status">
-                <span id="available-machines">8</span>/10 Machin Disponib <br>
-                <span id="timer-simulation" style="font-weight: 300; font-style: italic;">Yon machin ap disponib nan 10 minit</span>
-            </div>
-        </section>
-
-        <div class="pricing-wrapper">
-            <div class="magic-card">
-                <div class="card-inner">
-                    <h3 style="color:var(--gold)">LE PETIT</h3>
-                    <p>5kg - 9kg</p>
-                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">650<span style="font-size:1rem;">HTG</span></div>
-                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
-                        <li>⚡ Pi rapid</li>
-                        <li>💰 Mwens kòb</li>
-                    </ul>
-                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
-                </div>
-            </div>
-            <div class="magic-card">
-                <div class="card-inner">
-                    <h3 style="color:var(--gold)">LE MALIN</h3>
-                    <p>10kg - 14kg</p>
-                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">850<span style="font-size:1rem;">HTG</span></div>
-                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
-                        <li>✨ Balans pafè</li>
-                        <li>🏠 Ideyal pou fanmi</li>
-                    </ul>
-                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
-                </div>
-            </div>
-            <div class="magic-card">
-                <div class="card-inner">
-                    <h3 style="color:var(--gold)">LE GÉANT</h3>
-                    <p>15kg - 22kg</p>
-                    <div style="font-size:2.5rem; font-weight:900; color:var(--gold)">1 000<span style="font-size:1rem;">HTG</span></div>
-                    <ul style="list-style:none; padding:20px 0; font-size:0.8rem; text-align:left;">
-                        <li>🧺 Tout ansanm</li>
-                        <li>🔥 Sechaj gratis</li>
-                    </ul>
-                    <a href="#" class="login-btn" style="background:var(--gold); color:#000; width:80%; text-align:center;">Chwazi</a>
-                </div>
-            </div>
+            <a href="#calculateur" class="login-btn" style="width:82%; text-align:center; background:var(--gold); color:#000;">Chwazi Plan sa</a>
+          </div>
         </div>
 
-        <section style="padding: 40px 20px;">
-            <div class="magic-card" style="max-width: 600px; margin: 0 auto;">
-                <div class="card-inner">
-                    <h3 style="color:var(--gold)">🧮 KALKILE SÈVIS OU</h3>
-                    <input type="number" id="user-kg" class="calc-input" placeholder="Konbyen Kilo rad?">
-                    <select id="pliyaj-select" class="calc-input">
-                        <option value="0">Pa gen pliyaj</option>
-                        <option value="150">Rad (150 HTG)</option>
-                    </select>
-                    <button onclick="alert('Kalkil an kous...')" class="login-btn" style="background:var(--gold); color:#000; margin-top:20px;">KALKILE</button>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <h4 style="color:var(--gold); margin:0; letter-spacing: 2px;">RETE KONEKTE AK NOU</h4>
-        <div style="display:flex; justify-content:center; gap:25px; margin:20px 0;">
-            <a href="https://wa.me/79961103506"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:45px;" alt="WhatsApp"></a>
-            <a href="https://t.me/mikenestor14"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" style="width:45px;" alt="Telegram"></a>
+        <!-- LE MALIN -->
+        <div class="magic-card reveal" style="transition-delay:0.15s">
+          <div class="card-inner">
+            <p class="card-plan-label">Plan Familyal</p>
+            <h3 class="card-title">LE MALIN</h3>
+            <p class="card-weight">10 kg – 14 kg</p>
+            <div class="card-price">850<span> HTG</span></div>
+            <div class="card-divider"></div>
+            <ul class="card-features">
+              <li>
+                <span class="feat-icon">✨</span>
+                <span><span class="card-desc-shimmer">Balans pafè</span> — pri ak pwa</span>
+              </li>
+              <li>
+                <span class="feat-icon">🏠</span>
+                <span><span class="card-desc-shimmer">Ideyal pou fanmi</span> — chak semèn</span>
+              </li>
+              <li>
+                <span class="feat-icon">✓</span>
+                <span>Pwogram favori kliyan nou yo</span>
+              </li>
+            </ul>
+            <a href="#calculateur" class="login-btn" style="width:82%; text-align:center; background:var(--gold); color:#000;">Chwazi Plan sa</a>
+          </div>
         </div>
-        <div style="margin-top:20px; font-size:0.7rem; color:var(--gold); letter-spacing: 1px;">ZETWAL ORGANISATION 2026 – MODÈNITE AK TRADISYON</div>
-    </footer>
 
-    <script>
-        // 4. BACKGROUND (SOLEIL + GALAXIE CORRIGÉ)
-        let scene, camera, renderer, stars, galaxy;
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        <!-- LE GÉANT -->
+        <div class="magic-card reveal-right">
+          <div class="card-inner">
+            <p class="card-plan-label">Plan Premium</p>
+            <h3 class="card-title">LE GÉANT</h3>
+            <p class="card-weight">15 kg – 22 kg</p>
+            <div class="card-price">1 000<span> HTG</span></div>
+            <div class="card-divider"></div>
+            <ul class="card-features">
+              <li>
+                <span class="feat-icon">🧺</span>
+                <span><span class="card-desc-shimmer">Tout ansanm</span> — kapasité maksimòm</span>
+              </li>
+              <li>
+                <span class="feat-icon">🔥</span>
+                <span><span class="card-desc-shimmer">Sechaj gratis</span> — valè ekstra</span>
+              </li>
+              <li>
+                <span class="feat-icon">👑</span>
+                <span>Pou gwo fanmi ak biznis</span>
+              </li>
+            </ul>
+            <a href="#calculateur" class="login-btn" style="width:82%; text-align:center; background:var(--gold); color:#000;">Chwazi Plan sa</a>
+          </div>
+        </div>
 
-            // Couche 1 : Étoiles fixes (Fond)
-            const starGeo = new THREE.BufferGeometry();
-            const starPos = [];
-            for(let i=0; i<2000; i++) starPos.push((Math.random()-0.5)*100, (Math.random()-0.5)*100, (Math.random()-0.5)*100);
-            starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
-            stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.05 }));
-            scene.add(stars);
+      </div>
+    </section>
 
-            // Couche 2 : Galaxie (Groupes d'étoiles dorées en rotation)
-            const galGeo = new THREE.BufferGeometry();
-            const galPos = [];
-            for(let i=0; i<1000; i++) {
-                const r = Math.random() * 20 + 5;
-                const theta = Math.random() * Math.PI * 2;
-                galPos.push(Math.cos(theta)*r, (Math.random()-0.5)*2, Math.sin(theta)*r);
-            }
-            galGeo.setAttribute('position', new THREE.Float32BufferAttribute(galPos, 3));
-            galaxy = new THREE.Points(galGeo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.08, transparent: true, opacity: 0.6 }));
-            scene.add(galaxy);
+    <!-- ==================== CALCULATEUR ==================== -->
+    <section class="calc-section" id="calculateur" aria-label="Calculateur de services">
+      <div class="calc-wrapper reveal">
+        <div class="calc-inner">
+          <h2 class="calc-title">🧮 Kalkile Sèvis Ou</h2>
+          <div class="calc-grid">
+            <!-- Kilogrammes -->
+            <div class="calc-field">
+              <label class="calc-label" for="user-kg">Konbyen Kilo rad?</label>
+              <input
+                type="number"
+                id="user-kg"
+                class="calc-input"
+                placeholder="Ex: 10"
+                min="1" max="22"
+                oninput="calculateTotal()"
+              >
+            </div>
+            <!-- Type de lavage -->
+            <div class="calc-field">
+              <label class="calc-label" for="wash-type">Type Lavaj</label>
+              <select id="wash-type" class="calc-input" onchange="calculateTotal()">
+                <option value="standard">Lavaj Estanda</option>
+                <option value="premium">Lavaj + Sechaj (gratis &gt;15kg)</option>
+              </select>
+            </div>
+            <!-- Pliage -->
+            <div class="calc-field full">
+              <label class="calc-label">Opsyon Siplemantè</label>
+              <div style="display:flex; flex-wrap:wrap; gap:16px; margin-top:4px;">
+                <label class="calc-checkbox-row">
+                  <input type="checkbox" id="opt-pliage" class="calc-checkbox" onchange="calculateTotal()">
+                  <span class="calc-checkbox-label">Pliyaj rad <span style="color:var(--gold)">(+150 HTG)</span></span>
+                </label>
+                <label class="calc-checkbox-row">
+                  <input type="checkbox" id="opt-draps" class="calc-checkbox" onchange="calculateTotal()">
+                  <span class="calc-checkbox-label">Dra / Lòt twal <span style="color:var(--gold)">(+100 HTG)</span></span>
+                </label>
+                <label class="calc-checkbox-row">
+                  <input type="checkbox" id="opt-express" class="calc-checkbox" onchange="calculateTotal()">
+                  <span class="calc-checkbox-label">Sèvis Ekspres <span style="color:var(--gold)">(+200 HTG)</span></span>
+                </label>
+              </div>
+            </div>
+          </div>
 
-            camera.position.z = 30;
-            animate();
+          <!-- Total dynamique -->
+          <div class="calc-total-box" id="totalBox">
+            <div class="calc-total-label">Total Estimasyon</div>
+            <div class="calc-total-amount" id="totalAmount">— HTG</div>
+            <div style="font-size:0.68rem; color:rgba(255,255,255,0.35); margin-top:6px;" id="planLabel"></div>
+          </div>
+
+          <!-- Bouton générer fiche -->
+          <button class="calc-btn" onclick="generateReceipt()">
+            ✦ Jenere Fich Sèvis Ou
+          </button>
+
+          <!-- Fiche résultat -->
+          <div class="calc-receipt" id="calcReceipt">
+            <div class="receipt-header">
+              <div class="receipt-logo">✦ LAVRI ZETWAL ✦</div>
+              <div class="receipt-date" id="receiptDate"></div>
+            </div>
+            <div id="receiptBody"></div>
+            <div class="receipt-total-row">
+              <span class="receipt-total-key">Total</span>
+              <span class="receipt-total-val" id="receiptTotal"></span>
+            </div>
+            <button class="receipt-print-btn" onclick="window.print()">⬇ Enprime / Sovgade Fich</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== CAROUSEL ==================== -->
+    <section class="carousel-section" aria-label="Galerie machines">
+      <div class="reveal" style="padding: 0 20px;">
+        <p class="section-subtitle">Ekipman nou</p>
+        <h2 class="section-title gold-shimmer">Machin nou yo</h2>
+      </div>
+      <div class="carousel-track-wrapper">
+        <div class="carousel-track" id="carouselTrack">
+          <!-- 10 slides générés par JS -->
+        </div>
+      </div>
+      <div class="carousel-controls">
+        <button class="carousel-btn" onclick="carouselPrev()" aria-label="Précédent">&#8592;</button>
+        <div class="carousel-dots" id="carouselDots"></div>
+        <button class="carousel-btn" onclick="carouselNext()" aria-label="Suivant">&#8594;</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <p class="footer-title">Rete Konekte Ak Nou</p>
+    <div class="footer-socials">
+      <a href="https://wa.me/79961103506" aria-label="WhatsApp" target="_blank" rel="noopener">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+      </a>
+      <a href="https://t.me/mikenestor14" aria-label="Telegram" target="_blank" rel="noopener">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+      </a>
+    </div>
+    <p class="footer-copy">ZETWAL ORGANISATION 2026 — Modènite ak Tradisyon</p>
+  </footer>
+
+
+  <!-- ============================================================
+       SCRIPTS
+  ============================================================ -->
+  <script>
+    /* ============================================================
+       1. THREE.JS — GALAXIES + ÉTOILES DYNAMIQUES
+    ============================================================ */
+    (function initThree() {
+      const canvas = document.getElementById('webgl-canvas');
+      const scene    = new THREE.Scene();
+      const camera   = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      camera.position.z = 30;
+
+      /* --- Couche 1 : Étoiles blanches fixes --- */
+      const starGeo = new THREE.BufferGeometry();
+      const sP = [];
+      for (let i = 0; i < 3000; i++) {
+        sP.push(
+          (Math.random() - 0.5) * 120,
+          (Math.random() - 0.5) * 120,
+          (Math.random() - 0.5) * 120
+        );
+      }
+      starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sP, 3));
+      const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
+        color: 0xffffff, size: 0.06, transparent: true, opacity: 0.8
+      }));
+      scene.add(stars);
+
+      /* --- Couche 2 : Galaxie dorée spirale --- */
+      const galGeo = new THREE.BufferGeometry();
+      const gP = [];
+      for (let i = 0; i < 1500; i++) {
+        const r     = Math.random() * 25 + 5;
+        const theta = Math.random() * Math.PI * 2;
+        const arm   = (Math.floor(Math.random() * 3) * (Math.PI * 2 / 3));
+        const spiral = theta + arm + r * 0.08;
+        gP.push(
+          Math.cos(spiral) * r,
+          (Math.random() - 0.5) * 2.5,
+          Math.sin(spiral) * r
+        );
+      }
+      galGeo.setAttribute('position', new THREE.Float32BufferAttribute(gP, 3));
+      const galaxy = new THREE.Points(galGeo, new THREE.PointsMaterial({
+        color: 0xffd700, size: 0.1, transparent: true, opacity: 0.55
+      }));
+      scene.add(galaxy);
+
+      /* --- Couche 3 : Particules bleues lointaines --- */
+      const blueGeo = new THREE.BufferGeometry();
+      const bP = [];
+      for (let i = 0; i < 800; i++) {
+        bP.push(
+          (Math.random() - 0.5) * 150,
+          (Math.random() - 0.5) * 150,
+          (Math.random() - 0.5) * 150
+        );
+      }
+      blueGeo.setAttribute('position', new THREE.Float32BufferAttribute(bP, 3));
+      const blueStars = new THREE.Points(blueGeo, new THREE.PointsMaterial({
+        color: 0x88bbff, size: 0.045, transparent: true, opacity: 0.45
+      }));
+      scene.add(blueStars);
+
+      /* --- Parallax léger sur la souris --- */
+      let mouseX = 0, mouseY = 0;
+      window.addEventListener('mousemove', e => {
+        mouseX = (e.clientX / innerWidth  - 0.5) * 0.015;
+        mouseY = (e.clientY / innerHeight - 0.5) * 0.015;
+      });
+
+      /* --- Animation loop --- */
+      let t = 0;
+      function animate() {
+        requestAnimationFrame(animate);
+        t += 0.0004;
+        stars.rotation.y     += 0.00018;
+        stars.rotation.x     += 0.00006;
+        galaxy.rotation.y    += 0.0008;
+        galaxy.rotation.x    += 0.0001;
+        blueStars.rotation.y -= 0.0003;
+
+        /* Légère dérive parallax caméra */
+        camera.position.x += (mouseX - camera.position.x) * 0.04;
+        camera.position.y += (-mouseY - camera.position.y) * 0.04;
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      /* --- Resize --- */
+      window.addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
+    })();
+
+
+    /* ============================================================
+       2. ANIMATION BOULE (fusion + respiration)
+    ============================================================ */
+    (function animateSun() {
+      const halfLeft  = document.querySelector('.sun-half.left');
+      const halfRight = document.querySelector('.sun-half.right');
+      const core      = document.getElementById('sunCore');
+
+      /* Phase 1 : apparition des moitiés */
+      setTimeout(() => {
+        halfLeft.style.transition  = 'transform 0.01s, opacity 0.4s';
+        halfRight.style.transition = 'transform 0.01s, opacity 0.4s';
+        halfLeft.style.opacity  = '1';
+        halfRight.style.opacity = '1';
+      }, 300);
+
+      /* Phase 2 : les moitiés glissent vers le centre */
+      setTimeout(() => {
+        halfLeft.style.transition  = 'transform 1s cubic-bezier(0.165,0.84,0.44,1), opacity 0.5s';
+        halfRight.style.transition = 'transform 1s cubic-bezier(0.165,0.84,0.44,1), opacity 0.5s';
+        halfLeft.style.transform   = 'translateX(0)';
+        halfRight.style.transform  = 'translateX(0)';
+      }, 600);
+
+      /* Phase 3 : fusion → core apparaît */
+      setTimeout(() => {
+        halfLeft.style.opacity  = '0';
+        halfRight.style.opacity = '0';
+        core.style.transition   = 'opacity 0.5s ease';
+        core.style.opacity      = '1';
+
+        /* Respiration GSAP */
+        gsap.to(core, {
+          scale: 1.08,
+          duration: 2.5,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut'
+        });
+        /* Glow pulsé */
+        gsap.to(core, {
+          filter: 'blur(2px) brightness(1.2)',
+          duration: 2.5,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: 0.5
+        });
+      }, 1650);
+    })();
+
+
+    /* ============================================================
+       3. MACHINE À ÉCRIRE — TITRE "Lavri Zetwal"
+    ============================================================ */
+    (function typewriterEffect() {
+      const el     = document.getElementById('heroTitle');
+      const cursor = document.getElementById('typeCursor');
+      const text   = 'Lavri Zetwal';
+      let i = 0;
+
+      /* Délai avant de commencer (laisser la boule entrer) */
+      setTimeout(function type() {
+        if (i < text.length) {
+          el.textContent += text[i];
+          i++;
+          setTimeout(type, 100 + Math.random() * 60);
+        } else {
+          /* Curseur disparaît après fin de frappe */
+          setTimeout(() => { cursor.style.animation = 'none'; cursor.style.opacity = '0'; }, 2500);
+        }
+      }, 1800);
+    })();
+
+
+    /* ============================================================
+       4. MACHINES STATUS — HUD
+    ============================================================ */
+    const machinesData = [
+      { id: 'MCH-01', name: 'Machine 1',  status: 'available', progress: 100, kg: null  },
+      { id: 'MCH-02', name: 'Machine 2',  status: 'available', progress: 100, kg: null  },
+      { id: 'MCH-03', name: 'Machine 3',  status: 'available', progress: 100, kg: null  },
+      { id: 'MCH-04', name: 'Machine 4',  status: 'busy',      progress: 55,  kg: '8kg' },
+      { id: 'MCH-05', name: 'Machine 5',  status: 'soon',      progress: 78,  kg: '12kg' },
+    ];
+
+    /* Compteurs pour les machines "soon" */
+    const soonTimers = {};
+    machinesData.forEach(m => {
+      if (m.status === 'soon') {
+        soonTimers[m.id] = (9 + Math.floor(Math.random() * 7)) * 60; // 9-15 min en secondes
+      }
+    });
+
+    function renderMachines() {
+      const grid = document.getElementById('machinesGrid');
+      grid.innerHTML = '';
+      machinesData.forEach((m, idx) => {
+        const card = document.createElement('div');
+        card.className = 'machine-card reveal';
+        card.style.transitionDelay = (idx * 0.1) + 's';
+
+        let badgeHTML, progressClass, bodyHTML;
+        if (m.status === 'available') {
+          badgeHTML     = '<span class="machine-status-badge badge-available">✓ Disponib</span>';
+          progressClass = 'fill-green';
+          bodyHTML      = `<div class="machine-info-text">Prè pou itilize — Plas disponib</div>`;
+        } else if (m.status === 'busy') {
+          badgeHTML     = '<span class="machine-status-badge badge-busy">● Okipe</span>';
+          progressClass = 'fill-orange';
+          bodyHTML      = `<div class="machine-info-text">Pwa aktyèl : <strong style="color:var(--gold)">${m.kg}</strong></div>`;
+        } else {
+          badgeHTML     = '<span class="machine-status-badge badge-soon">◎ Byento lib</span>';
+          progressClass = 'fill-gold';
+          const sec = soonTimers[m.id] || 0;
+          const mm  = String(Math.floor(sec / 60)).padStart(2, '0');
+          const ss  = String(sec % 60).padStart(2, '0');
+          bodyHTML  = `
+            <div class="machine-info-text">Disponib nan :</div>
+            <div class="machine-countdown" id="countdown-${m.id}">${mm}:${ss}</div>
+          `;
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            stars.rotation.y += 0.0002;
-            galaxy.rotation.y += 0.001; // La galaxie tourne plus vite pour la profondeur
-            renderer.render(scene, camera);
+        card.innerHTML = `
+          <div class="machine-hud-header">
+            <span class="machine-id">${m.id}</span>
+            ${badgeHTML}
+          </div>
+          <div style="font-size:0.82rem; font-weight:600; margin-bottom:6px; color:rgba(255,255,255,0.85)">${m.name}</div>
+          <div class="machine-progress-bar">
+            <div class="machine-progress-fill ${progressClass}" style="width:${m.progress}%"></div>
+          </div>
+          <div class="machine-hud-body">${bodyHTML}</div>
+        `;
+        grid.appendChild(card);
+      });
+      triggerReveal(); /* Met à jour les observers */
+    }
+    renderMachines();
+
+    /* --- Compte à rebours machines "soon" --- */
+    setInterval(() => {
+      machinesData.forEach(m => {
+        if (m.status === 'soon' && soonTimers[m.id] !== undefined) {
+          soonTimers[m.id]--;
+          if (soonTimers[m.id] <= 0) {
+            m.status   = 'available';
+            m.progress = 100;
+            delete soonTimers[m.id];
+            renderMachines();
+          } else {
+            const sec = soonTimers[m.id];
+            const mm  = String(Math.floor(sec / 60)).padStart(2, '0');
+            const ss  = String(sec % 60).padStart(2, '0');
+            const el  = document.getElementById('countdown-' + m.id);
+            if (el) el.textContent = mm + ':' + ss;
+          }
         }
+      });
+      /* Mise à jour hero */
+      updateHeroCounts();
+    }, 1000);
 
-        // SIMULATION DYNAMIQUE MACHINES
-        setInterval(() => {
-            const available = Math.floor(Math.random() * 3) + 7;
-            document.getElementById('available-machines').innerText = available;
-        }, 10000);
+    /* --- Timer hero "yon machin pral disponib" --- */
+    let heroTimerSec = (9 + Math.floor(Math.random() * 7)) * 60;
+    function updateHeroCounts() {
+      const avail = machinesData.filter(m => m.status === 'available').length;
+      document.getElementById('available-machines').textContent = avail;
+      heroTimerSec--;
+      if (heroTimerSec <= 0) heroTimerSec = (9 + Math.floor(Math.random() * 7)) * 60;
+      const mm = String(Math.floor(heroTimerSec / 60)).padStart(2, '0');
+      const ss = String(heroTimerSec % 60).padStart(2, '0');
+      document.getElementById('timer-simulation').textContent =
+        'Yon machine pral disponib nan ' + mm + ':' + ss;
+    }
+    updateHeroCounts();
 
-        init();
-        
-        // Animation Respiration Soleil
-        gsap.to(".sun-core", { scale: 1.1, duration: 2, repeat: -1, yoyo: true, ease: "sine.inOut" });
-    </script>
+
+    /* ============================================================
+       5. CALCULATEUR
+    ============================================================ */
+    const PRICES = {
+      petit:   { min: 5,  max: 9,  price: 650  },
+      malin:   { min: 10, max: 14, price: 850  },
+      geant:   { min: 15, max: 22, price: 1000 },
+      pliage:  150,
+      draps:   100,
+      express: 200,
+    };
+
+    function calculateTotal() {
+      const kg       = parseFloat(document.getElementById('user-kg').value) || 0;
+      const washType = document.getElementById('wash-type').value;
+      const pliage   = document.getElementById('opt-pliage').checked;
+      const draps    = document.getElementById('opt-draps').checked;
+      const express  = document.getElementById('opt-express').checked;
+
+      if (kg <= 0) {
+        document.getElementById('totalAmount').textContent = '— HTG';
+        document.getElementById('planLabel').textContent   = '';
+        return;
+      }
+
+      let base = 0, planName = '';
+      if      (kg <= 9)  { base = PRICES.petit.price; planName = 'LE PETIT (5–9kg)'; }
+      else if (kg <= 14) { base = PRICES.malin.price; planName = 'LE MALIN (10–14kg)'; }
+      else if (kg <= 22) { base = PRICES.geant.price; planName = 'LE GÉANT (15–22kg)'; }
+      else               { base = PRICES.geant.price + Math.ceil((kg - 22) / 5) * 200; planName = 'Chaj Ekstra'; }
+
+      let total = base;
+      if (pliage)  total += PRICES.pliage;
+      if (draps)   total += PRICES.draps;
+      if (express) total += PRICES.express;
+
+      document.getElementById('totalAmount').textContent = total.toLocaleString('fr-HT') + ' HTG';
+      document.getElementById('planLabel').textContent   = planName;
+
+      /* Animation légère sur le total */
+      const box = document.getElementById('totalBox');
+      box.style.borderColor = 'rgba(255,215,0,0.55)';
+      box.style.boxShadow   = '0 0 20px rgba(255,215,0,0.12)';
+      setTimeout(() => {
+        box.style.borderColor = '';
+        box.style.boxShadow   = '';
+      }, 600);
+    }
+
+    function generateReceipt() {
+      const kg       = parseFloat(document.getElementById('user-kg').value) || 0;
+      const washType = document.getElementById('wash-type').value;
+      const pliage   = document.getElementById('opt-pliage').checked;
+      const draps    = document.getElementById('opt-draps').checked;
+      const express  = document.getElementById('opt-express').checked;
+      const total    = document.getElementById('totalAmount').textContent;
+      const plan     = document.getElementById('planLabel').textContent;
+
+      if (kg <= 0 || total === '— HTG') {
+        alert('Tanpri antre konbyen kilo rad ou genyen!');
+        return;
+      }
+
+      /* Date + heure */
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('fr-FR') + ' — ' + now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('receiptDate').textContent = dateStr;
+
+      /* Corps de la fiche */
+      const rows = [
+        { k: 'Pwa rad',        v: kg + ' kg' },
+        { k: 'Plan chwazi',    v: plan },
+        { k: 'Type lavaj',     v: washType === 'premium' ? 'Lavaj + Sechaj' : 'Lavaj Estanda' },
+        { k: 'Pliyaj',         v: pliage  ? '✓ Wi (+150 HTG)'  : '✗ Non' },
+        { k: 'Dra / Twal',     v: draps   ? '✓ Wi (+100 HTG)'  : '✗ Non' },
+        { k: 'Sèvis Ekspres',  v: express ? '✓ Wi (+200 HTG)'  : '✗ Non' },
+      ];
+      document.getElementById('receiptBody').innerHTML = rows
+        .map(r => `<div class="receipt-row"><span class="receipt-row-key">${r.k}</span><span class="receipt-row-val">${r.v}</span></div>`)
+        .join('');
+
+      document.getElementById('receiptTotal').textContent = total;
+
+      const receipt = document.getElementById('calcReceipt');
+      receipt.classList.add('visible');
+      receipt.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+
+    /* ============================================================
+       6. CAROUSEL — 10 MACHINES
+    ============================================================ */
+    const CAROUSEL_ITEMS = [
+      { name: 'Machine Lave #1',    img: 'machine1.jpg',  icon: '🫧' },
+      { name: 'Machine Lave #2',    img: 'machine2.jpg',  icon: '🫧' },
+      { name: 'Machine Seche #1',   img: 'machine3.jpg',  icon: '🌀' },
+      { name: 'Machine Seche #2',   img: 'machine4.jpg',  icon: '🌀' },
+      { name: 'Station Premium',    img: 'machine5.jpg',  icon: '⭐' },
+      { name: 'Machine Pro #1',     img: 'machine6.jpg',  icon: '🔧' },
+      { name: 'Machine Pro #2',     img: 'machine7.jpg',  icon: '🔧' },
+      { name: 'Machine Géante #1',  img: 'machine8.jpg',  icon: '🏭' },
+      { name: 'Machine Géante #2',  img: 'machine9.jpg',  icon: '🏭' },
+      { name: 'Machine Spécialisée',img: 'machine10.jpg', icon: '💎' },
+    ];
+
+    let carouselIndex = 0;
+    const VISIBLE_COUNT = () => window.innerWidth < 600 ? 1 : window.innerWidth < 900 ? 2 : 3;
+
+    function buildCarousel() {
+      const track = document.getElementById('carouselTrack');
+      const dots  = document.getElementById('carouselDots');
+      track.innerHTML = '';
+      dots.innerHTML  = '';
+
+      CAROUSEL_ITEMS.forEach((item, i) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+        slide.innerHTML = `
+          <div class="carousel-slide-inner">
+            <div class="carousel-placeholder-icon">${item.icon}</div>
+            <div class="carousel-machine-label">${item.name}</div>
+            <div class="carousel-img-name">${item.img}</div>
+          </div>
+        `;
+        track.appendChild(slide);
+      });
+
+      const numDots = Math.ceil(CAROUSEL_ITEMS.length / VISIBLE_COUNT());
+      for (let d = 0; d < numDots; d++) {
+        const dot = document.createElement('div');
+        dot.className = 'carousel-dot' + (d === 0 ? ' active' : '');
+        dot.onclick = () => { carouselIndex = d; updateCarousel(); };
+        dots.appendChild(dot);
+      }
+      updateCarousel();
+    }
+
+    function updateCarousel() {
+      const vc     = VISIBLE_COUNT();
+      const slides = document.querySelectorAll('.carousel-slide');
+      if (!slides.length) return;
+      const slideW = slides[0].offsetWidth + 20; /* width + gap */
+      const maxIdx = Math.ceil(CAROUSEL_ITEMS.length / vc) - 1;
+      carouselIndex = Math.max(0, Math.min(carouselIndex, maxIdx));
+
+      document.getElementById('carouselTrack').style.transform =
+        `translateX(-${carouselIndex * vc * slideW}px)`;
+
+      document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === carouselIndex);
+      });
+    }
+
+    function carouselNext() {
+      const maxIdx = Math.ceil(CAROUSEL_ITEMS.length / VISIBLE_COUNT()) - 1;
+      carouselIndex = carouselIndex >= maxIdx ? 0 : carouselIndex + 1;
+      updateCarousel();
+    }
+    function carouselPrev() {
+      const maxIdx = Math.ceil(CAROUSEL_ITEMS.length / VISIBLE_COUNT()) - 1;
+      carouselIndex = carouselIndex <= 0 ? maxIdx : carouselIndex - 1;
+      updateCarousel();
+    }
+
+    /* Swipe tactile */
+    let touchStartX = 0;
+    const track = document.getElementById('carouselTrack');
+    if (track) {
+      track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+      track.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 40) dx < 0 ? carouselNext() : carouselPrev();
+      });
+    }
+
+    buildCarousel();
+    window.addEventListener('resize', () => { buildCarousel(); });
+
+
+    /* ============================================================
+       7. SCROLL REVEAL — INTERSECTION OBSERVER
+    ============================================================ */
+    function triggerReveal() {
+      const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      revealEls.forEach(el => obs.observe(el));
+    }
+    triggerReveal();
+
+
+    /* ============================================================
+       8. MICRO-INTERACTIONS : curseur étoilé
+    ============================================================ */
+    (function starCursor() {
+      document.addEventListener('click', e => {
+        for (let i = 0; i < 6; i++) {
+          const s = document.createElement('div');
+          s.style.cssText = `
+            position:fixed;
+            left:${e.clientX}px;top:${e.clientY}px;
+            width:5px;height:5px;
+            border-radius:50%;
+            background:var(--gold);
+            pointer-events:none;
+            z-index:9999;
+            transform:translate(-50%,-50%);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+          `;
+          document.body.appendChild(s);
+          const angle = (Math.PI * 2 / 6) * i;
+          const dist  = 30 + Math.random() * 20;
+          setTimeout(() => {
+            s.style.transform = `translate(${Math.cos(angle)*dist - 2.5}px, ${Math.sin(angle)*dist - 2.5}px) scale(0)`;
+            s.style.opacity   = '0';
+          }, 10);
+          setTimeout(() => s.remove(), 650);
+        }
+      });
+    })();
+
+  </script>
 </body>
 </html>
