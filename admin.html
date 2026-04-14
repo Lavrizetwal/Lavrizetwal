@@ -861,6 +861,12 @@ function resetAddForm() {
 }
 
 function generateQRForProduct(product) {
+  console.log('Generating QR for:', product.id);
+  if (typeof QRCode === 'undefined') {
+    console.error('QRCode library not loaded!');
+    toast('Erreur: Bibliothèque QR non chargée', 'error');
+    return;
+  }
   const url = `${SITE_URL}/product/${product.id}`;
   const card = document.getElementById('qr-result-card');
   const display = document.getElementById('qr-display');
@@ -875,12 +881,24 @@ function generateQRForProduct(product) {
   display.appendChild(urlText);
   document.getElementById('qr-url-text').textContent = url;
 
-  QRCode.toCanvas(canvas, url, {
-    width: 200, margin: 2,
-    color: { dark: '#000000', light: '#ffffff' }
-  }, err => { if (err) console.error(err); });
-
-  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  try {
+    QRCode.toCanvas(canvas, url, {
+      width: 200,
+      margin: 2,
+      color: { dark: '#000000', light: '#ffffff' }
+    }, (err) => {
+      if (err) {
+        console.error('QR Error:', err);
+        toast('Erreur de génération QR', 'error');
+      } else {
+        console.log('QR Generated successfully');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  } catch (e) {
+    console.error('QR Exception:', e);
+    toast('Erreur QR: ' + e.message, 'error');
+  }
 }
 
 window.showQRForProduct = (id) => {
