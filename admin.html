@@ -1245,3 +1245,33 @@ uploadArea.addEventListener('drop', e => {
   if (file && file.type.startsWith('image/')) {
     document.getElementById('product-img-file').files = e.dataTransfer.files;
     handleImageSelect({ target: { files: [f
+// Admin confirmé
+  currentUser = user;
+  document.getElementById('auth-wall').classList.add('hidden');
+  document.getElementById('denied-wall').classList.remove('show');
+  document.getElementById('app').classList.add('show');
+  
+  // On récupère l'élément pour afficher l'email
+  const navEmail = document.getElementById('nav-email');
+  if (navEmail) navEmail.textContent = user.email;
+
+  // Charger les données initiales de Supabase
+  loadAllData();
+});
+
+// --- Ensuite, ajoute les fonctions indispensables pour que les boutons marchent ---
+
+async function loadAllData() {
+  await loadProducts();
+  await loadWashRecords();
+  updateStats();
+}
+
+// Fonction pour changer d'onglet (Tabs)
+window.switchTab = (tabId) => {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  
+  event.currentTarget.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+};
