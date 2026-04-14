@@ -9,7 +9,7 @@
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- QR Code generator -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
   <!-- QR Scanner -->
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
@@ -860,43 +860,61 @@ function resetAddForm() {
   document.getElementById('product-img-file').value = '';
 }
 
-function generateQRForProduct(product) {
-  console.log('Generating QR for:', product.id);
-  if (typeof QRCode === 'undefined') {
-    console.error('QRCode library not loaded!');
-    toast('Erreur: Bibliothèque QR non chargée', 'error');
-    return;
-  }
-  const url = `${SITE_URL}/product/${product.id}`;
+async function generateQRForProduct(product) {
+  console.log('Attempting to generate QR for:', product.id);
+  
+  // 1. Attendre un peu que le DOM soit prêt si nécessaire
   const card = document.getElementById('qr-result-card');
   const display = document.getElementById('qr-display');
   card.style.display = 'block';
-  display.innerHTML = '';
-
-  const canvas = document.createElement('canvas');
-  const urlText = document.createElement('div');
-  urlText.className = 'qr-url';
-  urlText.textContent = url;
-  display.appendChild(canvas);
-  display.appendChild(urlText);
+  display.innerHTML = '<div style="padding:20px;font-size:0.7rem;color:var(--text-muted)">Génération du QR...</div>';
+  
+  const url = `${SITE_URL}/product/${product.id}`;
   document.getElementById('qr-url-text').textContent = url;
 
+  // 2. Vérifier la bibliothèque avec une petite attente si absente au début
+  if (typeof QRCode === 'undefined') {
+    console.warn('QRCode not found yet, waiting 500ms...');
+    await new Promise(r => setTimeout(r, 500));
+  }
+
+  if (typeof QRCode === 'undefined') {
+    console.error('QRCode library still not loaded!');
+    display.innerHTML = '<div style="color:var(--red);font-size:0.7rem">Erreur: Bibliothèque QR non chargée. Vérifiez votre connexion internet.</div>';
+    toast('Erreur: Bibliothèque QR manquante', 'error');
+    return;
+  }
+
   try {
-    QRCode.toCanvas(canvas, url, {
-      width: 200,
+    display.innerHTML = ''; // Nettoyer le message de chargement
+    const canvas = document.createElement('canvas');
+    display.appendChild(canvas);
+
+    const options = {
+      width: 220,
       margin: 2,
-      color: { dark: '#000000', light: '#ffffff' }
-    }, (err) => {
+      color: { dark: '#000000', light: '#ffffff' },
+      errorCorrectionLevel: 'H'
+    };
+
+    QRCode.toCanvas(canvas, url, options, (err) => {
       if (err) {
-        console.error('QR Error:', err);
-        toast('Erreur de génération QR', 'error');
+        console.error('QR Render Error:', err);
+        display.innerHTML = '<div style="color:var(--red);font-size:0.7rem">Erreur de rendu QR</div>';
+        toast('Erreur de rendu QR', 'error');
       } else {
         console.log('QR Generated successfully');
+        const urlText = document.createElement('div');
+        urlText.className = 'qr-url';
+        urlText.style.cssText = 'font-size:0.65rem;color:var(--text-muted);margin-top:10px;text-align:center';
+        urlText.textContent = url;
+        display.appendChild(urlText);
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     });
   } catch (e) {
     console.error('QR Exception:', e);
+    display.innerHTML = '<div style="color:var(--red);font-size:0.7rem">Exception QR</div>';
     toast('Erreur QR: ' + e.message, 'error');
   }
 }
