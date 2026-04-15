@@ -5,10 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZETWAL ORGANISATION | Inovasyon ak Ekselans</title>
+    
+    <!-- Scripts Externes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
@@ -38,129 +43,73 @@
         .nb{position:absolute;border-radius:50%;filter:blur(100px);animation:nd 20s ease-in-out infinite alternate}
         .nb:nth-child(1){width:600px;height:600px;top:-150px;left:-150px;background:radial-gradient(circle,rgba(201,168,76,0.1)0%,transparent 70%)}
         .nb:nth-child(2){width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(255,255,255,0.05)0%,transparent 70%);animation-delay:-10s}
-        @keyframes nd{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,-20px) scale(1.05)}}
 
         /* --- NAVIGATION --- */
-        .nav { 
-            position: fixed; top: 0; width: 100%; z-index: 2000; 
-            background: rgba(13, 12, 8, 0.85); backdrop-filter: blur(25px); 
-            border-bottom: 1px solid rgba(201, 168, 76, 0.2);
-        }
+        .nav { position: fixed; top: 0; width: 100%; z-index: 2000; background: rgba(13, 12, 8, 0.85); backdrop-filter: blur(25px); border-bottom: 1px solid rgba(201, 168, 76, 0.2); }
         .nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-pale),var(--gold),transparent);background-size:200% 100%;animation:nl 5s linear infinite}
         @keyframes nl{to{background-position:200% 0}}
-        
-        .nav-content { display: flex; flex-direction: column; align-items: center; padding: 12px 20px; position: relative; }
-        
-        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; text-decoration: none; color: inherit; }
-        .nav-logo-img { width: 30px; height: 30px; filter: drop-shadow(0 0 5px var(--gold-glow)); }
-        .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 12px 20px; position: relative; }
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+        .nav-logo-img { width: 30px; height: 30px; }
+        .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
         .logo-text span { color: var(--gold); }
+
+        /* User Menu */
+        .user-auth-area { display: flex; align-items: center; gap: 15px; }
+        #login-trigger-btn { padding: 8px 20px; font-size: 0.65rem; border-radius: 20px; cursor: pointer; background: var(--gold); border: none; font-weight: 800; text-transform: uppercase; transition: 0.3s; }
+        #user-profile-btn { cursor: pointer; display: none; align-items: center; gap: 8px; font-weight: 800; color: var(--gold); font-size: 0.75rem; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 20px; transition: var(--transition); }
+        #user-profile-btn:hover { background: var(--gold); color: #000; }
         
-        .nav-links { 
-            display: flex; list-style: none; gap: 10px; margin: 0; padding: 5px; 
-            overflow-x: auto; width: 100%; justify-content: center; scrollbar-width: none;
+        #user-info-card { 
+            position: fixed; top: 75px; right: 20px; width: 280px; background: rgba(13, 12, 8, 0.98); 
+            backdrop-filter: blur(30px); border: 1px solid var(--gold); border-radius: 20px; 
+            padding: 25px; z-index: 2005; display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s ease;
         }
-        .nav-links::-webkit-scrollbar { display: none; }
-        .nav-links a { 
-            color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 600; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1.5px;
-            padding: 7px 15px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.25); transition: var(--transition); 
-        }
-        .nav-links a:hover, .nav-links a.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.05); box-shadow: 0 0 15px var(--gold-glow); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .info-row { margin-bottom: 15px; border-bottom: 1px solid rgba(201,168,76,0.1); padding-bottom: 10px; }
+        .info-label { font-size: 0.6rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .info-value { font-size: 0.85rem; font-weight: 600; }
+        .admin-link { display: none; margin-top: 15px; }
+        .btn-logout { margin-top: 15px; width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ff4444; color: #ff4444; background: transparent; cursor: pointer; font-weight: 700; font-size: 0.7rem; transition: 0.3s; }
+        .btn-logout:hover { background: #ff4444; color: #fff; }
 
-        .theme-toggle { position: fixed; top: 120px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
-        .theme-toggle:hover { transform: rotate(180deg) scale(1.1); }
+        /* Auth Modal */
+        .auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        .auth-modal { background: #0d0c08; border: 1px solid var(--gold); border-radius: 30px; padding: 40px; width: 90%; max-width: 400px; text-align: center; }
+        .auth-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--gold); background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 15px; outline: none; font-family: 'Montserrat', sans-serif; }
+        .btn-auth { width: 100%; padding: 15px; border-radius: 50px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: 0.3s; margin-bottom: 10px; font-size: 0.75rem; }
+        .btn-google { background: #fff; color: #000; }
+        .btn-phone { background: var(--gold); color: #000; }
 
-        /* --- HERO --- */
+        /* --- HERO & BIG SPHERE --- */
         .hero { min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 140px 20px 40px; position: relative; }
-        .hero-title { 
-            font-family: 'Cormorant Garamond', serif; font-size: clamp(2.8rem, 10vw, 5.5rem); font-weight: 700; letter-spacing: 8px;
-            background: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold) 35%, var(--gold-pale) 50%, var(--gold) 65%, var(--gold-deep) 100%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shimmer 6s linear infinite; margin-bottom: 15px;
-        }
+        .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.8rem, 10vw, 5.5rem); font-weight: 700; letter-spacing: 8px; background: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold) 35%, var(--gold-pale) 50%, var(--gold) 65%, var(--gold-deep) 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 6s linear infinite; margin-bottom: 15px; }
         @keyframes shimmer{to{background-position:200% center}}
         .hero-sub { font-size: 0.8rem; letter-spacing: 5px; color: rgba(201, 168, 76, 0.7); text-transform: uppercase; font-weight: 600; }
-
-        /* --- BIG SPHERE --- */
-        .big-sphere {
-            width: 100px; height: 100px;
-            background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep));
-            border-radius: 50%; margin: 20px auto;
-            box-shadow: 0 0 50px var(--gold);
-            animation: spherePulse 4s infinite ease-in-out;
-            filter: blur(1px);
-        }
-        @keyframes spherePulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 30px var(--gold); }
-            50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 70px var(--gold); }
-        }
+        .big-sphere { width: 100px; height: 100px; background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep)); border-radius: 50%; margin: 25px auto; box-shadow: 0 0 50px var(--gold); animation: spherePulse 4s infinite ease-in-out; filter: blur(1px); }
+        @keyframes spherePulse { 0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 30px var(--gold); } 50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 70px var(--gold); } }
 
         /* --- SECTIONS GRID --- */
-        .main-grid { max-width: 1200px; margin: 0 auto; padding: 40px 20px 100px; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 40px; }
-        @media (max-width: 400px) { .main-grid { grid-template-columns: 1fr; } }
-
-        /* --- LIQUID BORDER CARD --- */
+        .main-grid { max-width: 1200px; margin: 0 auto; padding: 40px 20px 80px; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 40px; }
         .card-wrap { position: relative; cursor: pointer; transition: var(--transition); }
         .card-wrap:hover { transform: translateY(-10px) scale(1.02); }
-
-        .liquid-border { 
-            position: relative; border-radius: 30px; background: var(--card-bg); 
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            padding: 40px 30px; text-align: center; min-height: 520px; 
-            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            border: 2px solid transparent; overflow: hidden;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.5);
-        }
-
-        .liquid-border::before { 
-            content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; 
-            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-pale), var(--gold), transparent); 
-            background-size: 200% 100%; animation: liquidGold 3s linear infinite; 
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
-            -webkit-mask-composite: xor; 
-        }
+        .liquid-border { position: relative; border-radius: 30px; background: var(--card-bg); backdrop-filter: blur(30px); padding: 40px 30px; text-align: center; min-height: 520px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; border: 2px solid transparent; overflow: hidden; box-shadow: 0 15px 45px rgba(0,0,0,0.5); }
+        .liquid-border::before { content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; background: linear-gradient(90deg, transparent, var(--gold), var(--gold-pale), var(--gold), transparent); background-size: 200% 100%; animation: liquidGold 3s linear infinite; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; }
         @keyframes liquidGold { to { background-position: 200% 50%; } }
-
         .item-icon { font-size: 3.5rem; margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--gold-glow)); transition: var(--transition); }
-        .card-wrap:hover .item-icon { transform: scale(1.2) rotate(5deg); }
-
         .item-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 2px; color: var(--gold-pale); margin-bottom: 15px; }
         .item-desc { font-size: 0.85rem; line-height: 1.8; color: rgba(255, 255, 255, 0.8); margin-bottom: 20px; font-weight: 400; }
-        .light-mode .item-desc { color: #333; }
-        
-        .item-details-list { width: 100%; text-align: left; border-top: 1px solid rgba(201, 168, 76, 0.15); padding-top: 20px; margin-bottom: 25px; }
-        .detail-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.7rem; color: rgba(201, 168, 76, 0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-        .detail-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 8px var(--gold); }
-
-        .btn-gold { 
-            display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, var(--gold), var(--gold-deep)); 
-            color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; 
-            text-transform: uppercase; font-size: 0.72rem; letter-spacing: 2px; transition: var(--transition); 
-            box-shadow: 0 5px 15px rgba(201, 168, 76, 0.3);
-        }
-        .btn-gold:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(201, 168, 76, 0.5); }
-
-        /* --- ADMIN SECTION --- */
-        #admin-panel { display: none; margin-top: 60px; padding: 40px 20px; background: rgba(201, 168, 76, 0.05); border-top: 1px solid var(--gold); text-align: center; }
-        .admin-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--gold); margin-bottom: 20px; letter-spacing: 3px; }
+        .btn-gold-card { display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, var(--gold), var(--gold-deep)); color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; transition: 0.3s; }
 
         /* --- FOOTER --- */
-        footer { 
-            background: rgba(13, 12, 8, 0.95); padding: 80px 5% 40px; text-align: center; 
-            border-top: 1px solid rgba(201, 168, 76, 0.2); position: relative;
-        }
-        footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-        
-        .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; letter-spacing: 4px; color: var(--white); margin-bottom: 30px; }
-        .footer-logo span { color: var(--gold); }
-        
-        .social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; flex-wrap: wrap; }
-        .social-btn { color: var(--gold); text-decoration: none; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: var(--transition); padding: 5px 10px; border: 1px solid transparent; border-radius: 10px; }
-        .social-btn:hover { color: var(--white); text-shadow: 0 0 10px var(--gold-glow); border-color: var(--gold); }
-        
-        .copyright { font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); letter-spacing: 1px; text-transform: uppercase; }
+        footer { background: rgba(13, 12, 8, 0.95); padding: 60px 10% 30px; border-top: 1px solid rgba(201, 168, 76, 0.2); text-align: center; }
+        .social-icons { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; }
+        .social-icon img { width: 40px; height: 40px; transition: 0.3s; filter: drop-shadow(0 0 5px rgba(201,168,76,0.3)); }
+        .social-icon:hover img { transform: scale(1.2); filter: drop-shadow(0 0 15px var(--gold)); }
+        .footer-bottom { border-top: 1px solid rgba(201,168,76,0.1); padding-top: 20px; font-size: 0.65rem; color: var(--gold); letter-spacing: 2px; font-weight: 800; text-transform: uppercase; }
 
-        /* --- REVEAL ANIMATION --- */
+        /* Reveal Animation */
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
         .reveal.active { opacity: 1; transform: translateY(0); }
     </style>
@@ -170,26 +119,61 @@
     <canvas id="bg-canvas"></canvas>
     <div class="nebula"><div class="nb"></div><div class="nb"></div></div>
 
-    <button class="theme-toggle" onclick="toggleTheme()" title="Chanje Mode">🌓</button>
-
+    <!-- Navigation -->
     <nav class="nav">
         <div class="nav-content">
             <a href="index.html" class="logo-container">
                 <img src="logo.png" alt="Zetwal" class="nav-logo-img">
                 <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
             </a>
-            <ul class="nav-links">
-                <li><a href="index.html" class="active">Akèy</a></li>
-                <li><a href="lavri.html">Lavri</a></li>
-                <li><a href="shop.html">Shop</a></li>
-                <li><a href="mall.html">Mall</a></li>
-                <li><a href="cinema.html">Sinema</a></li>
-                <li><a href="technopark.html">Technopark</a></li>
-                <li><a href="association.html">Asosye</a></li>
-                <li><a href="games.html">Jwèt</a></li>
-            </ul>
+            <div class="user-auth-area">
+                <button id="login-trigger-btn" onclick="toggleAuthModal(true)">Koneksyon</button>
+                <div id="user-profile-btn" onclick="toggleInfoCard()">
+                    <span id="display-name-nav">Loading...</span>
+                </div>
+            </div>
         </div>
     </nav>
+
+    <!-- User Info Card -->
+    <div id="user-info-card">
+        <div class="info-row">
+            <div class="info-label">Non</div>
+            <div class="info-value" id="card-name">—</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Statit</div>
+            <div class="info-value" id="card-status">Utilisateur</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Pwen ou genyen</div>
+            <div class="info-value" id="card-points" style="color:var(--gold); font-size: 1.2rem;">0.0</div>
+        </div>
+        <div class="admin-link" id="admin-access">
+            <a href="admin.html" class="btn-gold-card" style="width:100%; text-align:center; display:block; padding: 10px 0; font-size: 0.6rem;">Aksè Administrasyon</a>
+        </div>
+        <button class="btn-logout" onclick="handleLogout()">Dekonekte</button>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="auth-overlay" id="auth-modal">
+        <div class="auth-modal">
+            <h2 style="color:var(--gold); margin-bottom: 25px; font-family:'Cormorant Garamond', serif; letter-spacing: 2px;">KONEKSYON</h2>
+            <div id="auth-main-view">
+                <button class="btn-auth btn-google" onclick="loginWithGoogle()">Konekte ak Google</button>
+                <div style="margin: 20px 0; color: rgba(255,255,255,0.3); font-size: 0.7rem; letter-spacing: 2px;">OSWA</div>
+                <input type="tel" id="phone-input" class="auth-input" placeholder="+509 XXXX XXXX">
+                <div id="recaptcha-container"></div>
+                <button class="btn-auth btn-phone" onclick="loginWithPhone()">Konekte ak Telefòn</button>
+            </div>
+            <div id="otp-view" style="display:none">
+                <p style="font-size: 0.8rem; margin-bottom: 15px; opacity: 0.7;">Antre kòd ou resevwa a :</p>
+                <input type="text" id="otp-input" class="auth-input" placeholder="123456">
+                <button class="btn-auth btn-phone" onclick="verifyOTP()">Verifye Kòd</button>
+            </div>
+            <button style="background:transparent; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size: 0.65rem; margin-top: 20px; text-transform:uppercase; letter-spacing: 1px;" onclick="toggleAuthModal(false)">Anile</button>
+        </div>
+    </div>
 
     <header class="hero">
         <h1 class="hero-title">ZETWAL</h1>
@@ -203,13 +187,8 @@
             <div class="liquid-border">
                 <div class="item-icon">🧺</div>
                 <h2 class="item-title">Lavri Zetwal</h2>
-                <p class="item-desc">Dekouvri premye sèvis blanchisri nan peyi a ki konbine ekoloji ak teknoloji pwent pou yon pwòpte san parèy.</p>
-                <div class="item-details-list">
-                    <div class="detail-row"><div class="detail-dot"></div> Netwayaj ekolojik (Green Cleaning)</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Livrezon rapid mwens pase 24h</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Swen espesyal tekstil delika</div>
-                </div>
-                <span class="btn-gold">Antre nan Lavri</span>
+                <p class="item-desc">Sèvis blanchisri futuriste ak teknoloji ekolojik pou yon pwòpte san parèy nan mwens pase 24h.</p>
+                <span class="btn-gold-card">Antre nan Lavri</span>
             </div>
         </div>
 
@@ -218,162 +197,131 @@
             <div class="liquid-border">
                 <div class="item-icon">🛒</div>
                 <h2 class="item-title">Shop Zetwal</h2>
-                <p class="item-desc">Yon seleksyon eksklizif nan pi bon pwodwi lokal ak entènasyonal kote bon jan kalite rankontre inovasyon.</p>
-                <div class="item-details-list">
-                    <div class="detail-row"><div class="detail-dot"></div> Pwodwi prim ak garanti</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Peman sekirize (Kach/Kat)</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Sèvis kliyan 24/7</div>
-                </div>
-                <span class="btn-gold">Vizite Shop la</span>
+                <p class="item-desc">Eksplore yon seleksyon prim nan pi bon pwodwi lokal ak entènasyonal ak livrezon ultra-rapid.</p>
+                <span class="btn-gold-card">Vizite Shop la</span>
             </div>
         </div>
 
-        <!-- 3. ZETWAL MALL -->
-        <div class="card-wrap reveal" onclick="location.href='mall.html'">
-            <div class="liquid-border">
-                <div class="item-icon">🏛️</div>
-                <h2 class="item-title">Zetwal Mall</h2>
-                <p class="item-desc">Premye mall futuriste nan peyi a ak 4 étaj ki dedye a plezi w, soti nan komès rive nan byennèt.</p>
-                <div class="item-details-list">
-                    <div class="detail-row"><div class="detail-dot"></div> Plis pase 50 boutik eksklizif</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Pakin entèlijan (HUD)</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Gastronomi ak Sante</div>
-                </div>
-                <span class="btn-gold">Dekouvri Mall la</span>
-            </div>
-        </div>
-
-        <!-- 4. SINEMA ZETWAL -->
-        <div class="card-wrap reveal" onclick="location.href='cinema.html'">
-            <div class="liquid-border">
-                <div class="item-icon">🎬</div>
-                <h2 class="item-title">Sinema Zetwal</h2>
-                <p class="item-desc">Plonje nan yon eksperyans sinematografik inik ak dènye kri teknoloji 4K ak son Dolby Atmos.</p>
-                <div class="item-details-list">
-                    <div class="detail-row"><div class="detail-dot"></div> Ekran teknoloji Lazè 4K</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Son imèsif 360 degre</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Chèz VIP ak sèvis nan plas</div>
-                </div>
-                <span class="btn-gold">Gade yon Fim</span>
-            </div>
-        </div>
-
-        <!-- 5. TECHNOPARK -->
-        <div class="card-wrap reveal" onclick="location.href='technopark.html'">
-            <div class="liquid-border">
-                <div class="item-icon">🚀</div>
-                <h2 class="item-title">Technopark</h2>
-                <p class="item-desc">Espas kote rèv teknolojik yo vin reyalite ak solisyon dijital inovatè pou lavni Ayiti.</p>
-                <div class="item-details-list">
-                    <div class="detail-row"><div class="detail-dot"></div> Enkubatè pou Startups</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Devlopman Software & AI</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Co-working futuriste</div>
-                </div>
-                <span class="btn-gold">Eksplore Inovasyon</span>
-            </div>
-        </div>
-
-        <!-- 6. JWÈT ZETWAL -->
+        <!-- 3. JWÈT ZETWAL -->
         <div class="card-wrap reveal" onclick="location.href='games.html'">
             <div class="liquid-border">
                 <div class="item-icon">🎮</div>
                 <h2 class="item-title">Jwèt Zetwal</h2>
-                <p class="item-desc">Plonje nan yon mond amizman san limit ak pi bon jwèt videyo ak eksperyans entèaktif pou tout laj.</p>
-                <div class="item-details-list">
-                    <div class="detail-row"><div class="detail-dot"></div> Tounwa jwèt an liy</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Eksperyans VR imèsif</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Zòn "Retro Gaming"</div>
-                </div>
-                <span class="btn-gold">Kòmanse Jwe</span>
-            </div>
-        </div>
-
-        <!-- 7. ASOSYE ZETWAL -->
-        <div class="card-wrap reveal" onclick="location.href='association.html'">
-            <div class="liquid-border">
-                <div class="item-icon">🤝</div>
-                <h2 class="item-title">Asosye Zetwal</h2>
-                <p class="item-desc">Vin fè pati rezo ki pi dinamik la epi benefisye de ekosistèm Zetwal pou propulse biznis ou.</p>
-                <div class="item-details-list">
-                    <div class="detail-row"><div class="detail-dot"></div> Patenarya estratejik</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Aksè ak baz kliyan prim</div>
-                    <div class="detail-row"><div class="detail-dot"></div> Sipò lojistik ak maketing</div>
-                </div>
-                <span class="btn-gold">Vin yon Asosye</span>
+                <p class="item-desc">Genyen pwen pandan w ap amize w! Patisipe nan Duel Mental ak lòt jwèt entèaktif.</p>
+                <span class="btn-gold-card">Kòmanse Jwe</span>
             </div>
         </div>
     </main>
 
-    <div id="admin-panel">
-        <h2 class="admin-title">🔒 ADMIN DASHBOARD</h2>
-        <a href="admin.html" class="btn-gold">Aksè Administrasyon</a>
-    </div>
-
     <footer>
-        <div class="footer-logo">ZETWAL <span>ORGANISATION</span></div>
-        <div class="social-links">
-            <a href="https://wa.me/79961103506" target="_blank" class="social-btn">WhatsApp: +7 996 110 35 06</a>
-            <a href="https://t.me/MikeNestor14" target="_blank" class="social-btn">Telegram: @MikeNestor14</a>
+        <div class="social-icons">
+            <a href="https://wa.me/79961103506" target="_blank" class="social-icon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+            </a>
+            <a href="https://t.me/MikeNestor14" target="_blank" class="social-icon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+            </a>
         </div>
-        <div class="copyright">© 2026 ZETWAL ORGANISATION — TOUT DWA REZÈVE.</div>
+        <div class="footer-bottom">© 2026 ZETWAL ORGANISATION — TOUT DWA REZÈVE.</div>
     </footer>
 
     <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+            authDomain: "lavrizetwal.firebaseapp.com",
+            projectId: "lavrizetwal",
+            storageBucket: "lavrizetwal.firebasestorage.app",
+            messagingSenderId: "291921316186",
+            appId: "1:291921316186:web:f55e8b34526960df394b63"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         // --- SUPABASE CONFIG ---
         const SUPABASE_URL = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
-        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- CHECK ADMIN STATUS ---
-        async function checkAdmin() {
-            const { data: { user } } = await db.auth.getUser();
-            const admins = ['mikenestorlive@gmail.com', 'schnaydernaderice1@gmail.com'];
-            if (user && admins.includes(user.email)) {
-                document.getElementById('admin-panel').style.display = 'block';
+        let confirmationResult;
+
+        // --- AUTH UI LOGIC ---
+        function toggleAuthModal(show) { document.getElementById('auth-modal').style.display = show ? 'flex' : 'none'; }
+        function toggleInfoCard() { const card = document.getElementById('user-info-card'); card.style.display = card.style.display === 'block' ? 'none' : 'block'; }
+
+        async function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try { await auth.signInWithPopup(provider); toggleAuthModal(false); } catch (e) { alert(e.message); }
+        }
+
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
+        async function loginWithPhone() {
+            const phone = document.getElementById('phone-input').value;
+            try {
+                confirmationResult = await auth.signInWithPhoneNumber(phone, window.recaptchaVerifier);
+                document.getElementById('auth-main-view').style.display = 'none';
+                document.getElementById('otp-view').style.display = 'block';
+            } catch (e) { alert(e.message); }
+        }
+
+        async function verifyOTP() {
+            const code = document.getElementById('otp-input').value;
+            try { await confirmationResult.confirm(code); toggleAuthModal(false); } catch (e) { alert("Kòd la pa bon"); }
+        }
+
+        function handleLogout() { auth.signOut(); location.reload(); }
+
+        // --- AUTH STATE OBSERVER ---
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                document.getElementById('login-trigger-btn').style.display = 'none';
+                document.getElementById('user-profile-btn').style.display = 'flex';
+                const name = user.displayName || user.phoneNumber || "Itilizatè";
+                document.getElementById('display-name-nav').textContent = name;
+                document.getElementById('card-name').textContent = name;
+
+                // Points in real-time
+                db.collection("users").doc(user.uid).onSnapshot(doc => {
+                    const points = doc.exists ? (doc.data().points || 0) : 0;
+                    document.getElementById('card-points').textContent = points.toFixed(1);
+                });
+
+                // Status logic
+                const admins = ['mikenestorlive@gmail.com', 'schnaydernaderice1@gmail.com'];
+                let status = "Utilisateur";
+                if (user.email && admins.includes(user.email)) {
+                    status = "Admin";
+                    document.getElementById('admin-access').style.display = 'block';
+                } else {
+                    const { data: p } = await sb.from('products').select('id').eq('client_email', user.email).limit(1);
+                    const { data: w } = await sb.from('wash_records').select('id').eq('client_name', name).limit(1);
+                    if ((p && p.length > 0) || (w && w.length > 0)) status = "Client";
+                }
+                document.getElementById('card-status').textContent = status;
+            } else {
+                document.getElementById('login-trigger-btn').style.display = 'block';
+                document.getElementById('user-profile-btn').style.display = 'none';
             }
-        }
-        checkAdmin();
-
-        // --- THEME TOGGLE ---
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-            const isLight = document.body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-        }
-        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+        });
 
         // --- THREE.JS BACKGROUND ---
         const canvas = document.querySelector('#bg-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         camera.position.z = 5;
-
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 1500;
-        const posArray = new Float32Array(particlesCount * 3);
-        for(let i=0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 15;
-        }
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({ size: 0.005, color: 0xc9a84c, transparent: true, opacity: 0.5 });
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        function animate() {
-            requestAnimationFrame(animate);
-            particlesMesh.rotation.y += 0.001;
-            particlesMesh.rotation.x += 0.0005;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        const geo = new THREE.BufferGeometry();
+        const count = 1500;
+        const pos = new Float32Array(count * 3);
+        for(let i=0; i<count*3; i++) pos[i] = (Math.random()-0.5)*15;
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const mat = new THREE.PointsMaterial({ size: 0.005, color: 0xc9a84c, transparent: true, opacity: 0.4 });
+        const points = new THREE.Points(geo, mat);
+        scene.add(points);
+        function anim() { requestAnimationFrame(anim); points.rotation.y += 0.001; renderer.render(scene, camera); }
+        anim();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
         // --- REVEAL ON SCROLL ---
@@ -382,19 +330,11 @@
             reveals.forEach(el => {
                 const windowHeight = window.innerHeight;
                 const elementTop = el.getBoundingClientRect().top;
-                const elementVisible = 100;
-                if (elementTop < windowHeight - elementVisible) {
-                    el.classList.add("active");
-                }
+                if (elementTop < windowHeight - 100) el.classList.add("active");
             });
         }
         window.addEventListener("scroll", reveal);
         reveal();
-
-        // --- GSAP HERO ANIMATION ---
-        gsap.from(".hero-title", { duration: 1.5, y: 50, opacity: 0, ease: "power4.out" });
-        gsap.from(".hero-sub", { duration: 1.5, y: 30, opacity: 0, delay: 0.5, ease: "power4.out" });
-        gsap.from(".big-sphere", { duration: 2, scale: 0, opacity: 0, delay: 0.8, ease: "back.out(1.7)" });
     </script>
 </body>
 </html>
