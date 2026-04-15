@@ -7,173 +7,144 @@
     <title>ZETWAL ORGANISATION | Inovasyon ak Ekselans</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --gold: #ffd700; --gold-deep: #b8860b; --gold-light: #fff8dc;
-            --gold-glow: rgba(255, 215, 0, 0.2); --bg: #010101; --text: #ffffff;
-            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            --glass-bg: rgba(255, 255, 255, 0.08);
+            --gold: #c9a84c; --gold-bright: #f0d060; --gold-deep: #8a6a1a; --gold-pale: #f5e6b0;
+            --gold-glow: rgba(201, 168, 76, 0.2); --bg: #0d0c08; --text: #ffffff;
+            --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
         }
-        .light-mode { --bg: #fdfdfd; --text: #1a1a1a; --glass-bg: rgba(0, 0, 0, 0.05); }
-        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease; }
-        #webgl-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
         
-        /* --- ANIMASYON --- */
-        @keyframes liquidGold { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes softTextGlow { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
-        @keyframes breatheSection { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.005); } }
-        @keyframes breatheBox { 0%, 100% { transform: scale(1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); } 50% { transform: scale(1.01); box-shadow: 0 12px 40px 0 rgba(255, 215, 0, 0.1); } }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         
-        /* GWO BOUL KI RESPIRE */
-        .big-sphere {
-            width: 120px; height: 120px;
-            background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep));
-            border-radius: 50%; margin: 0 auto 20px;
-            box-shadow: 0 0 50px var(--gold);
-            animation: spherePulse 4s infinite ease-in-out;
-            filter: blur(1px);
-        }
-        @keyframes spherePulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 30px var(--gold); }
-            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 70px var(--gold); }
-        }
+        #bg-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
+
+        /* --- NEBULA --- */
+        .nebula{position:fixed;inset:0;z-index:-9;pointer-events:none;overflow:hidden}
+        .nb{position:absolute;border-radius:50%;filter:blur(100px);animation:nd 20s ease-in-out infinite alternate}
+        .nb:nth-child(1){width:600px;height:600px;top:-150px;left:-150px;background:radial-gradient(circle,rgba(201,168,76,0.1)0%,transparent 70%)}
+        .nb:nth-child(2){width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(255,255,255,0.05)0%,transparent 70%);animation-delay:-10s}
+        @keyframes nd{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,-20px) scale(1.05)}}
 
         /* --- NAVIGATION --- */
         .nav { 
-            position: fixed; top: 0; width: 100%; z-index: 1000; 
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); 
-            border-bottom: 3px solid transparent;
-            /* Koridò likid la sèlman nan bordi a kounye a */
-            border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1;
-            animation: breatheSection 4s infinite ease-in-out;
+            position: fixed; top: 0; width: 100%; z-index: 2000; 
+            background: rgba(13, 12, 8, 0.85); backdrop-filter: blur(25px); 
+            border-bottom: 1px solid rgba(201, 168, 76, 0.2);
         }
-        .nav-content { position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px 10px; }
+        .nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-pale),var(--gold),transparent);background-size:200% 100%;animation:nl 5s linear infinite}
+        @keyframes nl{to{background-position:200% 0}}
         
-        .auth-container { position: absolute; right: 20px; top: 15px; text-align: right; }
-        .login-btn {
-            padding: 8px 18px; border: 1px solid var(--gold); border-radius: 20px;
-            color: var(--gold); text-decoration: none; font-size: 0.7rem;
-            font-weight: 600; text-transform: uppercase; transition: 0.3s; cursor: pointer; background: transparent;
-        }
-        .login-btn:hover { background: var(--gold); color: #000; }
-        #user-display { color: var(--gold); font-size: 0.7rem; font-weight: 700; line-height: 1.2; }
-        .logout-link { color: #ff4444; cursor: pointer; text-decoration: underline; font-size: 0.55rem; display: block; }
-
-        .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        .nav-logo-img { width: 25px; height: 25px; }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+        .nav-content { display: flex; flex-direction: column; align-items: center; padding: 12px 20px; position: relative; }
+        
+        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; text-decoration: none; color: inherit; }
+        .nav-logo-img { width: 30px; height: 30px; filter: drop-shadow(0 0 5px var(--gold-glow)); }
+        .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
         .logo-text span { color: var(--gold); }
         
         .nav-links { 
             display: flex; list-style: none; gap: 10px; margin: 0; padding: 5px; 
-            overflow-x: auto; width: 100%; white-space: nowrap; -webkit-overflow-scrolling: touch;
+            overflow-x: auto; width: 100%; justify-content: center; scrollbar-width: none;
         }
         .nav-links::-webkit-scrollbar { display: none; }
         .nav-links a { 
-            color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.6rem; text-transform: uppercase; 
-            padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.4); transition: 0.3s; 
+            color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 600; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 7px 15px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.25); transition: var(--transition); 
         }
-        .nav-links a.active { background: var(--gold); color: #000; }
-
-        .theme-toggle { position: fixed; top: 120px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); font-size: 1.2rem; }
+        .nav-links a:hover, .nav-links a.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.05); box-shadow: 0 0 15px var(--gold-glow); }
 
         /* --- HERO --- */
-        .hero { padding: 180px 5% 60px; text-align: center; }
-        .gold-shimmer { 
-            background: linear-gradient(90deg, var(--text) 0%, var(--gold) 50%, var(--text) 100%);
+        .hero { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 140px 20px 60px; position: relative; }
+        .hero-title { 
+            font-family: 'Cormorant Garamond', serif; font-size: clamp(2.8rem, 10vw, 5.5rem); font-weight: 700; letter-spacing: 8px;
+            background: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold) 35%, var(--gold-pale) 50%, var(--gold) 65%, var(--gold-deep) 100%);
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: softTextGlow 6s linear infinite; font-size: clamp(2.5rem, 10vw, 5rem); font-family: 'Playfair Display', serif; margin: 0;
+            animation: shimmer 6s linear infinite; margin-bottom: 15px;
         }
-        .hero p {
-            background: linear-gradient(90deg, rgba(255,255,255,0.6) 0%, var(--gold) 50%, rgba(255,255,255,0.6) 100%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: softTextGlow 8s linear infinite; letter-spacing: 3px; font-size: 0.85rem; font-weight: 600;
-        }
+        @keyframes shimmer{to{background-position:200% center}}
+        .hero-sub { font-size: 0.8rem; letter-spacing: 5px; color: rgba(201, 168, 76, 0.7); text-transform: uppercase; font-weight: 600; }
 
-        /* --- CARDS & LIQUID BORDER --- */
-        .carousel-container { width: 100%; padding: 40px 0 120px; }
-        .hub-carousel { display: flex; gap: 30px; overflow-x: auto; padding: 20px 5%; scroll-snap-type: x mandatory; flex-wrap: nowrap; }
-        .hub-carousel::-webkit-scrollbar { display: none; }
-        
-        .carousel-item { 
-            flex: 0 0 320px; scroll-snap-align: center; 
-            transition: transform 0.5s var(--transition); 
-            cursor: pointer;
-        }
-        .carousel-item:hover { transform: scale(1.08); z-index: 10; }
+        /* --- SECTIONS GRID --- */
+        .main-grid { max-width: 1200px; margin: 0 auto; padding: 40px 20px 100px; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 40px; }
+        @media (max-width: 400px) { .main-grid { grid-template-columns: 1fr; } }
+
+        /* --- LIQUID BORDER CARD --- */
+        .card-wrap { position: relative; cursor: pointer; transition: var(--transition); }
+        .card-wrap:hover { transform: translateY(-10px) scale(1.02); }
 
         .liquid-border { 
-            position: relative; border-radius: 35px; background: var(--glass-bg); 
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            padding: 30px 20px; text-align: center; height: 420px; 
+            position: relative; border-radius: 30px; background: rgba(20, 18, 12, 0.7); 
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            padding: 40px 30px; text-align: center; min-height: 500px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            border: 3px solid transparent; /* Ogmante soti 2 rive 3 pou pi vizib */
-            animation: breatheBox 5s infinite ease-in-out;
-            overflow: hidden;
+            border: 2px solid transparent; overflow: hidden;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.5);
         }
 
         .liquid-border::before { 
-            content: ""; position: absolute; inset: -3px; z-index: -1; border-radius: inherit; padding: 3px; 
-            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); 
-            background-size: 200% 100%; animation: liquidGold 2s linear infinite; 
+            content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2px; 
+            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-pale), var(--gold), transparent); 
+            background-size: 200% 100%; animation: liquidGold 3s linear infinite; 
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
             -webkit-mask-composite: xor; 
         }
+        @keyframes liquidGold { to { background-position: 200% 50%; } }
+
+        .item-icon { font-size: 3.5rem; margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--gold-glow)); transition: var(--transition); }
+        .card-wrap:hover .item-icon { transform: scale(1.2) rotate(5deg); }
+
+        .item-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 2px; color: var(--gold-pale); margin-bottom: 15px; }
+        .item-desc { font-size: 0.85rem; line-height: 1.8; color: rgba(255, 255, 255, 0.8); margin-bottom: 20px; font-weight: 400; }
         
-        .liquid-border h3, .liquid-border p:not(.btn-main-gold), .liquid-border .item-detail {
-            background: linear-gradient(90deg, var(--text) 0%, var(--gold) 50%, var(--text) 100%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: softTextGlow 10s linear infinite;
-        }
+        .item-details-list { width: 100%; text-align: left; border-top: 1px solid rgba(201, 168, 76, 0.15); padding-top: 20px; margin-bottom: 25px; }
+        .detail-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.7rem; color: rgba(201, 168, 76, 0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .detail-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 8px var(--gold); }
 
-        .item-icon { font-size: 3rem; filter: drop-shadow(0 0 10px var(--gold-glow)); }
-        .item-title { font-size: 1.5rem; font-family: 'Playfair Display', serif; margin: 10px 0; }
-        .item-desc { font-size: 0.85rem; line-height: 1.4; opacity: 0.9; }
-        .item-detail { font-size: 0.7rem; border-top: 1px solid rgba(255,215,0,0.2); padding-top: 10px; width: 100%; }
-
-        .btn-main-gold { 
-            display: inline-block; padding: 10px 25px; background: var(--gold); color: #000 !important; 
-            -webkit-text-fill-color: #000 !important; 
-            text-decoration: none; border-radius: 50px; font-weight: 800; 
-            text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; transition: 0.3s; 
+        .btn-gold { 
+            display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, var(--gold), var(--gold-deep)); 
+            color: #000; text-decoration: none; border-radius: 50px; font-weight: 800; 
+            text-transform: uppercase; font-size: 0.72rem; letter-spacing: 2px; transition: var(--transition); 
+            box-shadow: 0 5px 15px rgba(201, 168, 76, 0.3);
         }
+        .btn-gold:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(201, 168, 76, 0.5); }
 
         /* --- FOOTER --- */
         footer { 
-            background: rgba(0,0,0,0.9); padding: 60px 5% 40px; text-align: center; 
-            border-top: 3px solid transparent;
-            border-image: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent) 1;
-            animation: breatheSection 6s infinite ease-in-out;
+            background: rgba(13, 12, 8, 0.95); padding: 80px 5% 40px; text-align: center; 
+            border-top: 1px solid rgba(201, 168, 76, 0.2); position: relative;
         }
-        .social-buttons { display: flex; justify-content: center; gap: 25px; margin: 20px 0; }
-        .social-icon { width: 45px; height: 45px; transition: 0.4s; }
-        .footer-bottom { margin-top: 20px; font-size: 0.7rem; color: var(--gold); letter-spacing: 1px; }
+        footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+        
+        .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; letter-spacing: 4px; color: var(--white); margin-bottom: 30px; }
+        .footer-logo span { color: var(--gold); }
+        
+        .social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; }
+        .social-btn { color: var(--gold); text-decoration: none; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: var(--transition); padding: 5px 10px; }
+        .social-btn:hover { color: var(--white); text-shadow: 0 0 10px var(--gold-glow); }
+        
+        .copyright { font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); letter-spacing: 1px; text-transform: uppercase; }
 
-        .gold-particle { position: fixed; pointer-events: none; background: var(--gold); border-radius: 50%; z-index: 9999; opacity: 0.8; }
+        /* --- REVEAL ANIMATION --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
     </style>
 </head>
-<body onmousemove="createGoldDust(event)" ontouchmove="createGoldDust(event.touches[0])">
+<body>
 
-    <canvas id="webgl-canvas"></canvas>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    <canvas id="bg-canvas"></canvas>
+    <div class="nebula"><div class="nb"></div><div class="nb"></div></div>
 
     <nav class="nav">
         <div class="nav-content">
-            <div class="auth-container">
-                <button id="google-login" class="login-btn">Login</button>
-                <div id="user-display" style="display: none;">
-                    <span id="user-name"></span><br>
-                    <span id="user-points"></span>
-                    <span class="logout-link" onclick="logout()">Dekonekte</span>
-                </div>
-            </div>
-
-            <div class="logo-container">
+            <a href="index.html" class="logo-container">
                 <img src="logo.png" alt="Zetwal" class="nav-logo-img">
                 <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
-            </div>
+            </a>
             <ul class="nav-links">
                 <li><a href="index.html" class="active">Akèy</a></li>
                 <li><a href="lavri.html">Lavri</a></li>
@@ -182,174 +153,171 @@
                 <li><a href="cinema.html">Sinema</a></li>
                 <li><a href="technopark.html">Technopark</a></li>
                 <li><a href="association.html">Asosye</a></li>
-                <li><a href="games.html">Jwèt</a></li>
             </ul>
         </div>
     </nav>
 
     <header class="hero">
-        <div class="big-sphere"></div> <h1 class="gold-shimmer">Inivè Zetwal</h1>
-        <p>LIDÈ NAN INOVASYON TEKNOLOJIK AK PWOGRÈ SOSYAL</p>
+        <h1 class="hero-title">ZETWAL</h1>
+        <p class="hero-sub">Lidè nan Inovasyon ak Ekselans</p>
     </header>
 
-    <main>
-        <div class="carousel-container">
-            <div class="hub-carousel">
-                <div class="carousel-item">
-                    <div class="liquid-border" onclick="location.href='lavri.html'">
-                        <div class="item-icon">🧺</div>
-                        <h3 class="item-title">Lavri Zetwal</h3>
-                        <p class="item-desc">Yon revolisyon nan fason w ap pran swen rad ou. Sèvis pwofesyonèl ak livrezon ultra-rapid.</p>
-                        <div class="item-detail">Netwayaj Ekontolojik • Swen Premium</div>
-                        <span class="btn-main-gold">Antre nan Lavri</span>
-                    </div>
+    <main class="main-grid">
+        <!-- 1. LAVRI ZETWAL -->
+        <div class="card-wrap reveal" onclick="location.href='lavri.html'">
+            <div class="liquid-border">
+                <div class="item-icon">🧺</div>
+                <h2 class="item-title">Lavri Zetwal</h2>
+                <p class="item-desc">Dekouvri premye sèvis blanchisri nan peyi a ki konbine ekoloji ak teknoloji pwent pou yon pwòpte san parèy.</p>
+                <div class="item-details-list">
+                    <div class="detail-row"><div class="detail-dot"></div> Netwayaj ekolojik (Green Cleaning)</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Livrezon rapid mwens pase 24h</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Swen espesyal tekstil delika</div>
                 </div>
-                <div class="carousel-item">
-                    <div class="liquid-border" onclick="location.href='shop.html'">
-                        <div class="item-icon">🛒</div>
-                        <h3 class="item-title">Shop Zetwal</h3>
-                        <p class="item-desc">Boutik eksklizif kote kalite rankontre elegans. Pwodwi chwazi ak anpil swen pou ou.</p>
-                        <div class="item-detail">Pwodwi Lokal • Gadget IA</div>
-                        <span class="btn-main-gold">Vizite Boutik la</span>
-                    </div>
+                <span class="btn-gold">Antre nan Lavri</span>
+            </div>
+        </div>
+
+        <!-- 2. SHOP ZETWAL -->
+        <div class="card-wrap reveal" onclick="location.href='shop.html'">
+            <div class="liquid-border">
+                <div class="item-icon">🛒</div>
+                <h2 class="item-title">Shop Zetwal</h2>
+                <p class="item-desc">Yon seleksyon eksklizif nan pi bon pwodwi lokal ak entènasyonal kote bon jan kalite rankontre inovasyon.</p>
+                <div class="item-details-list">
+                    <div class="detail-row"><div class="detail-dot"></div> Pwodwi prim ak garanti</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Peman sekirize (Kach/Kat)</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Sèvis kliyan 24/7</div>
                 </div>
-                <div class="carousel-item">
-                    <div class="liquid-border" onclick="location.href='mall.html'">
-                        <div class="item-icon">🏢</div>
-                        <h3 class="item-title">Mall Zetwal</h3>
-                        <p class="item-desc">Eksperyans yon sant komèsyal vityèl 3D. Tout sa ou bezwen nan yon sèl plas.</p>
-                        <div class="item-detail">Shopping 3D • Eksperyans Immèsif</div>
-                        <span class="btn-main-gold">Antre nan Mall la</span>
-                    </div>
+                <span class="btn-gold">Vizite Shop la</span>
+            </div>
+        </div>
+
+        <!-- 3. ZETWAL MALL -->
+        <div class="card-wrap reveal" onclick="location.href='mall.html'">
+            <div class="liquid-border">
+                <div class="item-icon">🏛️</div>
+                <h2 class="item-title">Zetwal Mall</h2>
+                <p class="item-desc">Premye mall futuriste nan peyi a ak 4 étaj ki dedye a plezi w, soti nan komès rive nan byennèt.</p>
+                <div class="item-details-list">
+                    <div class="detail-row"><div class="detail-dot"></div> Plis pase 50 boutik eksklizif</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Pakin entèlijan (HUD)</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Gastronomi ak Sante</div>
                 </div>
-                <div class="carousel-item">
-                    <div class="liquid-border" onclick="location.href='cinema.html'">
-                        <div class="item-icon">🎬</div>
-                        <h3 class="item-title">Sinema</h3>
-                        <p class="item-desc">Gade pi bèl fim ak kreyasyon vizyèl nou yo nan yon kalite siperyè.</p>
-                        <div class="item-detail">Streaming 4K • Pwodiksyon Lokal</div>
-                        <span class="btn-main-gold">Gade Fim yo</span>
-                    </div>
+                <span class="btn-gold">Dekouvri Mall la</span>
+            </div>
+        </div>
+
+        <!-- 4. SINEMA ZETWAL -->
+        <div class="card-wrap reveal" onclick="location.href='cinema.html'">
+            <div class="liquid-border">
+                <div class="item-icon">🎬</div>
+                <h2 class="item-title">Sinema Zetwal</h2>
+                <p class="item-desc">Plonje nan yon eksperyans sinematografik inik ak dènye kri teknoloji 4K ak son Dolby Atmos.</p>
+                <div class="item-details-list">
+                    <div class="detail-row"><div class="detail-dot"></div> Ekran teknoloji Lazè 4K</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Son imèsif 360 degre</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Chèz VIP ak sèvis nan plas</div>
                 </div>
-                <div class="carousel-item">
-                    <div class="liquid-border" onclick="location.href='technopark.html'">
-                        <div class="item-icon">🤖</div>
-                        <h3 class="item-title">Technopark</h3>
-                        <p class="item-desc">Laboratwa inovasyon kote lavni ap bati. Devlopman Mike-agent-IA ak robotik.</p>
-                        <div class="item-detail">AI • Kodaj • Rechèch</div>
-                        <span class="btn-main-gold">Eksplore Inovasyon</span>
-                    </div>
+                <span class="btn-gold">Gade yon Fim</span>
+            </div>
+        </div>
+
+        <!-- 5. TECHNOPARK -->
+        <div class="card-wrap reveal" onclick="location.href='technopark.html'">
+            <div class="liquid-border">
+                <div class="item-icon">🚀</div>
+                <h2 class="item-title">Technopark</h2>
+                <p class="item-desc">Espas kote rèv teknolojik yo vin reyalite ak solisyon dijital inovatè pou lavni Ayiti.</p>
+                <div class="item-details-list">
+                    <div class="detail-row"><div class="detail-dot"></div> Enkubatè pou Startups</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Devlopman Software & AI</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Co-working futuriste</div>
                 </div>
-                <div class="carousel-item">
-                    <div class="liquid-border" onclick="location.href='association.html'">
-                        <div class="item-icon">🤝</div>
-                        <h3 class="item-title">Asosye</h3>
-                        <p class="item-desc">Rejwenn kominote a epi vin yon pati nan chanjman an. Ann bati ansanm.</p>
-                        <div class="item-detail">Patenarya • Filantropi</div>
-                        <span class="btn-main-gold">Vin yon Asosye</span>
-                    </div>
+                <span class="btn-gold">Eksplore Inovasyon</span>
+            </div>
+        </div>
+
+        <!-- 6. ASOSYE ZETWAL -->
+        <div class="card-wrap reveal" onclick="location.href='association.html'">
+            <div class="liquid-border">
+                <div class="item-icon">🤝</div>
+                <h2 class="item-title">Asosye Zetwal</h2>
+                <p class="item-desc">Vin fè pati rezo ki pi dinamik la epi benefisye de ekosistèm Zetwal pou propulse biznis ou.</p>
+                <div class="item-details-list">
+                    <div class="detail-row"><div class="detail-dot"></div> Patenarya estratejik</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Aksè ak baz kliyan prim</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Sipò lojistik ak maketing</div>
                 </div>
-                <div class="carousel-item">
-                    <div class="liquid-border" onclick="location.href='games.html'">
-                        <div class="item-icon">🎮</div>
-                        <h3 class="item-title">Jwèt</h3>
-                        <p class="item-desc">Diveti w ak jwèt videyo eksklizif nou devlope pou plezi ou.</p>
-                        <div class="item-detail">Gaming • Defi • Rekonpans</div>
-                        <span class="btn-main-gold">Kòmanse Jwe</span>
-                    </div>
-                </div>
+                <span class="btn-gold">Vin yon Asosye</span>
             </div>
         </div>
     </main>
 
     <footer>
-        <h4 style="color:var(--gold); margin:0; letter-spacing: 2px;">RETE KONEKTE AK NOU</h4>
-        <div class="social-buttons">
-            <a href="https://wa.me/79961103506"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="social-icon" alt="WhatsApp"></a>
-            <a href="https://t.me/mikenestor14"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" class="social-icon" alt="Telegram"></a>
+        <div class="footer-logo">ZETWAL <span>ORGANISATION</span></div>
+        <div class="social-links">
+            <a href="#" class="social-btn">Instagram</a>
+            <a href="#" class="social-btn">Facebook</a>
+            <a href="#" class="social-btn">Twitter</a>
+            <a href="#" class="social-btn">WhatsApp</a>
         </div>
-        <div class="footer-bottom">ZETWAL ORGANISATION 2026 – MODÈNITE AK TRADISYON</div>
+        <div class="copyright">© 2026 ZETWAL ORGANISATION — TOUT DWA REZÈVE.</div>
     </footer>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-            authDomain: "lavrizetwal.firebaseapp.com",
-            projectId: "lavrizetwal",
-            storageBucket: "lavrizetwal.firebasestorage.app",
-            messagingSenderId: "291921316186",
-            appId: "1:291921316186:web:f55e8b34526960df394b63",
-            measurementId: "G-65R9V5MRBV"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
-
-        const loginBtn = document.getElementById("google-login");
-        const userDisplay = document.getElementById("user-display");
-        const userNameSpan = document.getElementById("user-name");
-        const userPointsSpan = document.getElementById("user-points");
-
-        loginBtn.onclick = () => signInWithPopup(auth, provider);
-        window.logout = () => signOut(auth);
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                loginBtn.style.display = "none";
-                userDisplay.style.display = "block";
-                userNameSpan.innerText = user.displayName.split(' ')[0];
-                const userRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(userRef);
-                if (!docSnap.exists()) {
-                    await setDoc(userRef, { points: 1000, name: user.displayName }, { merge: true });
-                }
-                onSnapshot(userRef, (doc) => {
-                    if (doc.exists()) {
-                        // Korije: sèlman "Pwen" yon sèl fwa
-                        userPointsSpan.innerText = (doc.data().points || 0) + " Pwen";
-                    }
-                });
-            } else {
-                loginBtn.style.display = "block";
-                userDisplay.style.display = "none";
-            }
-        });
-    </script>
-
     <script>
-        function spawnParticle(x, y) {
-            const p = document.createElement('div'); p.className = 'gold-particle';
-            const s = Math.random() * 3 + 1; p.style.width = p.style.height = s + 'px';
-            p.style.left = x + 'px'; p.style.top = y + 'px';
-            document.body.appendChild(p);
-            gsap.to(p, { duration: 1, x: (Math.random()-0.5)*50, y: (Math.random()-0.5)*50, opacity: 0, onComplete: () => p.remove() });
-        }
-        function createGoldDust(e) { spawnParticle(e.clientX, e.clientY); }
-        window.toggleTheme = () => {
-            document.body.classList.toggle('light-mode');
-            document.querySelector('.theme-toggle').innerHTML = document.body.classList.contains('light-mode') ? '🌙' : '🌓';
-        };
+        // --- THREE.JS BACKGROUND ---
+        const canvas = document.querySelector('#bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
 
-        let scene, camera, renderer, stars;
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            const geo = new THREE.BufferGeometry(); const pos = [];
-            for(let i=0; i<1500; i++) pos.push((Math.random()-0.5)*40, (Math.random()-0.5)*40, (Math.random()-0.5)*40);
-            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            stars = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffd700, size: 0.03 }));
-            scene.add(stars); camera.position.z = 5; animate();
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1500;
+        const posArray = new Float32Array(particlesCount * 3);
+        for(let i=0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15;
         }
-        function animate() { requestAnimationFrame(animate); stars.rotation.y += 0.0004; renderer.render(scene, camera); }
-        init();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.005, color: 0xc9a84c, transparent: true, opacity: 0.5 });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.rotation.x += 0.0005;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // --- REVEAL ON SCROLL ---
+        function reveal() {
+            const reveals = document.querySelectorAll(".reveal");
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add("active");
+                }
+            });
+        }
+        window.addEventListener("scroll", reveal);
+        reveal(); // Initial check
+
+        // --- GSAP HERO ANIMATION ---
+        gsap.from(".hero-title", { duration: 1.5, y: 50, opacity: 0, ease: "power4.out" });
+        gsap.from(".hero-sub", { duration: 1.5, y: 30, opacity: 0, delay: 0.5, ease: "power4.out" });
     </script>
 </body>
 </html>
