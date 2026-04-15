@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
@@ -16,11 +17,19 @@
             --gold-glow: rgba(201, 168, 76, 0.2); --bg: #0d0c08; --text: #ffffff;
             --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
             --glass-bg: rgba(255, 255, 255, 0.05);
+            --card-bg: rgba(20, 18, 12, 0.7);
+        }
+        
+        .light-mode {
+            --bg: #fdfdfd; --text: #1a1a1a;
+            --glass-bg: rgba(0, 0, 0, 0.05);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --gold: #b8860b; --gold-deep: #8a6a1a;
         }
         
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
-        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease, color 0.5s ease; }
         
         #bg-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
 
@@ -58,8 +67,11 @@
         }
         .nav-links a:hover, .nav-links a.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.05); box-shadow: 0 0 15px var(--gold-glow); }
 
+        .theme-toggle { position: fixed; top: 120px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+        .theme-toggle:hover { transform: rotate(180deg) scale(1.1); }
+
         /* --- HERO --- */
-        .hero { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 140px 20px 60px; position: relative; }
+        .hero { min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 140px 20px 40px; position: relative; }
         .hero-title { 
             font-family: 'Cormorant Garamond', serif; font-size: clamp(2.8rem, 10vw, 5.5rem); font-weight: 700; letter-spacing: 8px;
             background: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold) 35%, var(--gold-pale) 50%, var(--gold) 65%, var(--gold-deep) 100%);
@@ -68,6 +80,20 @@
         }
         @keyframes shimmer{to{background-position:200% center}}
         .hero-sub { font-size: 0.8rem; letter-spacing: 5px; color: rgba(201, 168, 76, 0.7); text-transform: uppercase; font-weight: 600; }
+
+        /* --- BIG SPHERE --- */
+        .big-sphere {
+            width: 100px; height: 100px;
+            background: radial-gradient(circle, #fff, var(--gold), var(--gold-deep));
+            border-radius: 50%; margin: 20px auto;
+            box-shadow: 0 0 50px var(--gold);
+            animation: spherePulse 4s infinite ease-in-out;
+            filter: blur(1px);
+        }
+        @keyframes spherePulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 30px var(--gold); }
+            50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 70px var(--gold); }
+        }
 
         /* --- SECTIONS GRID --- */
         .main-grid { max-width: 1200px; margin: 0 auto; padding: 40px 20px 100px; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 40px; }
@@ -78,9 +104,9 @@
         .card-wrap:hover { transform: translateY(-10px) scale(1.02); }
 
         .liquid-border { 
-            position: relative; border-radius: 30px; background: rgba(20, 18, 12, 0.7); 
+            position: relative; border-radius: 30px; background: var(--card-bg); 
             backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            padding: 40px 30px; text-align: center; min-height: 500px; 
+            padding: 40px 30px; text-align: center; min-height: 520px; 
             display: flex; flex-direction: column; justify-content: space-between; align-items: center;
             border: 2px solid transparent; overflow: hidden;
             box-shadow: 0 15px 45px rgba(0,0,0,0.5);
@@ -100,6 +126,7 @@
 
         .item-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 2px; color: var(--gold-pale); margin-bottom: 15px; }
         .item-desc { font-size: 0.85rem; line-height: 1.8; color: rgba(255, 255, 255, 0.8); margin-bottom: 20px; font-weight: 400; }
+        .light-mode .item-desc { color: #333; }
         
         .item-details-list { width: 100%; text-align: left; border-top: 1px solid rgba(201, 168, 76, 0.15); padding-top: 20px; margin-bottom: 25px; }
         .detail-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.7rem; color: rgba(201, 168, 76, 0.8); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
@@ -113,6 +140,10 @@
         }
         .btn-gold:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(201, 168, 76, 0.5); }
 
+        /* --- ADMIN SECTION --- */
+        #admin-panel { display: none; margin-top: 60px; padding: 40px 20px; background: rgba(201, 168, 76, 0.05); border-top: 1px solid var(--gold); text-align: center; }
+        .admin-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--gold); margin-bottom: 20px; letter-spacing: 3px; }
+
         /* --- FOOTER --- */
         footer { 
             background: rgba(13, 12, 8, 0.95); padding: 80px 5% 40px; text-align: center; 
@@ -123,9 +154,9 @@
         .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; letter-spacing: 4px; color: var(--white); margin-bottom: 30px; }
         .footer-logo span { color: var(--gold); }
         
-        .social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; }
-        .social-btn { color: var(--gold); text-decoration: none; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: var(--transition); padding: 5px 10px; }
-        .social-btn:hover { color: var(--white); text-shadow: 0 0 10px var(--gold-glow); }
+        .social-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; flex-wrap: wrap; }
+        .social-btn { color: var(--gold); text-decoration: none; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: var(--transition); padding: 5px 10px; border: 1px solid transparent; border-radius: 10px; }
+        .social-btn:hover { color: var(--white); text-shadow: 0 0 10px var(--gold-glow); border-color: var(--gold); }
         
         .copyright { font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); letter-spacing: 1px; text-transform: uppercase; }
 
@@ -138,6 +169,8 @@
 
     <canvas id="bg-canvas"></canvas>
     <div class="nebula"><div class="nb"></div><div class="nb"></div></div>
+
+    <button class="theme-toggle" onclick="toggleTheme()" title="Chanje Mode">🌓</button>
 
     <nav class="nav">
         <div class="nav-content">
@@ -153,6 +186,7 @@
                 <li><a href="cinema.html">Sinema</a></li>
                 <li><a href="technopark.html">Technopark</a></li>
                 <li><a href="association.html">Asosye</a></li>
+                <li><a href="games.html">Jwèt</a></li>
             </ul>
         </div>
     </nav>
@@ -160,6 +194,7 @@
     <header class="hero">
         <h1 class="hero-title">ZETWAL</h1>
         <p class="hero-sub">Lidè nan Inovasyon ak Ekselans</p>
+        <div class="big-sphere"></div>
     </header>
 
     <main class="main-grid">
@@ -238,7 +273,22 @@
             </div>
         </div>
 
-        <!-- 6. ASOSYE ZETWAL -->
+        <!-- 6. JWÈT ZETWAL -->
+        <div class="card-wrap reveal" onclick="location.href='games.html'">
+            <div class="liquid-border">
+                <div class="item-icon">🎮</div>
+                <h2 class="item-title">Jwèt Zetwal</h2>
+                <p class="item-desc">Plonje nan yon mond amizman san limit ak pi bon jwèt videyo ak eksperyans entèaktif pou tout laj.</p>
+                <div class="item-details-list">
+                    <div class="detail-row"><div class="detail-dot"></div> Tounwa jwèt an liy</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Eksperyans VR imèsif</div>
+                    <div class="detail-row"><div class="detail-dot"></div> Zòn "Retro Gaming"</div>
+                </div>
+                <span class="btn-gold">Kòmanse Jwe</span>
+            </div>
+        </div>
+
+        <!-- 7. ASOSYE ZETWAL -->
         <div class="card-wrap reveal" onclick="location.href='association.html'">
             <div class="liquid-border">
                 <div class="item-icon">🤝</div>
@@ -254,18 +304,44 @@
         </div>
     </main>
 
+    <div id="admin-panel">
+        <h2 class="admin-title">🔒 ADMIN DASHBOARD</h2>
+        <a href="admin.html" class="btn-gold">Aksè Administrasyon</a>
+    </div>
+
     <footer>
         <div class="footer-logo">ZETWAL <span>ORGANISATION</span></div>
         <div class="social-links">
-            <a href="#" class="social-btn">Instagram</a>
-            <a href="#" class="social-btn">Facebook</a>
-            <a href="#" class="social-btn">Twitter</a>
-            <a href="#" class="social-btn">WhatsApp</a>
+            <a href="https://wa.me/79961103506" target="_blank" class="social-btn">WhatsApp: +7 996 110 35 06</a>
+            <a href="https://t.me/MikeNestor14" target="_blank" class="social-btn">Telegram: @MikeNestor14</a>
         </div>
         <div class="copyright">© 2026 ZETWAL ORGANISATION — TOUT DWA REZÈVE.</div>
     </footer>
 
     <script>
+        // --- SUPABASE CONFIG ---
+        const SUPABASE_URL = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- CHECK ADMIN STATUS ---
+        async function checkAdmin() {
+            const { data: { user } } = await db.auth.getUser();
+            const admins = ['mikenestorlive@gmail.com', 'schnaydernaderice1@gmail.com'];
+            if (user && admins.includes(user.email)) {
+                document.getElementById('admin-panel').style.display = 'block';
+            }
+        }
+        checkAdmin();
+
+        // --- THEME TOGGLE ---
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+
         // --- THREE.JS BACKGROUND ---
         const canvas = document.querySelector('#bg-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -313,11 +389,12 @@
             });
         }
         window.addEventListener("scroll", reveal);
-        reveal(); // Initial check
+        reveal();
 
         // --- GSAP HERO ANIMATION ---
         gsap.from(".hero-title", { duration: 1.5, y: 50, opacity: 0, ease: "power4.out" });
         gsap.from(".hero-sub", { duration: 1.5, y: 30, opacity: 0, delay: 0.5, ease: "power4.out" });
+        gsap.from(".big-sphere", { duration: 2, scale: 0, opacity: 0, delay: 0.8, ease: "back.out(1.7)" });
     </script>
 </body>
 </html>
