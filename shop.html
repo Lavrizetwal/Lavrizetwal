@@ -1,62 +1,127 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Zetwal Shop — Boutique en ligne</title>
-  <link rel="icon" type="image/png" href="logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <style>
-    /* ============================================================
-       VARIABLES & RESET
-    ============================================================ */
-    :root {
-      --gold: #ffd700; --gold-deep: #b8860b; --gold-pale: #fff8dc;
-      --bg: #010101; --surface: #0d0d0d; --surface2: #141414;
-      --text: #ffffff; --text-muted: rgba(255,255,255,0.5);
-      --border: rgba(255,215,0,0.18); --border-hover: rgba(255,215,0,0.4);
-      --green: #00ff88; --red: #ff4444; --blue: #00b4ff;
-      --radius: 14px; --radius-sm: 8px;
-      --shadow: 0 8px 32px rgba(0,0,0,0.5);
-      --tr: all 0.3s cubic-bezier(0.165,0.84,0.44,1);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: 'Montserrat', sans-serif;
-      min-height: 100vh; overflow-x: hidden;
-    }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: var(--gold-deep); border-radius: 2px; }
-    ::selection { background: rgba(255,215,0,0.25); }
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZETWAL SHOP | Boutik an liy</title>
+    
+    <!-- Scripts Externes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #c9a84c; --gold-bright: #f0d060; --gold-deep: #8a6a1a; --gold-pale: #f5e6b0;
+            --gold-glow: rgba(201, 168, 76, 0.2); --bg: #0d0c08; --text: #ffffff;
+            --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --card-bg: rgba(20, 18, 12, 0.7);
+        }
+        
+        .light-mode {
+            --bg: #fdfdfd; --text: #1a1a1a;
+            --glass-bg: rgba(0, 0, 0, 0.05);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --gold: #b8860b; --gold-deep: #8a6a1a;
+        }
+        
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body { background: var(--bg); color: var(--text); margin: 0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; transition: background 0.5s ease, color 0.5s ease; }
+        
+        #bg-canvas { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
+
+        /* --- NEBULA --- */
+        .nebula{position:fixed;inset:0;z-index:-9;pointer-events:none;overflow:hidden}
+        .nb{position:absolute;border-radius:50%;filter:blur(100px);animation:nd 20s ease-in-out infinite alternate}
+        .nb:nth-child(1){width:600px;height:600px;top:-150px;left:-150px;background:radial-gradient(circle,rgba(201,168,76,0.1)0%,transparent 70%)}
+        .nb:nth-child(2){width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(255,255,255,0.05)0%,transparent 70%);animation-delay:-10s}
+        @keyframes nd{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,-20px) scale(1.05)}}
+
+        /* --- NAVIGATION --- */
+        .nav { 
+            position: fixed; top: 0; width: 100%; z-index: 2000; 
+            background: rgba(13, 12, 8, 0.85); backdrop-filter: blur(25px); 
+            border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+        }
+        .nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-pale),var(--gold),transparent);background-size:200% 100%;animation:nl 5s linear infinite}
+        @keyframes nl{to{background-position:200% 0}}
+        
+        .nav-content { display: flex; flex-direction: column; align-items: center; padding: 12px 20px; position: relative; }
+        
+        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; text-decoration: none; color: inherit; }
+        .nav-logo-img { width: 30px; height: 30px; filter: drop-shadow(0 0 5px var(--gold-glow)); }
+        .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+        .logo-text span { color: var(--gold); }
+
+        /* User Auth Area */
+        .user-auth-area { display: flex; align-items: center; gap: 15px; margin-top: 10px; }
+        #login-trigger-btn { padding: 8px 20px; font-size: 0.65rem; border-radius: 20px; cursor: pointer; background: var(--gold); border: none; font-weight: 800; text-transform: uppercase; transition: 0.3s; }
+        #user-profile-btn { cursor: pointer; display: none; align-items: center; gap: 8px; font-weight: 800; color: var(--gold); font-size: 0.75rem; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 20px; transition: var(--transition); }
+        #user-profile-btn:hover { background: var(--gold); color: #000; }
+        
+        #user-info-card { 
+            position: fixed; top: 120px; right: 20px; width: 280px; background: rgba(13, 12, 8, 0.98); 
+            backdrop-filter: blur(30px); border: 1px solid var(--gold); border-radius: 20px; 
+            padding: 25px; z-index: 2005; display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .info-row { margin-bottom: 15px; border-bottom: 1px solid rgba(201,168,76,0.1); padding-bottom: 10px; text-align: left; }
+        .info-label { font-size: 0.6rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .info-value { font-size: 0.85rem; font-weight: 600; }
+        .admin-link { display: none; margin-top: 15px; }
+        .btn-logout { margin-top: 15px; width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ff4444; color: #ff4444; background: transparent; cursor: pointer; font-weight: 700; font-size: 0.7rem; transition: 0.3s; }
+        .btn-logout:hover { background: #ff4444; color: #fff; }
+
+        /* Auth Modal */
+        .auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        .auth-modal { background: #0d0c08; border: 1px solid var(--gold); border-radius: 30px; padding: 40px; width: 90%; max-width: 400px; text-align: center; }
+        .auth-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--gold); background: rgba(255,255,255,0.05); color: #fff; margin-bottom: 15px; outline: none; font-family: 'Montserrat', sans-serif; }
+        .btn-auth { width: 100%; padding: 15px; border-radius: 50px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: 0.3s; margin-bottom: 10px; font-size: 0.75rem; }
+        .btn-google { background: #fff; color: #000; }
+        .btn-phone { background: var(--gold); color: #000; }
+
+        .nav-links { 
+            display: flex; list-style: none; gap: 10px; margin: 0; padding: 5px; 
+            overflow-x: auto; width: 100%; justify-content: center; scrollbar-width: none;
+        }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a { 
+            color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 600; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 7px 15px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.25); transition: var(--transition); 
+        }
+        .nav-links a:hover, .nav-links a.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.05); box-shadow: 0 0 15px var(--gold-glow); }
+
+        .theme-toggle { position: fixed; top: 160px; right: 20px; z-index: 2000; background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--gold-glow); font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+        .theme-toggle:hover { transform: rotate(180deg) scale(1.1); }
+
+        /* --- FOOTER --- */
+        footer { 
+            background: rgba(13, 12, 8, 0.95); padding: 80px 5% 40px; text-align: center; 
+            border-top: 1px solid rgba(201, 168, 76, 0.2); position: relative;
+        }
+        footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+        
+        .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; letter-spacing: 4px; color: var(--white); margin-bottom: 30px; }
+        .footer-logo span { color: var(--gold); }
+        
+        .social-icons { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; }
+        .social-icon img { width: 40px; height: 40px; transition: 0.3s; filter: drop-shadow(0 0 5px rgba(201,168,76,0.3)); }
+        .social-icon:hover img { transform: scale(1.2); filter: drop-shadow(0 0 15px var(--gold)); }
+        
+        .copyright { font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); letter-spacing: 1px; text-transform: uppercase; border-top: 1px solid rgba(201,168,76,0.1); padding-top: 20px; }
 
     /* ============================================================
-       NAVBAR
+       SHOP SPECIFIC STYLES
     ============================================================ */
-    .navbar {
-      position: fixed; top: 0; left: 0; right: 0; height: 60px; z-index: 500;
-      background: rgba(1,1,1,0.9); backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-    }
-    .navbar::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold), var(--gold-pale), var(--gold), transparent);
-      background-size: 200% 100%; animation: gline 5s linear infinite;
-    }
-    @keyframes gline { to { background-position: 200% 0; } }
-    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1rem; letter-spacing: 2px; text-decoration: none; color: var(--text); }
-    .nav-logo span { color: var(--gold); }
-    .nav-home { font-size: 0.65rem; color: var(--text-muted); text-decoration: none; transition: var(--tr); }
-    .nav-home:hover { color: var(--gold); }
-
-    /* ============================================================
-       MAIN LAYOUT
-    ============================================================ */
-    .main { padding: 80px 20px 40px; max-width: 1200px; margin: 0 auto; }
 
     /* SEARCH BAR */
     .search-section {
