@@ -119,226 +119,391 @@
         
         .copyright { font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); letter-spacing: 1px; text-transform: uppercase; border-top: 1px solid rgba(201,168,76,0.1); padding-top: 20px; }
 
+        /* --- REVEAL ANIMATION --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
     /* ============================================================
-       SHOP SPECIFIC STYLES
+       SHOP SPECIFIC STYLES - DEUXIÈME HEADER
     ============================================================ */
 
-    /* SEARCH BAR */
-    .search-section {
-      margin-bottom: 30px;
-      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
-    }
-    .search-input {
-      flex: 1; min-width: 200px;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: var(--text);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.85rem;
-      outline: none;
-      transition: var(--tr);
-    }
-    .search-input:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(255,215,0,0.08);
-    }
-    .search-input::placeholder { color: var(--text-muted); }
+        /* Shop Header Secondaire */
+        .shop-header-secondary {
+            margin-top: 140px;
+            background: rgba(13, 12, 8, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+            padding: 20px 5%;
+            position: sticky;
+            top: 100px;
+            z-index: 1500;
+        }
 
-    /* CATEGORY TABS */
-    .category-tabs {
-      display: flex; gap: 8px; margin-bottom: 28px;
-      overflow-x: auto; scrollbar-width: none; padding-bottom: 4px;
-    }
-    .category-tabs::-webkit-scrollbar { display: none; }
-    .category-tab {
-      flex-shrink: 0; padding: 9px 20px; border-radius: 20px;
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text-muted); font-family: 'Montserrat', sans-serif;
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-      cursor: pointer; transition: var(--tr);
-    }
-    .category-tab:hover { border-color: var(--border-hover); color: var(--text); }
-    .category-tab.active {
-      background: linear-gradient(135deg, var(--gold), var(--gold-deep)); color: #000;
-      border-color: var(--gold); box-shadow: 0 0 16px rgba(255,215,0,0.3);
-    }
+        /* SEARCH BAR */
+        .search-section {
+            display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 600px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-radius: 25px;
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .search-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+            background: rgba(255,255,255,0.08);
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.4); }
+        
+        .search-icon-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--gold);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+        .search-icon-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        /* CATEGORY TABS */
+        .category-tabs {
+            display: flex; gap: 8px; 
+            overflow-x: auto; scrollbar-width: none; 
+            padding-bottom: 4px;
+            margin-top: 15px;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .category-tab {
+            flex-shrink: 0; padding: 10px 22px; border-radius: 25px;
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(201, 168, 76, 0.25);
+            color: rgba(255,255,255,0.6); 
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer; transition: var(--transition);
+            white-space: nowrap;
+        }
+        .category-tab:hover { 
+            border-color: var(--gold); 
+            color: var(--gold); 
+            background: rgba(201, 168, 76, 0.05);
+        }
+        .category-tab.active {
+            background: linear-gradient(135deg, var(--gold), var(--gold-deep)); 
+            color: #000;
+            border-color: var(--gold); 
+            box-shadow: 0 0 16px rgba(201, 168, 76, 0.3);
+        }
 
     /* PRODUCTS GRID */
+    .shop-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 40px 20px 100px;
+    }
+    
     .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
     }
+    
     .product-card {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: var(--radius); overflow: hidden;
-      transition: var(--tr); cursor: pointer;
-      text-decoration: none; color: inherit;
-      display: block;
+        background: var(--card-bg);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: var(--transition);
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        backdrop-filter: blur(15px);
     }
+    
     .product-card:hover {
-      border-color: var(--border-hover);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow);
+        border-color: var(--gold);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(201, 168, 76, 0.15);
     }
+    
     .product-img {
-      width: 100%; height: 200px; object-fit: cover;
-      background: rgba(255,255,255,0.03);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3rem; position: relative; overflow: hidden;
+        width: 100%; height: 220px; object-fit: cover;
+        background: rgba(255,255,255,0.03);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; position: relative; overflow: hidden;
     }
+    
     .product-img img { width: 100%; height: 100%; object-fit: cover; }
+    
     .product-img-placeholder {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.02);
+        width: 100%; height: 100%;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,0.02);
     }
-    .product-body { padding: 16px; }
+    
+    .product-body { padding: 18px; }
+    
     .product-cat {
-      display: inline-block;
-      font-size: 0.55rem; letter-spacing: 1.5px; text-transform: uppercase;
-      color: rgba(255,215,0,0.7);
-      border: 1px solid rgba(255,215,0,0.2);
-      padding: 2px 8px; border-radius: 12px;
-      margin-bottom: 8px;
+        display: inline-block;
+        font-size: 0.55rem; letter-spacing: 1.5px; text-transform: uppercase;
+        color: var(--gold);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        padding: 3px 10px; border-radius: 15px;
+        margin-bottom: 10px;
     }
+    
     .product-name {
-      font-size: 0.95rem; font-weight: 700;
-      margin-bottom: 6px; line-height: 1.3;
+        font-size: 1rem; font-weight: 700;
+        margin-bottom: 8px; line-height: 1.3;
+        font-family: 'Cormorant Garamond', serif;
     }
+    
     .product-price {
-      font-size: 1.1rem; font-weight: 800; color: var(--gold);
-      margin-bottom: 8px; font-family: 'Playfair Display', serif;
+        font-size: 1.2rem; font-weight: 800; color: var(--gold);
+        margin-bottom: 10px; font-family: 'Cormorant Garamond', serif;
     }
+    
     .product-desc {
-      font-size: 0.7rem; color: var(--text-muted);
-      line-height: 1.5; margin-bottom: 10px;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        font-size: 0.72rem; color: rgba(255,255,255,0.6);
+        line-height: 1.6; margin-bottom: 12px;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
+    
     .product-meta {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      font-size: 0.62rem; color: var(--text-muted);
-      margin-top: 10px; padding-top: 10px;
-      border-top: 1px solid rgba(255,255,255,0.05);
+        display: flex; gap: 10px; flex-wrap: wrap;
+        font-size: 0.62rem; color: rgba(255,255,255,0.5);
+        margin-top: 12px; padding-top: 12px;
+        border-top: 1px solid rgba(201,168,76,0.15);
     }
+    
     .product-status-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 3px 10px; border-radius: 20px;
-      font-size: 0.58rem; font-weight: 700; letter-spacing: 1px;
-      margin-top: 8px;
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 12px; border-radius: 20px;
+        font-size: 0.58rem; font-weight: 700; letter-spacing: 1px;
+        margin-top: 10px;
     }
+    
     .status-available {
-      background: rgba(0,255,136,0.1); color: var(--green);
-      border: 1px solid rgba(0,255,136,0.2);
+        background: rgba(0,255,136,0.1); color: #00ff88;
+        border: 1px solid rgba(0,255,136,0.25);
     }
+    
     .status-unavailable {
-      background: rgba(255,68,68,0.1); color: var(--red);
-      border: 1px solid rgba(255,68,68,0.2);
+        background: rgba(255,68,68,0.1); color: #ff4444;
+        border: 1px solid rgba(255,68,68,0.25);
     }
+    
     .delivery-info {
-      font-size: 0.6rem; color: var(--text-muted);
-      margin-top: 6px;
+        font-size: 0.62rem; color: rgba(255,255,255,0.5);
+        margin-top: 8px;
     }
 
     /* EMPTY STATE */
     .empty-state {
-      grid-column: 1 / -1;
-      text-align: center; padding: 60px 20px;
-      color: var(--text-muted);
+        grid-column: 1 / -1;
+        text-align: center; padding: 80px 20px;
+        color: rgba(255,255,255,0.4);
     }
-    .empty-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.5; }
-    .empty-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
-    .empty-sub { font-size: 0.75rem; line-height: 1.6; }
+    .empty-icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.4; }
+    .empty-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 10px; color: var(--text); }
+    .empty-sub { font-size: 0.8rem; line-height: 1.6; }
 
     /* LOADING */
     .loading-state {
-      grid-column: 1 / -1;
-      text-align: center; padding: 60px 20px;
-      color: var(--text-muted); font-size: 0.85rem;
+        grid-column: 1 / -1;
+        text-align: center; padding: 80px 20px;
+        color: rgba(255,255,255,0.5); font-size: 0.9rem;
     }
     .spinner {
-      width: 30px; height: 30px;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      display: inline-block; margin-bottom: 12px;
+        width: 40px; height: 40px;
+        border: 3px solid rgba(201, 168, 76, 0.2);
+        border-top-color: var(--gold);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block; margin-bottom: 15px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* COLOR DOTS */
-    .color-dots { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+    .color-dots { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
     .color-dot {
-      width: 14px; height: 14px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.3);
-      display: inline-block;
+        width: 16px; height: 16px; border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.3);
+        display: inline-block;
     }
 
     /* TOAST */
     .toast {
-      position: fixed; bottom: 24px; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: rgba(10,10,10,0.95); border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px 24px; font-size: 0.75rem; font-weight: 600;
-      color: var(--gold); z-index: 9000; transition: transform 0.4s cubic-bezier(0.165,0.84,0.44,1), opacity 0.4s;
-      opacity: 0; pointer-events: none; backdrop-filter: blur(12px); white-space: nowrap;
+        position: fixed; bottom: 30px; left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: rgba(13, 12, 8, 0.95); 
+        border: 1px solid var(--gold);
+        border-radius: 15px; 
+        padding: 14px 28px; 
+        font-size: 0.78rem; font-weight: 600;
+        color: var(--gold); 
+        z-index: 9000; 
+        transition: transform 0.4s cubic-bezier(0.165,0.84,0.44,1), opacity 0.4s;
+        opacity: 0; pointer-events: none; 
+        backdrop-filter: blur(12px); 
+        white-space: nowrap;
     }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    .toast.success { border-color: rgba(0,255,136,0.3); color: var(--green); }
-    .toast.error { border-color: rgba(255,68,68,0.3); color: var(--red); }
-
-    /* NEBULA BG */
-    .nebula { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-    .nb { position: absolute; border-radius: 50%; filter: blur(80px); animation: nd 22s ease-in-out infinite alternate; }
-    .nb:nth-child(1) { width: 400px; height: 400px; top: -80px; left: -80px; background: radial-gradient(circle, rgba(100,60,200,0.1) 0%, transparent 70%); }
-    .nb:nth-child(2) { width: 350px; height: 350px; bottom: 10%; right: -60px; background: radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 70%); animation-delay: -10s; }
-    @keyframes nd { 0% { transform: translate(0,0) scale(1) } 100% { transform: translate(20px,-15px) scale(1.05) } }
+    .toast.success { border-color: #00ff88; color: #00ff88; }
+    .toast.error { border-color: #ff4444; color: #ff4444; }
   </style>
 </head>
 <body>
 
+<canvas id="bg-canvas"></canvas>
 <div class="nebula"><div class="nb"></div><div class="nb"></div></div>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-  <a href="/" class="nav-home">← Retour</a>
-  <a href="/" class="nav-logo">ZETWAL <span>SHOP</span></a>
-  <div style="width: 60px;"></div>
+<button class="theme-toggle" onclick="toggleTheme()" title="Chanje Mode">🌓</button>
+
+<!-- HEADER PRINCIPAL (identique à index.html) -->
+<nav class="nav">
+    <div class="nav-content">
+        <a href="index.html" class="logo-container">
+            <img src="logo.png" alt="Zetwal" class="nav-logo-img">
+            <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
+        </a>
+        <div class="user-auth-area">
+            <button id="login-trigger-btn" onclick="toggleAuthModal(true)">Koneksyon</button>
+            <div id="user-profile-btn" onclick="toggleInfoCard()">
+                <span id="display-name-nav">Loading...</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Akèy</a></li>
+            <li><a href="lavri.html">Lavri</a></li>
+            <li><a href="shop.html" class="active">Shop</a></li>
+            <li><a href="mall.html">Mall</a></li>
+            <li><a href="cinema.html">Sinema</a></li>
+            <li><a href="technopark.html">Technopark</a></li>
+            <li><a href="association.html">Asosye</a></li>
+            <li><a href="games.html">Jwèt</a></li>
+        </ul>
+    </div>
 </nav>
 
-<!-- MAIN CONTENT -->
-<main class="main">
-  <!-- SEARCH -->
-  <div class="search-section">
-    <input type="text" id="search-input" class="search-input" placeholder="Rechercher un produit par nom..." oninput="filterProducts()">
-  </div>
-
-  <!-- CATEGORY TABS -->
-  <div class="category-tabs" id="category-tabs">
-    <button class="category-tab active" onclick="filterByCategory('all')">Tous</button>
-    <button class="category-tab" onclick="filterByCategory('vetement')">Vêtements</button>
-    <button class="category-tab" onclick="filterByCategory('chaussures')">Chaussures</button>
-    <button class="category-tab" onclick="filterByCategory('aliment')">Aliments</button>
-    <button class="category-tab" onclick="filterByCategory('electronique')">Électronique</button>
-    <button class="category-tab" onclick="filterByCategory('maison')">Maison</button>
-    <button class="category-tab" onclick="filterByCategory('beaute')">Beauté</button>
-    <button class="category-tab" onclick="filterByCategory('sport')">Sport</button>
-    <button class="category-tab" onclick="filterByCategory('accessoire')">Accessoires</button>
-    <button class="category-tab" onclick="filterByCategory('autre')">Autre</button>
-  </div>
-
-  <!-- PRODUCTS GRID -->
-  <div class="products-grid" id="products-grid">
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <div>Chargement des produits...</div>
+<!-- User Info Card -->
+<div id="user-info-card">
+    <div class="info-row">
+        <div class="info-label">Non</div>
+        <div class="info-value" id="card-name">—</div>
     </div>
-  </div>
-</main>
+    <div class="info-row">
+        <div class="info-label">Statit</div>
+        <div class="info-value" id="card-status">Utilisateur</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Pwen ou genyen</div>
+        <div class="info-value" id="card-points" style="color:var(--gold); font-size: 1.2rem;">0.0</div>
+    </div>
+    <div class="admin-link" id="admin-access">
+        <a href="admin.html" class="btn-gold" style="width:100%; text-align:center; display:block; padding: 10px 0; font-size: 0.6rem;">Aksè Administrasyon</a>
+    </div>
+    <button class="btn-logout" onclick="handleLogout()">Dekonekte</button>
+</div>
+
+<!-- Auth Modal -->
+<div class="auth-overlay" id="auth-modal">
+    <div class="auth-modal">
+        <h2 style="color:var(--gold); margin-bottom: 25px; font-family:'Cormorant Garamond', serif; letter-spacing: 2px;">KONEKSYON</h2>
+        <div id="auth-main-view">
+            <button class="btn-auth btn-google" onclick="loginWithGoogle()">Konekte ak Google</button>
+            <div style="margin: 20px 0; color: rgba(255,255,255,0.3); font-size: 0.7rem; letter-spacing: 2px;">OSWA</div>
+            <input type="tel" id="phone-input" class="auth-input" placeholder="+509 XXXX XXXX">
+            <div id="recaptcha-container"></div>
+            <button class="btn-auth btn-phone" onclick="loginWithPhone()">Konekte ak Telefòn</button>
+        </div>
+        <div id="otp-view" style="display:none">
+            <p style="font-size: 0.8rem; margin-bottom: 15px; opacity: 0.7;">Antre kòd ou resevwa a :</p>
+            <input type="text" id="otp-input" class="auth-input" placeholder="123456">
+            <button class="btn-auth btn-phone" onclick="verifyOTP()">Verifye Kòd</button>
+        </div>
+        <button style="background:transparent; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size: 0.65rem; margin-top: 20px; text-transform:uppercase; letter-spacing: 1px;" onclick="toggleAuthModal(false)">Anile</button>
+    </div>
+</div>
+
+<!-- DEUXIÈME HEADER - SPÉCIFIQUE SHOP -->
+<div class="shop-header-secondary">
+    <!-- Barre de recherche avec icône loupe -->
+    <div class="search-section">
+        <div class="search-wrapper">
+            <input type="text" id="search-input" class="search-input" placeholder="Rechercher un produit par nom..." oninput="filterProducts()">
+            <button class="search-icon-btn" onclick="filterProducts()" title="Rechercher">🔍</button>
+        </div>
+    </div>
+    
+    <!-- Catégories -->
+    <div class="category-tabs" id="category-tabs">
+        <button class="category-tab active" onclick="filterByCategory('all')">Tous</button>
+        <button class="category-tab" onclick="filterByCategory('vetement')">Vêtements</button>
+        <button class="category-tab" onclick="filterByCategory('chaussures')">Chaussures</button>
+        <button class="category-tab" onclick="filterByCategory('aliment')">Aliments</button>
+        <button class="category-tab" onclick="filterByCategory('electronique')">Électronique</button>
+        <button class="category-tab" onclick="filterByCategory('maison')">Maison</button>
+        <button class="category-tab" onclick="filterByCategory('beaute')">Beauté & Soins</button>
+        <button class="category-tab" onclick="filterByCategory('sport')">Sport</button>
+        <button class="category-tab" onclick="filterByCategory('accessoire')">Accessoires</button>
+        <button class="category-tab" onclick="filterByCategory('autre')">Autre</button>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="shop-content">
+    <!-- PRODUCTS GRID -->
+    <div class="products-grid" id="products-grid">
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <div>Chargement des produits...</div>
+        </div>
+    </div>
+</div>
 
 <div class="toast" id="toast"></div>
+
+<!-- FOOTER (identique à index.html) -->
+<footer>
+    <div class="footer-logo">ZETWAL <span>ORGANISATION</span></div>
+    <div class="social-icons">
+        <a href="https://wa.me/79961103506" target="_blank" class="social-icon">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+        </a>
+        <a href="https://t.me/MikeNestor14" target="_blank" class="social-icon">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+        </a>
+    </div>
+    <div class="copyright">© 2026 ZETWAL ORGANISATION — TOUT DWA REZÈVE.</div>
+</footer>
 
 <script type="module">
 // ============================================================
@@ -520,6 +685,103 @@ function toast(msg, type = 'info') {
 // INIT
 // ============================================================
 loadProducts();
+
+// ============================================================
+// AUTH & THEME FUNCTIONS (copied from index.html)
+// ============================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+    authDomain: "lavrizetwal.firebaseapp.com",
+    projectId: "lavrizetwal",
+    storageBucket: "lavrizetwal.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abc123"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db_firebase = firebase.firestore();
+
+let currentUser = null;
+let confirmationResult = null;
+
+window.toggleAuthModal = function(show) { 
+    document.getElementById('auth-modal').style.display = show ? 'flex' : 'none'; 
+}
+
+window.loginWithGoogle = async function() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try { await auth.signInWithPopup(provider); toggleAuthModal(false); } catch (e) { alert(e.message); }
+}
+
+window.loginWithPhone = async function() {
+    const phone = document.getElementById('phone-input').value;
+    if (!phone) return alert("Antre nimewo telefòn");
+    try {
+        confirmationResult = await auth.signInWithPhoneNumber(phone, window.recaptchaVerifier);
+        document.getElementById('auth-main-view').style.display = 'none';
+        document.getElementById('otp-view').style.display = 'block';
+    } catch (e) { alert(e.message); }
+}
+
+window.verifyOTP = async function() {
+    const code = document.getElementById('otp-input').value;
+    if (!code) return alert("Antre kòd la");
+    try { await confirmationResult.confirm(code); toggleAuthModal(false); } catch (e) { alert("Kòd la pa bon"); }
+}
+
+window.handleLogout = function() { auth.signOut(); location.reload(); }
+
+window.toggleTheme = function() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+
+// Check theme on load
+if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+}
+
+// Auth state listener
+auth.onAuthStateChanged(user => {
+    currentUser = user;
+    const loginBtn = document.getElementById('login-trigger-btn');
+    const profileBtn = document.getElementById('user-profile-btn');
+    const infoCard = document.getElementById('user-info-card');
+    
+    if (user) {
+        loginBtn.style.display = 'none';
+        profileBtn.style.display = 'flex';
+        document.getElementById('display-name-nav').textContent = user.displayName || user.email;
+        
+        // Load user data from Firestore
+        db_firebase.collection('users').doc(user.uid).get().then(doc => {
+            if (doc.exists) {
+                const data = doc.data();
+                document.getElementById('card-name').textContent = data.name || user.displayName || user.email;
+                document.getElementById('card-status').textContent = data.isAdmin ? 'Administratè' : 'Utilisateur';
+                document.getElementById('card-points').textContent = (data.points || 0).toFixed(1);
+                
+                if (data.isAdmin) {
+                    document.getElementById('admin-access').style.display = 'block';
+                }
+            }
+        });
+    } else {
+        loginBtn.style.display = 'block';
+        profileBtn.style.display = 'none';
+        infoCard.style.display = 'none';
+    }
+});
+
+window.toggleInfoCard = function() {
+    const card = document.getElementById('user-info-card');
+    card.style.display = card.style.display === 'block' ? 'none' : 'block';
+}
+
+// Initialize reCAPTCHA
+window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    'size': 'invisible'
+});
 </script>
 </body>
 </html>
