@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The changes only include HTML files (shop.html and admin.html), which are source code files that should be tracked in version control. No build artifacts, dependencies, temporary files, or other items requiring exclusion are present in the change list.
+Nothing needs to be added to the .gitignore file since only a source file (shop.html) was modified and there are no build artifacts, dependencies, or temporary files in the changes.
