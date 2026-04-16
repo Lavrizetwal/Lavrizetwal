@@ -424,8 +424,59 @@
           <input type="number" id="product-price" placeholder="Ex: 1500" min="0" step="0.01">
         </div>
         <div class="field">
+          <label>Catégorie *</label>
+          <select id="product-category">
+            <option value="">Sélectionner une catégorie...</option>
+            <option value="vetement">Vêtement</option>
+            <option value="chaussures">Chaussures</option>
+            <option value="aliment">Aliment</option>
+            <option value="electronique">Électronique</option>
+            <option value="maison">Maison</option>
+            <option value="beaute">Beauté & Soins</option>
+            <option value="sport">Sport</option>
+            <option value="accessoire">Accessoire</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+        <div class="field">
           <label>Description</label>
           <textarea id="product-desc" placeholder="Couleur, taille, état, matière..."></textarea>
+        </div>
+        <div class="field">
+          <label>Couleurs disponibles (séparées par des virgules)</label>
+          <input type="text" id="product-colors" placeholder="Ex: Noir, Blanc, Rouge">
+        </div>
+        <div class="field">
+          <label>Quantité disponible *</label>
+          <input type="number" id="product-quantity" placeholder="Ex: 10" min="0" step="1">
+        </div>
+        <div class="field">
+          <label>Disponibilité *</label>
+          <select id="product-availability" onchange="toggleAvailabilityFields()">
+            <option value="available">Disponible</option>
+            <option value="unavailable">Non disponible</option>
+          </select>
+        </div>
+        <!-- Champs pour produit disponible -->
+        <div id="available-fields" style="display:block">
+          <div class="field">
+            <label>Livraison possible ?</label>
+            <select id="product-delivery">
+              <option value="yes">Oui</option>
+              <option value="no">Non</option>
+            </select>
+          </div>
+          <div class="field" id="delivery-hours-field">
+            <label>Délai de livraison (heures)</label>
+            <input type="number" id="product-delivery-hours" placeholder="Ex: 24" min="1" step="1">
+          </div>
+        </div>
+        <!-- Champs pour produit non disponible -->
+        <div id="unavailable-fields" style="display:none">
+          <div class="field">
+            <label>Date de disponibilité estimée</label>
+            <input type="date" id="product-available-date">
+          </div>
         </div>
         <button class="btn btn-gold" id="save-product-btn" onclick="saveProduct()">
           💾 Enregistrer &amp; Générer QR
@@ -591,6 +642,7 @@
 const SUPABASE_URL  = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
 const SITE_URL      = 'https://zetwal.org';
+const SHOP_URL      = `${SITE_URL}/shop.html`;
 
 // Firebase config (même que le reste du site)
 const FIREBASE_CONFIG = {
@@ -794,10 +846,18 @@ window.saveProduct = async () => {
   const name  = document.getElementById('product-name').value.trim();
   const price = parseFloat(document.getElementById('product-price').value);
   const desc  = document.getElementById('product-desc').value.trim();
+  const category = document.getElementById('product-category').value;
+  const colorsStr = document.getElementById('product-colors').value.trim();
+  const quantity = parseInt(document.getElementById('product-quantity').value) || 0;
+  const availability = document.getElementById('product-availability').value;
+  const delivery = document.getElementById('product-delivery').value;
+  const deliveryHours = parseInt(document.getElementById('product-delivery-hours').value) || null;
+  const availableDate = document.getElementById('product-available-date').value || null;
   const btn   = document.getElementById('save-product-btn');
 
   if (!name)        { toast('Nom requis', 'error'); return; }
   if (isNaN(price)) { toast('Prix requis', 'error'); return; }
+  if (!category)    { toast('Catégorie requise', 'error'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Enregistrement...';
@@ -817,14 +877,27 @@ window.saveProduct = async () => {
       imageUrl = urlData.publicUrl;
     }
 
-    // Insérer dans la table products (schéma Gemini)
+    // Préparer les couleurs en tableau
+    const colors = colorsStr ? colorsStr.split(',').map(c => c.trim()).filter(c => c) : [];
+
+    // Déterminer le statut selon disponibilité
+    let status = availability === 'available' ? 'available' : 'unavailable';
+
+    // Insérer dans la table products avec tous les nouveaux champs
     const { data, error } = await db.from('products').insert({
       name,
       price,
       description: desc,
+      category,
+      colors,
+      quantity,
+      availability: status,
+      delivery_possible: availability === 'available' ? (delivery === 'yes') : null,
+      delivery_hours: availability === 'available' && delivery === 'yes' ? deliveryHours : null,
+      available_date: availability === 'unavailable' ? availableDate : null,
       image_url: imageUrl,
-      status: 'available',
-      qr_code_value: null   // mis à jour après insertion avec l'UUID réel
+      status: status,
+      qr_code_value: null
     }).select().single();
 
     if (error) throw error;
@@ -850,15 +923,49 @@ window.saveProduct = async () => {
 };
 
 function resetAddForm() {
-  ['product-name','product-price','product-desc'].forEach(id => {
+  ['product-name','product-price','product-desc','product-category','product-colors','product-quantity','product-delivery-hours','product-available-date'].forEach(id => {
     document.getElementById(id).value = '';
   });
+  document.getElementById('product-availability').value = 'available';
+  document.getElementById('product-delivery').value = 'yes';
   document.getElementById('img-preview').style.display = 'none';
   document.querySelector('.img-upload-icon').style.display = '';
   document.querySelector('.img-upload-text').style.display = '';
   currentImageFile = null;
   document.getElementById('product-img-file').value = '';
+  toggleAvailabilityFields();
 }
+
+// Toggle affichage des champs selon disponibilité
+window.toggleAvailabilityFields = () => {
+  const availability = document.getElementById('product-availability').value;
+  const availableFields = document.getElementById('available-fields');
+  const unavailableFields = document.getElementById('unavailable-fields');
+  const deliveryHoursField = document.getElementById('delivery-hours-field');
+  
+  if (availability === 'available') {
+    availableFields.style.display = 'block';
+    unavailableFields.style.display = 'none';
+  } else {
+    availableFields.style.display = 'none';
+    unavailableFields.style.display = 'block';
+  }
+};
+
+// Afficher/masquer champ heures livraison selon si livraison possible
+document.addEventListener('DOMContentLoaded', () => {
+  const deliverySelect = document.getElementById('product-delivery');
+  if (deliverySelect) {
+    deliverySelect.addEventListener('change', () => {
+      const deliveryHoursField = document.getElementById('delivery-hours-field');
+      if (deliverySelect.value === 'yes') {
+        deliveryHoursField.style.display = 'flex';
+      } else {
+        deliveryHoursField.style.display = 'none';
+      }
+    });
+  }
+});
 
 async function generateQRForProduct(product) {
   console.log('Attempting to generate QR for:', product.id);
