@@ -242,7 +242,7 @@
     .scan-result { margin-top: 20px; padding: 20px; background: var(--surface2); border-radius: var(--radius); border: 1px solid var(--green); display: none; }
     .scan-result.show { display: block; animation: fadeup 0.4s ease; }
 
-    .spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -550,6 +550,7 @@
   let qrScanner = null;
   let scannedProductId = null;
   let lastSavedProduct = null;
+  let selectedFile = null;
 
   // ============================================================
   // AUTHENTIFICATION
@@ -610,6 +611,47 @@
   }
 
   // ============================================================
+  // GESTION IMAGES
+  // ============================================================
+  function handleImageSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    selectedFile = file;
+    const preview = document.getElementById('p-preview');
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+    document.querySelector('.img-upload-icon').style.display = 'none';
+    document.querySelector('.img-upload-text').style.display = 'none';
+  }
+
+  function previewImageFromUrl() {
+    const url = document.getElementById('p-image-url').value.trim();
+    const preview = document.getElementById('p-preview');
+    if (url) {
+      preview.src = url;
+      preview.style.display = 'block';
+      document.querySelector('.img-upload-icon').style.display = 'none';
+      document.querySelector('.img-upload-text').style.display = 'none';
+      selectedFile = null; // Priorité à l'URL si remplie
+    }
+  }
+
+  async function uploadImageToSupabase(file) {
+    const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+    const { data, error } = await db.storage
+      .from('product-images')
+      .upload(fileName, file);
+    
+    if (error) throw error;
+    
+    const { data: publicData } = db.storage
+      .from('product-images')
+      .getPublicUrl(fileName);
+      
+    return publicData.publicUrl;
+  }
+
+  // ============================================================
   // GESTION PRODUITS
   // ============================================================
   async function loadProducts() {
@@ -645,7 +687,7 @@
     const stock = parseInt(document.getElementById('p-stock').value) || 1;
     const colors = document.getElementById('p-colors').value.trim();
     const desc = document.getElementById('p-desc').value.trim();
-    const imgUrl = document.getElementById('p-image-url').value.trim();
+    let imgUrl = document.getElementById('p-image-url').value.trim();
     const btn = document.getElementById('save-product-btn');
 
     if (!name || isNaN(price)) { toast('Veuillez remplir les champs obligatoires (*)', 'error'); return; }
@@ -653,23 +695,33 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Enregistrement...';
 
-    const productData = {
-      name, category, price, stock_quantity: stock, colors, description: desc, image_url: imgUrl, availability: 'Disponible'
-    };
+    try {
+      // Téléverser l'image si un fichier est sélectionné
+      if (selectedFile) {
+        btn.innerHTML = '<span class="spinner"></span> Téléversement image...';
+        imgUrl = await uploadImageToSupabase(selectedFile);
+      }
 
-    const { data, error } = await db.from('products').insert([productData]).select();
+      const productData = {
+        name, category, price, stock_quantity: stock, colors, description: desc, image_url: imgUrl, availability: 'Disponible'
+      };
 
-    btn.disabled = false;
-    btn.innerHTML = '💾 Enregistrer le Produit';
+      const { data, error } = await db.from('products').insert([productData]).select();
+      if (error) throw error;
 
-    if (error) { toast('Erreur: ' + error.message, 'error'); return; }
-
-    lastSavedProduct = data[0];
-    toast('Produit ajouté avec succès !', 'success');
-    generateQRForProduct(lastSavedProduct);
-    document.getElementById('qr-result-card').style.display = 'block';
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    loadProducts();
+      lastSavedProduct = data[0];
+      toast('Produit ajouté avec succès !', 'success');
+      generateQRForProduct(lastSavedProduct);
+      document.getElementById('qr-result-card').style.display = 'block';
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      loadProducts();
+      resetAddForm();
+    } catch (e) {
+      toast('Erreur: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '💾 Enregistrer le Produit';
+    }
   }
 
   async function deleteProduct(id) {
@@ -845,7 +897,15 @@
   function toast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show ' + type; setTimeout(() => t.classList.remove('show'), 3000); }
   function formatPrice(n) { return new Intl.NumberFormat('fr-HT').format(n || 0); }
   function escHtml(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
-  function resetAddForm() { ['p-name','p-price','p-stock','p-colors','p-desc','p-image-url'].forEach(id => document.getElementById(id).value = ''); document.getElementById('qr-result-card').style.display = 'none'; }
+  function resetAddForm() { 
+    ['p-name','p-price','p-stock','p-colors','p-desc','p-image-url'].forEach(id => document.getElementById(id).value = ''); 
+    selectedFile = null;
+    const preview = document.getElementById('p-preview');
+    preview.src = '';
+    preview.style.display = 'none';
+    document.querySelector('.img-upload-icon').style.display = 'block';
+    document.querySelector('.img-upload-text').style.display = 'block';
+  }
   function resetWashForm() { ['wash-client','wash-phone','wash-weight','wash-amount','wash-pickup','wash-notes'].forEach(id => document.getElementById(id).value = ''); }
 </script>
 </body>
