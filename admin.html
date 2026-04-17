@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- QR Code generator -->
+  <!-- QR Code generator (Loaded before module script) -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <!-- QR Scanner -->
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -1019,21 +1019,27 @@ function generateQRForProduct(product) {
   canvas.style.cssText = 'display:block;width:200px;height:200px;border-radius:8px';
   display.appendChild(canvas);
 
-  /* Générer le QR */
-  const qrLib = window.QRCode || QRCode;
-  if (qrLib && qrLib.toCanvas) {
-    qrLib.toCanvas(canvas, url, {
-      width: 200, margin: 1,
-      color: { dark: '#000000', light: '#ffffff' }
-    }, err => {
-      if (err) {
-        console.error('QR Error:', err);
-        display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Erreur génération QR</div>';
-      }
-    });
-  } else {
-    console.error('QR Library not found');
-    display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Bibliothèque QR non chargée</div>';
+  /* Générer le QR avec détection robuste */
+  try {
+    // Essayer plusieurs façons d'accéder à la bibliothèque
+    const qrLib = window.QRCode || (typeof QRCode !== 'undefined' ? QRCode : null);
+    
+    if (qrLib && typeof qrLib.toCanvas === 'function') {
+      qrLib.toCanvas(canvas, url, {
+        width: 200, margin: 1,
+        color: { dark: '#000000', light: '#ffffff' }
+      }, err => {
+        if (err) {
+          console.error('QR Error:', err);
+          display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Erreur génération QR</div>';
+        }
+      });
+    } else {
+      throw new Error('Bibliothèque QRCode non trouvée ou incompatible');
+    }
+  } catch (e) {
+    console.error('QR Library Error:', e);
+    display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Erreur: Bibliothèque QR non chargée</div>';
   }
 
   /* Remplir les champs texte */
