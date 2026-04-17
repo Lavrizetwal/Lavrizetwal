@@ -12,6 +12,8 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <!-- QR Scanner -->
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <!-- Chart.js for Statistics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     /* ============================================================
@@ -382,6 +384,14 @@
       <div class="stat-pill"><div class="stat-label">Fiches Lavage</div><div class="stat-value" id="stat-wash">—</div></div>
     </div>
 
+    <!-- CHART SECTION -->
+    <div class="card" id="stats-chart-card" style="margin-bottom: 28px;">
+      <div class="card-title">📊 Aperçu des Activités</div>
+      <div style="height: 300px; position: relative;">
+        <canvas id="statsChart"></canvas>
+      </div>
+    </div>
+
     <!-- TABS -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('products')">📦 Produits</button>
@@ -693,6 +703,7 @@ let currentImageFile = null;
 let scannedProductId = null;
 let qrScanner        = null;
 let lastSavedProduct = null;
+let statsChart       = null;
 
 // ============================================================
 // AUTH — FIREBASE GUARD
@@ -1009,15 +1020,21 @@ function generateQRForProduct(product) {
   display.appendChild(canvas);
 
   /* Générer le QR */
-  QRCode.toCanvas(canvas, url, {
-    width: 200, margin: 1,
-    color: { dark: '#000000', light: '#ffffff' }
-  }, err => {
-    if (err) {
-      console.error('QR Error:', err);
-      display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Erreur génération QR</div>';
-    }
-  });
+  const qrLib = window.QRCode || QRCode;
+  if (qrLib && qrLib.toCanvas) {
+    qrLib.toCanvas(canvas, url, {
+      width: 200, margin: 1,
+      color: { dark: '#000000', light: '#ffffff' }
+    }, err => {
+      if (err) {
+        console.error('QR Error:', err);
+        display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Erreur génération QR</div>';
+      }
+    });
+  } else {
+    console.error('QR Library not found');
+    display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Bibliothèque QR non chargée</div>';
+  }
 
   /* Remplir les champs texte */
   const idEl = document.getElementById('qr-product-id');
@@ -1427,10 +1444,73 @@ window.deleteWashRecord = async (id) => {
 // STATS
 // ============================================================
 function loadStats() {
-  document.getElementById('stat-total').textContent = allProducts.length;
-  document.getElementById('stat-avail').textContent = allProducts.filter(p => p.status === 'available').length;
-  document.getElementById('stat-sold').textContent  = allProducts.filter(p => p.status === 'sold').length;
-  document.getElementById('stat-wash').textContent  = allWashRecords.length;
+  const total = allProducts.length;
+  const avail = allProducts.filter(p => p.status === 'available').length;
+  const sold  = allProducts.filter(p => p.status === 'sold').length;
+  const wash  = allWashRecords.length;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-avail').textContent = avail;
+  document.getElementById('stat-sold').textContent  = sold;
+  document.getElementById('stat-wash').textContent  = wash;
+
+  updateStatsChart(avail, sold, wash);
+}
+
+function updateStatsChart(avail, sold, wash) {
+  const ctx = document.getElementById('statsChart').getContext('2d');
+  
+  if (statsChart) {
+    statsChart.destroy();
+  }
+
+  statsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Disponibles', 'Vendus', 'Fiches Lavage'],
+      datasets: [{
+        label: 'Quantité',
+        data: [avail, sold, wash],
+        backgroundColor: [
+          'rgba(0, 255, 136, 0.2)',
+          'rgba(255, 68, 68, 0.2)',
+          'rgba(255, 215, 0, 0.2)'
+        ],
+        borderColor: [
+          '#00ff88',
+          '#ff4444',
+          '#ffd700'
+        ],
+        borderWidth: 1,
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0d0d0d',
+          titleColor: '#ffd700',
+          bodyColor: '#fff',
+          borderColor: 'rgba(255, 215, 0, 0.2)',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { family: 'Montserrat' } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: 'rgba(255, 255, 255, 0.7)', font: { family: 'Montserrat', weight: '600' } }
+        }
+      }
+    }
+  });
 }
 
 // ============================================================
