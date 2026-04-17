@@ -740,7 +740,7 @@ function initDOMListeners() {
     });
   }
   
-  // Drag & drop image (moved from bottom to ensure proper init)
+  // Drag & drop image
   const uploadArea = document.getElementById('upload-area');
   if (uploadArea) {
     uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
@@ -749,7 +749,9 @@ function initDOMListeners() {
       e.preventDefault(); uploadArea.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
       if (file && file.type.startsWith('image/')) {
-        document.getElementById('product-img-file').files = e.dataTransfer.files;
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        document.getElementById('product-img-file').files = dataTransfer.files;
         handleImageSelect({ target: { files: [file] } });
       }
     });
@@ -760,7 +762,6 @@ function initDOMListeners() {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initDOMListeners);
 } else {
-  // Si le script s'exécute après que DOMContentLoaded soit déclenché
   initDOMListeners();
 }
 
@@ -1396,7 +1397,6 @@ function formatPrice(n) {
 }
 
 // Drag & drop image — Déjà initialisé dans initDOMListeners()
-// (code supprimé pour éviter les doublons et les erreurs de timing)
 </script>
 </body>
 </html>
