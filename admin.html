@@ -8,8 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- QR Code generator (Loaded before module script) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <!-- QR Code generator (Plus robuste) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <!-- QR Scanner -->
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <!-- Chart.js for Statistics -->
@@ -1012,34 +1012,38 @@ function generateQRForProduct(product) {
   /* Vider proprement le conteneur */
   display.innerHTML = '';
 
-  /* Canvas taille fixe — 200×200px, ne change jamais */
-  const canvas = document.createElement('canvas');
-  canvas.width  = 200;
-  canvas.height = 200;
-  canvas.style.cssText = 'display:block;width:200px;height:200px;border-radius:8px';
-  display.appendChild(canvas);
+  /* Conteneur pour le QR */
+  const qrContainer = document.createElement('div');
+  qrContainer.id = "qrcode-canvas-container";
+  qrContainer.style.cssText = 'display:block;width:200px;height:200px;background:#fff;padding:10px;border-radius:8px';
+  display.appendChild(qrContainer);
 
-  /* Générer le QR avec détection robuste */
+  /* Générer le QR avec qrcode.js (plus compatible avec les navigateurs mobiles) */
   try {
-    // Essayer plusieurs façons d'accéder à la bibliothèque
-    const qrLib = window.QRCode || (typeof QRCode !== 'undefined' ? QRCode : null);
-    
-    if (qrLib && typeof qrLib.toCanvas === 'function') {
-      qrLib.toCanvas(canvas, url, {
-        width: 200, margin: 1,
-        color: { dark: '#000000', light: '#ffffff' }
-      }, err => {
-        if (err) {
-          console.error('QR Error:', err);
-          display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Erreur génération QR</div>';
-        }
+    if (typeof QRCode !== 'undefined') {
+      new QRCode(qrContainer, {
+        text: url,
+        width: 180,
+        height: 180,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
       });
+      
+      // Petit ajustement pour s'assurer que l'image générée ne dépasse pas
+      setTimeout(() => {
+        const img = qrContainer.querySelector('img');
+        if (img) img.style.width = '100%';
+        const canv = qrContainer.querySelector('canvas');
+        if (canv) canv.style.width = '100%';
+      }, 50);
+
     } else {
-      throw new Error('Bibliothèque QRCode non trouvée ou incompatible');
+      throw new Error('Bibliothèque QRCode non trouvée');
     }
   } catch (e) {
     console.error('QR Library Error:', e);
-    display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Erreur: Bibliothèque QR non chargée</div>';
+    display.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:20px">Erreur: Bibliothèque QR non chargée. Vérifiez votre connexion internet.</div>';
   }
 
   /* Remplir les champs texte */
@@ -1063,10 +1067,12 @@ window.showQRForProduct = (id) => {
 
 window.downloadQR = () => {
   const canvas = document.querySelector('#qr-display canvas');
-  if (!canvas) return;
+  const img = document.querySelector('#qr-display img');
+  if (!canvas && !img) return;
+  
   const link = document.createElement('a');
   link.download = `zetwal-qr-${lastSavedProduct?.id || 'product'}.png`;
-  link.href = canvas.toDataURL();
+  link.href = canvas ? canvas.toDataURL() : img.src;
   link.click();
 };
 
