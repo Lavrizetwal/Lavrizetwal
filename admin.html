@@ -728,10 +728,41 @@ window.handleSignOut = async () => {
   toast('Déconnecté', 'info');
 };
 
-// Enter key on login
-document.getElementById('login-pass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleLogin();
-});
+// ============================================================
+// INIT DOM LISTENERS — Attacher les écouteurs quand le DOM est prêt
+// ============================================================
+function initDOMListeners() {
+  // Enter key on login
+  const loginPassField = document.getElementById('login-pass');
+  if (loginPassField) {
+    loginPassField.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  }
+  
+  // Drag & drop image (moved from bottom to ensure proper init)
+  const uploadArea = document.getElementById('upload-area');
+  if (uploadArea) {
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault(); uploadArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        document.getElementById('product-img-file').files = e.dataTransfer.files;
+        handleImageSelect({ target: { files: [file] } });
+      }
+    });
+  }
+}
+
+// Appeler initDOMListeners quand le DOM est complètement chargé
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDOMListeners);
+} else {
+  // Si le script s'exécute après que DOMContentLoaded soit déclenché
+  initDOMListeners();
+}
 
 // ============================================================
 // SUPABASE — PRODUITS
@@ -1364,13 +1395,8 @@ function formatPrice(n) {
   return new Intl.NumberFormat('fr-HT').format(n ?? 0);
 }
 
-// Drag & drop image
-const uploadArea = document.getElementById('upload-area');
-uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-uploadArea.addEventListener('drop', e => {
-  e.preventDefault(); uploadArea.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) {
-    document.getElementById('product-img-file').files = e.dataTransfer.files;
-    handleImageSelect({ target: { files: [f
+// Drag & drop image — Déjà initialisé dans initDOMListeners()
+// (code supprimé pour éviter les doublons et les erreurs de timing)
+</script>
+</body>
+</html>
