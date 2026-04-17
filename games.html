@@ -303,7 +303,7 @@
   <div class="stats-bar">
     <div class="stat-pill">🏆 <span>Nimewo 1:</span> <span class="sval" id="topPlayer">—</span></div>
     <div class="stat-pill">🎮 <span>Pwen Ou:</span> <span class="sval" id="myPoints">—</span></div>
-    <div class="stat-pill">⚡ <span>Jwèt Aktif:</span> <span class="sval">8</span></div>
+    <div class="stat-pill">⚡ <span>Jwèt Aktif:</span> <span class="sval">9</span></div>
     <div class="stat-pill">👥 <span>Jwè Total:</span> <span class="sval" id="totalPlayers">—</span></div>
   </div>
 
@@ -484,6 +484,15 @@ const GAMES_CATALOG = [
     cost:10, reward:'5×nivo pwen', cat:'puzzle',
     tag:'hot', color:'#fbbf24', glow:'rgba(251,191,36,0.1)',
     init(c){ initMaze(c) }, destroy(){ destroyMaze() }
+  },
+
+  /* 9. RUNNER ZETWAL — Kouri, sote, siviv! */
+  {
+    id:'runner', name:'Runner Zetwal', icon:'🏃',
+    desc:'Kouri pou yo pa kenbe ou! Sote obstak, evite monster, bat rekò distans!',
+    cost:10, reward:'1 pwen / 100m', cat:'reflex',
+    tag:'new', color:'#f97316', glow:'rgba(249,115,22,0.12)',
+    init(c){ initRunner(c) }, destroy(){ destroyRunner() }
   }
 ];
 
@@ -680,19 +689,20 @@ window.replayGame = async () => {
 let isAwarding = false;
 
 async function awardPoints(pts, gameName){
-  if(!userUID||pts<=0||isAwarding) return;
-  isAwarding = true;
+  if(!userUID || pts<=0) return;
+  /* Pa bloke — pèmèt plizyè pwen nan sèsyon an */
   try{
-    /* Firebase increment() = akimilasyon garanti — pa janm pèdi pwen */
+    /* increment() garanti akimilasyon — pa janm pèdi pwen */
     await updateDoc(doc(db,'users',userUID), { points: increment(pts) });
     showToast(`+${pts} pwen — ${gameName}!`, 'success');
   } catch(e){
-    /* Offline fallback — sèvgade lokal, sync pita */
+    /* Offline fallback */
     const key='zetwal_pending_pts';
     const pending = parseInt(localStorage.getItem(key)||'0') + pts;
     localStorage.setItem(key, pending);
     showToast(`+${pts} pwen (sèvgade lokal)`, 'success');
-  } finally { isAwarding = false; }
+    console.warn('awardPoints offline:', e);
+  }
 }
 
 /* Sync pwen offline pandan sèsyon an */
@@ -737,7 +747,8 @@ function showGameOver(opts){
 }
 
 /* ============================================================
-   LEADERBOARD — TOP 3 PA JWÈ + GLOBAL — Refresh Manyèl
+   LEADERBOARD — TOP 3 PA JWÈ — Refresh Manyèl
+   Chak jwèt gen pwòp kolòn: Jwè | Pwen
 ============================================================ */
 async function loadLeaderboards(){
   const grid = document.getElementById('lbGrid');
@@ -746,30 +757,42 @@ async function loadLeaderboards(){
   const out = [];
   for(const g of GAMES_CATALOG){
     try{
-      const q = query(collection(db,'leaderboards'), orderBy('score','desc'), limit(30));
+      /* Rechèch dirèk pa gameId — limite 50 pou filtraj */
+      const q = query(
+        collection(db,'leaderboards'),
+        orderBy('gameId'),
+        limit(200)
+      );
       const snap = await getDocs(q);
       const rows = [];
-      snap.forEach(d=>{ if(d.data().gameId===g.id) rows.push(d.data()); });
-      rows.sort((a,b)=>b.score-a.score);
+      snap.forEach(d=>{
+        const dat = d.data();
+        if(dat.gameId === g.id) rows.push(dat);
+      });
+      /* Tri desandan pa skor */
+      rows.sort((a,b) => (b.score||0) - (a.score||0));
       const top3 = rows.slice(0,3);
-      const rankClass = i => i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+      const rankCls = i => i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+      const medal   = i => i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
       out.push(`
         <div class="lb-card">
           <div class="lb-card-title" style="color:${g.color}">${g.icon} ${g.name}</div>
-          ${top3.length===0
-            ? '<div style="font-size:0.65rem;color:rgba(255,255,255,0.25);padding:8px 0">Pa gen jwè ankò — soyez premye!</div>'
+          ${!top3.length
+            ? '<div style="font-size:0.65rem;color:rgba(255,255,255,0.2);padding:8px 0">Pa gen jwè ankò</div>'
             : top3.map((r,i)=>`
               <div class="lb-item">
-                <span class="lb-rank ${rankClass(i)}">${i+1}</span>
-                <span class="lb-name">${r.username||'Jwè'}</span>
-                <span class="lb-score">${r.score}</span>
+                <span class="lb-rank ${rankCls(i)}">${medal(i)||i+1}</span>
+                <span class="lb-name">${escHtml(r.username||'Jwè')}</span>
+                <span class="lb-score">${(r.score||0).toLocaleString()}</span>
               </div>`).join('')
           }
         </div>`);
-    } catch(e){ /* silencieux */ }
+    } catch(e){ console.warn('lb error', g.id, e); }
   }
   grid.innerHTML = out.join('') || '<div style="color:rgba(255,255,255,0.3);font-size:0.7rem;padding:20px;text-align:center">Erè Firebase</div>';
 }
+
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 async function loadTopPlayer(){
   try{
@@ -1189,15 +1212,26 @@ function endMemory(){
 }
 
 /* ============================================================
-   🍬 ZETWAL MATCH — Candy Crush Style
-   8×8 grid · Mouvman limité · Match-3/4/5 · Spésyal kandisi
-   Sèvgad nivo+skor — localStorage + Firebase
+   🍬 ZETWAL MATCH — Candy Crush v2
+   ✅ Power-ups fonsyonèl (4→liy/kolon, 5→rainbow, T/L→bomb)
+   ✅ Aktivasyon spesyal kòrèk (klike sou spesyal = eksplozyon)
+   ✅ Nivo pwogresif (difikilte monte chak nivo)
 ============================================================ */
 const CANDY_COLS=8, CANDY_ROWS=8;
 const C_COLORS=['#ff4757','#ffd700','#2ed573','#1e90ff','#ff6b9d','#a29bfe'];
 const C_EMOJI  =['🔴',    '🟡',    '🟢',    '🔵',    '💗',    '🟣'   ];
 let cBoard=[], cSel=null, cScore=0, cMoves=0, cLevel=1, cTarget=500;
 let cBusy=false, cAutoSaveTimer=null;
+
+/* Nivo config — monte chak 5 nivo */
+function candyLevelConfig(lvl){
+  const base = Math.min(lvl-1, 20);
+  return {
+    moves:  Math.max(8, 25 - Math.floor(base * 0.8)),
+    target: 500 * lvl + base * 200,
+    colors: Math.min(6, 4 + Math.floor(lvl/4)) /* plis koulè = plis difisil */
+  };
+}
 
 /* ---- Sèvgad / Chajman ---- */
 function candySave(){
@@ -1211,7 +1245,6 @@ async function candyLoad(){
   if(local){
     try{
       const s=JSON.parse(local);
-      /* Sèvgad valide si mwens 7 jou */
       if(Date.now()-s.ts < 7*24*3600*1000){
         cLevel=s.level||1; cScore=s.score||0; cMoves=s.moves||0;
         return cLevel>1;
@@ -1227,16 +1260,17 @@ async function candyLoad(){
 }
 
 function candyInitLevel(){
-  const movesBase=[0,25,22,20,18,16,14,12,12,12,10];
-  cMoves = movesBase[Math.min(cLevel,10)] || 10;
-  cTarget = 500 * cLevel;
+  const cfg = candyLevelConfig(cLevel);
+  cMoves  = cfg.moves;
+  cTarget = cfg.target;
   cBusy=false; cSel=null;
-  /* Génération plateau sans matches initiaux */
+  const numColors = cfg.colors;
   do{
     cBoard=[];
     for(let r=0;r<CANDY_ROWS;r++){
       cBoard[r]=[];
-      for(let c=0;c<CANDY_COLS;c++) cBoard[r][c]={color:Math.floor(Math.random()*C_COLORS.length),special:null};
+      for(let c=0;c<CANDY_COLS;c++)
+        cBoard[r][c]={color:Math.floor(Math.random()*numColors),special:null};
     }
   } while(candyFindMatches().length>0);
 }
@@ -1247,9 +1281,8 @@ function initCandy(container){
   wrap.id='candy-wrap';
   wrap.style.cssText='display:flex;flex-direction:column;align-items:center;padding:12px;width:100%;max-width:420px;user-select:none';
   container.insertBefore(wrap,container.firstChild);
-
   candyLoad().then(hasSave=>{
-    if(hasSave) showToast(`💾 Nivo ${cLevel} — kontinye kote ou te kite!`,'success');
+    if(hasSave) showToast(`💾 Nivo ${cLevel} — kontinye!`,'success');
     else { cLevel=1; cScore=0; }
     candyInitLevel();
     candyRenderAll(wrap);
@@ -1272,24 +1305,20 @@ function candyRenderAll(wrap){
       @keyframes candyFlash{from{opacity:1}to{opacity:0.3}}
       .cc{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;transition:transform 0.12s ease,box-shadow 0.12s ease;position:relative;border:1px solid transparent;background:rgba(255,255,255,0.04)}
       .cc:hover{transform:scale(1.1)}
-      .cc.csel{transform:scale(1.12);border:1.5px solid rgba(255,255,255,0.7)!important;box-shadow:0 0 14px rgba(255,255,255,0.5)}
+      .cc.csel{transform:scale(1.15);border:2px solid rgba(255,255,255,0.85)!important;box-shadow:0 0 18px rgba(255,255,255,0.6)}
       .cc.cpop{animation:cpop 0.22s ease forwards}
-      @keyframes cpop{0%{transform:scale(1)}50%{transform:scale(1.35)}100%{transform:scale(0);opacity:0}}
-      .cc.cdrop{animation:cdrop 0.28s cubic-bezier(0.34,1.56,0.64,1)}
-      @keyframes cdrop{from{transform:translateY(-60px);opacity:0}to{transform:translateY(0);opacity:1}}
-      .spH{box-shadow:0 0 10px 3px rgba(255,255,255,0.5)!important}
-      .spV{box-shadow:0 0 10px 3px rgba(255,255,255,0.5)!important}
-      .spB{box-shadow:0 0 12px 4px rgba(255,120,0,0.8)!important}
-      .spR{box-shadow:0 0 14px 5px rgba(255,215,0,0.9)!important;animation:rbow 1s linear infinite alternate}
-      @keyframes rbow{from{box-shadow:0 0 14px 5px rgba(255,0,100,0.8)}to{box-shadow:0 0 14px 5px rgba(0,255,200,0.8)}}
-      .cscorepop{position:absolute;font-family:Orbitron,monospace;font-weight:900;pointer-events:none;z-index:50;font-size:0.65rem;color:#ffd700;animation:sfloat 0.8s ease forwards}
-      @keyframes sfloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-40px) scale(1.5)}}
+      @keyframes cpop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(0);opacity:0}}
+      .spH{box-shadow:0 0 12px 4px rgba(0,200,255,0.8)!important;background:rgba(0,200,255,0.15)!important}
+      .spV{box-shadow:0 0 12px 4px rgba(200,0,255,0.8)!important;background:rgba(200,0,255,0.15)!important}
+      .spB{box-shadow:0 0 14px 5px rgba(255,120,0,0.9)!important;background:rgba(255,120,0,0.2)!important}
+      .spR{box-shadow:0 0 16px 6px rgba(255,215,0,0.95)!important;animation:rbow 0.8s linear infinite alternate}
+      @keyframes rbow{from{box-shadow:0 0 16px 6px rgba(255,0,100,0.9)}to{box-shadow:0 0 16px 6px rgba(0,255,200,0.9)}}
     </style>
     <div style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:8px;padding:8px 14px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.06)">
       <div style="text-align:center"><div style="font-size:0.5rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px">Nivo</div><div style="font-family:Orbitron,monospace;font-size:1rem;font-weight:700;color:#ffd700">${cLevel}</div></div>
       <div style="text-align:center"><div style="font-size:0.5rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px">Skor</div><div style="font-family:Orbitron,monospace;font-size:1rem;font-weight:700;color:#ffd700" id="c-score-disp">${cScore}</div></div>
       <div style="text-align:center"><div style="font-size:0.5rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px">Mouvman</div><div style="font-family:Orbitron,monospace;font-size:1rem;font-weight:700;${movCls}" id="c-moves-disp">${cMoves}</div></div>
-      <div style="text-align:center"><div style="font-size:0.5rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px">Sibl</div><div style="font-family:Orbitron,monospace;font-size:0.85rem;font-weight:700;color:#a29bfe">${cTarget}</div></div>
+      <div style="text-align:center"><div style="font-size:0.5rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px">Sibl</div><div style="font-family:Orbitron,monospace;font-size:0.85rem;font-weight:700;color:#a29bfe">${cTarget.toLocaleString()}</div></div>
     </div>
     <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;margin-bottom:8px;overflow:hidden">
       <div id="c-prog" style="height:100%;border-radius:3px;width:${pct}%;background:linear-gradient(90deg,#ff006e,#ffd700,#00ff88);transition:width 0.4s ease"></div>
@@ -1327,24 +1356,52 @@ function candyRenderGrid(){
 
 function candyTap(r,c2){
   if(cBusy) return;
+
+  /* Si klike sou yon spesyal san sèl — aktive l dirèkteman */
+  const cell = cBoard[r][c2];
+  if(!cSel && cell.special){
+    /* Aktive spesyal avèk klike */
+    cSel={r,c:c2};
+    candyRenderGrid();
+    return;
+  }
+
   if(!cSel){ cSel={r,c:c2}; candyRenderGrid(); return; }
+
+  /* Si menm kase a seleksyone — désélectionner */
+  if(cSel.r===r && cSel.c===c2){ cSel=null; candyRenderGrid(); return; }
+
   const dr=Math.abs(r-cSel.r), dc=Math.abs(c2-cSel.c);
-  if(dr+dc===1){ candyDoSwap(cSel.r,cSel.c,r,c2); }
-  else{ cSel={r,c:c2}; candyRenderGrid(); }
+
+  /* Adjacen — swap nòmal */
+  if(dr+dc===1){
+    candyDoSwap(cSel.r,cSel.c,r,c2);
+  }
+  /* Klike sou yon lòt kase — chanje sèl */
+  else {
+    cSel={r,c:c2}; candyRenderGrid();
+  }
 }
 
 function candyDoSwap(r1,c1,r2,c2){
   cBusy=true; cSel=null;
+
+  /* Swap */
   const tmp=cBoard[r1][c1]; cBoard[r1][c1]=cBoard[r2][c2]; cBoard[r2][c2]=tmp;
   candyRenderGrid();
+
+  /* Cherche matches après swap */
   const matches=candyFindMatches();
-  if(matches.length===0){
-    /* Revenir — mouvman invalide */
+  const hasSpecial = cBoard[r1][c1]?.special || cBoard[r2][c2]?.special;
+
+  if(matches.length===0 && !hasSpecial){
+    /* Swap invalide — revenir */
     const tmp2=cBoard[r1][c1]; cBoard[r1][c1]=cBoard[r2][c2]; cBoard[r2][c2]=tmp2;
     candyRenderGrid(); cBusy=false;
-    showToast('Pa gen match — eseye yon lòt!','error');
+    showToast('Pa gen match!','error');
     return;
   }
+
   cMoves--;
   const md=document.getElementById('c-moves-disp');
   if(md){ md.textContent=cMoves; if(cMoves<=4) md.style.color='#ff4444'; }
@@ -1359,7 +1416,8 @@ function candyFindMatches(){
     while(c2<CANDY_COLS){
       if(cBoard[r][c2].special==='rainbow'){c2++;continue;}
       let run=[{r,c:c2}], col=cBoard[r][c2].color;
-      while(c2+run.length<CANDY_COLS && cBoard[r][c2+run.length].color===col && cBoard[r][c2+run.length].special!=='rainbow') run.push({r,c:c2+run.length});
+      while(c2+run.length<CANDY_COLS && cBoard[r][c2+run.length].color===col && !cBoard[r][c2+run.length].special)
+        run.push({r,c:c2+run.length});
       if(run.length>=3) info.push({cells:run,len:run.length,dir:'h',color:col});
       c2+=run.length||1;
     }
@@ -1370,7 +1428,8 @@ function candyFindMatches(){
     while(r<CANDY_ROWS){
       if(cBoard[r][c2].special==='rainbow'){r++;continue;}
       let run=[{r,c:c2}], col=cBoard[r][c2].color;
-      while(r+run.length<CANDY_ROWS && cBoard[r+run.length][c2].color===col && cBoard[r+run.length][c2].special!=='rainbow') run.push({r:r+run.length,c:c2});
+      while(r+run.length<CANDY_ROWS && cBoard[r+run.length][c2].color===col && !cBoard[r+run.length][c2].special)
+        run.push({r:r+run.length,c:c2});
       if(run.length>=3) info.push({cells:run,len:run.length,dir:'v',color:col});
       r+=run.length||1;
     }
@@ -1380,56 +1439,101 @@ function candyFindMatches(){
 
 async function candyChain(matches, chainLvl){
   if(!matches.length){ cBusy=false; candyCheckState(); return; }
+
   const toRemove=new Set();
   const newSpecials=[];
 
   matches.forEach(m=>{
     m.cells.forEach(({r,c:c2})=>{
       const cell=cBoard[r][c2];
-      if(cell.special==='h'){ for(let cc=0;cc<CANDY_COLS;cc++) toRemove.add(r*100+cc); }
-      else if(cell.special==='v'){ for(let rr=0;rr<CANDY_ROWS;rr++) toRemove.add(rr*100+c2); }
-      else if(cell.special==='bomb'){ for(let dr=-2;dr<=2;dr++) for(let dc=-2;dc<=2;dc++){ const nr=r+dr,nc=c2+dc; if(nr>=0&&nr<CANDY_ROWS&&nc>=0&&nc<CANDY_COLS) toRemove.add(nr*100+nc); } }
-      else if(cell.special==='rainbow'){ for(let rr=0;rr<CANDY_ROWS;rr++) for(let cc=0;cc<CANDY_COLS;cc++) if(cBoard[rr][cc].color===m.color) toRemove.add(rr*100+cc); }
-      else toRemove.add(r*100+c2);
+      /* Aktive spesyal existan */
+      if(cell.special==='h'){
+        /* Toute la rangée */
+        for(let cc=0;cc<CANDY_COLS;cc++) toRemove.add(r*100+cc);
+        if(window.burst3D) burst3D();
+      } else if(cell.special==='v'){
+        /* Toute la colonne */
+        for(let rr=0;rr<CANDY_ROWS;rr++) toRemove.add(rr*100+c2);
+        if(window.burst3D) burst3D();
+      } else if(cell.special==='bomb'){
+        /* Zone 5×5 */
+        for(let dr=-2;dr<=2;dr++) for(let dc=-2;dc<=2;dc++){
+          const nr=r+dr,nc=c2+dc;
+          if(nr>=0&&nr<CANDY_ROWS&&nc>=0&&nc<CANDY_COLS) toRemove.add(nr*100+nc);
+        }
+        if(window.burst3D) burst3D();
+      } else if(cell.special==='rainbow'){
+        /* Efase toute la couleur cible */
+        const targetColor = m.color;
+        for(let rr=0;rr<CANDY_ROWS;rr++) for(let cc=0;cc<CANDY_COLS;cc++)
+          if(cBoard[rr][cc].color===targetColor) toRemove.add(rr*100+cc);
+        if(window.burst3D) burst3D();
+        showToast('⭐ RAINBOW! Tout koulè efase!', 'success');
+      } else {
+        toRemove.add(r*100+c2);
+      }
     });
-    /* Créer spéciaux */
-    if(m.len>=5){ const mid=m.cells[Math.floor(m.cells.length/2)]; newSpecials.push({r:mid.r,c:mid.c,special:'rainbow',color:m.color}); }
-    else if(m.len===4){ const mid=m.cells[Math.floor(m.cells.length/2)]; newSpecials.push({r:mid.r,c:mid.c,special:m.dir==='h'?'h':'v',color:m.color}); }
-    /* T/L → bomb */
-    else if(m.len>=3){
+
+    /* Créer power-ups selon longueur match */
+    if(m.len>=5){
+      /* 5+ → Rainbow (efase couleur entière) */
+      const mid=m.cells[Math.floor(m.cells.length/2)];
+      newSpecials.push({r:mid.r,c:mid.c,special:'rainbow',color:m.color});
+      showToast('⭐ RAINBOW KREYE!', 'success');
+    } else if(m.len===4){
+      /* 4 → Liy (H) ou Kolon (V) selon direksyon */
+      const mid=m.cells[Math.floor(m.cells.length/2)];
+      newSpecials.push({r:mid.r,c:mid.c,special:m.dir==='h'?'h':'v',color:m.color});
+      showToast(m.dir==='h'?'↔️ LINY kreye!':'↕️ KOLÒN kreye!','success');
+    } else if(m.len>=3){
+      /* Vérifier intersection T/L → bomb */
       const cross=m.cells.find(x=>matches.some(m2=>m2!==m&&m2.cells.some(x2=>x2.r===x.r&&x2.c===x.c)));
-      if(cross) newSpecials.push({r:cross.r,c:cross.c,special:'bomb',color:m.color});
+      if(cross){
+        newSpecials.push({r:cross.r,c:cross.c,special:'bomb',color:m.color});
+        showToast('💥 BOMB kreye!','success');
+      }
     }
   });
 
-  /* Score */
-  const pts=toRemove.size*10*chainLvl;
-  cScore+=pts;
+  /* Score × bonus chaîne */
+  const pts = toRemove.size * 10 * chainLvl;
+  cScore += pts;
   document.getElementById('ovScore').textContent=cScore;
-  const sd=document.getElementById('c-score-disp'); if(sd) sd.textContent=cScore;
+  const sd=document.getElementById('c-score-disp'); if(sd) sd.textContent=cScore.toLocaleString();
   const prog=document.getElementById('c-prog');
   if(prog) prog.style.width=Math.min(100,Math.round(cScore/cTarget*100))+'%';
 
   /* Animation suppression */
   const grid=document.getElementById('c-grid');
-  if(grid) toRemove.forEach(k=>{ const el=grid.children[Math.floor(k/100)*CANDY_COLS+(k%100)]; if(el) el.classList.add('cpop'); });
+  if(grid) toRemove.forEach(k=>{
+    const el=grid.children[Math.floor(k/100)*CANDY_COLS+(k%100)];
+    if(el) el.classList.add('cpop');
+  });
   if(window.burst3D) burst3D();
-  await new Promise(res=>setTimeout(res,260));
+  await new Promise(res=>setTimeout(res,270));
 
-  /* Appliquer */
-  toRemove.forEach(k=>{ const r=Math.floor(k/100),c2=k%100; cBoard[r][c2]=null; });
-  newSpecials.forEach(s=>{ if(!cBoard[s.r][s.c]) cBoard[s.r][s.c]={color:s.color,special:s.special}; });
+  /* Appliquer suppressions */
+  toRemove.forEach(k=>{ cBoard[Math.floor(k/100)][k%100]=null; });
 
-  /* Gravité */
+  /* Appliquer nouveaux spéciaux (pas sur case déjà supprimée) */
+  newSpecials.forEach(s=>{
+    if(cBoard[s.r] && !cBoard[s.r][s.c])
+      cBoard[s.r][s.c]={color:s.color,special:s.special};
+  });
+
+  /* Gravité — chute */
   for(let c2=0;c2<CANDY_COLS;c2++){
     const col=[];
     for(let r=CANDY_ROWS-1;r>=0;r--) if(cBoard[r][c2]) col.push(cBoard[r][c2]);
-    while(col.length<CANDY_ROWS) col.push({color:Math.floor(Math.random()*C_COLORS.length),special:null});
+    const cfg=candyLevelConfig(cLevel);
+    while(col.length<CANDY_ROWS)
+      col.push({color:Math.floor(Math.random()*cfg.colors),special:null});
     for(let r=CANDY_ROWS-1;r>=0;r--) cBoard[r][c2]=col[CANDY_ROWS-1-r];
   }
 
   candyRenderGrid();
   await new Promise(res=>setTimeout(res,280));
+  /* Chaîne récursive */
   candyChain(candyFindMatches(), chainLvl+1);
 }
 
@@ -1441,19 +1545,21 @@ function candyCheckState(){
 }
 
 function candyLevelWin(){
-  const bonus=cMoves*8;
-  const totalPts=Math.floor(cScore/100)+bonus;
+  const bonus=cMoves*10;
+  const totalPts=Math.floor(cScore/50)+bonus;
   candySave();
   if(window.burst3D) burst3D();
   awardPoints(totalPts,'Zetwal Match Nivo '+cLevel);
   saveScore('candy', cScore);
   const wrap=document.getElementById('candy-wrap');
   const overlay=document.createElement('div');
-  overlay.style.cssText='position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.88);border-radius:12px;z-index:30;text-align:center;padding:20px;animation:msgfade 0.3s ease';
+  overlay.style.cssText='position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.9);border-radius:12px;z-index:30;text-align:center;padding:20px;animation:msgfade 0.3s ease';
+  const nextCfg=candyLevelConfig(cLevel+1);
   overlay.innerHTML=`
     <div style="font-size:3rem;margin-bottom:10px">🎉</div>
     <div style="font-family:Orbitron,monospace;font-size:1.6rem;font-weight:900;color:#ffd700;margin-bottom:6px">NIVO ${cLevel} KONPLÈ!</div>
-    <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);margin-bottom:8px">Skor: ${cScore} · Bonus Mouvman: +${bonus}</div>
+    <div style="font-size:0.72rem;color:rgba(255,255,255,0.7);margin-bottom:4px">Skor: ${cScore.toLocaleString()} · Bonus: +${bonus}</div>
+    <div style="font-size:0.65rem;color:rgba(255,255,255,0.5);margin-bottom:8px">Nivo ${cLevel+1}: Sibl ${nextCfg.target.toLocaleString()} en ${nextCfg.moves} mouvman</div>
     <div style="font-family:Orbitron,monospace;font-size:1.1rem;color:#00ff88;font-weight:700;margin-bottom:20px">+${totalPts} ZETWAL PWEN!</div>
     <button id="c-next-btn" style="padding:12px 30px;background:linear-gradient(135deg,#ffd700,#b8860b);color:#000;border:none;border-radius:20px;font-family:Orbitron,monospace;font-size:0.7rem;font-weight:700;letter-spacing:2px;cursor:pointer">➡ NIVO ${cLevel+1}</button>
   `;
@@ -1467,9 +1573,8 @@ function candyLevelWin(){
 
 function candyLevelFail(){
   const pts=Math.floor(cScore/200);
-  showGameOver({icon:'🍬',title:'Mouvman Fini!',sub:`Nivo ${cLevel} · Skor: ${cScore}/${cTarget}`,ptsEarned:pts,score:cScore});
+  showGameOver({icon:'🍬',title:'Mouvman Fini!',sub:`Nivo ${cLevel} · Skor: ${cScore.toLocaleString()}/${cTarget.toLocaleString()}`,ptsEarned:pts,score:cScore});
   saveScore('candy',cScore);
-  /* Reset sèvgad — pati nèf */
   cLevel=1; cScore=0;
   candySave();
 }
@@ -1632,31 +1737,84 @@ function gAI(){
   const st=document.getElementById('g-status'); if(st){st.textContent='Tour Ou — Jwè ⚪';st.style.color='#ffd700';}
 }
 
-/* AI EASY */
-function gAIEasy(){ const c=gCands(gBoard,1); return c[Math.floor(Math.random()*Math.min(c.length,8))]; }
-
-/* AI MEDIUM — bloke sèlman victoire imedyat */
-function gAIMed(){
-  for(const m of gCands(gBoard,1)){ const b=gCopy(gBoard); b[m.r][m.c]=2; if(gWin(b,m.r,m.c,2)) return m; }
-  for(const m of gCands(gBoard,1)){ const b=gCopy(gBoard); b[m.r][m.c]=1; if(gWin(b,m.r,m.c,1)) return m; }
-  return gAIEasy();
+/* AI EASY — jouè prè ak yon ti chans viktwa/blokaj */
+function gAIEasy(){
+  const cands=gCands(gBoard,1);
+  /* 30% chance bloke menace imedyat */
+  if(Math.random()<0.3){
+    for(const m of cands){ const b=gCopy(gBoard); b[m.r][m.c]=1; if(gWin(b,m.r,m.c,1)) return m; }
+  }
+  return cands[Math.floor(Math.random()*Math.min(cands.length,10))];
 }
 
-/* MINIMAX + ALPHA-BETA */
+/* AI MEDIUM — bloke 4-en-rang + cherche victoire */
+function gAIMed(){
+  const cands=gCands(gBoard,2);
+  /* Victoire imedyat */
+  for(const m of cands){ const b=gCopy(gBoard); b[m.r][m.c]=2; if(gWin(b,m.r,m.c,2)) return m; }
+  /* Bloke victoire joueur */
+  for(const m of cands){ const b=gCopy(gBoard); b[m.r][m.c]=1; if(gWin(b,m.r,m.c,1)) return m; }
+  /* Bloke 4 ouvert */
+  for(const m of cands){
+    const b=gCopy(gBoard); b[m.r][m.c]=1;
+    if(gThreatLevel(b,m.r,m.c,1)>=4) return m;
+  }
+  /* Cherche meilleur coup offensif */
+  let best=null,bestVal=-Infinity;
+  for(const m of cands.slice(0,15)){
+    const b=gCopy(gBoard); b[m.r][m.c]=2;
+    const v=gThreatLevel(b,m.r,m.c,2);
+    if(v>bestVal){bestVal=v;best=m;}
+  }
+  return best||cands[0];
+}
+
+/* Niveau de menace d'un coup (1=joueur, 2=AI) */
+function gThreatLevel(board,r,c,p){
+  const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+  let max=0;
+  dirs.forEach(([dr,dc])=>{
+    const{len,oe}=gSeq(board,r,c,dr,dc,p);
+    const threat=len*10+oe*2;
+    if(threat>max) max=threat;
+  });
+  return max;
+}
+
+/* MINIMAX + ALPHA-BETA amélioré */
 function gMinimax(depth){
   const cands=gCands(gBoard,2);
   if(!cands.length) return{r:7,c:7};
-  /* Win imedyat */
+  /* Victoire imedyat */
   for(const m of cands){ const b=gCopy(gBoard); b[m.r][m.c]=2; if(gWin(b,m.r,m.c,2)) return m; }
-  /* Bloke win jwè */
+  /* Bloke victoire joueur */
   for(const m of cands){ const b=gCopy(gBoard); b[m.r][m.c]=1; if(gWin(b,m.r,m.c,1)) return m; }
-  let best=null,bestSc=-Infinity;
+  /* Bloke menace 4 ouvè */
   for(const m of cands){
+    const b=gCopy(gBoard); b[m.r][m.c]=1;
+    const{len,oe}=gBestSeq(b,m.r,m.c,1);
+    if(len>=4&&oe>=1) return m;
+  }
+
+  let best=null,bestSc=-Infinity;
+  const topCands=cands.slice(0,gDiff==='mike'?22:14);
+  for(const m of topCands){
     const b=gCopy(gBoard); b[m.r][m.c]=2;
     const sc=gAB(b,depth-1,-Infinity,Infinity,false,m.r,m.c);
     if(sc>bestSc){bestSc=sc;best=m;}
   }
   return best||cands[0];
+}
+
+/* Meilleure séquence pour position */
+function gBestSeq(board,r,c,p){
+  const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+  let best={len:0,oe:0};
+  dirs.forEach(([dr,dc])=>{
+    const s=gSeq(board,r,c,dr,dc,p);
+    if(s.len>best.len||(s.len===best.len&&s.oe>best.oe)) best=s;
+  });
+  return best;
 }
 
 function gAB(board,depth,alpha,beta,isMax,lr,lc){
@@ -1990,6 +2148,239 @@ window.moveMazeDir=function(dir){
       showGameOver({icon:'🌀',title:`Nivo ${mazeLvl-1} Konplè!`,sub:`+${pts} pwen touche`,ptsEarned:0,score:mazeLvl-1});}
   }
 };
+
+/* ============================================================
+   9. RUNNER ZETWAL — Endless runner (kouri, sote, siviv!)
+   Jwè kouri, yon bèt chase l, obstak dinamik sou ray tren
+============================================================ */
+let rCanvas,rCtx,rOver,rAnimId;
+let rPlayer, rObstacles, rEnemies, rScore, rDist, rSpeed, rFloor;
+let rJumping, rDoubleJump, rJumpV, rSpawnTimer, rBgOffset;
+const RW=440,RH=280,RFLOOR=210,RGRAV=0.55,RJUMP=-11,RDOUBLE=-9;
+
+function initRunner(container){
+  rCanvas=document.createElement('canvas');
+  rCanvas.width=RW; rCanvas.height=RH;
+  rCanvas.style.cssText='border-radius:12px;border:1px solid rgba(249,115,22,0.4);touch-action:none;display:block;max-width:100%';
+  container.insertBefore(rCanvas,container.firstChild);
+  rCtx=rCanvas.getContext('2d');
+  rOver=false; rScore=0; rDist=0; rSpeed=3.5; rSpawnTimer=0; rBgOffset=0;
+  rFloor=RFLOOR;
+  rPlayer={x:70,y:rFloor,w:28,h:36,vy:0,onGround:true,frame:0,frameT:0};
+  rObstacles=[]; rEnemies=[];
+  rJumping=false; rDoubleJump=false; rJumpV=0;
+  runnerDraw();
+  runnerDrawStart();
+
+  const jump=()=>{
+    if(rOver)return;
+    if(rPlayer.onGround){
+      rPlayer.vy=RJUMP; rPlayer.onGround=false;
+      rDoubleJump=true;
+      if(window.burst3D) burst3D();
+    } else if(rDoubleJump){
+      rPlayer.vy=RDOUBLE; rDoubleJump=false;
+      if(window.burst3D) burst3D();
+    }
+  };
+
+  rCanvas.addEventListener('touchstart',e=>{e.preventDefault();jump();},{passive:false});
+  rCanvas.addEventListener('mousedown',jump);
+  window._rKey=(e)=>{
+    if(!document.getElementById('game-overlay').classList.contains('open'))return;
+    if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();}
+  };
+  window.addEventListener('keydown',window._rKey);
+
+  /* Démarrer au premier input */
+  let started=false;
+  const startRun=()=>{
+    if(!started&&!rOver){ started=true; runnerLoop(); }
+  };
+  rCanvas.addEventListener('touchstart',startRun,{once:true});
+  rCanvas.addEventListener('mousedown',startRun,{once:true});
+  window.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp')startRun();},{once:true});
+}
+
+function destroyRunner(){
+  cancelAnimationFrame(rAnimId);
+  window.removeEventListener('keydown',window._rKey);
+  rOver=true;
+}
+
+function runnerDrawStart(){
+  if(!rCtx)return;
+  runnerDraw();
+  rCtx.fillStyle='rgba(0,0,0,0.55)';
+  rCtx.fillRect(0,0,RW,RH);
+  rCtx.textAlign='center';
+  rCtx.font='20px Arial'; rCtx.fillText('🏃',RW/2,RH/2-24);
+  rCtx.fillStyle='#f97316';
+  rCtx.font='bold 14px Orbitron,monospace';
+  rCtx.fillText('TAPE / KLIKE / SPACE POU KÒMANSE',RW/2,RH/2+10);
+  rCtx.fillStyle='rgba(255,255,255,0.5)';
+  rCtx.font='10px Montserrat';
+  rCtx.fillText('Double sote disponib!',RW/2,RH/2+32);
+  rCtx.textAlign='start';
+}
+
+function runnerLoop(){
+  if(rOver)return;
+
+  /* Physics joueur */
+  rPlayer.vy+=RGRAV;
+  rPlayer.y+=rPlayer.vy;
+  if(rPlayer.y>=rFloor){
+    rPlayer.y=rFloor; rPlayer.vy=0; rPlayer.onGround=true; rDoubleJump=true;
+  }
+
+  /* Vitesse croissante */
+  rSpeed = 3.5 + rDist/800;
+  rDist += rSpeed;
+  rScore = Math.floor(rDist/10);
+  document.getElementById('ovScore').textContent=rScore;
+
+  /* Background scroll */
+  rBgOffset=(rBgOffset+rSpeed*0.5)%RW;
+
+  /* Animation joueur */
+  rPlayer.frameT++;
+  if(rPlayer.frameT>5){ rPlayer.frame=(rPlayer.frame+1)%4; rPlayer.frameT=0; }
+
+  /* Spawn obstacles et ennemis */
+  rSpawnTimer++;
+  const spawnRate=Math.max(55-Math.floor(rDist/500)*3,28);
+  if(rSpawnTimer>spawnRate){
+    rSpawnTimer=0;
+    const type=Math.random();
+    if(type<0.45){
+      /* Obstacle bas */
+      const h=20+Math.random()*30;
+      rObstacles.push({x:RW+10,y:rFloor+rPlayer.h-h,w:18,h,type:'low'});
+    } else if(type<0.75){
+      /* Obstacle haut (à sauter dessous ou double saut) */
+      rObstacles.push({x:RW+10,y:rFloor-60,w:20,h:50,type:'high'});
+    } else {
+      /* Ennemi qui court */
+      rEnemies.push({x:RW+10,y:rFloor+rPlayer.h-24,w:28,h:24,frame:0,ft:0});
+    }
+  }
+
+  /* Move + collision obstacles */
+  rObstacles=rObstacles.filter(o=>{
+    o.x-=rSpeed;
+    if(runnerCollide(rPlayer,{x:o.x,y:o.y,w:o.w,h:o.h})){endRunner();return false;}
+    return o.x>-30;
+  });
+
+  /* Move + collision ennemis */
+  rEnemies=rEnemies.filter(e=>{
+    e.x-=rSpeed*1.15; /* ennemis un peu plus rapides */
+    e.ft++; if(e.ft>6){e.frame=(e.frame+1)%3;e.ft=0;}
+    if(runnerCollide(rPlayer,{x:e.x,y:e.y,w:e.w,h:e.h})){endRunner();return false;}
+    return e.x>-40;
+  });
+
+  runnerDraw();
+  rAnimId=requestAnimationFrame(runnerLoop);
+}
+
+function runnerCollide(a,b){
+  const pad=4;
+  return a.x+pad<b.x+b.w && a.x+a.w-pad>b.x &&
+         a.y+pad<b.y+b.h && a.y+a.h-pad>b.y;
+}
+
+function runnerDraw(){
+  if(!rCtx)return;
+  /* Fond gradient nuit */
+  const bg=rCtx.createLinearGradient(0,0,0,RH);
+  bg.addColorStop(0,'#030118'); bg.addColorStop(0.7,'#0a0500'); bg.addColorStop(1,'#141414');
+  rCtx.fillStyle=bg; rCtx.fillRect(0,0,RW,RH);
+
+  /* Étoiles background */
+  rCtx.fillStyle='rgba(255,215,0,0.6)';
+  for(let i=0;i<18;i++){
+    const sx=((i*97+rBgOffset*0.3)%RW);
+    const sy=10+((i*43)%120);
+    rCtx.fillRect(sx,sy,i%3===0?2:1,i%3===0?2:1);
+  }
+
+  /* Rails du tren — fond */
+  const railY=rFloor+rPlayer.h+4;
+  rCtx.fillStyle='rgba(249,115,22,0.25)';
+  rCtx.fillRect(0,railY,RW,4);
+  rCtx.fillRect(0,railY+8,RW,4);
+  /* Traverses animées */
+  rCtx.fillStyle='rgba(249,115,22,0.15)';
+  for(let i=0;i<8;i++){
+    const tx=((i*60-rBgOffset*1.2)%RW+RW)%RW;
+    rCtx.fillRect(tx,railY-2,12,14);
+  }
+
+  /* Sol */
+  rCtx.fillStyle='rgba(249,115,22,0.15)';
+  rCtx.fillRect(0,rFloor+rPlayer.h,RW,3);
+
+  /* Obstacles */
+  rObstacles.forEach(o=>{
+    const col = o.type==='high'?'#6366f1':'#f97316';
+    rCtx.shadowBlur=10; rCtx.shadowColor=col;
+    rCtx.fillStyle=col;
+    rCtx.beginPath(); rCtx.roundRect(o.x,o.y,o.w,o.h,4); rCtx.fill();
+    rCtx.shadowBlur=0;
+    /* Icône */
+    rCtx.font='12px Arial'; rCtx.textAlign='center';
+    rCtx.fillText(o.type==='high'?'🔷':'🧱',o.x+o.w/2,o.y+o.h/2+4);
+    rCtx.textAlign='start';
+  });
+
+  /* Ennemis — "bèt" */
+  rEnemies.forEach(e=>{
+    rCtx.shadowBlur=14; rCtx.shadowColor='#ff4444';
+    rCtx.font='22px Arial'; rCtx.textAlign='center';
+    const enemyFrames=['👾','👹','👺'];
+    rCtx.fillText(enemyFrames[e.frame%3],e.x+e.w/2,e.y+e.h-2);
+    rCtx.shadowBlur=0; rCtx.textAlign='start';
+  });
+
+  /* Joueur */
+  rCtx.shadowBlur=16; rCtx.shadowColor='#f97316';
+  rCtx.font='26px Arial'; rCtx.textAlign='center';
+  const pFrames=['🏃','🏃'];
+  rCtx.fillText(rPlayer.onGround ? pFrames[rPlayer.frame%2] : '🦘',
+    rPlayer.x+rPlayer.w/2, rPlayer.y+rPlayer.h+2);
+  rCtx.shadowBlur=0; rCtx.textAlign='start';
+
+  /* HUD — skor + vitès */
+  rCtx.fillStyle='#fff';
+  rCtx.font='bold 13px Orbitron,monospace';
+  rCtx.fillText(rScore+'m',10,22);
+  rCtx.fillStyle='rgba(249,115,22,0.7)';
+  rCtx.font='9px Montserrat';
+  rCtx.fillText('x'+rSpeed.toFixed(1),10,36);
+
+  /* Double saut indicator */
+  if(rDoubleJump&&!rPlayer.onGround){
+    rCtx.fillStyle='rgba(0,255,136,0.7)';
+    rCtx.font='9px Montserrat';
+    rCtx.textAlign='center';
+    rCtx.fillText('↑ DBL SOTE',rPlayer.x+rPlayer.w/2,rPlayer.y-8);
+    rCtx.textAlign='start';
+  }
+}
+
+function endRunner(){
+  rOver=true; cancelAnimationFrame(rAnimId);
+  window.removeEventListener('keydown',window._rKey);
+  const pts=Math.floor(rDist/100);
+  showGameOver({
+    icon:'🏃',
+    title: rScore>500?'Kouri Vit!':rScore>200?'Pa mal!':'Game Over!',
+    sub:`Ou kouri ${rScore}m • Vitès max: x${rSpeed.toFixed(1)}`,
+    ptsEarned:pts,score:rScore
+  });
+}
 
 /* ============================================================
    INIT FINAL — sync pwen offline + cleanup
