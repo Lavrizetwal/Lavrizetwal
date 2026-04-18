@@ -534,7 +534,7 @@
       <label>Mot de passe</label>
       <input type="password" id="login-pass" class="auth-input" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <button class="btn btn-gold" id="login-btn" onclick="handleLogin()">
+    <button class="btn btn-gold" id="login-btn">
       Connexion
     </button>
     <div class="auth-err" id="login-err"></div>
@@ -981,9 +981,21 @@ function initDOMListeners() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDOMListeners);
+  document.addEventListener('DOMContentLoaded', () => {
+    initDOMListeners();
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+      console.log("Attaching click listener to login-btn");
+      loginBtn.addEventListener('click', handleLogin);
+    }
+  });
 } else {
   initDOMListeners();
+  const loginBtn = document.getElementById('login-btn');
+  if (loginBtn) {
+    console.log("Attaching click listener to login-btn");
+    loginBtn.addEventListener('click', handleLogin);
+  }
 }
 
 // ============================================================
