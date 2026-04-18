@@ -903,22 +903,29 @@ function showAuthWall() {
 // ============================================================
 // LOGIN
 // ============================================================
-window.handleLogin = async () => {
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-pass').value;
-  const btn   = document.getElementById('login-btn');
-  const err   = document.getElementById('login-err');
+async function handleLogin() {
+  const emailInput = document.getElementById('login-email');
+  const passInput = document.getElementById('login-pass');
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-err');
+
+  if (!emailInput || !passInput || !btn || !err) return;
+
+  const email = emailInput.value.trim();
+  const pass = passInput.value;
 
   if (!email || !pass) { showErr(err, 'Email et mot de passe requis.'); return; }
 
   btn.disabled = true;
+  const originalBtnText = btn.innerHTML;
   btn.innerHTML = '<span class="spinner"></span>';
   err.classList.remove('show');
 
   try {
     await signInWithEmailAndPassword(auth, email, pass);
-    // onAuthStateChanged prend le relais
+    // onAuthStateChanged prendra le relais automatiquement
   } catch (e) {
+    console.error("Login error:", e);
     const msgs = {
       'auth/wrong-password': 'Mot de passe incorrect.',
       'auth/user-not-found': 'Aucun compte avec cet email.',
@@ -927,9 +934,11 @@ window.handleLogin = async () => {
     };
     showErr(err, msgs[e.code] || e.message);
     btn.disabled = false;
-    btn.innerHTML = 'Connexion';
+    btn.innerHTML = originalBtnText;
   }
-};
+}
+// Exposition explicite au scope global (nécessaire pour onclick dans un module)
+window.handleLogin = handleLogin;
 
 function showErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
 
