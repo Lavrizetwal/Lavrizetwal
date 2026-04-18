@@ -942,10 +942,40 @@ window.handleSignOut = async () => {
   toast('Déconnecté', 'info');
 };
 
-// Enter key on login
-document.getElementById('login-pass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleLogin();
-});
+// ============================================================
+// DOM LISTENERS — Sécurisé pour éviter les erreurs au chargement
+// ============================================================
+function initDOMListeners() {
+  const loginPass = document.getElementById('login-pass');
+  if (loginPass) {
+    loginPass.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  }
+
+  const uploadArea = document.getElementById('upload-area');
+  if (uploadArea) {
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault(); uploadArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const fileInput = document.getElementById('product-img-file');
+        if (fileInput) {
+          fileInput.files = e.dataTransfer.files;
+          handleImageSelect({ target: { files: [file] }});
+        }
+      }
+    });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDOMListeners);
+} else {
+  initDOMListeners();
+}
 
 // ============================================================
 // SUPABASE — PRODUITS
@@ -1578,18 +1608,7 @@ function formatPrice(n) {
   return new Intl.NumberFormat('fr-HT').format(n ?? 0);
 }
 
-// Drag & drop image
-const uploadArea = document.getElementById('upload-area');
-uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-uploadArea.addEventListener('drop', e => {
-  e.preventDefault(); uploadArea.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) {
-    document.getElementById('product-img-file').files = e.dataTransfer.files;
-    handleImageSelect({ target: { files: [file[0]] }});
-  }
-});
+// Drag & drop image — Déjà initialisé dans initDOMListeners()
 
 // ============================================================
 // PATCH switchTab — ajoute analytics + calculator san kraze egzistant
