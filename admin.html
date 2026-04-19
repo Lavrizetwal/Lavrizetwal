@@ -1286,20 +1286,25 @@
 // CONFIGURATION FIREBASE & SUPABASE
 // ============================================================
 const firebaseConfig = {
-  apiKey: "AIzaSyDfKnKJCJKJKJKJKJKJKJKJKJKJKJKJKJ",
-  authDomain: "zetwal-app.firebaseapp.com",
-  projectId: "zetwal-app",
-  storageBucket: "zetwal-app.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdefghijklmnop"
+  apiKey:            "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+  authDomain:        "lavrizetwal.firebaseapp.com",
+  projectId:         "lavrizetwal",
+  storageBucket:     "lavrizetwal.firebasestorage.app",
+  messagingSenderId: "291921316186",
+  appId:             "1:291921316186:web:f55e8b34526960df394b63"
 };
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-const supabaseUrl = 'https://your-supabase-url.supabase.co';
-const supabaseKey = 'your-supabase-key';
+const supabaseUrl = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
 const db = supabase.createClient(supabaseUrl, supabaseKey);
+
+const ADMIN_EMAILS = [
+  'mikenestorlive@gmail.com',
+  'schnaydernaderice1@gmail.com'
+];
 
 // ============================================================
 // GLOBAL STATE
@@ -1317,7 +1322,6 @@ let chartsInstances = {};
 window.addEventListener('DOMContentLoaded', () => {
   initLoginListeners();
   checkAuth();
-  loadStats();
 });
 
 function initLoginListeners() {
@@ -1376,6 +1380,12 @@ function initLoginListeners() {
 function checkAuth() {
   auth.onAuthStateChanged((user) => {
     if (user) {
+      const email = user.email?.toLowerCase() || '';
+      if (!ADMIN_EMAILS.includes(email)) {
+        toast('Accès refusé', 'error');
+        auth.signOut();
+        return;
+      }
       document.getElementById('auth-wall').classList.add('hidden');
       document.getElementById('user-email').textContent = user.email;
       document.getElementById('user-avatar').textContent = user.email.charAt(0).toUpperCase();
@@ -1391,6 +1401,7 @@ window.handleLogin = async () => {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value.trim();
   const errDiv = document.getElementById('login-err');
+  const btn = document.getElementById('login-btn');
 
   if (!email || !pass) {
     errDiv.textContent = 'Email et mot de passe requis';
@@ -1398,12 +1409,17 @@ window.handleLogin = async () => {
     return;
   }
 
+  btn.disabled = true;
+  btn.innerHTML = '<span style="animation:spin 1s linear infinite">⏳</span> Vérification...';
+
   try {
     await auth.signInWithEmailAndPassword(email, pass);
     errDiv.classList.remove('show');
   } catch (e) {
     errDiv.textContent = 'Erreur: ' + e.message;
     errDiv.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Se Connecter';
   }
 };
 
