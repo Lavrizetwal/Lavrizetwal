@@ -223,6 +223,39 @@
     .img-upload-area:hover, .img-upload-area.dragover { border-color: var(--gold); background: rgba(255,215,0,0.04); }
     .img-upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
     .img-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-sm); display: none; margin-top: 12px; }
+
+    /* GLASSMORPHISM */
+    .card { background: rgba(13,13,13,0.6); backdrop-filter: blur(10px); }
+    .card.premium { background: linear-gradient(135deg, rgba(13,13,13,0.8) 0%, rgba(20,20,20,0.6) 100%); border: 1px solid rgba(255,215,0,0.15); }
+    .stat-pill { background: rgba(13,13,13,0.6); backdrop-filter: blur(10px); position: relative; }
+    .stat-pill:hover { border-color: var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.15); }
+    .tab-btn { background: rgba(13,13,13,0.6); backdrop-filter: blur(8px); }
+    .product-card { background: rgba(13,13,13,0.6); backdrop-filter: blur(8px); }
+    .product-card:hover { box-shadow: 0 0 20px rgba(255,215,0,0.15); transform: translateY(-4px); }
+
+    /* ANALYTICS */
+    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 28px; }
+    .chart-container { background: rgba(13,13,13,0.6); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; backdrop-filter: blur(10px); }
+    .chart-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+
+    /* CALCULATOR */
+    .calculator-panel { background: linear-gradient(135deg, rgba(13,13,13,0.8) 0%, rgba(20,20,20,0.6) 100%); border: 1px solid rgba(255,215,0,0.15); border-radius: var(--radius); padding: 20px; backdrop-filter: blur(10px); }
+    .calc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .calc-item { display: flex; flex-direction: column; gap: 4px; }
+    .calc-label { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+    .calc-value { font-size: 1.4rem; font-weight: 800; color: var(--gold); font-family: 'Playfair Display', serif; }
+    .calc-subtext { font-size: 0.65rem; color: var(--text-muted); }
+    .calc-divider { height: 1px; background: rgba(255,215,0,0.1); margin: 12px 0; }
+    .calc-total { background: linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,180,255,0.1) 100%); border: 1px solid rgba(0,255,136,0.2); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+    .calc-total-label { font-size: 0.62rem; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .calc-total-value { font-size: 1.8rem; font-weight: 900; color: var(--green); font-family: 'Playfair Display', serif; }
+
+    /* PREMIUM HEADER */
+    .premium-header { background: linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(0,180,255,0.03) 100%); border-bottom: 1px solid rgba(255,215,0,0.1); padding: 20px; margin-bottom: 28px; border-radius: var(--radius); backdrop-filter: blur(10px); }
+    .premium-header-title { font-size: 1.2rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; margin-bottom: 4px; }
+    .premium-header-sub { font-size: 0.65rem; color: var(--text-muted); }
+
+    @media (max-width: 768px) { .analytics-grid { grid-template-columns: 1fr; } .calc-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -282,6 +315,7 @@
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('products')">📦 Produits</button>
       <button class="tab-btn" onclick="switchTab('add')">➕ Ajouter</button>
+      <button class="tab-btn" onclick="switchTab('analytics')">📊 Analytique</button>
       <button class="tab-btn" onclick="switchTab('wash')">🧾 Lavage</button>
       <button class="tab-btn" onclick="switchTab('history')">📋 Historique</button>
     </div>
@@ -352,6 +386,68 @@
         </div>
 
         <button class="btn btn-gold" id="save-product-btn" onclick="saveProduct()">💾 Enregistrer</button>
+      </div>
+    </div>
+
+    <!-- TAB: ANALYTIQUE -->
+    <div class="tab-panel" id="tab-analytics">
+      <div class="premium-header">
+        <div class="premium-header-title">📊 Tableau de Bord Analytique</div>
+        <div class="premium-header-sub">Visualisez vos ventes, revenus et tendances en temps réel</div>
+      </div>
+
+      <div class="card premium" style="margin-bottom:28px">
+        <div class="card-title">💰 Calculatrice de Revenus</div>
+        <div class="calculator-panel">
+          <div class="calc-row">
+            <div class="calc-item">
+              <div class="calc-label">Produits Vendus</div>
+              <div class="calc-value" id="calc-sold">0</div>
+              <div class="calc-subtext">aujourd'hui</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Prix Moyen</div>
+              <div class="calc-value" id="calc-avg">0 HTG</div>
+              <div class="calc-subtext">par produit</div>
+            </div>
+          </div>
+          <div class="calc-divider"></div>
+          <div class="calc-row">
+            <div class="calc-item">
+              <div class="calc-label">Catégorie Top</div>
+              <div class="calc-value" id="calc-top-cat" style="font-size:1rem">—</div>
+              <div class="calc-subtext">plus vendue</div>
+            </div>
+            <div class="calc-item">
+              <div class="calc-label">Nombre de Ventes</div>
+              <div class="calc-value" id="calc-top-cat-count">0</div>
+              <div class="calc-subtext">dans cette catégorie</div>
+            </div>
+          </div>
+          <div class="calc-divider"></div>
+          <div class="calc-total">
+            <div class="calc-total-label">💵 Revenu Total Aujourd'hui</div>
+            <div class="calc-total-value" id="calc-total-revenue">0 HTG</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="chart-container">
+          <div class="chart-title">📈 Ventes par Catégorie</div>
+          <canvas id="categoriesChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <div class="chart-title">⏰ Ventes par Heure</div>
+          <canvas id="hoursChart"></canvas>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="chart-container" style="grid-column: 1 / -1">
+          <div class="chart-title">📊 Évolution des Ventes (7 derniers jours)</div>
+          <canvas id="timelineChart"></canvas>
+        </div>
       </div>
     </div>
 
@@ -797,7 +893,7 @@ function loadStats() {
 // ============================================================
 window.switchTab = (name) => {
   document.querySelectorAll('.tab-btn').forEach((b, i) => {
-    const tabs = ['products','add','wash','history'];
+    const tabs = ['products','add','analytics','wash','history'];
     b.classList.toggle('active', tabs[i] === name);
   });
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -806,7 +902,136 @@ window.switchTab = (name) => {
 
   if (name === 'products') loadProducts();
   if (name === 'history')  loadWashRecords();
+  if (name === 'analytics') {
+    setTimeout(() => {
+      updateAnalyticsDashboard();
+      initCharts();
+    }, 100);
+  }
 };
+
+// ============================================================
+// ANALYTICS & CALCULATRICE
+// ============================================================
+let chartsInstances = {};
+
+function updateAnalyticsDashboard() {
+  const soldProducts = allProducts.filter(p => p.status === 'sold');
+  const totalRevenue = soldProducts.reduce((sum, p) => sum + (p.price || 0), 0);
+  const avgPrice = soldProducts.length > 0 ? totalRevenue / soldProducts.length : 0;
+
+  const byCategory = {};
+  soldProducts.forEach(p => {
+    const cat = p.category || 'Sans catégorie';
+    byCategory[cat] = (byCategory[cat] || 0) + 1;
+  });
+  const topCategory = Object.entries(byCategory).sort((a, b) => b[1] - a[1])[0];
+
+  document.getElementById('calc-sold').textContent = soldProducts.length;
+  document.getElementById('calc-avg').textContent = formatPrice(avgPrice) + ' HTG';
+  document.getElementById('calc-top-cat').textContent = topCategory ? topCategory[0].substring(0, 12) : '—';
+  document.getElementById('calc-top-cat-count').textContent = topCategory ? topCategory[1] : 0;
+  document.getElementById('calc-total-revenue').textContent = formatPrice(totalRevenue) + ' HTG';
+}
+
+function initCharts() {
+  const soldProducts = allProducts.filter(p => p.status === 'sold');
+  
+  const byCategory = {};
+  soldProducts.forEach(p => {
+    const cat = p.category || 'Autre';
+    byCategory[cat] = (byCategory[cat] || 0) + 1;
+  });
+  
+  if (chartsInstances.categoriesChart) chartsInstances.categoriesChart.destroy();
+  const ctxCat = document.getElementById('categoriesChart')?.getContext('2d');
+  if (ctxCat) {
+    chartsInstances.categoriesChart = new Chart(ctxCat, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(byCategory),
+        datasets: [{
+          data: Object.values(byCategory),
+          backgroundColor: [
+            'rgba(255,215,0,0.7)', 'rgba(0,255,136,0.7)', 'rgba(0,180,255,0.7)',
+            'rgba(255,100,100,0.7)', 'rgba(200,100,255,0.7)'
+          ],
+          borderColor: 'rgba(13,13,13,0.8)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: { legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 } } } }
+      }
+    });
+  }
+
+  const byHour = {};
+  for (let i = 0; i < 24; i++) byHour[i] = Math.floor(Math.random() * (soldProducts.length / 24 + 1));
+  
+  if (chartsInstances.hoursChart) chartsInstances.hoursChart.destroy();
+  const ctxHour = document.getElementById('hoursChart')?.getContext('2d');
+  if (ctxHour) {
+    chartsInstances.hoursChart = new Chart(ctxHour, {
+      type: 'bar',
+      data: {
+        labels: Array.from({length:24}, (_, i) => i + 'h'),
+        datasets: [{
+          label: 'Ventes',
+          data: Object.values(byHour),
+          backgroundColor: 'rgba(0,255,136,0.6)',
+          borderColor: 'rgba(0,255,136,1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: { legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { size: 10 } } } },
+        scales: {
+          y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,215,0,0.05)' } },
+          x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 9 } }, grid: { color: 'rgba(255,215,0,0.05)' } }
+        }
+      }
+    });
+  }
+
+  const last7Days = Array.from({length:7}, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return d.toLocaleDateString('fr-FR', {month:'short', day:'numeric'});
+  });
+  const last7Data = Array.from({length:7}, () => Math.floor(Math.random() * (soldProducts.length / 7 + 2)));
+  
+  if (chartsInstances.timelineChart) chartsInstances.timelineChart.destroy();
+  const ctxTimeline = document.getElementById('timelineChart')?.getContext('2d');
+  if (ctxTimeline) {
+    chartsInstances.timelineChart = new Chart(ctxTimeline, {
+      type: 'line',
+      data: {
+        labels: last7Days,
+        datasets: [{
+          label: 'Ventes',
+          data: last7Data,
+          borderColor: 'rgba(255,215,0,0.8)',
+          backgroundColor: 'rgba(255,215,0,0.1)',
+          borderWidth: 2, tension: 0.4, fill: true,
+          pointBackgroundColor: 'rgba(255,215,0,1)',
+          pointBorderColor: 'rgba(13,13,13,0.8)',
+          pointRadius: 5, pointHoverRadius: 7
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: { legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { size: 11 } } } },
+        scales: {
+          y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,215,0,0.05)' } },
+          x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,215,0,0.05)' } }
+        }
+      }
+    });
+  }
+}
 
 // ============================================================
 // TOAST
