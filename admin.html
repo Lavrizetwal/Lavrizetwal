@@ -1318,7 +1318,13 @@ window.copyQRUrl = async () => {
 // ============================================================
 window.sellProduct = async (id) => {
   if (!confirm('Marquer ce produit comme VENDU ?')) return;
-  const { error } = await db.from('products').update({ status: 'sold', sold_at: new Date().toISOString() }).eq('id', id);
+  // Mise à jour du statut, de la disponibilité et remise du stock à 0
+  const { error } = await db.from('products').update({ 
+    status: 'sold', 
+    availability: 'Non disponible',
+    stock_quantity: 0,
+    sold_at: new Date().toISOString() 
+  }).eq('id', id);
   if (error) { toast('Erreur: ' + error.message, 'error'); return; }
   toast('Produit marqué comme vendu!', 'success');
   await loadProducts(); loadStats();
@@ -1552,18 +1558,16 @@ window.saveWashRecord = async () => {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Enregistrement...';
 
-  // Schéma Gemini: customer_name + details (JSONB contenant tout le reste)
+  // Schéma SQL: colonnes directes (phone, weight, service_type, amount, pickup_date, status, notes)
   const { error } = await db.from('wash_records').insert({
     customer_name: client,
-    details: {
-      phone,
-      weight_kg: weight,
-      service_type: type,
-      amount_htg: amount,
-      pickup_date: pickup || null,
-      notes,
-      status: 'pending'
-    }
+    phone: phone,
+    weight: weight,
+    service_type: type,
+    amount: amount,
+    pickup_date: pickup || null,
+    status: 'pending',
+    notes: notes
   });
 
   btn.disabled = false;
