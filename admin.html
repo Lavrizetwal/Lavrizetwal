@@ -316,6 +316,7 @@
       <button class="tab-btn" onclick="switchTab('history')">📋 Historique</button>
       <button class="tab-btn" onclick="switchTab('analytics')">📊 Analytics</button>
       <button class="tab-btn" onclick="switchTab('calculator')">🧮 Calculatrice</button>
+      <button class="tab-btn" onclick="switchTab('settings')">⚙️ Paramètres</button>
     </div>
 
     <!-- PRODUITS -->
@@ -578,6 +579,52 @@
     <!-- ANALYTICS & CALCULATRICE (injectés par JS) -->
     <div class="tab-panel" id="tab-analytics"></div>
     <div class="tab-panel" id="tab-calculator"></div>
+
+    <!-- ═══ PARAMÈTRES — CITASYON + STATUT MAGAZEN ═══ -->
+    <div class="tab-panel" id="tab-settings">
+
+      <!-- STATUT MAGAZEN -->
+      <div class="card" style="max-width:560px;margin-bottom:20px">
+        <div class="card-title">🏪 Statut Magazen</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:16px">Kontròle si magazen an ouvri oswa fèmen — andepandan de lè otomatik la.</div>
+
+        <!-- Statut aktyèl -->
+        <div id="store-current-status" style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm)">
+          <span id="admin-store-dot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0"></span>
+          <span id="admin-store-label" style="font-size:0.8rem;font-weight:700">Chargement...</span>
+          <span id="admin-store-mode" style="font-size:0.62rem;color:var(--text-muted);margin-left:auto"></span>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-green" style="flex:1" onclick="setStoreForce('open')">🟢 Forcer OUVERT</button>
+          <button class="btn btn-red"   style="flex:1" onclick="setStoreForce('closed')">🔴 Forcer FERMÉ</button>
+          <button class="btn btn-outline" style="flex:1" onclick="setStoreForce('null')">🔄 Mode Auto (8h–20h)</button>
+        </div>
+      </div>
+
+      <!-- CITATIONS SEMAINE -->
+      <div class="card" style="max-width:800px">
+        <div class="card-title">💬 Citations de la Semaine</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px">Écrivez jusqu'à 7 citations. Choisissez celle du jour avec le bouton <strong style="color:var(--gold)">Activer</strong>.</div>
+
+        <!-- Prévisualisation citation active -->
+        <div id="quote-preview" style="display:none;background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;text-align:center">
+          <div style="font-size:0.55rem;color:rgba(255,215,0,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">CITATION ACTIVE EN CE MOMENT</div>
+          <div id="qp-text" style="font-size:0.9rem;font-style:italic;color:rgba(255,255,255,0.85);margin-bottom:6px"></div>
+          <div id="qp-author" style="font-size:0.62rem;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase"></div>
+        </div>
+
+        <div id="quotes-form"></div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+          <button class="btn btn-gold" style="flex:1" onclick="saveQuotes()">💾 Enregistrer toutes les citations</button>
+          <button class="btn btn-outline" style="width:auto" onclick="addQuoteRow()">＋ Ajouter une ligne</button>
+        </div>
+        <div id="quotes-save-msg" style="font-size:0.72rem;color:var(--green);margin-top:10px;display:none">✅ Citations enregistrées!</div>
+      </div>
+
+    </div>
+    <!-- ═══════════════════════════════════════════════ -->
 
   </main>
 </div>
@@ -1391,7 +1438,7 @@ function loadStats(){
 
 window.switchTab=(name)=>{
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    const tabs=['products','coming','add','scan','wash','history','analytics','calculator'];
+    const tabs=['products','coming','add','scan','wash','history','analytics','calculator','settings'];
     b.classList.toggle('active',tabs[i]===name);
   });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -1401,7 +1448,161 @@ window.switchTab=(name)=>{
   if(name==='history')  loadWashRecords();
   if(name==='analytics')  initAnalytics();
   if(name==='calculator') initCalculator();
+  if(name==='settings')   initSettings();
   if(name!=='scan'&&qrScanner) stopScanner();
+};
+
+// ============================================================
+// PARAMÈTRES — CITASYON + STATUT MAGAZEN
+// ============================================================
+let settingsInit = false;
+let quotesData   = [];  // [{text, author}, ...]
+let activeDayIdx = 0;
+
+async function initSettings() {
+  if (settingsInit) { await refreshStoreStatus(); return; }
+  settingsInit = true;
+  await Promise.all([refreshStoreStatus(), loadQuotes()]);
+}
+
+// ── STATUT MAGAZEN ────────────────────────────────────────────
+async function refreshStoreStatus() {
+  const dot   = document.getElementById('admin-store-dot');
+  const label = document.getElementById('admin-store-label');
+  const mode  = document.getElementById('admin-store-mode');
+  if (!dot) return;
+
+  let force = null;
+  try {
+    const { data } = await db.from('site_settings').select('value').eq('key','store_force').single();
+    if (data && data.value && data.value !== 'null') force = data.value;
+  } catch(e){}
+
+  const h = new Date().getHours(); // heure locale — affichage seulement
+  const autoOpen = (h >= 8 && h < 20);
+  const isOpen   = force === 'open' ? true : force === 'closed' ? false : autoOpen;
+
+  if (isOpen) {
+    dot.style.cssText   = 'width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#00ff88;box-shadow:0 0 10px #00ff88';
+    label.style.color   = '#00ff88';
+    label.textContent   = '🟢 Magazen OUVRI';
+  } else {
+    dot.style.cssText   = 'width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#ff4444;box-shadow:0 0 10px #ff4444';
+    label.style.color   = '#ff4444';
+    label.textContent   = '🔴 Magazen FÈMEN';
+  }
+  mode.textContent = force === 'open' ? 'Mode: Forcé ouvert' : force === 'closed' ? 'Mode: Forcé fermé' : 'Mode: Automatique (8h–20h)';
+}
+
+window.setStoreForce = async (val) => {
+  try {
+    await db.from('site_settings').upsert({ key:'store_force', value: val, updated_at: new Date().toISOString() });
+    toast(val === 'null' ? 'Mode automatique activé' : val === 'open' ? '✅ Magazen forcé OUVERT' : '🔴 Magazen forcé FERMÉ', 'success');
+    await refreshStoreStatus();
+  } catch(e) { toast('Erreur: '+e.message,'error'); }
+};
+
+// ── CITATIONS ─────────────────────────────────────────────────
+async function loadQuotes() {
+  try {
+    const [rW, rD] = await Promise.all([
+      db.from('site_settings').select('value').eq('key','quote_week').single(),
+      db.from('site_settings').select('value').eq('key','quote_active_day').single()
+    ]);
+    quotesData   = JSON.parse(rW?.data?.value || '[]');
+    activeDayIdx = parseInt(rD?.data?.value  || '0');
+  } catch(e) { quotesData = []; activeDayIdx = 0; }
+
+  // Garantir au moins 1 ligne vide
+  if (!quotesData.length) quotesData = [{ text:'', author:'' }];
+  renderQuotesForm();
+  renderQuotePreview();
+}
+
+function renderQuotesForm() {
+  const container = document.getElementById('quotes-form');
+  if (!container) return;
+  container.innerHTML = quotesData.map((q, i) => `
+    <div id="quote-row-${i}" style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:start;margin-bottom:12px;padding:14px;background:${i===activeDayIdx?'rgba(255,215,0,0.06)':'rgba(255,255,255,0.02)'};border:1px solid ${i===activeDayIdx?'rgba(255,215,0,0.3)':'rgba(255,255,255,0.06)'};border-radius:var(--radius-sm)">
+      <div>
+        <div style="display:flex;gap:8px;margin-bottom:6px">
+          <span style="font-size:0.58rem;color:var(--text-muted);padding:3px 10px;background:rgba(255,255,255,0.04);border-radius:10px">Jour ${i+1}</span>
+          ${i===activeDayIdx?'<span style="font-size:0.55rem;color:var(--gold);padding:3px 10px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:10px">✨ Active</span>':''}
+        </div>
+        <input type="text" id="qt-${i}" value="${escH(q.text||'')}" placeholder="Ekri citasyon an…"
+          style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Montserrat',sans-serif;font-size:0.78rem;outline:none;margin-bottom:5px">
+        <input type="text" id="qa-${i}" value="${escH(q.author||'')}" placeholder="Otè (opsyonèl)"
+          style="width:100%;padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Montserrat',sans-serif;font-size:0.68rem;outline:none">
+      </div>
+      <button onclick="activateQuote(${i})" title="Aktive pou jodi a"
+        style="padding:8px 12px;background:${i===activeDayIdx?'rgba(255,215,0,0.15)':'rgba(255,255,255,0.04)'};border:1px solid ${i===activeDayIdx?'rgba(255,215,0,0.3)':'var(--border)'};border-radius:var(--radius-sm);color:${i===activeDayIdx?'var(--gold)':'var(--text-muted)'};cursor:pointer;font-family:inherit;font-size:0.62rem;font-weight:700;transition:var(--tr);white-space:nowrap">
+        ${i===activeDayIdx?'✨ Active':'Aktive'}
+      </button>
+      <button onclick="removeQuoteRow(${i})" title="Supprimer"
+        style="padding:8px 10px;background:rgba(255,68,68,0.06);border:1px solid rgba(255,68,68,0.15);border-radius:var(--radius-sm);color:#ff8888;cursor:pointer;font-family:inherit;font-size:0.75rem">
+        ✕
+      </button>
+    </div>`).join('');
+}
+
+function renderQuotePreview() {
+  const q  = quotesData[activeDayIdx] || quotesData[0];
+  const pv = document.getElementById('quote-preview');
+  if (!pv) return;
+  if (!q || !q.text) { pv.style.display='none'; return; }
+  pv.style.display = 'block';
+  document.getElementById('qp-text').textContent   = `" ${q.text} "`;
+  document.getElementById('qp-author').textContent = q.author ? `— ${q.author}` : '';
+}
+
+window.activateQuote = async (i) => {
+  activeDayIdx = i;
+  collectFormValues();
+  try {
+    await db.from('site_settings').upsert({ key:'quote_active_day', value: String(i), updated_at: new Date().toISOString() });
+    toast(`✅ Citasyon ${i+1} aktive!`, 'success');
+    renderQuotesForm();
+    renderQuotePreview();
+  } catch(e) { toast('Erreur: '+e.message,'error'); }
+};
+
+window.addQuoteRow = () => {
+  if (quotesData.length >= 7) { toast('Maksimòm 7 citasyon', 'error'); return; }
+  collectFormValues();
+  quotesData.push({ text:'', author:'' });
+  renderQuotesForm();
+};
+
+window.removeQuoteRow = (i) => {
+  if (quotesData.length <= 1) { toast('Kite omwen 1 citasyon', 'error'); return; }
+  collectFormValues();
+  quotesData.splice(i, 1);
+  if (activeDayIdx >= quotesData.length) activeDayIdx = quotesData.length - 1;
+  renderQuotesForm();
+  renderQuotePreview();
+};
+
+function collectFormValues() {
+  quotesData = quotesData.map((_, i) => ({
+    text:   document.getElementById(`qt-${i}`)?.value.trim() || '',
+    author: document.getElementById(`qa-${i}`)?.value.trim() || ''
+  }));
+}
+
+window.saveQuotes = async () => {
+  collectFormValues();
+  const valid = quotesData.filter(q => q.text);
+  if (!valid.length) { toast('Ekri omwen 1 citasyon', 'error'); return; }
+  try {
+    await db.from('site_settings').upsert([
+      { key:'quote_week',       value: JSON.stringify(quotesData),     updated_at: new Date().toISOString() },
+      { key:'quote_active_day', value: String(activeDayIdx),           updated_at: new Date().toISOString() }
+    ]);
+    const msg = document.getElementById('quotes-save-msg');
+    if (msg) { msg.style.display='block'; setTimeout(()=>msg.style.display='none', 3000); }
+    toast('✅ Citations enregistrées!', 'success');
+    renderQuotePreview();
+  } catch(e) { toast('Erreur: '+e.message,'error'); }
 };
 
 // ============================================================
