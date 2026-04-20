@@ -10,10 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <style>
     /* ============================================================
@@ -150,7 +146,7 @@
       display:flex;align-items:center;justify-content:center;font-size:4rem;
       flex-shrink:0;
     }
-    .pcard-img img{width:100%;height:100%; object-fit:cover;display:block;transition:transform 0.5s ease}
+    .pcard-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.5s ease}
     .pcard:hover .pcard-img img{transform:scale(1.05)}
 
     /* Badge numéro produit — toujours visible, coin haut gauche */
@@ -177,468 +173,856 @@
       display:flex;align-items:center;justify-content:center;
       font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;
       color:var(--red);letter-spacing:4px;text-transform:uppercase;
-      z-index:4;backdrop-filter:blur(2px);
+      backdrop-filter:blur(2px);
     }
 
-    /* Body */
-    .pcard-body{padding:18px;flex:1;display:flex;flex-direction:column}
-    .pcard-name{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;line-height:1.1;margin-bottom:8px;color:var(--text)}
-    .pcard-price{font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:12px}
-    .pcard-price span{font-size:0.65rem;font-weight:600;opacity:0.6;margin-left:2px}
-    .pcard-desc{font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin-bottom:18px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    /* Corps */
+    .pcard-body{padding:16px;flex:1;display:flex;flex-direction:column;gap:10px}
+    .pcard-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;line-height:1.3;color:#fff}
+    .pcard-price{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--gold)}
+    .pcard-price span{font-size:0.72rem;font-family:'Montserrat',sans-serif;font-weight:400;color:rgba(201,168,76,0.65)}
+    .pcard-desc{font-size:0.7rem;color:var(--text-muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    /* ID affiché sous le nom */
+    .pcard-id{
+      display:flex;align-items:center;gap:6px;
+      background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);
+      border-radius:6px;padding:5px 8px;
+    }
+    .pcard-id-label{font-size:0.52rem;color:rgba(201,168,76,0.55);text-transform:uppercase;letter-spacing:1px;flex-shrink:0}
+    .pcard-id-val{font-size:0.6rem;font-family:monospace;color:rgba(201,168,76,0.8);word-break:break-all;flex:1}
+    .copy-btn{
+      flex-shrink:0;padding:2px 8px;background:rgba(201,168,76,0.1);
+      border:1px solid rgba(201,168,76,0.25);border-radius:4px;
+      color:var(--gold);font-size:0.52rem;font-weight:700;cursor:pointer;
+      font-family:'Montserrat',sans-serif;transition:var(--tr);
+    }
+    .copy-btn:hover{background:rgba(201,168,76,0.2)}
 
-    /* ID copiable */
-    .pcard-id{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:6px 10px;margin-top:auto;cursor:default}
-    .pcard-id-label{font-size:0.5rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px}
-    .pcard-id-val{font-size:0.65rem;font-family:monospace;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-    .copy-btn{background:none;border:none;color:var(--gold);font-size:0.7rem;cursor:pointer;opacity:0.6;transition:0.2s;padding:2px}
-    .copy-btn:hover{opacity:1;transform:scale(1.1)}
-
-    /* CTA WhatsApp */
+    /* Bouton WA */
     .pcard-cta{
-      margin-top:14px;width:100%;padding:10px;
-      background:rgba(201,168,76,0.1);border:1px solid var(--border);
-      border-radius:var(--radius-sm);color:var(--gold);
-      font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;
       display:flex;align-items:center;justify-content:center;gap:8px;
-      text-decoration:none;transition:var(--tr);
+      padding:11px;border-radius:var(--radius-sm);
+      background:linear-gradient(135deg,#128C7E,#25D366);
+      color:#fff;font-family:'Montserrat',sans-serif;font-size:0.65rem;
+      font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+      text-decoration:none;border:none;cursor:pointer;
+      transition:var(--tr);position:relative;overflow:hidden;
+      margin-top:auto;
     }
-    .pcard-cta:hover{background:var(--gold);color:#000;border-color:var(--gold);box-shadow:0 0 15px rgba(201,168,76,0.3)}
-    .sold-cta{background:rgba(255,68,68,0.05);border-color:rgba(255,68,68,0.2);color:rgba(255,68,68,0.6);cursor:not-allowed}
-    .sold-cta:hover{background:rgba(255,68,68,0.05);color:rgba(255,68,68,0.6);box-shadow:none}
+    .pcard-cta::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s}
+    .pcard:hover .pcard-cta::before{left:100%}
+    .pcard-cta:hover{box-shadow:0 0 20px rgba(37,211,102,0.4);transform:translateY(-1px)}
+    .pcard-cta.sold-cta{background:rgba(255,255,255,0.06);color:var(--text-muted);cursor:default}
+    .pcard-cta.sold-cta:hover{transform:none;box-shadow:none}
 
     /* ============================================================
-       STATES (Loading, Error, Empty)
+       ÉTATS — Empty / Loading
     ============================================================ */
-    .state-box{grid-column:1/-1;text-align:center;padding:100px 20px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:var(--radius)}
-    .state-icon{font-size:3rem;display:block;margin-bottom:16px;opacity:0.3}
-    .state-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--gold);margin-bottom:8px}
+    .state-box{
+      grid-column:1/-1;text-align:center;padding:60px 20px;
+      color:var(--text-muted);font-size:0.8rem;
+    }
+    .state-icon{font-size:3.5rem;margin-bottom:16px;opacity:0.5;display:block}
+    .state-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);margin-bottom:8px}
+
+    /* Skeleton loader */
+    .skel-card{background:rgba(255,255,255,0.035);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .skel{background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:skelanim 1.4s ease infinite;border-radius:4px}
+    @keyframes skelanim{to{background-position:-200% 0}}
 
     /* ============================================================
        TOAST
     ============================================================ */
-    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#111;border:1px solid var(--gold);color:#fff;padding:12px 24px;border-radius:50px;font-size:0.8rem;font-weight:600;z-index:10000;transition:transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);display:flex;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
-    .toast.show{transform:translateX(-50%) translateY(0)}
-    .toast.success{border-color:var(--green)}
-    .toast.error{border-color:var(--red)}
+    .toast{
+      position:fixed;bottom:24px;left:50%;
+      transform:translateX(-50%) translateY(80px);
+      background:rgba(13,12,8,0.95);border:1px solid var(--border);
+      border-radius:12px;padding:11px 22px;font-size:0.75rem;font-weight:600;
+      color:var(--gold);z-index:9000;
+      transition:transform 0.4s cubic-bezier(0.165,0.84,0.44,1),opacity 0.4s;
+      opacity:0;pointer-events:none;backdrop-filter:blur(12px);white-space:nowrap;
+    }
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast.success{border-color:rgba(0,255,136,0.3);color:var(--green)}
+    .toast.error{border-color:rgba(255,68,68,0.3);color:var(--red)}
 
     /* ============================================================
-       USER MENU MODAL
+       FOOTER
     ============================================================ */
-    #user-info-card { 
-      position: fixed; top: 100px; right: 20px; width: 280px; background: rgba(13, 12, 8, 0.98); 
-      backdrop-filter: blur(30px); border: 1px solid var(--gold); border-radius: 20px; 
-      padding: 25px; z-index: 2005; display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-      animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    .info-row { margin-bottom: 15px; border-bottom: 1px solid rgba(201,168,76,0.1); padding-bottom: 10px; text-align: left; }
-    .info-label { font-size: 0.6rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-    .info-value { font-size: 0.85rem; font-weight: 600; }
-    .admin-link { display: none; margin-top: 15px; }
-    .btn-logout { margin-top: 15px; width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ff4444; color: #ff4444; background: transparent; cursor: pointer; font-weight: 700; font-size: 0.7rem; transition: 0.3s; }
-    .btn-logout:hover { background: #ff4444; color: #fff; }
+    footer{background:#000;padding:40px 20px;text-align:center;border-top:1px solid var(--border);position:relative}
+    footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-pale),var(--gold),transparent);background-size:200% 100%;animation:nline 5s linear infinite}
+    .footer-brand{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px}
+    .social-row{display:flex;justify-content:center;gap:16px;margin-bottom:16px}
+    .social-row a{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:rgba(201,168,76,0.06);border:1px solid var(--border);transition:var(--tr)}
+    .social-row a:hover{background:rgba(201,168,76,0.14);box-shadow:0 0 15px rgba(201,168,76,0.2)}
+    .social-row img{width:24px}
+    .footer-copy{font-size:0.58rem;color:rgba(201,168,76,0.4);letter-spacing:2px;text-transform:uppercase}
 
     /* ============================================================
        RESPONSIVE
     ============================================================ */
-    @media (max-width:768px){
+    @media(max-width:640px){
       .nav-links{display:none}
-      .hero{padding-top:100px}
-      .stats-pill{min-width:45%;max-width:none}
+      .products-grid{grid-template-columns:repeat(2,1fr)}
+      .stats-bar{gap:8px}
+      .stats-pill{min-width:100px;padding:8px 12px}
+      .filter-bar{gap:8px}
     }
+    @media(max-width:400px){
+      .products-grid{grid-template-columns:1fr}
+    }
+    /* ============================================================
+       FILTRES CATÉGORIE
+    ============================================================ */
+    .cat-bar{
+      display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;
+      scrollbar-width:none;padding:12px 0 4px;
+    }
+    .cat-bar::-webkit-scrollbar{display:none}
+    .cat-btn{
+      flex-shrink:0;padding:7px 16px;border-radius:20px;
+      background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);
+      color:rgba(255,255,255,0.5);font-family:'Montserrat',sans-serif;
+      font-size:0.6rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+      cursor:pointer;transition:var(--tr);white-space:nowrap;
+    }
+    .cat-btn:hover{border-color:rgba(201,168,76,0.4);color:var(--gold)}
+    .cat-btn.active{
+      background:rgba(201,168,76,0.1);border-color:var(--gold);
+      color:var(--gold);box-shadow:0 0 10px rgba(201,168,76,0.12);
+    }
+
+    /* ============================================================
+       MODAL PRODUIT
+    ============================================================ */
+    .pmodal-overlay{
+      position:fixed;inset:0;z-index:5000;
+      background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);
+      display:flex;align-items:center;justify-content:center;
+      padding:20px;opacity:0;pointer-events:none;
+      transition:opacity 0.3s ease;
+    }
+    .pmodal-overlay.open{opacity:1;pointer-events:all}
+    .pmodal{
+      background:#0d0c08;border:1px solid rgba(201,168,76,0.25);
+      border-radius:18px;width:100%;max-width:560px;
+      max-height:92vh;overflow-y:auto;
+      position:relative;
+      transform:translateY(30px);
+      transition:transform 0.35s cubic-bezier(0.165,0.84,0.44,1);
+      scrollbar-width:thin;scrollbar-color:var(--gold-deep) transparent;
+    }
+    .pmodal-overlay.open .pmodal{transform:translateY(0)}
+    .pmodal::-webkit-scrollbar{width:3px}
+    .pmodal::-webkit-scrollbar-thumb{background:var(--gold-deep);border-radius:2px}
+
+    /* Ligne dorée top */
+    .pmodal::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,var(--gold),var(--gold-pale),var(--gold),transparent);
+      border-radius:18px 18px 0 0;
+    }
+
+    /* Image hero */
+    .pmodal-img{
+      width:100%;height:260px;object-fit:cover;
+      border-radius:16px 16px 0 0;display:block;
+    }
+    .pmodal-img-placeholder{
+      width:100%;height:200px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:5rem;background:rgba(255,255,255,0.02);
+      border-radius:16px 16px 0 0;
+    }
+
+    /* Fermer */
+    .pmodal-close{
+      position:absolute;top:14px;right:14px;z-index:10;
+      width:34px;height:34px;border-radius:50%;
+      background:rgba(0,0,0,0.7);border:1px solid rgba(255,100,100,0.3);
+      color:#ff9999;font-size:0.9rem;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:var(--tr);font-family:inherit;
+    }
+    .pmodal-close:hover{background:rgba(255,100,100,0.2)}
+
+    /* Contenu */
+    .pmodal-body{padding:22px 24px 28px}
+    .pmodal-cat{
+      display:inline-block;font-size:0.58rem;font-weight:700;
+      letter-spacing:1.5px;text-transform:uppercase;
+      color:var(--gold);background:rgba(201,168,76,0.08);
+      border:1px solid rgba(201,168,76,0.2);border-radius:20px;
+      padding:3px 12px;margin-bottom:10px;
+    }
+    .pmodal-name{
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.7rem;font-weight:700;line-height:1.2;
+      color:#fff;margin-bottom:6px;
+    }
+    .pmodal-price{
+      font-family:'Cormorant Garamond',serif;
+      font-size:2rem;font-weight:700;color:var(--gold);
+      margin-bottom:16px;
+    }
+    .pmodal-price span{font-size:0.9rem;font-family:'Montserrat',sans-serif;color:rgba(201,168,76,0.6)}
+
+    /* Grille infos */
+    .pmodal-grid{
+      display:grid;grid-template-columns:1fr 1fr;
+      gap:10px;margin-bottom:16px;
+    }
+    .pmodal-info-box{
+      background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+      border-radius:10px;padding:11px 14px;
+    }
+    .pmodal-info-label{
+      font-size:0.55rem;color:rgba(201,168,76,0.55);
+      text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;
+    }
+    .pmodal-info-val{font-size:0.82rem;font-weight:600;color:#fff}
+
+    /* Description */
+    .pmodal-desc{
+      font-size:0.78rem;color:rgba(255,255,255,0.6);
+      line-height:1.7;margin-bottom:16px;
+      background:rgba(255,255,255,0.02);border-radius:8px;padding:12px;
+    }
+
+    /* Couleurs */
+    .pmodal-colors{
+      display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;
+    }
+    .pmodal-color-chip{
+      padding:4px 12px;border-radius:20px;font-size:0.62rem;font-weight:600;
+      background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
+      color:var(--gold);
+    }
+
+    /* QR Code */
+    .pmodal-qr-wrap{
+      text-align:center;padding:16px;
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.07);
+      border-radius:10px;margin-bottom:16px;
+    }
+    .pmodal-qr-img{
+      width:130px;height:130px;border-radius:8px;display:block;margin:0 auto 8px;
+    }
+    .pmodal-qr-url{
+      font-size:0.58rem;color:rgba(255,255,255,0.35);
+      word-break:break-all;font-family:monospace;
+    }
+
+    /* Boutons action */
+    .pmodal-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .pmodal-btn-wa{
+      flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:13px;border-radius:10px;
+      background:linear-gradient(135deg,#128C7E,#25D366);
+      color:#fff;font-family:'Montserrat',sans-serif;
+      font-size:0.68rem;font-weight:700;letter-spacing:1.5px;
+      text-transform:uppercase;text-decoration:none;
+      transition:var(--tr);border:none;cursor:pointer;
+    }
+    .pmodal-btn-wa:hover{box-shadow:0 0 20px rgba(37,211,102,0.4);transform:translateY(-1px)}
+    .pmodal-btn-share{
+      padding:13px 18px;border-radius:10px;
+      background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);
+      color:var(--gold);font-family:'Montserrat',sans-serif;
+      font-size:0.68rem;font-weight:700;cursor:pointer;transition:var(--tr);
+    }
+    .pmodal-btn-share:hover{background:rgba(201,168,76,0.16)}
+
+    /* Badge délai */
+    .pmodal-delay{
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);
+      border-radius:20px;padding:5px 14px;font-size:0.65rem;
+      color:#fbbf24;font-weight:600;margin-bottom:14px;
+    }
+
   </style>
 </head>
 <body>
 
-  <canvas id="bg-canvas"></canvas>
-  <div class="nebula"><div class="nb"></div><div class="nb"></div><div class="nb"></div></div>
+<canvas id="bg-canvas"></canvas>
+<div class="nebula" aria-hidden="true"><div class="nb"></div><div class="nb"></div><div class="nb"></div></div>
+<div class="toast" id="toast"></div>
 
-  <!-- NAVIGATION -->
-  <nav class="nav">
-    <div class="nav-inner">
-      <a href="index.html" class="nav-logo">
-        <img src="logo.png" alt="Zetwal">
-        <div class="nav-brand">ZETWAL <span>SHOP</span></div>
-      </a>
-      <ul class="nav-links">
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="lavri.html">Laverie</a></li>
-        <li><a href="shop.html" class="active">Shop</a></li>
-        <li><a href="mall.html">Mall</a></li>
-        <li><a href="cinema.html">Cinéma</a></li>
-        <li><a href="technoparc.html">Technoparc</a></li>
-        <li><a href="associes.html">Associés</a></li>
-        <li><a href="jeux.html">Jeux</a></li>
-      </ul>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <button id="login-trigger-btn" onclick="handleLoginGoogle()" style="padding:8px 16px;border-radius:20px;border:none;background:var(--gold);color:#000;font-weight:800;font-size:0.6rem;text-transform:uppercase;cursor:pointer;">Konekte</button>
-        <div id="user-profile-btn" onclick="toggleInfoCard()" style="display:none;align-items:center;gap:8px;cursor:pointer;border:1px solid var(--gold);padding:5px 12px;border-radius:20px;color:var(--gold);font-weight:800;font-size:0.65rem;">
-          <span id="display-name-nav">Profil</span>
-        </div>
-      </div>
+<!-- ============================================================
+     NAVIGATION
+============================================================ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="https://zetwal.org/index.html" class="nav-logo">
+      <img src="logo.png" alt="Zetwal">
+      <span class="nav-brand">ZETWAL <span>SHOP</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="https://zetwal.org/index.html">Akèy</a></li>
+      <li><a href="https://zetwal.org/lavri.html">Lavri</a></li>
+      <li><a href="https://zetwal.org/mall.html">Mall</a></li>
+      <li><a href="https://zetwal.org/cinema.html">Sinema</a></li>
+      <li><a href="https://zetwal.org/technopark.html">Technopark</a></li>
+      <li><a href="https://zetwal.org/games.html">Jwèt</a></li>
+      <li><a href="https://zetwal.org/shop.html" class="active">Shop</a></li>
+    </ul>
+    <div class="nav-cart" id="nav-cart">
+      🛍️ <span id="cart-count">0</span> Sélection
     </div>
-  </nav>
-
-  <!-- USER INFO CARD -->
-  <div id="user-info-card">
-    <div class="info-row"><div class="info-label">Non</div><div class="info-value" id="card-name">—</div></div>
-    <div class="info-row"><div class="info-label">Estati</div><div class="info-value" id="card-status">Utilisateur</div></div>
-    <div class="info-row"><div class="info-label">Pwen Zetwal</div><div class="info-value" id="card-points">0.0</div></div>
-    <a href="admin.html" id="admin-access" class="admin-link"><button style="width:100%; padding:10px; border-radius:10px; border:none; background:var(--gold); color:#000; font-weight:800; font-size:0.65rem; cursor:pointer; text-transform:uppercase;">Accéder à l'administration</button></a>
-    <button class="btn-logout" onclick="handleLogout()">Dekonekte</button>
   </div>
+</nav>
 
-  <!-- HERO -->
-  <header class="hero">
-    <h1 class="hero-title">ZETWAL SHOP</h1>
-    <p class="hero-sub">Eksperyans Boutik Premium an Ayiti</p>
-  </header>
+<!-- ============================================================
+     HERO
+============================================================ -->
+<header class="hero">
+  <h1 class="hero-title">Zetwal Shop</h1>
+  <p class="hero-sub">Pwodwi lokal • Kalite mondyal • Livrezon rapid</p>
+</header>
 
-  <!-- STATS BAR -->
-  <section class="stats-bar">
-    <div class="stats-pill">
-      <span class="stats-pill-icon">📦</span>
-      <div class="stats-pill-info">
-        <span class="stats-pill-val" id="stat-total">0</span>
-        <span class="stats-pill-label">Total pwodwi</span>
+<!-- ============================================================
+     STATS BAR — STABILE (pa gen chart ki ap tonbe)
+     4 pills simples horizontales
+============================================================ -->
+<div class="stats-bar" id="stats-bar">
+  <div class="stats-pill">
+    <span class="stats-pill-icon">📦</span>
+    <div class="stats-pill-info">
+      <span class="stats-pill-val" id="stat-total">—</span>
+      <span class="stats-pill-label">Pwodwi Total</span>
+    </div>
+  </div>
+  <div class="stats-pill">
+    <span class="stats-pill-icon">✅</span>
+    <div class="stats-pill-info">
+      <span class="stats-pill-val" id="stat-avail" style="color:var(--green)">—</span>
+      <span class="stats-pill-label">Disponib</span>
+    </div>
+  </div>
+  <div class="stats-pill">
+    <span class="stats-pill-icon">🔴</span>
+    <div class="stats-pill-info">
+      <span class="stats-pill-val" id="stat-sold" style="color:var(--red)">—</span>
+      <span class="stats-pill-label">Vendu</span>
+    </div>
+  </div>
+  <div class="stats-pill">
+    <span class="stats-pill-icon">🕐</span>
+    <div class="stats-pill-info">
+      <span class="stats-pill-val" id="stat-updated">—</span>
+      <span class="stats-pill-label">Dènye Mete Ajou</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FILTRES
+============================================================ -->
+<div class="filter-section">
+  <div class="filter-bar">
+    <input type="text" class="search-input" id="search-input"
+      placeholder="🔍  Chèche yon pwodwi..." oninput="filterShop()">
+    <button class="filter-btn active" onclick="setFilter('all',this)">Tout</button>
+    <button class="filter-btn" onclick="setFilter('available',this)">✅ Disponib</button>
+    <button class="filter-btn" onclick="setFilter('sold',this)">🔴 Vendu</button>
+    <select class="sort-select" id="sort-select" onchange="filterShop()">
+      <option value="newest">Pi Nouvo Dabò</option>
+      <option value="price-asc">Pri: Ba → Wo</option>
+      <option value="price-desc">Pri: Wo → Ba</option>
+      <option value="name">Non A→Z</option>
+    </select>
+  </div>
+  <!-- Filtres catégorie -->
+  <div class="cat-bar" id="cat-bar">
+    <button class="cat-btn active" onclick="setCategory('',this)">🏷️ Tout Kategori</button>
+    <button class="cat-btn" onclick="setCategory('Vêtements',this)">👕 Rad</button>
+    <button class="cat-btn" onclick="setCategory('Chaussures',this)">👟 Soulye</button>
+    <button class="cat-btn" onclick="setCategory('Aliments',this)">🍎 Manje</button>
+    <button class="cat-btn" onclick="setCategory('Électroniques',this)">📱 Elektwonik</button>
+    <button class="cat-btn" onclick="setCategory('Maison',this)">🏠 Kay</button>
+    <button class="cat-btn" onclick="setCategory('Beauté & Soins',this)">💄 Bote</button>
+    <button class="cat-btn" onclick="setCategory('Sport',this)">⚽ Espò</button>
+    <button class="cat-btn" onclick="setCategory('Accessoires',this)">👜 Akseswa</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     GRILLE PRODUITS
+============================================================ -->
+<section class="products-section">
+  <div class="products-grid" id="products-grid">
+    <!-- Skeleton loaders -->
+    <div class="skel-card">
+      <div class="skel" style="height:200px;border-radius:0"></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div class="skel" style="height:14px;width:70%"></div>
+        <div class="skel" style="height:20px;width:50%"></div>
+        <div class="skel" style="height:10px;width:90%"></div>
+        <div class="skel" style="height:10px;width:80%"></div>
+        <div class="skel" style="height:36px;border-radius:8px;margin-top:6px"></div>
       </div>
     </div>
-    <div class="stats-pill">
-      <span class="stats-pill-icon">✨</span>
-      <div class="stats-pill-info">
-        <span class="stats-pill-val" id="stat-avail">0</span>
-        <span class="stats-pill-label">Disponib kounye a</span>
+    <div class="skel-card">
+      <div class="skel" style="height:200px;border-radius:0"></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div class="skel" style="height:14px;width:65%"></div>
+        <div class="skel" style="height:20px;width:45%"></div>
+        <div class="skel" style="height:10px;width:85%"></div>
+        <div class="skel" style="height:10px;width:75%"></div>
+        <div class="skel" style="height:36px;border-radius:8px;margin-top:6px"></div>
       </div>
     </div>
-    <div class="stats-pill">
-      <span class="stats-pill-icon">🏷️</span>
-      <div class="stats-pill-info">
-        <span class="stats-pill-val" id="stat-cats">0</span>
-        <span class="stats-pill-label">Kategori</span>
+    <div class="skel-card">
+      <div class="skel" style="height:200px;border-radius:0"></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div class="skel" style="height:14px;width:80%"></div>
+        <div class="skel" style="height:20px;width:55%"></div>
+        <div class="skel" style="height:10px;width:90%"></div>
+        <div class="skel" style="height:10px;width:70%"></div>
+        <div class="skel" style="height:36px;border-radius:8px;margin-top:6px"></div>
       </div>
     </div>
-    <div class="stats-pill">
-      <span class="stats-pill-icon">🏆</span>
-      <div class="stats-pill-info">
-        <span class="stats-pill-val">Premium</span>
-        <span class="stats-pill-label">Kalite garanti</span>
-      </div>
-    </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FILTRES -->
-  <section class="filter-section">
-    <div class="filter-bar">
-      <input type="text" id="search-input" class="search-input" placeholder="Chèche non, deskripsyon oswa nimewo pwodwi..." oninput="filterShop()">
-      <button class="filter-btn active" onclick="setFilter('all', this)">Tout</button>
-      <button class="filter-btn" onclick="setFilter('available', this)">Disponib</button>
-      <button class="filter-btn" onclick="setFilter('sold', this)">Vendu</button>
-      <select id="sort-select" class="sort-select" onchange="filterShop()">
-        <option value="newest">Dènye yo</option>
-        <option value="price-asc">Pri pi ba</option>
-        <option value="price-desc">Pri pi wo</option>
-        <option value="name">Non (A-Z)</option>
-      </select>
-    </div>
-  </section>
+<!-- ============================================================
+     MODAL DÉTAIL PRODUIT
+============================================================ -->
+<div class="pmodal-overlay" id="pmodal-overlay" onclick="closeProductModal(event)">
+  <div class="pmodal" id="pmodal">
+    <button class="pmodal-close" onclick="closeModal()">✕</button>
+    <div id="pmodal-content"></div>
+  </div>
+</div>
 
-  <!-- PRODUCTS GRID -->
-  <main class="products-section">
-    <div class="products-grid" id="products-grid">
-      <div class="state-box">
-        <span class="state-icon">⏳</span>
-        <div class="state-title">Chajman pwodwi yo...</div>
-        <p>N ap prepare pi bon eksperyans pou ou.</p>
-      </div>
-    </div>
-  </main>
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+  <div class="footer-brand">Zetwal Shop</div>
+  <div class="social-row">
+    <a href="https://wa.me/79961103506" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+    </a>
+    <a href="https://t.me/mikenestor14" target="_blank" rel="noopener" aria-label="Telegram">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+    </a>
+  </div>
+  <div class="footer-copy">ZETWAL ORGANISATION 2026 — Pwodwi Lokal, Kalite Mondyal</div>
+</footer>
 
-  <div class="toast" id="toast"></div>
+<!-- ============================================================
+     SCRIPTS
+============================================================ -->
+<script>
+/* ============================================================
+   SUPABASE CONFIG
+============================================================ */
+const SUPABASE_URL = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
+const WA_NUMBER   = '79961103506';
+const SITE_URL    = 'https://zetwal.org';
 
-  <script type="module">
-  /* ============================================================
-     CONFIG & INIT
-  ============================================================ */
-  const SUPABASE_URL = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
-  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* ============================================================
+   ÉTAT
+============================================================ */
+let allProducts   = [];
+let filterStatus  = 'all';
+let filterCat     = '';
+let toastTimer;
 
-  // Firebase Config
-  const firebaseConfig = {
-      apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-      authDomain: "lavrizetwal.firebaseapp.com",
-      projectId: "lavrizetwal",
-      storageBucket: "lavrizetwal.firebasestorage.app",
-      messagingSenderId: "291921316186",
-      appId: "1:291921316186:web:f55e8b34526960df394b63"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db_fs = firebase.firestore();
+/* ============================================================
+   INIT
+============================================================ */
+window.addEventListener('DOMContentLoaded', async () => {
+  initThreeJS();
+  await loadProducts();
+});
 
-  const WA_NUMBER = "79961103506";
-  const SITE_URL  = window.location.origin;
-  const ADMIN_EMAILS = ['mikenestorlive@gmail.com', 'schnaydernaderice1@gmail.com'];
+/* ============================================================
+   SUPABASE — CHARGER PRODUITS
+============================================================ */
+async function loadProducts() {
+  try {
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  let allProducts = [];
-  let filterStatus = 'all';
-  let toastTimer;
+    const { data, error } = await db
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initThreeJS();
-    loadProducts();
-    initAuthListener();
+    if (error) throw error;
+
+    allProducts = data || [];
+    updateStats();
+    renderGrid(allProducts);
+
+  } catch (e) {
+    console.error('Supabase error:', e);
+    renderError(e.message);
+  }
+}
+
+/* ============================================================
+   STATS — 4 pills stables, pas de chart
+============================================================ */
+function updateStats() {
+  const total  = allProducts.length;
+  const avail  = allProducts.filter(p => p.status === 'available').length;
+  const sold   = allProducts.filter(p => p.status === 'sold').length;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-avail').textContent = avail;
+  document.getElementById('stat-sold').textContent  = sold;
+
+  /* Heure dernière mise à jour */
+  const now = new Date();
+  document.getElementById('stat-updated').textContent =
+    now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+
+/* ============================================================
+   FILTRE & TRI
+============================================================ */
+window.setFilter = (status, btn) => {
+  filterStatus = status;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterShop();
+};
+
+window.setCategory = (cat, btn) => {
+  filterCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterShop();
+};
+
+window.filterShop = () => {
+  const q    = document.getElementById('search-input').value.toLowerCase().trim();
+  const sort = document.getElementById('sort-select').value;
+
+  let list = allProducts.filter(p => {
+    const matchStatus = filterStatus === 'all' || p.status === filterStatus;
+    const matchSearch = !q || p.name?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q);
+    const matchCat    = !filterCat || p.category === filterCat;
+    return matchStatus && matchSearch && matchCat;
   });
 
-  /* ============================================================
-     AUTH
-  ============================================================ */
-  function initAuthListener() {
-    auth.onAuthStateChanged(user => {
-        const loginBtn = document.getElementById('login-trigger-btn');
-        const profileBtn = document.getElementById('user-profile-btn');
-        if (user) {
-            loginBtn.style.display = 'none';
-            profileBtn.style.display = 'flex';
-            document.getElementById('display-name-nav').textContent = user.displayName || user.email;
-            
-            const isAdmin = ADMIN_EMAILS.includes(user.email);
-            document.getElementById('card-name').textContent = user.displayName || user.email;
-            document.getElementById('card-status').textContent = isAdmin ? 'Admin' : 'Utilisateur';
-            if (isAdmin) document.getElementById('admin-access').style.display = 'block';
-            
-            db_fs.collection('users').doc(user.uid).get().then(doc => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    document.getElementById('card-points').textContent = (data.points || 0).toFixed(1);
-                }
-            });
-        } else {
-            loginBtn.style.display = 'block';
-            profileBtn.style.display = 'none';
-        }
-    });
-  }
+  /* Tri */
+  if (sort === 'price-asc')  list = list.sort((a,b) => (a.price||0)-(b.price||0));
+  if (sort === 'price-desc') list = list.sort((a,b) => (b.price||0)-(a.price||0));
+  if (sort === 'name')       list = list.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+  /* newest: déjà trié par Supabase */
 
-  window.handleLoginGoogle = () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(e => showToast(e.message, 'error'));
-  };
-  window.handleLogout = () => auth.signOut().then(() => location.reload());
-  window.toggleInfoCard = () => { 
-    const c = document.getElementById('user-info-card'); 
-    c.style.display = c.style.display === 'block' ? 'none' : 'block'; 
-  };
+  renderGrid(list);
+};
 
-  /* ============================================================
-     CHARGEMENT DONNÉES
-  ============================================================ */
-  async function loadProducts() {
-    try {
-      const { data, error } = await db.from('products').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
-      allProducts = data || [];
-      updateStats(allProducts);
-      filterShop();
-    } catch (e) {
-      console.error(e);
-      renderError(e.message);
-    }
-  }
+/* ============================================================
+   RENDU GRILLE — Nimewo pwodwi toujou vizib
+============================================================ */
+function renderGrid(list) {
+  const grid = document.getElementById('products-grid');
 
-  function updateStats(list) {
-    document.getElementById('stat-total').textContent = list.length;
-    document.getElementById('stat-avail').textContent = list.filter(p => p.availability !== 'Non disponible').length;
-    const cats = new Set(list.map(p => p.category).filter(Boolean));
-    document.getElementById('stat-cats').textContent = cats.size;
-  }
-
-  /* ============================================================
-     LOGIQUE FILTRES
-  ============================================================ */
-  window.setFilter = (status, btn) => {
-    filterStatus = status;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterShop();
-  };
-
-  window.filterShop = () => {
-    const q    = document.getElementById('search-input').value.toLowerCase().trim();
-    const sort = document.getElementById('sort-select').value;
-
-    let list = allProducts.filter(p => {
-      const isAvailable = p.availability !== 'Non disponible';
-      const matchStatus = filterStatus === 'all' || 
-                         (filterStatus === 'available' && isAvailable) || 
-                         (filterStatus === 'sold' && !isAvailable);
-      
-      const shortNum = (p.sku || p.id || '').replace(/-/g,'').substring(0,8).toLowerCase();
-      const matchSearch = !q || 
-                          p.name?.toLowerCase().includes(q) || 
-                          p.description?.toLowerCase().includes(q) ||
-                          shortNum.includes(q);
-      return matchStatus && matchSearch;
-    });
-
-    /* Tri */
-    if (sort === 'price-asc')  list = list.sort((a,b) => (a.price||0)-(b.price||0));
-    if (sort === 'price-desc') list = list.sort((a,b) => (b.price||0)-(a.price||0));
-    if (sort === 'name')       list = list.sort((a,b) => (a.name||'').localeCompare(b.name||''));
-    /* newest: déjà trié par Supabase */
-
-    renderGrid(list);
-  };
-
-  /* ============================================================
-     RENDU GRILLE
-  ============================================================ */
-  function renderGrid(list) {
-    const grid = document.getElementById('products-grid');
-
-    if (!list.length) {
-      grid.innerHTML = `
-        <div class="state-box">
-          <span class="state-icon">🔍</span>
-          <div class="state-title">Okenn pwodwi jwenn</div>
-          <p>Eseye chanje rechèch ou oswa filtre a.</p>
-        </div>`;
-      return;
-    }
-
-    grid.innerHTML = list.map(p => {
-      const isSold   = p.availability === 'Non disponible';
-      const shortNum = (p.sku || p.id || '').replace(/-/g,'').substring(0,8).toUpperCase();
-      const waMsg    = encodeURIComponent(
-        `Bonjou! Mwen enterese nan pwodwi sa a:\n` +
-        `📦 ${p.name}\n💰 ${formatPrice(p.price)} HTG\n🔢 #${shortNum}\n` +
-        `🔗 ${SITE_URL}/product/${p.id}`
-      );
-      const waUrl = `https://wa.me/${WA_NUMBER}?text=${waMsg}`;
-
-      return `
-      <div class="pcard" onclick="openProduct('${p.id}')">
-        <div class="pcard-img">
-          ${p.image_url
-            ? `<img src="${escH(p.image_url)}" alt="${escH(p.name)}" loading="lazy">`
-            : '<span>📦</span>'
-          }
-          <div class="pcard-num">#${shortNum}</div>
-          <div class="pcard-status-badge ${isSold ? 'badge-sold' : 'badge-available'}">
-            ${isSold ? '● VENDU' : '● DISPONIB'}
-          </div>
-          ${isSold ? '<div class="sold-overlay">VENDU</div>' : ''}
-        </div>
-
-        <div class="pcard-body">
-          <div class="pcard-name">${escH(p.name)}</div>
-          <div class="pcard-price">${formatPrice(p.price)} <span>HTG</span></div>
-          ${p.description ? `<div class="pcard-desc">${escH(p.description)}</div>` : ''}
-
-          <div class="pcard-id" onclick="event.stopPropagation()">
-            <span class="pcard-id-label">ID</span>
-            <span class="pcard-id-val">${p.id}</span>
-            <button class="copy-btn" onclick="copyText('${p.id}','ID copié!')">📋</button>
-          </div>
-
-          <a href="${isSold ? '#' : waUrl}" 
-             class="pcard-cta ${isSold ? 'sold-cta' : ''}"
-             ${isSold ? '' : 'target="_blank" rel="noopener"'}
-             onclick="event.stopPropagation()">
-            ${isSold
-              ? '🔴 Pwodwi sa a vendu'
-              : `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.001-1.369l-.36-.213-3.735.861.879-3.638-.234-.375A9.788 9.788 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
-                Kontakte sou WhatsApp`
-            }
-          </a>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function renderError(msg) {
-    document.getElementById('products-grid').innerHTML = `
+  if (!list.length) {
+    grid.innerHTML = `
       <div class="state-box">
-        <span class="state-icon">⚠️</span>
-        <div class="state-title">Erè koneksyon</div>
-        <p style="font-size:0.7rem;margin-top:4px;opacity:0.6">${escH(msg)}</p>
-        <button onclick="loadProducts()" style="margin-top:16px;padding:8px 20px;background:rgba(201,168,76,0.12);border:1px solid var(--border);border-radius:8px;color:var(--gold);font-family:Montserrat,sans-serif;font-size:0.65rem;cursor:pointer">↺ Eseye ankò</button>
+        <span class="state-icon">🔍</span>
+        <div class="state-title">Okenn pwodwi jwenn</div>
+        <p>Eseye chanje rechèch ou oswa filtre a.</p>
       </div>`;
+    return;
   }
 
-  window.openProduct = (id) => {
-    // Note: This points to a generic product route. Ensure product.html exists if needed.
-    // For now, it stays as per your design.
-    window.location.href = `product.html?id=${id}`;
-  };
+  grid.innerHTML = list.map(p => {
+    const isSold   = p.status === 'sold';
+    /* Numéro court — 8 chars sans tirets */
+    const shortNum = (p.id || '').replace(/-/g,'').substring(0,8).toUpperCase();
+    const waMsg    = encodeURIComponent(
+      `Bonjou! Mwen enterese nan pwodwi sa a:\n` +
+      `📦 ${p.name}\n💰 ${formatPrice(p.price)} HTG\n🔢 #${shortNum}\n` +
+      `🔗 ${SITE_URL}/product/${p.id}`
+    );
+    const waUrl = `https://wa.me/${WA_NUMBER}?text=${waMsg}`;
 
-  window.copyText = async (text, msg) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      showToast(msg || 'Kopye!', 'success');
-    } catch(e) { showToast('Enposib kopye', 'error'); }
-  };
+    return `
+    <div class="pcard" onclick="openProduct('${p.id}')">
+      <div class="pcard-img">
+        ${p.image_url
+          ? `<img src="${escH(p.image_url)}" alt="${escH(p.name)}" loading="lazy">`
+          : '<span>📦</span>'
+        }
+        <!-- Numéro produit — toujours visible coin haut gauche -->
+        <div class="pcard-num">#${shortNum}</div>
+        <!-- Statut coin haut droit -->
+        <div class="pcard-status-badge ${isSold ? 'badge-sold' : 'badge-available'}">
+          ${isSold ? '● VENDU' : '● DISPONIB'}
+        </div>
+        ${isSold ? '<div class="sold-overlay">VENDU</div>' : ''}
+      </div>
 
-  function showToast(msg, type) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show ' + (type||'');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
-  }
+      <div class="pcard-body">
+        <div class="pcard-name">${escH(p.name)}</div>
+        <div class="pcard-price">${formatPrice(p.price)} <span>HTG</span></div>
+        ${p.description ? `<div class="pcard-desc">${escH(p.description)}</div>` : ''}
 
-  function escH(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-  function formatPrice(n) {
-    return new Intl.NumberFormat('fr-HT').format(n || 0);
-  }
+        <!-- ID complet visible et copiable -->
+        <div class="pcard-id" onclick="event.stopPropagation()">
+          <span class="pcard-id-label">ID</span>
+          <span class="pcard-id-val">${p.id}</span>
+          <button class="copy-btn" onclick="copyText('${p.id}','ID copié!')">📋</button>
+        </div>
 
-  function initThreeJS() {
-    const canvas = document.getElementById('bg-canvas');
-    const scene  = new THREE.Scene();
-    const cam    = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-    const rend   = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-    rend.setSize(innerWidth, innerHeight);
-    rend.setPixelRatio(Math.min(devicePixelRatio, 2));
-    cam.position.z = 8;
+        <!-- Bouton WhatsApp ou Vendu -->
+        <a href="${isSold ? '#' : waUrl}" 
+           class="pcard-cta ${isSold ? 'sold-cta' : ''}"
+           ${isSold ? '' : 'target="_blank" rel="noopener"'}
+           onclick="event.stopPropagation()">
+          ${isSold
+            ? '🔴 Pwodwi sa a vendu'
+            : `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.001-1.369l-.36-.213-3.735.861.879-3.638-.234-.375A9.788 9.788 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+              Kontakte sou WhatsApp`
+          }
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-    const sg = new THREE.BufferGeometry(), sp = [];
-    for (let i = 0; i < 2500; i++)
-      sp.push((Math.random()-.5)*70, (Math.random()-.5)*70, (Math.random()-.5)*70);
-    sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
-    const stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, opacity: 0.65 }));
-    scene.add(stars);
+function renderError(msg) {
+  document.getElementById('products-grid').innerHTML = `
+    <div class="state-box">
+      <span class="state-icon">⚠️</span>
+      <div class="state-title">Erè koneksyon</div>
+      <p style="font-size:0.7rem;margin-top:4px;opacity:0.6">${escH(msg)}</p>
+      <button onclick="loadProducts()" style="margin-top:16px;padding:8px 20px;background:rgba(201,168,76,0.12);border:1px solid var(--border);border-radius:8px;color:var(--gold);font-family:Montserrat,sans-serif;font-size:0.65rem;cursor:pointer">↺ Eseye ankò</button>
+    </div>`;
+}
 
-    const gg = new THREE.BufferGeometry(), gp = [];
-    for (let i = 0; i < 900; i++) {
-      const r = Math.random()*24+5, t = Math.random()*Math.PI*2;
-      gp.push(Math.cos(t)*r, (Math.random()-.5)*3, Math.sin(t)*r);
+/* ============================================================
+   MODAL — Ouvri detay pwodwi konplè
+============================================================ */
+window.openProduct = (id) => {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+
+  const isSold    = p.status === 'sold';
+  const isComing  = p.status === 'coming';
+  const shortNum  = (p.id||'').replace(/-/g,'').substring(0,8).toUpperCase();
+  const qrUrl     = `${SITE_URL}/product/${p.id}`;
+  const waMsg     = encodeURIComponent(
+    `Bonjou! Mwen enterese nan pwodwi sa a:\n` +
+    `📦 ${p.name}\n💰 ${formatPrice(p.price)} HTG\n🔢 #${shortNum}\n🔗 ${qrUrl}`
+  );
+  const waUrl = `https://wa.me/${WA_NUMBER}?text=${waMsg}`;
+
+  /* Statut badge */
+  const statusBadge = isSold
+    ? `<span style="background:rgba(255,68,68,0.12);color:#ff4444;border:1px solid rgba(255,68,68,0.25);border-radius:20px;padding:3px 12px;font-size:0.6rem;font-weight:700">🔴 VENDU</span>`
+    : isComing
+    ? `<span style="background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);border-radius:20px;padding:3px 12px;font-size:0.6rem;font-weight:700">🕐 BIENTÔT</span>`
+    : `<span style="background:rgba(0,255,136,0.1);color:#00ff88;border:1px solid rgba(0,255,136,0.25);border-radius:20px;padding:3px 12px;font-size:0.6rem;font-weight:700">✅ DISPONIB</span>`;
+
+  /* Délai si coming */
+  const delayHtml = isComing && p.delay_days
+    ? `<div class="pmodal-delay">⏱ Disponib nan: ${p.delay_days} jou</div>`
+    : '';
+
+  /* Couleurs */
+  const colorsHtml = p.colors
+    ? `<div style="margin-bottom:16px">
+        <div style="font-size:0.58rem;color:rgba(201,168,76,0.55);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">🎨 Koulè disponib</div>
+        <div class="pmodal-colors">
+          ${p.colors.split(',').map(c => `<span class="pmodal-color-chip">${escH(c.trim())}</span>`).join('')}
+        </div>
+      </div>`
+    : '';
+
+  /* Livraison */
+  const livrHtml = `<div style="font-size:0.75rem;font-weight:600;color:${p.delivery_available?'#00b4ff':'rgba(255,255,255,0.35)'}">
+    ${p.delivery_available ? '🚚 Livrezon possib' : '🚫 Pa livrab'}
+  </div>`;
+
+  /* Stock */
+  const stockVal  = p.stock_quantity ?? '—';
+  const stockColor = (p.stock_quantity > 0) ? '#00ff88' : '#ff4444';
+
+  /* QR image */
+  const qrImgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(qrUrl)}`;
+
+  document.getElementById('pmodal-content').innerHTML = `
+    ${p.image_url
+      ? `<img class="pmodal-img" src="${escH(p.image_url)}" alt="${escH(p.name)}">`
+      : `<div class="pmodal-img-placeholder">📦</div>`
     }
-    gg.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3));
-    const galaxy = new THREE.Points(gg, new THREE.PointsMaterial({ color: 0xc9a84c, size: 0.08, transparent: true, opacity: 0.45 }));
-    scene.add(galaxy);
+    <div class="pmodal-body">
 
-    let mx = 0, my = 0;
-    window.addEventListener('mousemove', e => { mx = (e.clientX/innerWidth-.5)*.01; my = (e.clientY/innerHeight-.5)*.01; });
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        ${p.category ? `<span class="pmodal-cat">${escH(p.category)}</span>` : ''}
+        ${statusBadge}
+      </div>
 
-    (function anim() {
-      requestAnimationFrame(anim);
-      stars.rotation.y  += 0.00015;
-      galaxy.rotation.y += 0.0006;
-      cam.position.x += (mx - cam.position.x) * 0.04;
-      cam.position.y += (-my - cam.position.y) * 0.04;
-      rend.render(scene, cam);
-    })();
+      <div class="pmodal-name">${escH(p.name)}</div>
+      <div class="pmodal-price">${formatPrice(p.price)} <span>HTG</span></div>
 
-    window.addEventListener('resize', () => {
-      cam.aspect = innerWidth/innerHeight;
-      cam.updateProjectionMatrix();
-      rend.setSize(innerWidth, innerHeight);
-    });
+      ${delayHtml}
+
+      <div class="pmodal-grid">
+        <div class="pmodal-info-box">
+          <div class="pmodal-info-label">📦 Stock</div>
+          <div class="pmodal-info-val" style="color:${stockColor}">${stockVal} inite</div>
+        </div>
+        <div class="pmodal-info-box">
+          <div class="pmodal-info-label">🚚 Livrezon</div>
+          ${livrHtml}
+        </div>
+        <div class="pmodal-info-box">
+          <div class="pmodal-info-label">🔢 Nimewo Pwodwi</div>
+          <div class="pmodal-info-val" style="font-family:monospace;font-size:0.72rem">#${shortNum}</div>
+        </div>
+        <div class="pmodal-info-box">
+          <div class="pmodal-info-label">📅 Dat Ajoute</div>
+          <div class="pmodal-info-val" style="font-size:0.72rem">${p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR') : '—'}</div>
+        </div>
+      </div>
+
+      ${p.description ? `<div class="pmodal-desc">${escH(p.description)}</div>` : ''}
+
+      ${colorsHtml}
+
+      <!-- QR Code -->
+      <div class="pmodal-qr-wrap">
+        <div style="font-size:0.58rem;color:rgba(201,168,76,0.55);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">🔳 QR Code Pwodwi</div>
+        <img class="pmodal-qr-img" src="${qrImgSrc}" alt="QR Code" loading="lazy">
+        <div class="pmodal-qr-url">${qrUrl}</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="pmodal-actions">
+        ${!isSold
+          ? `<a href="${waUrl}" target="_blank" rel="noopener" class="pmodal-btn-wa">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.001-1.369l-.36-.213-3.735.861.879-3.638-.234-.375A9.788 9.788 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+              Kontakte sou WhatsApp
+            </a>`
+          : `<div style="flex:1;text-align:center;padding:13px;background:rgba(255,255,255,0.04);border-radius:10px;font-size:0.7rem;color:rgba(255,255,255,0.35)">🔴 Pwodwi sa a deja vendu</div>`
+        }
+        <button class="pmodal-btn-share" onclick="shareProduct('${p.id}','${escH(p.name)}')">🔗</button>
+      </div>
+    </div>`;
+
+  document.getElementById('pmodal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeModal = () => {
+  document.getElementById('pmodal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+window.closeProductModal = (e) => {
+  if (e.target === document.getElementById('pmodal-overlay')) closeModal();
+};
+
+/* Fermer avec Escape */
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+window.shareProduct = async (id, name) => {
+  const url = `${SITE_URL}/product/${id}`;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: name, url });
+    } else {
+      await navigator.clipboard.writeText(url);
+      showToast('Lyen kopye!', 'success');
+    }
+  } catch(e) {
+    try { await navigator.clipboard.writeText(url); showToast('Lyen kopye!', 'success'); } catch(_){}
   }
-  </script>
+};
+
+/* ============================================================
+   COPIER TEXTE
+============================================================ */
+window.copyText = async (text, msg) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast(msg || 'Kopye!', 'success');
+  } catch(e) { showToast('Enposib kopye', 'error'); }
+};
+
+/* ============================================================
+   TOAST
+============================================================ */
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type||'');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ============================================================
+   UTILS
+============================================================ */
+function escH(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatPrice(n) {
+  return new Intl.NumberFormat('fr-HT').format(n || 0);
+}
+
+/* ============================================================
+   THREE.JS — Background galaktik
+============================================================ */
+function initThreeJS() {
+  const canvas = document.getElementById('bg-canvas');
+  const scene  = new THREE.Scene();
+  const cam    = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+  const rend   = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  rend.setSize(innerWidth, innerHeight);
+  rend.setPixelRatio(Math.min(devicePixelRatio, 2));
+  cam.position.z = 8;
+
+  /* Étoiles */
+  const sg = new THREE.BufferGeometry(), sp = [];
+  for (let i = 0; i < 2500; i++)
+    sp.push((Math.random()-.5)*70, (Math.random()-.5)*70, (Math.random()-.5)*70);
+  sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+  const stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.04, transparent: true, opacity: 0.65 }));
+  scene.add(stars);
+
+  /* Particules dorées */
+  const gg = new THREE.BufferGeometry(), gp = [];
+  for (let i = 0; i < 900; i++) {
+    const r = Math.random()*24+5, t = Math.random()*Math.PI*2;
+    gp.push(Math.cos(t)*r, (Math.random()-.5)*3, Math.sin(t)*r);
+  }
+  gg.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3));
+  const galaxy = new THREE.Points(gg, new THREE.PointsMaterial({ color: 0xc9a84c, size: 0.08, transparent: true, opacity: 0.45 }));
+  scene.add(galaxy);
+
+  let mx = 0, my = 0;
+  window.addEventListener('mousemove', e => { mx = (e.clientX/innerWidth-.5)*.01; my = (e.clientY/innerHeight-.5)*.01; });
+
+  (function anim() {
+    requestAnimationFrame(anim);
+    stars.rotation.y  += 0.00015;
+    galaxy.rotation.y += 0.0006;
+    cam.position.x += (mx - cam.position.x) * 0.04;
+    cam.position.y += (-my - cam.position.y) * 0.04;
+    rend.render(scene, cam);
+  })();
+
+  window.addEventListener('resize', () => {
+    cam.aspect = innerWidth/innerHeight;
+    cam.updateProjectionMatrix();
+    rend.setSize(innerWidth, innerHeight);
+  });
+}
+</script>
 </body>
 </html>
