@@ -1293,7 +1293,25 @@ window.saveWashRecord = async () => {
   const notes=document.getElementById('wash-notes').value.trim(), btn=document.getElementById('save-wash-btn');
   if(!client){toast('Nom du client requis','error');return;} if(isNaN(weight)||weight<=0){toast('Poids requis','error');return;}
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enregistrement...';
-  const {error}=await db.from('wash_records').insert({customer_name:client,details:{phone,weight_kg:weight,service_type:type,amount_htg:amount,pickup_date:pickup||null,notes,status:'pending'}});
+  const {error}=await db.from('wash_records').insert({
+    customer_name: client,
+    phone,
+    weight_kg:    weight,
+    service_type: type,
+    amount_htg:   amount,
+    pickup_date:  pickup || null,
+    notes,
+    status:       'pending',
+    details: {
+      phone,
+      weight_kg:    weight,
+      service_type: type,
+      amount_htg:   amount,
+      pickup_date:  pickup || null,
+      notes,
+      status:       'pending'
+    }
+  });
   btn.disabled=false; btn.innerHTML='💾 Enregistrer Fiche';
   if(error){toast('Erreur: '+error.message,'error');return;}
   toast('Fiche enregistrée!','success');
@@ -1314,12 +1332,20 @@ const STC={pending:'color:#fbbf24',ready:'color:var(--green)',delivered:'color:v
 function renderWashTable(list){
   const tbody=document.getElementById('wash-table-body');
   if(!list.length){tbody.innerHTML='<tr><td colspan="8" style="color:var(--text-muted);padding:20px">Aucune fiche trouvée.</td></tr>';return;}
-  tbody.innerHTML=list.map(r=>{const d=r.details||{},st=d.status||'pending';return`<tr>
+  tbody.innerHTML=list.map(r=>{
+    /* Lecture colonnes directes en priorité, JSONB en fallback */
+    const d   = r.details || {};
+    const ph  = r.phone        || d.phone        || '—';
+    const wk  = r.weight_kg    ?? d.weight_kg    ?? '—';
+    const svc = r.service_type || d.service_type || 'standard';
+    const amt = r.amount_htg   ?? d.amount_htg   ?? 0;
+    const st  = r.status       || d.status       || 'pending';
+    return`<tr>
     <td style="font-weight:600">${escH(r.customer_name)}</td>
-    <td style="color:var(--text-muted)">${escH(d.phone||'—')}</td>
-    <td>${d.weight_kg??'—'} kg</td>
-    <td>${SL[d.service_type]||d.service_type||'—'}</td>
-    <td style="color:var(--gold);font-weight:700">${d.amount_htg>0?fmtP(d.amount_htg)+' HTG':'—'}</td>
+    <td style="color:var(--text-muted)">${escH(ph)}</td>
+    <td>${wk} kg</td>
+    <td>${SL[svc]||svc||'—'}</td>
+    <td style="color:var(--gold);font-weight:700">${amt>0?fmtP(amt)+' HTG':'—'}</td>
     <td style="${STC[st]||''}">${STL[st]||st}</td>
     <td style="color:var(--text-muted);font-size:0.68rem">${new Date(r.created_at).toLocaleDateString('fr-FR')}</td>
     <td><div style="display:flex;gap:5px;flex-wrap:wrap">
@@ -1327,11 +1353,26 @@ function renderWashTable(list){
       ${st==='ready'?`<button class="btn btn-blue" style="padding:4px 8px;font-size:0.55rem;width:auto" onclick="updateWashStatus('${r.id}','delivered')">📦 Livré</button>`:''}
       <button class="btn btn-red" style="padding:4px 8px;font-size:0.55rem;width:auto" onclick="deleteWashRecord('${r.id}')">🗑</button>
     </div></td>
-  </tr>`}).join('');
+  </tr>`;}).join('');
 }
 
-window.filterWash=()=>{const q=document.getElementById('search-wash').value.toLowerCase(),st=document.getElementById('filter-wash-status').value;renderWashTable(allWashRecords.filter(r=>{const d=r.details||{};return(!q||r.customer_name?.toLowerCase().includes(q)||d.phone?.includes(q))&&(!st||(d.status||'pending')===st);}));};
-window.updateWashStatus=async(id,status)=>{const rec=allWashRecords.find(r=>r.id===id);if(!rec)return;const{error}=await db.from('wash_records').update({details:{...(rec.details||{}),status}}).eq('id',id);if(error){toast('Erreur: '+error.message,'error');return;}toast('Statut mis à jour','success');await loadWashRecords();};
+window.filterWash=()=>{
+  const q=document.getElementById('search-wash').value.toLowerCase();
+  const st=document.getElementById('filter-wash-status').value;
+  renderWashTable(allWashRecords.filter(r=>{
+    const d=r.details||{};
+    const ph=(r.phone||d.phone||'');
+    const rs=(r.status||d.status||'pending');
+    return (!q||r.customer_name?.toLowerCase().includes(q)||ph.includes(q))&&(!st||rs===st);
+  }));
+};
+window.updateWashStatus=async(id,status)=>{
+  const rec=allWashRecords.find(r=>r.id===id); if(!rec) return;
+  const newDetails={...(rec.details||{}),status};
+  const {error}=await db.from('wash_records').update({status, details:newDetails}).eq('id',id);
+  if(error){toast('Erreur: '+error.message,'error');return;}
+  toast('Statut mis à jour','success'); await loadWashRecords();
+};
 window.deleteWashRecord=async(id)=>{if(!confirm('Supprimer cette fiche ?'))return;const{error}=await db.from('wash_records').delete().eq('id',id);if(error){toast('Erreur: '+error.message,'error');return;}toast('Fiche supprimée','info');await loadWashRecords();loadStats();};
 
 // ============================================================
