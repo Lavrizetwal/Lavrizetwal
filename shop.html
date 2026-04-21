@@ -442,6 +442,192 @@
       color:#fbbf24;font-weight:600;margin-bottom:14px;
     }
 
+    /* ============================================================
+       PANIER — STYLES AJOUTÉS (pa touche rès)
+    ============================================================ */
+
+    /* Bouton +Panier sur la carte */
+    .pcard-add-btn {
+      display:flex;align-items:center;justify-content:center;gap:6px;
+      padding:9px 12px;border-radius:var(--radius-sm);
+      background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+      color:var(--gold);font-family:'Montserrat',sans-serif;
+      font-size:0.6rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+      cursor:pointer;transition:var(--tr);width:100%;
+    }
+    .pcard-add-btn:hover{background:rgba(201,168,76,0.2);box-shadow:0 0 12px rgba(201,168,76,0.2)}
+    .pcard-add-btn.in-cart{
+      background:rgba(201,168,76,0.18);border-color:var(--gold);
+      color:var(--gold);
+    }
+    .pcard-add-btn:active{transform:scale(0.97)}
+
+    /* Badge montant sous la carte (visible depuis la liste) */
+    .pcard-cart-badge{
+      display:none;align-items:center;justify-content:space-between;
+      padding:5px 10px;background:rgba(201,168,76,0.07);
+      border:1px solid rgba(201,168,76,0.2);border-radius:8px;
+      font-size:0.62rem;
+    }
+    .pcard-cart-badge.show{display:flex}
+    .pcard-cart-qty{
+      display:flex;align-items:center;gap:6px;
+    }
+    .pcard-qty-btn{
+      width:22px;height:22px;border-radius:50%;
+      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+      color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:var(--tr);font-family:inherit;line-height:1;
+    }
+    .pcard-qty-btn:hover{background:rgba(255,255,255,0.14)}
+    .pcard-qty-num{font-weight:800;color:#fff;min-width:16px;text-align:center}
+    .pcard-cart-subtotal{font-weight:700;color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:0.85rem}
+
+    /* Panneau panier latéral */
+    .cart-panel{
+      position:fixed;right:0;top:0;bottom:0;z-index:6000;
+      width:min(420px,100vw);
+      background:#0a0a07;border-left:1px solid rgba(201,168,76,0.2);
+      transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.165,0.84,0.44,1);
+      display:flex;flex-direction:column;
+      box-shadow:-20px 0 60px rgba(0,0,0,0.7);
+    }
+    .cart-panel.open{transform:translateX(0)}
+    .cart-panel::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,var(--gold),var(--gold-pale),var(--gold),transparent);
+    }
+
+    /* Overlay derrière le panneau */
+    .cart-overlay{
+      position:fixed;inset:0;z-index:5999;
+      background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
+      opacity:0;pointer-events:none;transition:opacity 0.3s;
+    }
+    .cart-overlay.open{opacity:1;pointer-events:all}
+
+    /* Header panier */
+    .cart-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:20px 22px;border-bottom:1px solid rgba(255,255,255,0.06);
+      flex-shrink:0;
+    }
+    .cart-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--gold)}
+    .cart-close-btn{
+      width:32px;height:32px;border-radius:50%;
+      background:rgba(255,100,100,0.08);border:1px solid rgba(255,100,100,0.2);
+      color:#ff9999;font-size:0.85rem;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:var(--tr);font-family:inherit;
+    }
+    .cart-close-btn:hover{background:rgba(255,100,100,0.2)}
+
+    /* Corps panier (scrollable) */
+    .cart-body{flex:1;overflow-y:auto;padding:16px 22px;scrollbar-width:thin;scrollbar-color:var(--gold-deep) transparent}
+    .cart-body::-webkit-scrollbar{width:3px}
+    .cart-body::-webkit-scrollbar-thumb{background:var(--gold-deep);border-radius:2px}
+    .cart-empty{
+      text-align:center;padding:60px 20px;
+      font-size:0.78rem;color:rgba(255,255,255,0.3);
+    }
+    .cart-empty-icon{font-size:3.5rem;display:block;margin-bottom:14px;opacity:0.3}
+
+    /* Item du panier */
+    .cart-item{
+      display:grid;grid-template-columns:56px 1fr auto;
+      gap:12px;align-items:center;
+      padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+      animation:fadeup 0.25s ease;
+    }
+    .cart-item-img{
+      width:56px;height:56px;border-radius:8px;object-fit:cover;
+      background:rgba(255,255,255,0.05);flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+    }
+    .cart-item-img img{width:56px;height:56px;border-radius:8px;object-fit:cover}
+    .cart-item-name{font-size:0.78rem;font-weight:700;color:#fff;margin-bottom:3px;line-height:1.3}
+    .cart-item-price{font-size:0.72rem;color:var(--gold);font-weight:600}
+    .cart-item-controls{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .cart-item-qty-btn{
+      width:24px;height:24px;border-radius:50%;
+      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+      color:#fff;font-size:0.88rem;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:var(--tr);font-family:inherit;line-height:1;
+    }
+    .cart-item-qty-btn:hover{background:rgba(255,255,255,0.15)}
+    .cart-item-qty-num{font-size:0.8rem;font-weight:800;color:#fff;min-width:18px;text-align:center}
+    .cart-item-remove{
+      width:24px;height:24px;border-radius:50%;
+      background:rgba(255,68,68,0.06);border:1px solid rgba(255,68,68,0.15);
+      color:#ff8888;font-size:0.7rem;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:var(--tr);font-family:inherit;
+    }
+    .cart-item-remove:hover{background:rgba(255,68,68,0.2)}
+
+    /* Footer panier */
+    .cart-footer{
+      padding:16px 22px;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;
+    }
+    .cart-summary{margin-bottom:14px}
+    .cart-summary-row{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:5px 0;font-size:0.72rem;color:rgba(255,255,255,0.5);
+    }
+    .cart-summary-row.total{
+      border-top:1px solid rgba(255,255,255,0.08);
+      margin-top:8px;padding-top:10px;
+    }
+    .cart-summary-row.total .cart-sum-label{font-size:0.8rem;font-weight:700;color:#fff}
+    .cart-summary-row.total .cart-sum-val{
+      font-family:'Cormorant Garamond',serif;font-size:1.5rem;
+      font-weight:700;color:var(--gold);
+    }
+    .cart-sum-label{color:rgba(255,255,255,0.5)}
+    .cart-sum-val{font-weight:700;color:#fff}
+
+    /* Bouton Commander via WA */
+    .cart-checkout-btn{
+      width:100%;padding:14px;border-radius:10px;
+      background:linear-gradient(135deg,#128C7E,#25D366);
+      color:#fff;font-family:'Montserrat',sans-serif;
+      font-size:0.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+      border:none;cursor:pointer;transition:var(--tr);
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      text-decoration:none;
+    }
+    .cart-checkout-btn:hover{box-shadow:0 0 20px rgba(37,211,102,0.4);transform:translateY(-1px)}
+    .cart-checkout-btn:disabled{opacity:0.35;cursor:not-allowed;transform:none;box-shadow:none}
+    .cart-clear-btn{
+      width:100%;padding:10px;border-radius:8px;
+      background:transparent;border:1px solid rgba(255,68,68,0.2);
+      color:rgba(255,100,100,0.6);font-family:'Montserrat',sans-serif;
+      font-size:0.6rem;font-weight:700;cursor:pointer;transition:var(--tr);margin-top:8px;
+    }
+    .cart-clear-btn:hover{background:rgba(255,68,68,0.08);color:#ff8888}
+
+    /* Bouton +Panier dans le modal produit */
+    .pmodal-btn-cart{
+      flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:13px;border-radius:10px;
+      background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+      color:var(--gold);font-family:'Montserrat',sans-serif;
+      font-size:0.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+      cursor:pointer;transition:var(--tr);
+    }
+    .pmodal-btn-cart:hover{background:rgba(201,168,76,0.2);box-shadow:0 0 15px rgba(201,168,76,0.2)}
+    .pmodal-btn-cart.in-cart{background:rgba(201,168,76,0.2);border-color:var(--gold)}
+
+    /* Pulse animation sur le nav-cart quand on ajoute */
+    @keyframes cartPulse{
+      0%{transform:scale(1)}
+      30%{transform:scale(1.15)}
+      100%{transform:scale(1)}
+    }
+    .cart-pulse{animation:cartPulse 0.35s ease}
+
   </style>
 </head>
 <body>
@@ -468,8 +654,9 @@
       <li><a href="https://zetwal.org/games.html">Jwèt</a></li>
       <li><a href="https://zetwal.org/shop.html" class="active">Shop</a></li>
     </ul>
-    <div class="nav-cart" id="nav-cart">
-      🛍️ <span id="cart-count">0</span> Sélection
+    <div class="nav-cart" id="nav-cart" onclick="openCart()" style="cursor:pointer;position:relative">
+      🛍️ <span id="cart-count">0</span>
+      <span id="cart-nav-total" style="display:none;margin-left:6px;padding:2px 10px;background:rgba(201,168,76,0.2);border-radius:12px;font-size:0.6rem;font-weight:800">0 HTG</span>
     </div>
   </div>
 </nav>
@@ -595,6 +782,39 @@
     <button class="pmodal-close" onclick="closeModal()">✕</button>
     <div id="pmodal-content"></div>
   </div>
+</div>
+
+<!-- ============================================================
+     PANIER — OVERLAY + PANNEAU LATERAL (AJOUTÉ)
+============================================================ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+
+<div class="cart-panel" id="cart-panel">
+
+  <!-- Header -->
+  <div class="cart-header">
+    <div class="cart-title">🛍️ Panye ou a</div>
+    <button class="cart-close-btn" onclick="closeCart()">✕</button>
+  </div>
+
+  <!-- Liste des articles -->
+  <div class="cart-body" id="cart-body">
+    <div class="cart-empty">
+      <span class="cart-empty-icon">🛒</span>
+      Panye ou vid.<br>Ajoute pwodwi pou kòmanse!
+    </div>
+  </div>
+
+  <!-- Résumé + checkout -->
+  <div class="cart-footer" id="cart-footer" style="display:none">
+    <div class="cart-summary" id="cart-summary"></div>
+    <a id="cart-checkout-btn" class="cart-checkout-btn" href="#" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.001-1.369l-.36-.213-3.735.861.879-3.638-.234-.375A9.788 9.788 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+      Kòmande via WhatsApp
+    </a>
+    <button class="cart-clear-btn" onclick="clearCart()">🗑 Vide panye a</button>
+  </div>
+
 </div>
 
 <!-- ============================================================
@@ -787,6 +1007,24 @@ function renderGrid(list) {
               Kontakte sou WhatsApp`
           }
         </a>
+
+        <!-- ── BOUTON + PANIER (AJOUTÉ) ── -->
+        ${!isSold ? `
+        <button class="pcard-add-btn ${cart.has(p.id)?'in-cart':''}" id="card-btn-${p.id}"
+          onclick="event.stopPropagation();cartToggle('${p.id}')">
+          ${cart.has(p.id) ? '✓ Dans le panier' : '🛍️ Ajoute nan Panye'}
+        </button>
+        <div class="pcard-cart-badge ${cart.has(p.id)?'show':''}" id="card-badge-${p.id}"
+          onclick="event.stopPropagation()">
+          <div class="pcard-cart-qty">
+            <button class="pcard-qty-btn" onclick="cartChangeQty('${p.id}',-1)">−</button>
+            <span class="pcard-qty-num" id="card-qty-${p.id}">${cart.get(p.id)?.qty||0}</span>
+            <button class="pcard-qty-btn" onclick="cartChangeQty('${p.id}',+1)">+</button>
+          </div>
+          <span class="pcard-cart-subtotal" id="card-sub-${p.id}">${formatPrice((cart.get(p.id)?.qty||0)*p.price)} HTG</span>
+        </div>
+        ` : ''}
+        <!-- ── FIN PANIER ── -->
       </div>
     </div>`;
   }).join('');
@@ -909,6 +1147,11 @@ window.openProduct = (id) => {
             </a>`
           : `<div style="flex:1;text-align:center;padding:13px;background:rgba(255,255,255,0.04);border-radius:10px;font-size:0.7rem;color:rgba(255,255,255,0.35)">🔴 Pwodwi sa a deja vendu</div>`
         }
+        ${!isSold ? `
+        <button class="pmodal-btn-cart ${cart.has(p.id)?'in-cart':''}" id="modal-cart-btn-${p.id}"
+          onclick="cartToggle('${p.id}');updateModalCartBtn('${p.id}')">
+          ${cart.has(p.id) ? '✓ Nan Panye' : '🛍️ + Panye'}
+        </button>` : ''}
         <button class="pmodal-btn-share" onclick="shareProduct('${p.id}','${escH(p.name)}')">🔗</button>
       </div>
     </div>`;
@@ -1023,6 +1266,215 @@ function initThreeJS() {
     rend.setSize(innerWidth, innerHeight);
   });
 }
+/* ============================================================
+   PANIER — SYSTÈME COMPLET (AJOUTÉ)
+   Structure: cart = Map<id, {product, qty}>
+============================================================ */
+
+// État du panier
+const cart = new Map();
+const WA_CART_NUMBER = WA_NUMBER;
+
+// ── OPEN / CLOSE ──────────────────────────────────────────────
+window.openCart = () => {
+  document.getElementById('cart-panel').classList.add('open');
+  document.getElementById('cart-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderCartPanel();
+};
+window.closeCart = () => {
+  document.getElementById('cart-panel').classList.remove('open');
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+// ── AJOUTER / RETIRER ─────────────────────────────────────────
+window.cartToggle = (id) => {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  if (cart.has(id)) {
+    cart.delete(id);
+  } else {
+    cart.set(id, { product: p, qty: 1 });
+  }
+  cartUpdateAll(id);
+  showToast(cart.has(id) ? `✅ "${p.name}" ajoute nan panye!` : `🗑 "${p.name}" retire`, 'success');
+};
+
+window.cartChangeQty = (id, delta) => {
+  if (!cart.has(id)) return;
+  const item = cart.get(id);
+  const newQty = item.qty + delta;
+  if (newQty <= 0) {
+    cart.delete(id);
+  } else {
+    const maxStock = item.product.stock_quantity ?? 999;
+    item.qty = Math.min(newQty, maxStock);
+  }
+  cartUpdateAll(id);
+};
+
+// ── MISE À JOUR GLOBALE ───────────────────────────────────────
+function cartUpdateAll(changedId) {
+  cartUpdateNavBar();
+  cartUpdateCardUI(changedId);
+  if (document.getElementById('cart-panel').classList.contains('open')) {
+    renderCartPanel();
+  }
+}
+
+// Mise à jour barre de nav (count + total)
+function cartUpdateNavBar() {
+  const totalItems = [...cart.values()].reduce((s, i) => s + i.qty, 0);
+  const totalPrice = [...cart.values()].reduce((s, i) => s + i.qty * i.product.price, 0);
+
+  const countEl = document.getElementById('cart-count');
+  const totalEl = document.getElementById('cart-nav-total');
+
+  if (countEl) countEl.textContent = totalItems;
+  if (totalEl) {
+    if (totalItems > 0) {
+      totalEl.style.display = 'inline-block';
+      totalEl.textContent = formatPrice(totalPrice) + ' HTG';
+    } else {
+      totalEl.style.display = 'none';
+    }
+  }
+
+  // Animation pulse sur le nav-cart
+  const nav = document.getElementById('nav-cart');
+  if (nav && totalItems > 0) {
+    nav.classList.remove('cart-pulse');
+    void nav.offsetWidth; // reflow
+    nav.classList.add('cart-pulse');
+  }
+}
+
+// Mise à jour visuelle de la carte dans la grille
+function cartUpdateCardUI(id) {
+  const btn    = document.getElementById(`card-btn-${id}`);
+  const badge  = document.getElementById(`card-badge-${id}`);
+  const qtyEl  = document.getElementById(`card-qty-${id}`);
+  const subEl  = document.getElementById(`card-sub-${id}`);
+
+  const item = cart.get(id);
+
+  if (btn) {
+    if (item) {
+      btn.classList.add('in-cart');
+      btn.textContent = '✓ Dans le panier';
+    } else {
+      btn.classList.remove('in-cart');
+      btn.textContent = '🛍️ Ajoute nan Panye';
+    }
+  }
+  if (badge) {
+    if (item) {
+      badge.classList.add('show');
+      if (qtyEl) qtyEl.textContent = item.qty;
+      if (subEl) subEl.textContent = formatPrice(item.qty * item.product.price) + ' HTG';
+    } else {
+      badge.classList.remove('show');
+    }
+  }
+}
+
+// Mise à jour bouton panier dans le modal
+window.updateModalCartBtn = (id) => {
+  const btn = document.getElementById(`modal-cart-btn-${id}`);
+  if (!btn) return;
+  const inCart = cart.has(id);
+  btn.textContent = inCart ? '✓ Nan Panye' : '🛍️ + Panye';
+  btn.classList.toggle('in-cart', inCart);
+};
+
+// ── RENDU DU PANNEAU PANIER ───────────────────────────────────
+function renderCartPanel() {
+  const body   = document.getElementById('cart-body');
+  const footer = document.getElementById('cart-footer');
+  if (!body) return;
+
+  if (cart.size === 0) {
+    body.innerHTML = `
+      <div class="cart-empty">
+        <span class="cart-empty-icon">🛒</span>
+        Panye ou vid.<br>Ajoute pwodwi pou kòmanse!
+      </div>`;
+    if (footer) footer.style.display = 'none';
+    return;
+  }
+
+  // Rendu des items
+  body.innerHTML = [...cart.values()].map(({ product: p, qty }) => `
+    <div class="cart-item">
+      <div class="cart-item-img">
+        ${p.image_url
+          ? `<img src="${escH(p.image_url)}" alt="${escH(p.name)}">`
+          : '📦'
+        }
+      </div>
+      <div>
+        <div class="cart-item-name">${escH(p.name)}</div>
+        <div class="cart-item-price">${formatPrice(p.price)} HTG / inite</div>
+        ${p.colors ? `<div style="font-size:0.58rem;color:rgba(201,168,76,0.5);margin-top:2px">🎨 ${escH(p.colors)}</div>` : ''}
+      </div>
+      <div class="cart-item-controls">
+        <button class="cart-item-qty-btn" onclick="cartChangeQty('${p.id}',-1)">−</button>
+        <span class="cart-item-qty-num">${qty}</span>
+        <button class="cart-item-qty-btn" onclick="cartChangeQty('${p.id}',+1)">+</button>
+        <button class="cart-item-remove" onclick="cartChangeQty('${p.id}',-999)" title="Retire">✕</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Résumé
+  const items  = [...cart.values()];
+  const nItems = items.reduce((s, i) => s + i.qty, 0);
+  const total  = items.reduce((s, i) => s + i.qty * i.product.price, 0);
+
+  const summary = document.getElementById('cart-summary');
+  if (summary) summary.innerHTML = `
+    <div class="cart-summary-row">
+      <span class="cart-sum-label">Nimewo atik</span>
+      <span class="cart-sum-val">${nItems}</span>
+    </div>
+    <div class="cart-summary-row total">
+      <span class="cart-sum-label">Total</span>
+      <span class="cart-sum-val">${formatPrice(total)} HTG</span>
+    </div>`;
+
+  // Lien WhatsApp commande
+  const checkout = document.getElementById('cart-checkout-btn');
+  if (checkout) {
+    const lines = items.map(({ product: p, qty }) =>
+      `• ${p.name} × ${qty} = ${formatPrice(qty * p.price)} HTG`
+    ).join('\n');
+    const msg = encodeURIComponent(
+      `Bonjou! Mwen vle pase yon kòmand:\n\n${lines}\n\n💰 TOTAL: ${formatPrice(total)} HTG\n\nMèsi!`
+    );
+    checkout.href = `https://wa.me/${WA_CART_NUMBER}?text=${msg}`;
+  }
+
+  if (footer) footer.style.display = 'block';
+}
+
+// ── VIDER LE PANIER ───────────────────────────────────────────
+window.clearCart = () => {
+  const ids = [...cart.keys()];
+  cart.clear();
+  ids.forEach(id => cartUpdateCardUI(id));
+  cartUpdateNavBar();
+  renderCartPanel();
+  showToast('Panye vid!', 'info');
+};
+
+// ── ESCAPE ferme aussi le panier ──────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('cart-panel')?.classList.contains('open')) {
+    closeCart();
+  }
+});
+
 </script>
 </body>
 </html>
