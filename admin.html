@@ -305,12 +305,18 @@
       <div class="stat-pill"><div class="stat-label">Disponibles</div><div class="stat-value" id="stat-avail" style="color:var(--green)">—</div></div>
       <div class="stat-pill"><div class="stat-label">Vendus</div><div class="stat-value" id="stat-sold" style="color:var(--red)">—</div></div>
       <div class="stat-pill"><div class="stat-label">Fiches Lavage</div><div class="stat-value" id="stat-wash">—</div></div>
+      <div class="stat-pill"><div class="stat-label">Total Ventes</div><div class="stat-value" id="stat-sales-count" style="color:var(--blue)">—</div></div>
+      <div class="stat-pill"><div class="stat-label">Revenus Ventes</div><div class="stat-value" id="stat-sales-revenue" style="color:var(--gold);font-size:1rem">—</div></div>
+      <div class="stat-pill"><div class="stat-label">Commandes</div><div class="stat-value" id="stat-orders-count" style="color:#fbbf24">—</div></div>
     </div>
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('products')">📦 Produits</button>
       <button class="tab-btn" onclick="switchTab('coming')">🕐 À Venir</button>
       <button class="tab-btn" onclick="switchTab('add')">➕ Ajouter</button>
+      <button class="tab-btn" onclick="switchTab('sales')">💰 Ventes</button>
+      <button class="tab-btn" onclick="switchTab('orders')">📋 Commandes</button>
+      <button class="tab-btn" onclick="switchTab('notifications')">🔔 Notifications</button>
       <button class="tab-btn" onclick="switchTab('scan')">📷 Scanner QR</button>
       <button class="tab-btn" onclick="switchTab('wash')">🧾 Fiche Lavage</button>
       <button class="tab-btn" onclick="switchTab('history')">📋 Historique</button>
@@ -580,6 +586,80 @@
     <div class="tab-panel" id="tab-analytics"></div>
     <div class="tab-panel" id="tab-calculator"></div>
 
+    <!-- ═══ VENTES ═══ -->
+    <div class="tab-panel" id="tab-sales">
+      <div class="card">
+        <div class="card-title">💰 Historique des Ventes</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <input type="text" id="search-sales" class="auth-input" placeholder="Rechercher produit, client..." style="flex:1;min-width:180px;margin-bottom:0" oninput="filterSales()">
+          <input type="date" id="filter-sales-date" class="auth-input" style="width:auto;margin-bottom:0" onchange="filterSales()">
+          <button class="btn btn-outline" style="width:auto" onclick="loadSales()">↺ Rafraîchir</button>
+        </div>
+        <!-- KPIs ventes -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px" id="sales-kpis">
+          <div style="flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px">
+            <div style="font-size:0.58rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Nb Ventes</div>
+            <div id="kpi-sales-nb" style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--blue)">—</div>
+          </div>
+          <div style="flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px">
+            <div style="font-size:0.58rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Unités vendues</div>
+            <div id="kpi-sales-units" style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--green)">—</div>
+          </div>
+          <div style="flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px">
+            <div style="font-size:0.58rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Revenus Totaux</div>
+            <div id="kpi-sales-rev" style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--gold)">—</div>
+          </div>
+          <div style="flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px">
+            <div style="font-size:0.58rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Revenus Commandés</div>
+            <div id="kpi-sales-orders-rev" style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:#fbbf24">—</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Prix/u</th><th>Total</th><th>Client</th><th>Date</th><th>Statut</th></tr></thead>
+            <tbody id="sales-table-body"><tr><td colspan="8" style="color:var(--text-muted);padding:20px">Chargement...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ COMMANDES ═══ -->
+    <div class="tab-panel" id="tab-orders">
+      <div class="card">
+        <div class="card-title">📋 Commandes / Précommandes</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <input type="text" id="search-orders" class="auth-input" placeholder="Rechercher client, produit..." style="flex:1;min-width:180px;margin-bottom:0" oninput="filterOrders()">
+          <select id="filter-orders-status" class="auth-input" style="width:auto;margin-bottom:0" onchange="filterOrders()">
+            <option value="">Tous statuts</option>
+            <option value="pending">En attente</option>
+            <option value="accepted">Acceptées</option>
+            <option value="refused">Refusées</option>
+          </select>
+          <button class="btn btn-outline" style="width:auto" onclick="loadOrders()">↺ Rafraîchir</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Client</th><th>Produit</th><th>Qté</th><th>Prix estimé</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody id="orders-table-body"><tr><td colspan="7" style="color:var(--text-muted);padding:20px">Chargement...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ NOTIFICATIONS ═══ -->
+    <div class="tab-panel" id="tab-notifications">
+      <div class="card">
+        <div class="card-title">🔔 Notifications</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn btn-outline" style="width:auto" onclick="markAllNotifsRead()">✓ Tout marquer lu</button>
+          <button class="btn btn-outline" style="width:auto" onclick="loadNotifications()">↺ Rafraîchir</button>
+        </div>
+        <div id="notif-list" style="display:flex;flex-direction:column;gap:10px">
+          <div style="color:var(--text-muted);font-size:0.75rem;padding:20px">Chargement...</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ═══ PARAMÈTRES — CITASYON + STATUT MAGAZEN ═══ -->
     <div class="tab-panel" id="tab-settings">
 
@@ -689,6 +769,8 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser=null, allProducts=[], allWashRecords=[], currentImageFile=null;
 let scannedProductId=null, qrScanner=null, lastSavedProduct=null;
+// ── Nouvelles listes globales ────────────────────────────────
+let allSales=[], allOrders=[], allNotifications=[];
 let auth = null;
 
 // ============================================================
@@ -728,7 +810,7 @@ async function onUserChange(user) {
   currentUser = user;
   hide('auth-wall'); hide('denied-wall'); showEl('app');
   document.getElementById('nav-email').textContent = user.email;
-  await Promise.all([loadProducts(), loadWashRecords()]);
+  await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications()]);
   loadStats();
 }
 
@@ -829,7 +911,7 @@ window.handleLogin = async () => {
     document.getElementById('denied-wall').classList.remove('show');
     document.getElementById('app').classList.add('show');
     document.getElementById('nav-email').textContent = data.email;
-    await Promise.all([loadProducts(), loadWashRecords()]);
+    await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications()]);
     loadStats();
 
   } catch(fetchErr) {
@@ -1174,7 +1256,9 @@ window.confirmSellQty = async () => {
 
   const newStock = Math.max(0, stockCurrent - qty);
   const newStatus = newStock <= 0 ? 'coming' : 'available';
+  const totalPrice = qty * (p.price || 0);
 
+  // 1. Mettre à jour le stock produit
   const {error} = await db.from('products').update({
     stock_quantity: newStock,
     status: newStatus,
@@ -1183,10 +1267,41 @@ window.confirmSellQty = async () => {
 
   if(error){toast('Erreur: '+error.message,'error');return;}
 
-  toast(`✅ ${qty} unité(s) vendue(s) — Stock restant: ${newStock}`, 'success');
+  // 2. Enregistrer la vente dans la table sales
+  const {error: saleErr} = await db.from('sales').insert({
+    product_id:    id,
+    product_name:  p.name,
+    product_price: p.price || 0,
+    quantity_sold: qty,
+    total_price:   totalPrice,
+    client_name:   currentUser?.email || 'Admin',
+    client_email:  currentUser?.email || null,
+    status:        'validated'
+  });
+  if(saleErr) console.error('Sale record error:', saleErr.message);
+
+  // 3. Notification admin : vente validée
+  await createNotification('new_sale',
+    `💰 Vente validée — ${p.name}`,
+    `${qty} unité(s) vendue(s) × ${fmtP(p.price)} HTG = ${fmtP(totalPrice)} HTG`,
+    'admin', { product_id: id }
+  );
+
+  // 4. Notification rupture si stock = 0
+  if(newStock === 0){
+    await createNotification('out_of_stock',
+      `⚠️ Rupture de stock — ${p.name}`,
+      `Le stock est à 0. Pensez à réapprovisionner ou déplacer en "À venir".`,
+      'admin', { product_id: id }
+    );
+  }
+
+  toast(`✅ ${qty} unité(s) vendue(s) — Stock restant: ${newStock} — Vente enregistrée`, 'success');
   closeModal('sell-qty-modal');
   sellQtyProductId = null;
-  await loadProducts(); loadStats();
+  await loadProducts();
+  await loadSales();
+  loadStats();
 };
 
 // Vente simple (depuis modal détail)
@@ -1434,21 +1549,43 @@ function loadStats(){
   const comingCount = allProducts.filter(p=>p.status==='coming'||(p.stock_quantity===0&&p.status==='available')).length;
   const comingBtn = document.querySelector('.tab-btn[onclick*="coming"]');
   if(comingBtn && comingCount>0) comingBtn.innerHTML = `🕐 À Venir <span style="background:rgba(251,191,36,0.3);border-radius:10px;padding:1px 7px;font-size:0.6rem;margin-left:4px">${comingCount}</span>`;
+  // Stats ventes depuis allSales
+  const salesCount   = allSales.length;
+  const salesRevenue = allSales.reduce((s,v)=>s+(v.total_price||0),0);
+  const ordersCount  = allOrders.filter(o=>o.status==='pending').length;
+  const salesNbEl = document.getElementById('stat-sales-count');
+  const salesRvEl = document.getElementById('stat-sales-revenue');
+  const ordersEl  = document.getElementById('stat-orders-count');
+  if(salesNbEl) salesNbEl.textContent = salesCount;
+  if(salesRvEl) salesRvEl.textContent = fmtP(salesRevenue)+' HTG';
+  if(ordersEl)  ordersEl.textContent  = ordersCount;
+  // Badge notifications non lues
+  const unreadNotifs = allNotifications.filter(n=>!n.read).length;
+  const notifBtn = document.querySelector('.tab-btn[onclick*="notifications"]');
+  if(notifBtn) notifBtn.innerHTML = unreadNotifs>0
+    ? `🔔 Notifications <span style="background:rgba(255,68,68,0.4);border-radius:10px;padding:1px 7px;font-size:0.6rem;margin-left:4px">${unreadNotifs}</span>`
+    : `🔔 Notifications`;
+  // Badge commandes en attente
+  const ordersBtn = document.querySelector('.tab-btn[onclick*="\'orders\'"]');
+  if(ordersBtn && ordersCount>0) ordersBtn.innerHTML = `📋 Commandes <span style="background:rgba(251,191,36,0.3);border-radius:10px;padding:1px 7px;font-size:0.6rem;margin-left:4px">${ordersCount}</span>`;
 }
 
 window.switchTab=(name)=>{
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    const tabs=['products','coming','add','scan','wash','history','analytics','calculator','settings'];
+    const tabs=['products','coming','add','sales','orders','notifications','scan','wash','history','analytics','calculator','settings'];
     b.classList.toggle('active',tabs[i]===name);
   });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   const panel=document.getElementById('tab-'+name); if(panel) panel.classList.add('active');
-  if(name==='products') loadProducts();
-  if(name==='coming')   { loadProducts(); }
-  if(name==='history')  loadWashRecords();
-  if(name==='analytics')  initAnalytics();
-  if(name==='calculator') initCalculator();
-  if(name==='settings')   initSettings();
+  if(name==='products')      loadProducts();
+  if(name==='coming')        loadProducts();
+  if(name==='sales')         { loadSales(); }
+  if(name==='orders')        { loadOrders(); }
+  if(name==='notifications') { loadNotifications(); }
+  if(name==='history')       loadWashRecords();
+  if(name==='analytics')     initAnalytics();
+  if(name==='calculator')    initCalculator();
+  if(name==='settings')      initSettings();
   if(name!=='scan'&&qrScanner) stopScanner();
 };
 
@@ -1646,67 +1783,7 @@ async function initAnalytics(){
   await refreshAnalytics();
 }
 
-async function refreshAnalytics(){
-  if(!allProducts.length)    await loadProducts();
-  if(!allWashRecords.length) await loadWashRecords();
-  // KPIs
-  const grid=document.getElementById('kpi-grid'); if(!grid) return;
-  const sold=allProducts.filter(p=>p.status==='sold'), avail=allProducts.filter(p=>p.status==='available');
-  const sR=sold.reduce((s,p)=>s+(p.price||0),0), wR=allWashRecords.reduce((s,r)=>s+(r.details?.amount_htg||0),0);
-  const today=new Date().toDateString(), tn=allProducts.filter(p=>new Date(p.created_at).toDateString()===today).length;
-  grid.innerHTML=[
-    {label:'Revenus Produits',val:fmtP(sR)+' HTG',icon:'💰',color:'#ffd700',sub:sold.length+' vendus'},
-    {label:'Revenus Lavage',val:fmtP(wR)+' HTG',icon:'🧺',color:'#00b4ff',sub:allWashRecords.length+' fiches'},
-    {label:'Revenus Totaux',val:fmtP(sR+wR)+' HTG',icon:'📊',color:'#00ff88',sub:'Tout combiné'},
-    {label:'Stock Potentiel',val:fmtP(avail.reduce((s,p)=>s+(p.price||0),0))+' HTG',icon:'📦',color:'#a855f7',sub:avail.length+' produits'},
-    {label:"Ajouts Aujourd'hui",val:tn,icon:'✨',color:'#ff6b9d',sub:'nouveaux produits'},
-    {label:'Total Produits',val:allProducts.length,icon:'🗂️',color:'#fbbf24',sub:sold.length+' vendus · '+avail.length+' dispo'},
-  ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-icon">${k.icon}</div><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
 
-  Object.values(acharts).forEach(c=>{try{c.destroy();}catch(e){}});acharts={};
-
-  const tc='rgba(255,255,255,0.5)', gc='rgba(255,255,255,0.07)';
-  const CO={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc,font:{family:'Montserrat',size:11}}}},scales:{x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},beginAtZero:true}}};
-
-  // Doughnut statut
-  const e1=document.getElementById('ch-status'); if(e1) acharts.s=new Chart(e1,{type:'doughnut',data:{labels:['Disponible','Vendu','À venir'],datasets:[{data:[avail.length,sold.length,allProducts.filter(p=>p.status==='coming').length],backgroundColor:['rgba(0,255,136,0.85)','rgba(255,68,68,0.85)','rgba(251,191,36,0.85)'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{color:tc,font:{family:'Montserrat',size:11}}}}}});
-
-  // Catégories
-  const ec=document.getElementById('ch-category');
-  if(ec){
-    const cats={};
-    allProducts.forEach(p=>{ const c=p.category||'Sans catégorie'; cats[c]=(cats[c]||0)+1; });
-    const catSorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,8);
-    acharts.c=new Chart(ec,{type:'bar',data:{labels:catSorted.map(([k])=>k),datasets:[
-      {label:'Total',data:catSorted.map(([,v])=>v),backgroundColor:'rgba(255,215,0,0.7)',borderRadius:6},
-      {label:'Vendus',data:catSorted.map(([k])=>allProducts.filter(p=>p.category===k&&p.status==='sold').length),backgroundColor:'rgba(0,255,136,0.7)',borderRadius:6}
-    ]},options:CO});
-  }
-
-  // Heures
-  const e2=document.getElementById('ch-hours');
-  if(e2){const h=Array(24).fill(0);allProducts.forEach(p=>{const hh=new Date(p.created_at).getHours();if(!isNaN(hh))h[hh]++;});const mx=Math.max(...h);
-    acharts.h=new Chart(e2,{type:'bar',data:{labels:h.map((_,i)=>i+'h'),datasets:[{label:'Ajouts',data:h,backgroundColor:h.map(v=>v===mx&&v>0?'rgba(255,215,0,0.85)':'rgba(255,215,0,0.22)'),borderRadius:4}]},options:{...CO,plugins:{legend:{display:false}}}});}
-
-  // Timeline
-  const e3=document.getElementById('ch-timeline');
-  if(e3){const now=new Date(),days=[];for(let i=29;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
-    const cd={},sd={};days.forEach(d=>{cd[d]=0;sd[d]=0;});allProducts.forEach(p=>{const d=p.created_at?.split('T')[0];if(d&&cd[d]!==undefined){cd[d]++;if(p.status==='sold')sd[d]++;}});
-    acharts.t=new Chart(e3,{type:'line',data:{labels:days.map(d=>new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})),datasets:[{label:'Ajoutés',data:days.map(d=>cd[d]),borderColor:'rgba(255,215,0,0.85)',backgroundColor:'rgba(255,215,0,0.08)',fill:true,tension:0.4,pointRadius:3},{label:'Vendus',data:days.map(d=>sd[d]),borderColor:'rgba(0,255,136,0.85)',backgroundColor:'rgba(0,255,136,0.06)',fill:true,tension:0.4,pointRadius:3}]},options:CO});}
-
-  // Lavage polar
-  const e4=document.getElementById('ch-wash');
-  if(e4){const t={standard:0,express:0,dry:0,folding:0,draps:0};allWashRecords.forEach(r=>{const tt=r.details?.service_type||'standard';if(t[tt]!==undefined)t[tt]++;});const ent=Object.entries(t).filter(([,v])=>v>0);
-    if(!ent.length){e4.parentElement.innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);font-size:0.75rem">Aucune fiche</div>';}
-    else acharts.w=new Chart(e4,{type:'polarArea',data:{labels:ent.map(([k])=>({standard:'Standard',express:'Express',dry:'Séchage',folding:'Complet',draps:'Draps'})[k]||k),datasets:[{data:ent.map(([,v])=>v),backgroundColor:['rgba(0,180,255,0.85)','rgba(255,215,0,0.85)','rgba(0,255,136,0.85)','rgba(168,85,247,0.85)','rgba(255,105,180,0.85)'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:tc,font:{size:10}}}},scales:{r:{ticks:{color:tc,font:{size:9}},grid:{color:gc}}}}});}
-
-  // Top produits
-  const tp=document.getElementById('top-products-tbl');
-  if(tp){const s=[...allProducts].sort((a,b)=>(b.price||0)-(a.price||0)).slice(0,6);
-    if(!s.length){tp.innerHTML='<div style="color:var(--text-muted);font-size:0.75rem;padding:10px">Aucun produit.</div>';}
-    else tp.innerHTML=`<table class="top-table"><thead><tr><th>#</th><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th></tr></thead><tbody>${s.map((p,i)=>`<tr><td><span class="rank-badge ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${i+1}</span></td><td style="font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(p.name)}</td><td style="font-size:0.68rem;color:var(--text-muted)">${escH(p.category||'—')}</td><td style="color:var(--gold);font-weight:700">${fmtP(p.price)} HTG</td><td style="font-size:0.68rem">${p.stock_quantity??0}</td><td><span class="product-status ${p.status==='sold'?'status-sold':'status-available'}">${p.status==='sold'?'● Vendu':'● Dispo'}</span></td></tr>`).join('')}</tbody></table>`;}
-}
-window.refreshAnalytics=refreshAnalytics;
 
 // ============================================================
 // CALCULATRICE
@@ -1793,7 +1870,311 @@ window.cLoadStock=()=>{const t=allProducts.filter(p=>p.status==='available').red
 window.f1=()=>{const px=parseFloat(document.getElementById('f1-prix')?.value)||0,qt=parseFloat(document.getElementById('f1-qty')?.value)||0,res=px*qt;const el=document.getElementById('f1-result');if(el){el.style.display='flex';document.getElementById('f1-val').textContent=fmtP(res)+' HTG';}cExpr=String(res);cDisp=cFmt(res);cUnit='HTG';cUpd();};
 window.f2=()=>{const date=document.getElementById('f2-date')?.value;if(!date)return;const dp=allProducts.filter(p=>p.created_at?.startsWith(date)&&p.status==='sold'),dw=allWashRecords.filter(r=>r.created_at?.startsWith(date));const pr=dp.reduce((s,p)=>s+(p.price||0),0),wr=dw.reduce((s,r)=>s+(r.details?.amount_htg||0),0),tot=pr+wr;const el=document.getElementById('f2-result');if(el){el.style.display='flex';document.getElementById('f2-val').textContent=fmtP(tot)+' HTG';document.getElementById('f2-detail').textContent=`Produits: ${fmtP(pr)} HTG (${dp.length}) · Lavage: ${fmtP(wr)} HTG (${dw.length})`;}cExpr=String(tot);cDisp=cFmt(tot);cUnit='HTG — Jour';cUpd();};
 window.f3=()=>{const v=parseFloat(document.getElementById('f3-vente')?.value)||0,c=parseFloat(document.getElementById('f3-cout')?.value)||0,m=v-c,p=v>0?((m/v)*100).toFixed(1):0;const el=document.getElementById('f3-result');if(el){el.style.display='flex';document.getElementById('f3-htg').textContent=fmtP(m)+' HTG';document.getElementById('f3-pct').textContent=p+'%';document.getElementById('f3-pct').style.color=m>=0?'var(--green)':'var(--red)';}cExpr=String(m);cDisp=cFmt(m);cUnit='HTG — Marge';cUpd();};
-window.f4=()=>{const el=document.getElementById('f4-result');if(!el)return;const sold=allProducts.filter(p=>p.status==='sold'),avail=allProducts.filter(p=>p.status==='available');const sR=sold.reduce((s,p)=>s+(p.price||0),0),aR=avail.reduce((s,p)=>s+(p.price||0),0),wR=allWashRecords.reduce((s,r)=>s+(r.details?.amount_htg||0),0),tot=sR+wR;el.style.display='block';el.innerHTML=[{l:'💰 Revenus Produits',v:fmtP(sR)+' HTG',c:'var(--gold)'},{l:'🧺 Revenus Lavage',v:fmtP(wR)+' HTG',c:'var(--blue)'},{l:'📊 Revenus Totaux',v:fmtP(tot)+' HTG',c:'var(--green)',b:true},{l:'📦 Valeur Stock',v:fmtP(aR)+' HTG',c:'var(--text-muted)'},{l:'📈 Taux de Vente',v:allProducts.length>0?((sold.length/allProducts.length)*100).toFixed(1)+'%':'0%',c:'var(--green)'}].map(r=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:0.72rem;color:var(--text-muted)">${r.l}</span><span style="font-size:0.78rem;font-weight:${r.b?'800':'700'};color:${r.c}">${r.v}</span></div>`).join('');};
+window.f4=()=>{const el=document.getElementById('f4-result');if(!el)return;const sold=allProducts.filter(p=>p.status==='sold'),avail=allProducts.filter(p=>p.status==='available');const sR=allSales.reduce((s,v)=>s+(v.total_price||0),0),aR=avail.reduce((s,p)=>s+(p.price||0),0),wR=allWashRecords.reduce((s,r)=>s+(r.details?.amount_htg||0),0),oR=allOrders.filter(o=>o.status==='accepted').reduce((s,o)=>s+(o.total_estimated||0),0),tot=sR+wR;el.style.display='block';el.innerHTML=[{l:'💰 Revenus Ventes',v:fmtP(sR)+' HTG',c:'var(--gold)'},{l:'🧺 Revenus Lavage',v:fmtP(wR)+' HTG',c:'var(--blue)'},{l:'📊 Revenus Totaux',v:fmtP(tot)+' HTG',c:'var(--green)',b:true},{l:'📋 Commandes Acceptées',v:fmtP(oR)+' HTG',c:'#fbbf24'},{l:'📦 Valeur Stock',v:fmtP(aR)+' HTG',c:'var(--text-muted)'},{l:'📈 Nb Ventes',v:allSales.length,c:'var(--blue)'}].map(r=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font-size:0.72rem;color:var(--text-muted)">${r.l}</span><span style="font-size:0.78rem;font-weight:${r.b?'800':'700'};color:${r.c}">${r.v}</span></div>`).join('');};
+
+// ============================================================
+// VENTES — loadSales, renderSalesTable, filterSales
+// ============================================================
+async function loadSales(){
+  try {
+    const {data,error}=await db.from('sales').select('*').order('created_at',{ascending:false}).limit(500);
+    if(error) throw error;
+    allSales = data||[];
+    renderSalesTable(allSales);
+    updateSalesKPIs();
+  } catch(e){ console.error('loadSales:',e.message); }
+}
+
+function updateSalesKPIs(){
+  const nb  = allSales.length;
+  const units = allSales.reduce((s,v)=>s+(v.quantity_sold||0),0);
+  const rev   = allSales.reduce((s,v)=>s+(v.total_price||0),0);
+  const ordRev= allOrders.filter(o=>o.status==='accepted').reduce((s,o)=>s+(o.total_estimated||0),0);
+  const e1=document.getElementById('kpi-sales-nb');    if(e1) e1.textContent=nb;
+  const e2=document.getElementById('kpi-sales-units'); if(e2) e2.textContent=units;
+  const e3=document.getElementById('kpi-sales-rev');   if(e3) e3.textContent=fmtP(rev)+' HTG';
+  const e4=document.getElementById('kpi-sales-orders-rev'); if(e4) e4.textContent=fmtP(ordRev)+' HTG';
+}
+
+function renderSalesTable(list){
+  const tbody=document.getElementById('sales-table-body');
+  if(!tbody) return;
+  if(!list.length){tbody.innerHTML='<tr><td colspan="8" style="color:var(--text-muted);padding:20px">Aucune vente enregistrée.</td></tr>';return;}
+  tbody.innerHTML=list.map((v,i)=>`<tr>
+    <td style="color:var(--text-muted);font-size:0.65rem">${i+1}</td>
+    <td style="font-weight:600;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(v.product_name||'—')}</td>
+    <td style="text-align:center">${v.quantity_sold??0}</td>
+    <td style="color:var(--text-muted)">${fmtP(v.product_price||0)} HTG</td>
+    <td style="color:var(--gold);font-weight:700">${fmtP(v.total_price||0)} HTG</td>
+    <td style="font-size:0.68rem;color:var(--text-muted)">${escH(v.client_name||'—')}</td>
+    <td style="font-size:0.65rem;color:var(--text-muted)">${v.created_at?new Date(v.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—'}</td>
+    <td><span style="background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:2px 8px;font-size:0.58rem;font-weight:700">✅ Validée</span></td>
+  </tr>`).join('');
+}
+
+window.filterSales=()=>{
+  const q   = document.getElementById('search-sales')?.value.toLowerCase().trim()||'';
+  const date= document.getElementById('filter-sales-date')?.value||'';
+  let list  = allSales.filter(v=>{
+    const mQ = !q || v.product_name?.toLowerCase().includes(q) || v.client_name?.toLowerCase().includes(q);
+    const mD = !date|| v.created_at?.startsWith(date);
+    return mQ&&mD;
+  });
+  renderSalesTable(list);
+};
+
+// ============================================================
+// COMMANDES — loadOrders, renderOrdersTable, accept/refuse
+// ============================================================
+async function loadOrders(){
+  try {
+    const {data,error}=await db.from('orders').select('*').order('created_at',{ascending:false}).limit(200);
+    if(error) throw error;
+    allOrders = data||[];
+    renderOrdersTable(allOrders);
+  } catch(e){ console.error('loadOrders:',e.message); }
+}
+
+function renderOrdersTable(list){
+  const tbody=document.getElementById('orders-table-body');
+  if(!tbody) return;
+  if(!list.length){tbody.innerHTML='<tr><td colspan="7" style="color:var(--text-muted);padding:20px">Aucune commande.</td></tr>';return;}
+  const statusStyle={
+    pending: 'background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.25)',
+    accepted:'background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2)',
+    refused: 'background:rgba(255,68,68,0.1);color:var(--red);border:1px solid rgba(255,68,68,0.2)'
+  };
+  const statusLabel={pending:'🕐 En attente',accepted:'✅ Acceptée',refused:'❌ Refusée'};
+  tbody.innerHTML=list.map(o=>`<tr>
+    <td>
+      <div style="font-weight:600">${escH(o.client_name||'—')}</div>
+      <div style="font-size:0.62rem;color:var(--text-muted)">${escH(o.client_email||o.client_phone||'')}</div>
+    </td>
+    <td style="font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(o.product_name||'—')}</td>
+    <td style="text-align:center">${o.quantity??1}</td>
+    <td style="color:var(--gold);font-weight:700">${fmtP(o.total_estimated||0)} HTG</td>
+    <td style="font-size:0.65rem;color:var(--text-muted)">${o.created_at?new Date(o.created_at).toLocaleDateString('fr-FR'):'—'}</td>
+    <td><span style="${statusStyle[o.status]||''};border-radius:10px;padding:3px 10px;font-size:0.6rem;font-weight:700">${statusLabel[o.status]||o.status}</span></td>
+    <td>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${o.status==='pending'?`
+          <button class="btn btn-green" style="padding:4px 10px;font-size:0.55rem;width:auto" onclick="acceptOrder('${o.id}')">✅ Accepter</button>
+          <button class="btn btn-red"   style="padding:4px 10px;font-size:0.55rem;width:auto" onclick="refuseOrder('${o.id}')">❌ Refuser</button>
+        `:''}
+        <button class="btn btn-outline" style="padding:4px 8px;font-size:0.55rem;width:auto" onclick="deleteOrder('${o.id}')">🗑</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+window.filterOrders=()=>{
+  const q  = document.getElementById('search-orders')?.value.toLowerCase().trim()||'';
+  const st = document.getElementById('filter-orders-status')?.value||'';
+  renderOrdersTable(allOrders.filter(o=>{
+    const mQ = !q || o.product_name?.toLowerCase().includes(q) || o.client_name?.toLowerCase().includes(q);
+    const mS = !st|| o.status===st;
+    return mQ&&mS;
+  }));
+};
+
+window.acceptOrder=async(id)=>{
+  const o=allOrders.find(x=>x.id===id); if(!o) return;
+  const {error}=await db.from('orders').update({status:'accepted',updated_at:new Date().toISOString()}).eq('id',id);
+  if(error){toast('Erreur: '+error.message,'error');return;}
+  // Notification pour le client
+  if(o.client_email){
+    await createNotification('order_accepted',
+      `✅ Commande acceptée — ${o.product_name}`,
+      `Votre commande de ${o.quantity} unité(s) a été acceptée. Prix estimé: ${fmtP(o.total_estimated)} HTG`,
+      `client:${o.client_email}`, {order_id:id}
+    );
+  }
+  toast('Commande acceptée — Client notifié','success');
+  await loadOrders(); loadStats();
+};
+
+window.refuseOrder=async(id)=>{
+  const o=allOrders.find(x=>x.id===id); if(!o) return;
+  const reason=prompt('Raison du refus (optionnel):','')||'';
+  const {error}=await db.from('orders').update({status:'refused',admin_note:reason,updated_at:new Date().toISOString()}).eq('id',id);
+  if(error){toast('Erreur: '+error.message,'error');return;}
+  if(o.client_email){
+    await createNotification('order_refused',
+      `❌ Commande refusée — ${o.product_name}`,
+      reason||'Votre commande n\'a pas pu être acceptée.',
+      `client:${o.client_email}`, {order_id:id}
+    );
+  }
+  toast('Commande refusée','info');
+  await loadOrders(); loadStats();
+};
+
+window.deleteOrder=async(id)=>{
+  if(!confirm('Supprimer cette commande ?'))return;
+  await db.from('orders').delete().eq('id',id);
+  toast('Commande supprimée','info');
+  await loadOrders(); loadStats();
+};
+
+// ============================================================
+// NOTIFICATIONS — load, render, mark read
+// ============================================================
+async function loadNotifications(){
+  try {
+    const {data,error}=await db.from('notifications')
+      .select('*')
+      .eq('target','admin')
+      .order('created_at',{ascending:false})
+      .limit(100);
+    if(error) throw error;
+    allNotifications = data||[];
+    renderNotifList(allNotifications);
+    loadStats(); // mise à jour badge
+  } catch(e){ console.error('loadNotifications:',e.message); }
+}
+
+function renderNotifList(list){
+  const container=document.getElementById('notif-list');
+  if(!container) return;
+  if(!list.length){container.innerHTML='<div style="color:var(--text-muted);font-size:0.75rem;padding:20px;text-align:center">Aucune notification.</div>';return;}
+  const typeIcon={
+    new_sale:'💰', new_order:'📋', out_of_stock:'⚠️',
+    product_arrived:'📦', order_accepted:'✅', order_refused:'❌', sale_confirmed:'🛍️'
+  };
+  container.innerHTML=list.map(n=>`
+    <div onclick="markNotifRead('${n.id}')" style="
+      display:flex;gap:14px;align-items:flex-start;
+      padding:14px 16px;border-radius:var(--radius-sm);cursor:pointer;
+      background:${n.read?'rgba(255,255,255,0.02)':'rgba(255,215,0,0.05)'};
+      border:1px solid ${n.read?'rgba(255,255,255,0.05)':'rgba(255,215,0,0.15)'};
+      transition:var(--tr);
+    " onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='${n.read?'rgba(255,255,255,0.02)':'rgba(255,215,0,0.05)'}'">
+      <div style="font-size:1.4rem;flex-shrink:0;margin-top:2px">${typeIcon[n.type]||'🔔'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:0.8rem;font-weight:700;color:${n.read?'var(--text-muted)':'#fff'};margin-bottom:4px">${escH(n.title)}</div>
+        <div style="font-size:0.7rem;color:var(--text-muted);line-height:1.5">${escH(n.message)}</div>
+        <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:6px">${n.created_at?new Date(n.created_at).toLocaleString('fr-FR'):'—'}</div>
+      </div>
+      ${!n.read?'<div style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px"></div>':''}
+    </div>`).join('');
+}
+
+window.markNotifRead=async(id)=>{
+  await db.from('notifications').update({read:true}).eq('id',id);
+  const n=allNotifications.find(x=>x.id===id);
+  if(n) n.read=true;
+  renderNotifList(allNotifications);
+  loadStats();
+};
+
+window.markAllNotifsRead=async()=>{
+  await db.from('notifications').update({read:true}).eq('target','admin').eq('read',false);
+  allNotifications.forEach(n=>n.read=true);
+  renderNotifList(allNotifications);
+  loadStats();
+  toast('Toutes les notifications lues','success');
+};
+
+// ============================================================
+// HELPER — Créer une notification
+// ============================================================
+async function createNotification(type, title, message, target='admin', metadata={}){
+  try {
+    await db.from('notifications').insert({
+      type, title, message, target,
+      metadata: metadata||{},
+      read: false
+    });
+    // Rafraîchir le badge si panel admin visible
+    if(target==='admin'){
+      const {data}=await db.from('notifications').select('id').eq('target','admin').eq('read',false);
+      allNotifications = data ? [...data, ...allNotifications.filter(n=>n.read)] : allNotifications;
+      loadStats();
+    }
+  } catch(e){ console.error('createNotification:',e.message); }
+}
+
+// ============================================================
+// MISE À JOUR ANALYTICS avec données ventes réelles
+// ============================================================
+async function refreshAnalytics(){
+  if(!allProducts.length)      await loadProducts();
+  if(!allWashRecords.length)   await loadWashRecords();
+  if(!allSales.length)         await loadSales();
+
+  const grid=document.getElementById('kpi-grid'); if(!grid) return;
+
+  const sold  = allProducts.filter(p=>p.status==='sold');
+  const avail = allProducts.filter(p=>p.status==='available');
+  // Revenus réels depuis table sales
+  const sR    = allSales.reduce((s,v)=>s+(v.total_price||0),0);
+  const wR    = allWashRecords.reduce((s,r)=>s+(r.details?.amount_htg||r.amount_htg||0),0);
+  const today = new Date().toDateString();
+  const tn    = allProducts.filter(p=>new Date(p.created_at).toDateString()===today).length;
+  const ordPending = allOrders.filter(o=>o.status==='pending').length;
+
+  grid.innerHTML=[
+    {label:'Revenus Ventes',  val:fmtP(sR)+' HTG',   icon:'💰',color:'#ffd700',sub:allSales.length+' ventes enregistrées'},
+    {label:'Revenus Lavage',  val:fmtP(wR)+' HTG',   icon:'🧺',color:'#00b4ff',sub:allWashRecords.length+' fiches'},
+    {label:'Revenus Totaux',  val:fmtP(sR+wR)+' HTG',icon:'📊',color:'#00ff88',sub:'Tout combiné'},
+    {label:'Stock Potentiel', val:fmtP(avail.reduce((s,p)=>s+(p.price||0),0))+' HTG',icon:'📦',color:'#a855f7',sub:avail.length+' produits'},
+    {label:'Commandes Attente',val:ordPending,         icon:'📋',color:'#fbbf24',sub:'à traiter'},
+    {label:"Ajouts Aujourd'hui",val:tn,                icon:'✨',color:'#ff6b9d',sub:'nouveaux produits'},
+  ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-icon">${k.icon}</div><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  Object.values(acharts).forEach(c=>{try{c.destroy();}catch(e){}});acharts={};
+
+  const tc='rgba(255,255,255,0.5)', gc='rgba(255,255,255,0.07)';
+  const CO={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc,font:{family:'Montserrat',size:11}}}},scales:{x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},beginAtZero:true}}};
+
+  // Doughnut statut produits
+  const e1=document.getElementById('ch-status');
+  if(e1) acharts.s=new Chart(e1,{type:'doughnut',data:{labels:['Disponible','Vendu','À venir'],datasets:[{data:[avail.length,sold.length,allProducts.filter(p=>p.status==='coming').length],backgroundColor:['rgba(0,255,136,0.85)','rgba(255,68,68,0.85)','rgba(251,191,36,0.85)'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{color:tc,font:{family:'Montserrat',size:11}}}}}});
+
+  // Catégories
+  const ec=document.getElementById('ch-category');
+  if(ec){
+    const cats={};
+    allProducts.forEach(p=>{const c=p.category||'Sans catégorie';cats[c]=(cats[c]||0)+1;});
+    const catSorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    acharts.c=new Chart(ec,{type:'bar',data:{labels:catSorted.map(([k])=>k),datasets:[
+      {label:'Total',data:catSorted.map(([,v])=>v),backgroundColor:'rgba(255,215,0,0.7)',borderRadius:6},
+      {label:'Vendus',data:catSorted.map(([k])=>allProducts.filter(p=>p.category===k&&p.status==='sold').length),backgroundColor:'rgba(0,255,136,0.7)',borderRadius:6}
+    ]},options:CO});
+  }
+
+  // Timeline 30j — ventes réelles par jour
+  const e3=document.getElementById('ch-timeline');
+  if(e3){
+    const now=new Date(),days=[];
+    for(let i=29;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+    const sd={},rv={};
+    days.forEach(d=>{sd[d]=0;rv[d]=0;});
+    allSales.forEach(v=>{const d=v.created_at?.split('T')[0];if(d&&sd[d]!==undefined){sd[d]++;rv[d]+=(v.total_price||0);}});
+    acharts.t=new Chart(e3,{type:'line',data:{labels:days.map(d=>new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})),datasets:[
+      {label:'Ventes',data:days.map(d=>sd[d]),borderColor:'rgba(255,215,0,0.85)',backgroundColor:'rgba(255,215,0,0.08)',fill:true,tension:0.4,pointRadius:3},
+      {label:'Revenus HTG',data:days.map(d=>rv[d]),borderColor:'rgba(0,255,136,0.85)',backgroundColor:'rgba(0,255,136,0.06)',fill:true,tension:0.4,pointRadius:3,yAxisID:'y1'}
+    ]},options:{...CO,scales:{...CO.scales,y1:{type:'linear',display:true,position:'right',ticks:{color:tc,font:{size:9}},grid:{drawOnChartArea:false}}}}});
+  }
+
+  // Heures
+  const e2=document.getElementById('ch-hours');
+  if(e2){const h=Array(24).fill(0);allSales.forEach(v=>{const hh=new Date(v.created_at).getHours();if(!isNaN(hh))h[hh]++;});const mx=Math.max(...h);
+    acharts.h=new Chart(e2,{type:'bar',data:{labels:h.map((_,i)=>i+'h'),datasets:[{label:'Ventes',data:h,backgroundColor:h.map(v=>v===mx&&v>0?'rgba(255,215,0,0.85)':'rgba(255,215,0,0.22)'),borderRadius:4}]},options:{...CO,plugins:{legend:{display:false}}}});}
+
+  // Lavage polar
+  const e4=document.getElementById('ch-wash');
+  if(e4){const t={standard:0,express:0,dry:0,folding:0,draps:0};allWashRecords.forEach(r=>{const tt=r.service_type||r.details?.service_type||'standard';if(t[tt]!==undefined)t[tt]++;});const ent=Object.entries(t).filter(([,v])=>v>0);
+    if(!ent.length){e4.parentElement.innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);font-size:0.75rem">Aucune fiche</div>';}
+    else acharts.w=new Chart(e4,{type:'polarArea',data:{labels:ent.map(([k])=>({standard:'Standard',express:'Express',dry:'Séchage',folding:'Complet',draps:'Draps'})[k]||k),datasets:[{data:ent.map(([,v])=>v),backgroundColor:['rgba(0,180,255,0.85)','rgba(255,215,0,0.85)','rgba(0,255,136,0.85)','rgba(168,85,247,0.85)','rgba(255,105,180,0.85)'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:tc,font:{size:10}}}},scales:{r:{ticks:{color:tc,font:{size:9}},grid:{color:gc}}}}});}
+
+  // Top produits
+  const tp=document.getElementById('top-products-tbl');
+  if(tp){const s=[...allProducts].sort((a,b)=>(b.price||0)-(a.price||0)).slice(0,6);
+    if(!s.length){tp.innerHTML='<div style="color:var(--text-muted);font-size:0.75rem;padding:10px">Aucun produit.</div>';}
+    else tp.innerHTML=`<table class="top-table"><thead><tr><th>#</th><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th></tr></thead><tbody>${s.map((p,i)=>`<tr><td><span class="rank-badge ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${i+1}</span></td><td style="font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(p.name)}</td><td style="font-size:0.68rem;color:var(--text-muted)">${escH(p.category||'—')}</td><td style="color:var(--gold);font-weight:700">${fmtP(p.price)} HTG</td><td style="font-size:0.68rem">${p.stock_quantity??0}</td><td><span class="product-status ${p.status==='sold'?'status-sold':'status-available'}">${p.status==='sold'?'● Vendu':'● Dispo'}</span></td></tr>`).join('')}</tbody></table>`;}
+}
+window.refreshAnalytics=refreshAnalytics;
 </script>
 </body>
 </html>
