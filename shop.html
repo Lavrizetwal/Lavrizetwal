@@ -10,6 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Firebase SDKs (pou koneksyon Google) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
   <style>
     /* ============================================================
@@ -628,6 +631,45 @@
     }
     .cart-pulse{animation:cartPulse 0.35s ease}
 
+    /* ============================================================
+       AUTH — CONNEXION GOOGLE (AJOUTÉ, pa touche rès)
+    ============================================================ */
+    .nav-auth-btn{
+      display:flex;align-items:center;gap:7px;
+      padding:7px 14px;border-radius:20px;border:none;
+      background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8);font-family:'Montserrat',sans-serif;
+      font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+      cursor:pointer;transition:var(--tr);white-space:nowrap;flex-shrink:0;
+    }
+    .nav-auth-btn:hover{background:rgba(255,255,255,0.13);border-color:rgba(255,255,255,0.3)}
+    .nav-auth-avatar{
+      width:28px;height:28px;border-radius:50%;border:1.5px solid var(--gold);
+      object-fit:cover;cursor:pointer;flex-shrink:0;
+      transition:var(--tr);
+    }
+    .nav-auth-avatar:hover{box-shadow:0 0 10px rgba(201,168,76,0.4)}
+    /* Dropdown utilisateur */
+    .auth-dropdown{
+      position:fixed;top:56px;right:20px;z-index:3000;
+      background:#0d0c08;border:1px solid rgba(201,168,76,0.25);
+      border-radius:14px;padding:16px;width:240px;
+      box-shadow:0 16px 40px rgba(0,0,0,0.7);
+      display:none;animation:fadedown 0.2s ease;
+    }
+    .auth-dropdown.open{display:block}
+    @keyframes fadedown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    .auth-drop-name{font-size:0.78rem;font-weight:700;color:#fff;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .auth-drop-email{font-size:0.6rem;color:var(--text-muted);margin-bottom:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .auth-drop-sep{height:1px;background:rgba(255,255,255,0.07);margin-bottom:12px}
+    .auth-drop-btn{
+      width:100%;padding:9px;border-radius:8px;
+      background:rgba(255,68,68,0.06);border:1px solid rgba(255,68,68,0.18);
+      color:#ff9999;font-family:'Montserrat',sans-serif;font-size:0.62rem;
+      font-weight:700;cursor:pointer;transition:var(--tr);
+    }
+    .auth-drop-btn:hover{background:rgba(255,68,68,0.15)}
+
   </style>
 </head>
 <body>
@@ -654,12 +696,31 @@
       <li><a href="https://zetwal.org/games.html">Jwèt</a></li>
       <li><a href="https://zetwal.org/shop.html" class="active">Shop</a></li>
     </ul>
-    <div class="nav-cart" id="nav-cart" onclick="openCart()" style="cursor:pointer;position:relative">
-      🛍️ <span id="cart-count">0</span>
-      <span id="cart-nav-total" style="display:none;margin-left:6px;padding:2px 10px;background:rgba(201,168,76,0.2);border-radius:12px;font-size:0.6rem;font-weight:800">0 HTG</span>
+    <!-- ── AUTH + PANIER ── -->
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <!-- Bouton connexion (caché si connecté) -->
+      <button id="auth-login-btn" class="nav-auth-btn" onclick="authSignIn()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        Konekte
+      </button>
+      <!-- Avatar utilisateur (caché si pas connecté) -->
+      <img id="auth-avatar" class="nav-auth-avatar" src="" alt="Profil" style="display:none" onclick="toggleAuthDropdown()">
+      <!-- Panier -->
+      <div class="nav-cart" id="nav-cart" onclick="openCart()" style="cursor:pointer;position:relative">
+        🛍️ <span id="cart-count">0</span>
+        <span id="cart-nav-total" style="display:none;margin-left:6px;padding:2px 10px;background:rgba(201,168,76,0.2);border-radius:12px;font-size:0.6rem;font-weight:800">0 HTG</span>
+      </div>
     </div>
   </div>
 </nav>
+
+<!-- Dropdown utilisateur (AJOUTÉ) -->
+<div class="auth-dropdown" id="auth-dropdown">
+  <div class="auth-drop-name" id="auth-drop-name">—</div>
+  <div class="auth-drop-email" id="auth-drop-email">—</div>
+  <div class="auth-drop-sep"></div>
+  <button class="auth-drop-btn" onclick="authSignOut()">🚪 Dekonekte</button>
+</div>
 
 <!-- ============================================================
      HERO
@@ -1474,6 +1535,257 @@ document.addEventListener('keydown', e => {
     closeCart();
   }
 });
+
+/* ============================================================
+   AUTH FIREBASE + PERSISTANCE PANIER (AJOUTÉ)
+   Connexion Google → panier sauvegardé dans Supabase
+   Sans connexion → localStorage comme fallback
+============================================================ */
+
+// ── CONFIG FIREBASE ───────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+  authDomain:        "lavrizetwal.firebaseapp.com",
+  projectId:         "lavrizetwal",
+  storageBucket:     "lavrizetwal.firebasestorage.app",
+  messagingSenderId: "291921316186",
+  appId:             "1:291921316186:web:f55e8b34526960df394b63"
+};
+
+// Init Firebase (evite double-init)
+if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+const fbAuth = firebase.auth();
+
+let currentUser = null;
+const CART_LS_KEY = 'zetwal_cart_v2';
+
+// ── INIT AUTH ─────────────────────────────────────────────────
+fbAuth.onAuthStateChanged(async (user) => {
+  currentUser = user;
+
+  const loginBtn  = document.getElementById('auth-login-btn');
+  const avatarEl  = document.getElementById('auth-avatar');
+  const nameEl    = document.getElementById('auth-drop-name');
+  const emailEl   = document.getElementById('auth-drop-email');
+
+  if (user) {
+    // Connecté
+    if (loginBtn)  loginBtn.style.display  = 'none';
+    if (avatarEl) {
+      avatarEl.style.display = 'block';
+      avatarEl.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName||'U')}&background=c9a84c&color=000&size=56`;
+    }
+    if (nameEl)  nameEl.textContent  = user.displayName || 'Itilizatè';
+    if (emailEl) emailEl.textContent = user.email || '';
+
+    // Charger panier depuis Supabase
+    await cartLoadFromSupabase(user.uid);
+  } else {
+    // Pas connecté
+    if (loginBtn)  loginBtn.style.display  = 'flex';
+    if (avatarEl)  avatarEl.style.display  = 'none';
+    if (nameEl)    nameEl.textContent  = '—';
+    if (emailEl)   emailEl.textContent = '—';
+
+    // Charger depuis localStorage
+    cartLoadFromLocalStorage();
+  }
+});
+
+// ── SIGN IN (Google Popup) ─────────────────────────────────────
+window.authSignIn = async () => {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await fbAuth.signInWithPopup(provider);
+    // onAuthStateChanged va gérer le reste
+  } catch(e) {
+    if (e.code !== 'auth/popup-closed-by-user') {
+      showToast('Erè koneksyon: ' + e.message, 'error');
+    }
+  }
+};
+
+// ── SIGN OUT ──────────────────────────────────────────────────
+window.authSignOut = async () => {
+  // Sauvegarder d'abord
+  if (currentUser) await cartSaveToSupabase(currentUser.uid);
+  closeAuthDropdown();
+  await fbAuth.signOut();
+  showToast('Ou dekonekte', 'info');
+};
+
+// ── DROPDOWN TOGGLE ───────────────────────────────────────────
+window.toggleAuthDropdown = () => {
+  document.getElementById('auth-dropdown').classList.toggle('open');
+};
+function closeAuthDropdown() {
+  document.getElementById('auth-dropdown').classList.remove('open');
+}
+// Clic hors dropdown → ferme
+document.addEventListener('click', (e) => {
+  const dd  = document.getElementById('auth-dropdown');
+  const av  = document.getElementById('auth-avatar');
+  if (dd && !dd.contains(e.target) && e.target !== av) {
+    dd.classList.remove('open');
+  }
+});
+
+/* ============================================================
+   PERSISTANCE PANIER
+============================================================ */
+
+// Supabase cart table: cart_items (user_id, cart_data jsonb)
+const sbCart = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── SAUVEGARDER DANS SUPABASE ─────────────────────────────────
+async function cartSaveToSupabase(uid) {
+  if (!uid) return;
+  try {
+    const cartData = [...cart.entries()].map(([id, item]) => ({
+      id,
+      qty: item.qty,
+      price: item.product.price,
+      name: item.product.name,
+      image_url: item.product.image_url || null,
+      colors: item.product.colors || null,
+      stock_quantity: item.product.stock_quantity ?? null
+    }));
+    await sbCart.from('cart_items').upsert({
+      user_id:    uid,
+      cart_data:  cartData,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
+  } catch(e) {
+    // Silencieux — fallback localStorage
+    cartSaveToLocalStorage();
+  }
+}
+
+// ── CHARGER DEPUIS SUPABASE ───────────────────────────────────
+async function cartLoadFromSupabase(uid) {
+  if (!uid) return;
+  try {
+    const { data, error } = await sbCart.from('cart_items')
+      .select('cart_data')
+      .eq('user_id', uid)
+      .single();
+
+    if (error || !data?.cart_data) {
+      // Essaie localStorage (panier offline)
+      cartLoadFromLocalStorage();
+      return;
+    }
+
+    // Reconstructing cart from saved data
+    // Attendons que allProducts soit chargé
+    const restore = async () => {
+      if (!allProducts.length) {
+        await new Promise(r => setTimeout(r, 500));
+      }
+      cart.clear();
+      for (const item of data.cart_data) {
+        // Cherche le produit actuel dans allProducts pour avoir toutes les infos
+        const liveProduct = allProducts.find(p => p.id === item.id);
+        if (liveProduct && liveProduct.status !== 'sold') {
+          const qty = Math.min(item.qty, liveProduct.stock_quantity ?? 9999);
+          if (qty > 0) cart.set(item.id, { product: liveProduct, qty });
+        }
+      }
+      cartUpdateNavBar();
+      renderGrid(allProducts.length ? (filterCat || filterStatus !== 'all' ? null : allProducts) : allProducts);
+      if (allProducts.length) filterShop();
+    };
+    restore();
+  } catch(e) {
+    cartLoadFromLocalStorage();
+  }
+}
+
+// ── SAUVEGARDE AUTOMATIQUE (après chaque modif) ───────────────
+// Override cartUpdateAll pour sauvegarder après chaque changement
+const _cartUpdateAllOriginal = cartUpdateAll;
+
+// Debounce save — évite trop d'appels Supabase
+let cartSaveTimer;
+function cartAutoSave() {
+  clearTimeout(cartSaveTimer);
+  cartSaveTimer = setTimeout(() => {
+    if (currentUser) {
+      cartSaveToSupabase(currentUser.uid);
+    } else {
+      cartSaveToLocalStorage();
+    }
+  }, 800);
+}
+
+// Monkey-patch cartToggle et cartChangeQty pour déclencher la sauvegarde
+const _origCartToggle    = window.cartToggle;
+const _origCartChangeQty = window.cartChangeQty;
+const _origClearCart     = window.clearCart;
+
+window.cartToggle = (id) => {
+  _origCartToggle(id);
+  cartAutoSave();
+};
+window.cartChangeQty = (id, delta) => {
+  _origCartChangeQty(id, delta);
+  cartAutoSave();
+};
+window.clearCart = () => {
+  _origClearCart();
+  cartAutoSave();
+};
+
+// ── FALLBACK : LOCALSTORAGE ───────────────────────────────────
+function cartSaveToLocalStorage() {
+  try {
+    const data = [...cart.entries()].map(([id, item]) => ({
+      id, qty: item.qty,
+      price: item.product.price,
+      name: item.product.name,
+      image_url: item.product.image_url || null,
+      colors: item.product.colors || null,
+      stock_quantity: item.product.stock_quantity ?? null
+    }));
+    localStorage.setItem(CART_LS_KEY, JSON.stringify(data));
+  } catch(e) {}
+}
+
+function cartLoadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem(CART_LS_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    const tryRestore = () => {
+      if (!allProducts.length) {
+        setTimeout(tryRestore, 400);
+        return;
+      }
+      cart.clear();
+      for (const item of data) {
+        const liveProduct = allProducts.find(p => p.id === item.id);
+        if (liveProduct && liveProduct.status !== 'sold') {
+          const qty = Math.min(item.qty, liveProduct.stock_quantity ?? 9999);
+          if (qty > 0) cart.set(item.id, { product: liveProduct, qty });
+        }
+      }
+      cartUpdateNavBar();
+      filterShop();
+    };
+    tryRestore();
+  } catch(e) {}
+}
+
+// ── SQL: créer la table si elle n'existe pas ──────────────────
+// (à exécuter une fois dans Supabase SQL Editor)
+// CREATE TABLE IF NOT EXISTS cart_items (
+//   user_id    TEXT PRIMARY KEY,
+//   cart_data  JSONB,
+//   updated_at TIMESTAMPTZ DEFAULT NOW()
+// );
+// ALTER TABLE cart_items ENABLE ROW LEVEL SECURITY;
+// CREATE POLICY "cart_all" ON cart_items FOR ALL USING (true) WITH CHECK (true);
+
 
 </script>
 </body>
