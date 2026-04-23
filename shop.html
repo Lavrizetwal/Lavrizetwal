@@ -724,6 +724,101 @@
     .auth-order-status-accepted{color:var(--green);font-weight:700;font-size:0.58rem}
     .auth-order-status-refused{color:var(--red);font-weight:700;font-size:0.58rem}
 
+    /* ── PANEL MES COMMANDES COMPLET (AJOUTÉ) ── */
+    .orders-panel{
+      position:fixed;right:0;top:0;bottom:0;z-index:6500;
+      width:min(440px,100vw);
+      background:#090906;border-left:1px solid rgba(201,168,76,0.18);
+      transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.165,0.84,0.44,1);
+      display:flex;flex-direction:column;
+      box-shadow:-20px 0 60px rgba(0,0,0,0.8);
+    }
+    .orders-panel.open{transform:translateX(0)}
+    .orders-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,#fbbf24,#fde68a,#fbbf24,transparent)}
+    .orders-panel-overlay{
+      position:fixed;inset:0;z-index:6499;background:rgba(0,0,0,0.65);
+      backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity 0.3s}
+    .orders-panel-overlay.open{opacity:1;pointer-events:all}
+    .orders-panel-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:20px 22px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+    .orders-panel-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:#fbbf24}
+    .orders-panel-close{width:32px;height:32px;border-radius:50%;background:rgba(255,100,100,0.08);
+      border:1px solid rgba(255,100,100,0.2);color:#ff9999;font-size:0.85rem;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;transition:var(--tr);font-family:inherit}
+    .orders-panel-close:hover{background:rgba(255,100,100,0.2)}
+    .orders-panel-body{flex:1;overflow-y:auto;padding:16px 22px;
+      scrollbar-width:thin;scrollbar-color:var(--gold-deep) transparent}
+    .orders-panel-body::-webkit-scrollbar{width:3px}
+    .orders-panel-body::-webkit-scrollbar-thumb{background:var(--gold-deep);border-radius:2px}
+    /* Tabs filtre à l'intérieur du panel */
+    .orders-panel-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+    .op-tab{flex:1;padding:7px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.45);
+      font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;
+      letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:var(--tr);
+      text-align:center;white-space:nowrap}
+    .op-tab:hover{border-color:rgba(251,191,36,0.3);color:#fbbf24}
+    .op-tab.active{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.4);color:#fbbf24}
+    .op-tab.active-green{background:rgba(0,255,136,0.08);border-color:rgba(0,255,136,0.3);color:var(--green)}
+    .op-tab.active-red{background:rgba(255,68,68,0.08);border-color:rgba(255,68,68,0.25);color:var(--red)}
+    /* Carte commande individuelle */
+    .order-card{
+      background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+      border-radius:12px;padding:14px 16px;margin-bottom:12px;
+      transition:var(--tr);position:relative;overflow:hidden;
+    }
+    .order-card.status-pending{border-left:3px solid #fbbf24}
+    .order-card.status-accepted{border-left:3px solid var(--green);background:rgba(0,255,136,0.03)}
+    .order-card.status-refused{border-left:3px solid var(--red);background:rgba(255,68,68,0.02)}
+    .order-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
+    .order-card-name{font-size:0.82rem;font-weight:700;color:#fff;flex:1;line-height:1.3}
+    .order-card-badge{
+      flex-shrink:0;padding:3px 10px;border-radius:20px;
+      font-size:0.58rem;font-weight:700;letter-spacing:0.5px;white-space:nowrap}
+    .badge-pending{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.3)}
+    .badge-accepted{background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.25)}
+    .badge-refused{background:rgba(255,68,68,0.1);color:var(--red);border:1px solid rgba(255,68,68,0.2)}
+    .order-card-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+    .order-card-meta-item{font-size:0.62rem}
+    .order-card-meta-label{color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;font-size:0.52rem;margin-bottom:2px}
+    .order-card-meta-val{color:rgba(255,255,255,0.75);font-weight:600}
+    .order-card-note{font-size:0.65rem;color:rgba(255,255,255,0.4);font-style:italic;
+      margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05)}
+    /* Message admin si refusé/accepté */
+    .order-admin-msg{
+      margin-top:8px;padding:8px 10px;border-radius:8px;font-size:0.65rem;line-height:1.5}
+    .order-admin-msg.accepted{background:rgba(0,255,136,0.07);color:var(--green);border:1px solid rgba(0,255,136,0.15)}
+    .order-admin-msg.refused{background:rgba(255,68,68,0.06);color:#ff9999;border:1px solid rgba(255,68,68,0.15)}
+    /* Indicateur nouveau statut */
+    .order-card-new-dot{
+      position:absolute;top:12px;right:12px;
+      width:8px;height:8px;border-radius:50%;background:var(--gold);
+      animation:pulseDot 1.5s ease infinite}
+    @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
+    /* Badge sur l'avatar */
+    .nav-notif-badge{
+      position:absolute;top:-3px;right:-3px;
+      width:16px;height:16px;border-radius:50%;
+      background:var(--red);border:2px solid var(--dark);
+      font-size:0.5rem;font-weight:800;color:#fff;
+      display:none;align-items:center;justify-content:center;
+      font-family:'Montserrat',sans-serif;
+    }
+    .nav-notif-badge.show{display:flex}
+    /* Bouton "Voir mes commandes" dans le dropdown */
+    .auth-view-orders-btn{
+      width:100%;padding:9px;border-radius:8px;margin-bottom:10px;
+      background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);
+      color:#fbbf24;font-family:'Montserrat',sans-serif;font-size:0.62rem;
+      font-weight:700;cursor:pointer;transition:var(--tr);
+      display:flex;align-items:center;justify-content:center;gap:7px}
+    .auth-view-orders-btn:hover{background:rgba(251,191,36,0.14)}
+    /* Empty state panel */
+    .orders-panel-empty{text-align:center;padding:50px 20px;color:rgba(255,255,255,0.3);font-size:0.75rem}
+    .orders-panel-empty-icon{font-size:3rem;display:block;margin-bottom:12px;opacity:0.3}
+
   </style>
 </head>
 <body>
@@ -758,7 +853,10 @@
         Konekte
       </button>
       <!-- Avatar utilisateur (caché si pas connecté) -->
-      <img id="auth-avatar" class="nav-auth-avatar" src="" alt="Profil" style="display:none" onclick="toggleAuthDropdown()">
+      <div style="position:relative;display:inline-flex;flex-shrink:0">
+        <img id="auth-avatar" class="nav-auth-avatar" src="" alt="Profil" style="display:none" onclick="toggleAuthDropdown()">
+        <span id="nav-notif-badge" class="nav-notif-badge" title="Nouvelles notifications"></span>
+      </div>
       <!-- Panier -->
       <div class="nav-cart" id="nav-cart" onclick="openCart()" style="cursor:pointer;position:relative">
         🛍️ <span id="cart-count">0</span>
@@ -773,13 +871,40 @@
   <div class="auth-drop-name" id="auth-drop-name">—</div>
   <div class="auth-drop-email" id="auth-drop-email">—</div>
   <div class="auth-drop-sep"></div>
-  <!-- Mes commandes -->
+  <!-- Bouton Voir mes commandes -->
+  <button class="auth-view-orders-btn" id="auth-view-orders-btn" style="display:none" onclick="closeAuthDropdown();openOrdersPanel()">
+    📋 <span id="auth-orders-btn-label">Mes Commandes</span>
+  </button>
+  <!-- Mini résumé commandes (3 dernières) -->
   <div class="auth-orders-section" id="auth-orders-section" style="display:none">
-    <div class="auth-orders-title">📋 Mes Commandes</div>
+    <div class="auth-orders-title">Dernières commandes</div>
     <div id="auth-orders-list"><div style="font-size:0.62rem;color:rgba(255,255,255,0.3);padding:4px 0">Chargement...</div></div>
   </div>
   <div class="auth-drop-sep" id="auth-orders-sep" style="display:none"></div>
   <button class="auth-drop-btn" onclick="authSignOut()">🚪 Dekonekte</button>
+</div>
+
+<!-- ── PANEL MES COMMANDES COMPLET (AJOUTÉ) ── -->
+<div class="orders-panel-overlay" id="orders-panel-overlay" onclick="closeOrdersPanel()"></div>
+<div class="orders-panel" id="orders-panel">
+  <div class="orders-panel-header">
+    <div class="orders-panel-title">📋 Mes Commandes</div>
+    <button class="orders-panel-close" onclick="closeOrdersPanel()">✕</button>
+  </div>
+  <div class="orders-panel-body" id="orders-panel-body">
+    <div class="orders-panel-tabs">
+      <button class="op-tab active" id="op-tab-all"      onclick="filterOrdersPanel('all',this)">Tout</button>
+      <button class="op-tab"        id="op-tab-pending"  onclick="filterOrdersPanel('pending',this)">🕐 Ap Tann</button>
+      <button class="op-tab"        id="op-tab-accepted" onclick="filterOrdersPanel('accepted',this)">✅ Aksepte</button>
+      <button class="op-tab"        id="op-tab-refused"  onclick="filterOrdersPanel('refused',this)">❌ Refize</button>
+    </div>
+    <div id="orders-panel-list">
+      <div class="orders-panel-empty">
+        <span class="orders-panel-empty-icon">📋</span>
+        Chargement...
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ============================================================
@@ -2106,28 +2231,79 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── CHARGER MES COMMANDES (dans le dropdown auth) ────────────
+// ── CHARGER MES COMMANDES (mini résumé dans le dropdown) ────────────
+// Stockage global pour le panel
+let myAllOrders      = [];
+let myOrdersFilter   = 'all';
+let seenOrderStatuses = {}; // {id: status} — pour détecter les changements
+
 async function loadMyOrders(email) {
   if (!email) return;
   try {
     const { data, error } = await sbOrders
       .from('orders')
-      .select('id,product_name,quantity,total_estimated,status,created_at')
+      .select('id,product_name,quantity,total_estimated,status,created_at,admin_note,product_price')
       .eq('client_email', email)
       .order('created_at', { ascending: false })
-      .limit(5);
+      .limit(50);
 
     if (error) throw error;
 
+    myAllOrders = data || [];
+
+    // ── Détection changements de statut (badge notification) ──
+    let hasNewUpdate = false;
+    const SEEN_KEY = 'zetwal_seen_orders_v1';
+    let seen = {};
+    try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); } catch(e){}
+
+    myAllOrders.forEach(o => {
+      if (o.status !== 'pending') {
+        if (seen[o.id] !== o.status) {
+          hasNewUpdate = true;
+        }
+      }
+    });
+
+    // Badge rouge sur l'avatar
+    const badge = document.getElementById('nav-notif-badge');
+    if (badge) {
+      const unread = myAllOrders.filter(o => o.status !== 'pending' && seen[o.id] !== o.status);
+      if (unread.length > 0) {
+        badge.textContent = unread.length > 9 ? '9+' : unread.length;
+        badge.classList.add('show');
+      } else {
+        badge.classList.remove('show');
+      }
+    }
+
+    // ── Mini résumé dans le dropdown (3 dernières) ──
     const section = document.getElementById('auth-orders-section');
     const sep     = document.getElementById('auth-orders-sep');
     const list    = document.getElementById('auth-orders-list');
+    const viewBtn = document.getElementById('auth-view-orders-btn');
+    const btnLabel= document.getElementById('auth-orders-btn-label');
+
     if (!section || !list) return;
 
-    if (!data || !data.length) {
+    if (!myAllOrders.length) {
       section.style.display = 'none';
       if (sep) sep.style.display = 'none';
+      if (viewBtn) viewBtn.style.display = 'none';
       return;
+    }
+
+    // Bouton "Voir mes commandes" avec compteur
+    if (viewBtn) {
+      viewBtn.style.display = 'flex';
+      const pending  = myAllOrders.filter(o=>o.status==='pending').length;
+      const accepted = myAllOrders.filter(o=>o.status==='accepted').length;
+      const refused  = myAllOrders.filter(o=>o.status==='refused').length;
+      if (btnLabel) btnLabel.textContent =
+        `Mes Commandes (${myAllOrders.length})` +
+        (accepted > 0 ? ` • ${accepted} ✅` : '') +
+        (refused  > 0 ? ` • ${refused} ❌` : '') +
+        (pending  > 0 ? ` • ${pending} 🕐` : '');
     }
 
     section.style.display = 'block';
@@ -2139,16 +2315,157 @@ async function loadMyOrders(email) {
       refused:  '<span class="auth-order-status-refused">❌ Refize</span>'
     };
 
-    list.innerHTML = data.map(o => `
-      <div class="auth-order-item">
+    // Montrer les 3 plus récentes avec changement de statut en premier
+    const sorted = [...myAllOrders].sort((a,b) => {
+      const aPrio = (a.status !== 'pending' && seen[a.id] !== a.status) ? 1 : 0;
+      const bPrio = (b.status !== 'pending' && seen[b.id] !== b.status) ? 1 : 0;
+      return bPrio - aPrio;
+    }).slice(0, 3);
+
+    list.innerHTML = sorted.map(o => {
+      const isNew = o.status !== 'pending' && seen[o.id] !== o.status;
+      return `<div class="auth-order-item" style="${isNew?'background:rgba(255,215,0,0.04);border-radius:6px;padding:5px 6px;margin:-2px -6px;':''}" onclick="closeAuthDropdown();openOrdersPanel()">
         <span class="auth-order-name">${escH(o.product_name)} ×${o.quantity}</span>
+        ${isNew ? '<span style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-right:6px;margin-top:1px;display:inline-block"></span>' : ''}
         ${statusLabel[o.status] || o.status}
-      </div>`).join('');
+      </div>`;
+    }).join('');
+
+    if (myAllOrders.length > 3) {
+      list.innerHTML += `<div style="font-size:0.6rem;color:rgba(201,168,76,0.5);text-align:center;margin-top:8px;cursor:pointer" onclick="closeAuthDropdown();openOrdersPanel()">
+        Wè tout ${myAllOrders.length} kòmand yo →
+      </div>`;
+    }
 
   } catch(e) {
     console.error('loadMyOrders:', e.message);
   }
 }
+
+// ── PANEL COMPLET MES COMMANDES ──────────────────────────────
+window.openOrdersPanel = async () => {
+  // Marquer toutes les commandes comme vues
+  const SEEN_KEY = 'zetwal_seen_orders_v1';
+  const seen = {};
+  myAllOrders.forEach(o => { seen[o.id] = o.status; });
+  try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); } catch(e){}
+
+  // Enlever le badge
+  const badge = document.getElementById('nav-notif-badge');
+  if (badge) badge.classList.remove('show');
+
+  // Ouvrir le panel
+  document.getElementById('orders-panel').classList.add('open');
+  document.getElementById('orders-panel-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  myOrdersFilter = 'all';
+  // Reset tabs
+  document.querySelectorAll('.op-tab').forEach(t => t.classList.remove('active','active-green','active-red'));
+  const allTab = document.getElementById('op-tab-all');
+  if (allTab) allTab.classList.add('active');
+
+  _renderOrdersPanel();
+};
+
+window.closeOrdersPanel = () => {
+  document.getElementById('orders-panel').classList.remove('open');
+  document.getElementById('orders-panel-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+window.filterOrdersPanel = (filter, btn) => {
+  myOrdersFilter = filter;
+  document.querySelectorAll('.op-tab').forEach(t => t.classList.remove('active','active-green','active-red'));
+  if (filter === 'accepted') btn.classList.add('active-green');
+  else if (filter === 'refused') btn.classList.add('active-red');
+  else btn.classList.add('active');
+  _renderOrdersPanel();
+};
+
+function _renderOrdersPanel() {
+  const container = document.getElementById('orders-panel-list');
+  if (!container) return;
+
+  const filtered = myOrdersFilter === 'all'
+    ? myAllOrders
+    : myAllOrders.filter(o => o.status === myOrdersFilter);
+
+  if (!filtered.length) {
+    const labels = {all:'Ou pako gen okenn kòmand.',pending:'Pa gen kòmand an attente.',accepted:'Pa gen kòmand aksepte.',refused:'Pa gen kòmand refize.'};
+    container.innerHTML = `
+      <div class="orders-panel-empty">
+        <span class="orders-panel-empty-icon">${myOrdersFilter==='accepted'?'✅':myOrdersFilter==='refused'?'❌':'📋'}</span>
+        ${labels[myOrdersFilter]||'Okenn kòmand.'}
+      </div>`;
+    return;
+  }
+
+  const statusConfig = {
+    pending:  { badge:'badge-pending',  icon:'🕐', label:'Ap tann repon admin',  cls:'status-pending'  },
+    accepted: { badge:'badge-accepted', icon:'✅', label:'Kòmand aksepte!',      cls:'status-accepted' },
+    refused:  { badge:'badge-refused',  icon:'❌', label:'Kòmand refize',        cls:'status-refused'  }
+  };
+
+  container.innerHTML = filtered.map(o => {
+    const cfg = statusConfig[o.status] || statusConfig.pending;
+    const date = o.created_at
+      ? new Date(o.created_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'})
+      : '—';
+
+    // Message admin si accepté ou refusé
+    const adminMsgHtml = o.admin_note && o.status !== 'pending'
+      ? `<div class="order-admin-msg ${o.status}">
+          💬 Admin: ${escH(o.admin_note)}
+         </div>`
+      : o.status === 'accepted'
+      ? `<div class="order-admin-msg accepted">
+          💬 Kòmand ou a aksepte! Ekip Zetwal ap kontakte ou.
+         </div>`
+      : '';
+
+    // Indicateur visuel selon le statut
+    const statusGlow = o.status === 'accepted'
+      ? 'box-shadow:0 0 20px rgba(0,255,136,0.08)'
+      : o.status === 'refused'
+      ? 'box-shadow:0 0 20px rgba(255,68,68,0.06)'
+      : '';
+
+    return `
+    <div class="order-card ${cfg.cls}" style="${statusGlow}">
+      <div class="order-card-header">
+        <div class="order-card-name">${escH(o.product_name)}</div>
+        <span class="order-card-badge ${cfg.badge}">${cfg.icon} ${cfg.label}</span>
+      </div>
+      <div class="order-card-meta">
+        <div class="order-card-meta-item">
+          <div class="order-card-meta-label">Kantite</div>
+          <div class="order-card-meta-val">${o.quantity} inite</div>
+        </div>
+        <div class="order-card-meta-item">
+          <div class="order-card-meta-label">Total estimé</div>
+          <div class="order-card-meta-val" style="color:var(--gold)">${formatPrice(o.total_estimated || 0)} HTG</div>
+        </div>
+        <div class="order-card-meta-item">
+          <div class="order-card-meta-label">Pri inite</div>
+          <div class="order-card-meta-val">${formatPrice(o.product_price || 0)} HTG</div>
+        </div>
+        <div class="order-card-meta-item">
+          <div class="order-card-meta-label">Dat kòmand</div>
+          <div class="order-card-meta-val">${date}</div>
+        </div>
+      </div>
+      ${adminMsgHtml}
+    </div>`;
+  }).join('');
+}
+
+// Escape ferme aussi le panel commandes
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('orders-panel')?.classList.contains('open')) {
+    closeOrdersPanel();
+  }
+});
 
 </script>
 </body>
