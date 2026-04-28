@@ -23,13 +23,62 @@
         .light-mode { --bg: #fdfdfd; --text: #1a1a1a; --glass-bg: rgba(0,0,0,0.05); --card-bg: rgba(255,255,255,0.8); --gold: #b8860b; --gold-deep: #8a6a1a; }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
-        body{background:var(--bg);color:var(--text);margin:0;font-family:'Montserrat',sans-serif;overflow-x:hidden;transition:background 0.5s ease,color 0.5s ease}
+        body{background:var(--bg);color:var(--text);margin:0;font-family:'Montserrat',sans-serif;overflow-x:hidden;transition:background 0.5s ease,color 0.5s ease;cursor:none}
+
+        /* ══════════════════════════════════════
+           CURSEUR DORÉ PERSONNALISÉ
+        ══════════════════════════════════════ */
+        #cursor-dot {
+            position:fixed;width:12px;height:12px;background:var(--gold);border-radius:50%;
+            pointer-events:none;z-index:99999;transform:translate(-50%,-50%);
+            box-shadow:0 0 12px var(--gold),0 0 24px rgba(201,168,76,0.5);
+            transition:width 0.2s,height 0.2s,background 0.2s;
+            mix-blend-mode:screen;
+        }
+        #cursor-ring {
+            position:fixed;width:36px;height:36px;border:1.5px solid rgba(201,168,76,0.6);
+            border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);
+            transition:width 0.3s,height 0.3s,border-color 0.3s;
+        }
+        body:hover #cursor-dot { opacity:1; }
+        a:hover ~ #cursor-dot, button:hover ~ #cursor-dot { width:20px;height:20px; }
+        .cursor-trail {
+            position:fixed;pointer-events:none;z-index:99990;border-radius:50%;
+            width:6px;height:6px;background:var(--gold);opacity:0;
+            transform:translate(-50%,-50%);mix-blend-mode:screen;
+        }
+
+        /* ══════════════════════════════════════
+           ZETWAL EN FOND IMPOSANT
+        ══════════════════════════════════════ */
+        #bg-text-zetwal {
+            position:fixed;inset:0;z-index:-8;display:flex;align-items:center;justify-content:center;
+            pointer-events:none;overflow:hidden;
+        }
+        #bg-text-zetwal span {
+            font-family:'Cormorant Garamond',serif;font-size:clamp(10rem,22vw,22rem);font-weight:700;
+            letter-spacing:0.05em;text-transform:uppercase;user-select:none;
+            background:linear-gradient(135deg,rgba(201,168,76,0.03) 0%,rgba(240,208,96,0.07) 50%,rgba(201,168,76,0.03) 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            animation:bgTextPulse 8s ease-in-out infinite;white-space:nowrap;
+        }
+        @keyframes bgTextPulse {
+            0%,100%{opacity:0.6;transform:scale(1) translateY(0px)}
+            50%{opacity:1;transform:scale(1.02) translateY(-8px)}
+        }
+
         #bg-canvas{position:fixed;inset:0;z-index:-10;pointer-events:none}
         .nebula{position:fixed;inset:0;z-index:-9;pointer-events:none;overflow:hidden}
         .nb{position:absolute;border-radius:50%;filter:blur(100px);animation:nd 20s ease-in-out infinite alternate}
         .nb:nth-child(1){width:600px;height:600px;top:-150px;left:-150px;background:radial-gradient(circle,rgba(201,168,76,0.1)0%,transparent 70%)}
         .nb:nth-child(2){width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(255,255,255,0.05)0%,transparent 70%);animation-delay:-10s}
         @keyframes nd{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,-20px) scale(1.05)}}
+
+        /* ══════════════════════════════════════
+           PARTICULE CANVAS SOURIS
+        ══════════════════════════════════════ */
+        #particle-canvas{position:fixed;inset:0;z-index:-7;pointer-events:none}
+
         .nav{position:fixed;top:0;width:100%;z-index:2000;background:rgba(13,12,8,0.85);backdrop-filter:blur(25px);border-bottom:1px solid rgba(201,168,76,0.2)}
         .nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-pale),var(--gold),transparent);background-size:200% 100%;animation:nl 5s linear infinite}
         @keyframes nl{to{background-position:200% 0}}
@@ -39,8 +88,8 @@
         .logo-text{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;letter-spacing:3px;text-transform:uppercase}
         .logo-text span{color:var(--gold)}
         .user-auth-area{display:flex;align-items:center;gap:15px;margin-top:10px}
-        #login-trigger-btn{padding:8px 20px;font-size:0.65rem;border-radius:20px;cursor:pointer;background:var(--gold);border:none;font-weight:800;text-transform:uppercase;transition:0.3s}
-        #user-profile-btn{cursor:pointer;display:none;align-items:center;gap:8px;font-weight:800;color:var(--gold);font-size:0.75rem;border:1px solid var(--gold);padding:5px 15px;border-radius:20px;transition:var(--transition)}
+        #login-trigger-btn{padding:8px 20px;font-size:0.65rem;border-radius:20px;cursor:none;background:var(--gold);border:none;font-weight:800;text-transform:uppercase;transition:0.3s}
+        #user-profile-btn{cursor:none;display:none;align-items:center;gap:8px;font-weight:800;color:var(--gold);font-size:0.75rem;border:1px solid var(--gold);padding:5px 15px;border-radius:20px;transition:var(--transition)}
         #user-profile-btn:hover{background:var(--gold);color:#000}
         #user-info-card{position:fixed;top:120px;right:20px;width:280px;background:rgba(13,12,8,0.98);backdrop-filter:blur(30px);border:1px solid var(--gold);border-radius:20px;padding:25px;z-index:2005;display:none;box-shadow:0 20px 50px rgba(0,0,0,0.8);animation:fadeIn 0.3s ease}
         @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
@@ -48,33 +97,54 @@
         .info-label{font-size:0.6rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
         .info-value{font-size:0.85rem;font-weight:600}
         .admin-link{display:none;margin-top:15px}
-        .btn-logout{margin-top:15px;width:100%;padding:10px;border-radius:10px;border:1px solid #ff4444;color:#ff4444;background:transparent;cursor:pointer;font-weight:700;font-size:0.7rem;transition:0.3s}
+        .btn-logout{margin-top:15px;width:100%;padding:10px;border-radius:10px;border:1px solid #ff4444;color:#ff4444;background:transparent;cursor:none;font-weight:700;font-size:0.7rem;transition:0.3s}
         .btn-logout:hover{background:#ff4444;color:#fff}
         .auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(15px)}
         .auth-modal{background:#0d0c08;border:1px solid var(--gold);border-radius:30px;padding:40px;width:90%;max-width:400px;text-align:center}
         .auth-input{width:100%;padding:15px;border-radius:12px;border:1px solid var(--gold);background:rgba(255,255,255,0.05);color:#fff;margin-bottom:15px;outline:none;font-family:'Montserrat',sans-serif}
-        .btn-auth{width:100%;padding:15px;border-radius:50px;border:none;font-weight:800;text-transform:uppercase;cursor:pointer;transition:0.3s;margin-bottom:10px;font-size:0.75rem}
+        .btn-auth{width:100%;padding:15px;border-radius:50px;border:none;font-weight:800;text-transform:uppercase;cursor:none;transition:0.3s;margin-bottom:10px;font-size:0.75rem}
         .btn-google{background:#fff;color:#000}
         .btn-phone{background:var(--gold);color:#000}
         .nav-links{display:flex;list-style:none;gap:10px;margin:0;padding:5px;overflow-x:auto;width:100%;justify-content:center;scrollbar-width:none}
         .nav-links::-webkit-scrollbar{display:none}
-        .nav-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-weight:600;font-size:0.58rem;text-transform:uppercase;letter-spacing:1.5px;padding:7px 15px;border-radius:20px;border:1px solid rgba(201,168,76,0.25);transition:var(--transition)}
+        .nav-links a{color:rgba(255,255,255,0.7);text-decoration:none;font-weight:600;font-size:0.58rem;text-transform:uppercase;letter-spacing:1.5px;padding:7px 15px;border-radius:20px;border:1px solid rgba(201,168,76,0.25);transition:var(--transition);cursor:none}
         .nav-links a:hover,.nav-links a.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.05);box-shadow:0 0 15px var(--gold-glow)}
-        .theme-toggle{position:fixed;top:160px;right:20px;z-index:2000;background:var(--gold);border:none;width:45px;height:45px;border-radius:50%;cursor:pointer;box-shadow:0 0 15px var(--gold-glow);font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+        .theme-toggle{position:fixed;top:160px;right:20px;z-index:2000;background:var(--gold);border:none;width:45px;height:45px;border-radius:50%;cursor:none;box-shadow:0 0 15px var(--gold-glow);font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
         .theme-toggle:hover{transform:rotate(180deg) scale(1.1)}
-        .hero{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:180px 20px 40px;position:relative}
+
+        /* ══════════════════════════════════════
+           HERO + PARALLAXE
+        ══════════════════════════════════════ */
+        .hero{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:180px 20px 40px;position:relative;will-change:transform}
         .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,10vw,5.5rem);font-weight:700;letter-spacing:8px;background:linear-gradient(135deg,var(--gold-deep) 0%,var(--gold) 35%,var(--gold-pale) 50%,var(--gold) 65%,var(--gold-deep) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 6s linear infinite;margin-bottom:15px}
         @keyframes shimmer{to{background-position:200% center}}
         .hero-sub{font-size:0.8rem;letter-spacing:5px;color:rgba(201,168,76,0.7);text-transform:uppercase;font-weight:600}
         .big-sphere{width:100px;height:100px;background:radial-gradient(circle,#fff,var(--gold),var(--gold-deep));border-radius:50%;margin:20px auto;box-shadow:0 0 50px var(--gold);animation:spherePulse 4s infinite ease-in-out;filter:blur(1px)}
         @keyframes spherePulse{0%,100%{transform:scale(1);opacity:0.8;box-shadow:0 0 30px var(--gold)}50%{transform:scale(1.15);opacity:1;box-shadow:0 0 70px var(--gold)}}
+
+        /* ══════════════════════════════════════
+           SECTIONS REVEAL CINÉMATIQUE
+        ══════════════════════════════════════ */
+        .section-parallax {
+            opacity:0;transform:translateY(60px) scale(0.97);
+            transition:opacity 0.9s cubic-bezier(0.165,0.84,0.44,1),transform 0.9s cubic-bezier(0.165,0.84,0.44,1);
+        }
+        .section-parallax.in-view {
+            opacity:1;transform:translateY(0) scale(1);
+        }
+
         .main-grid{max-width:1200px;margin:0 auto;padding:40px 20px 100px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:40px}
         @media(max-width:400px){.main-grid{grid-template-columns:1fr}}
-        .card-wrap{position:relative;cursor:pointer;transition:var(--transition)}
+        .card-wrap{position:relative;cursor:none;transition:var(--transition)}
         .card-wrap:hover{transform:translateY(-10px) scale(1.02)}
         .liquid-border{position:relative;border-radius:30px;background:var(--card-bg);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);padding:40px 30px;text-align:center;min-height:520px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;border:2px solid transparent;overflow:hidden;box-shadow:0 15px 45px rgba(0,0,0,0.5)}
         .liquid-border::before{content:"";position:absolute;inset:-2px;z-index:-1;border-radius:inherit;padding:2px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-pale),var(--gold),transparent);background-size:200% 100%;animation:liquidGold 3s linear infinite;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor}
         @keyframes liquidGold{to{background-position:200% 50%}}
+
+        /* Halo doré au hover carte */
+        .liquid-border::after{content:'';position:absolute;inset:0;border-radius:30px;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(201,168,76,0.08) 0%,transparent 60%);opacity:0;transition:opacity 0.3s;pointer-events:none}
+        .card-wrap:hover .liquid-border::after{opacity:1}
+
         .item-icon{font-size:3.5rem;margin-bottom:15px;filter:drop-shadow(0 0 15px var(--gold-glow));transition:var(--transition)}
         .card-wrap:hover .item-icon{transform:scale(1.2) rotate(5deg)}
         .item-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;letter-spacing:2px;color:var(--gold-pale);margin-bottom:15px}
@@ -83,8 +153,9 @@
         .item-details-list{width:100%;text-align:left;border-top:1px solid rgba(201,168,76,0.15);padding-top:20px;margin-bottom:25px}
         .detail-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:0.7rem;color:rgba(201,168,76,0.8);text-transform:uppercase;letter-spacing:1px;font-weight:600}
         .detail-dot{width:5px;height:5px;background:var(--gold);border-radius:50%;box-shadow:0 0 8px var(--gold)}
-        .btn-gold{display:inline-block;padding:12px 30px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#000;text-decoration:none;border-radius:50px;font-weight:800;text-transform:uppercase;font-size:0.72rem;letter-spacing:2px;transition:var(--transition);box-shadow:0 5px 15px rgba(201,168,76,0.3)}
+        .btn-gold{display:inline-block;padding:12px 30px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#000;text-decoration:none;border-radius:50px;font-weight:800;text-transform:uppercase;font-size:0.72rem;letter-spacing:2px;transition:var(--transition);box-shadow:0 5px 15px rgba(201,168,76,0.3);cursor:none}
         .btn-gold:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(201,168,76,0.5)}
+
         footer{background:rgba(13,12,8,0.95);padding:80px 5% 40px;text-align:center;border-top:1px solid rgba(201,168,76,0.2);position:relative}
         footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
         .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;letter-spacing:4px;color:var(--white);margin-bottom:30px}
@@ -95,9 +166,29 @@
         .copyright{font-size:0.65rem;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;border-top:1px solid rgba(201,168,76,0.1);padding-top:20px}
         .reveal{opacity:0;transform:translateY(30px);transition:all 0.8s ease-out}
         .reveal.active{opacity:1;transform:translateY(0)}
+
+        /* ══════════════════════════════════════
+           SCAN LINE + VIGNETTE CINÉMATIQUE
+        ══════════════════════════════════════ */
+        #vignette{position:fixed;inset:0;pointer-events:none;z-index:9990;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.55) 100%)}
+        #scanlines{position:fixed;inset:0;pointer-events:none;z-index:9989;opacity:0.025;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.5) 2px,rgba(0,0,0,0.5) 4px)}
     </style>
 </head>
 <body>
+
+    <!-- CURSEUR DORÉ -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- VIGNETTE + SCANLINES -->
+    <div id="vignette"></div>
+    <div id="scanlines"></div>
+
+    <!-- ZETWAL IMPOSANT EN FOND -->
+    <div id="bg-text-zetwal"><span>ZETWAL</span></div>
+
+    <!-- CANVAS PARTICULES 2D SOURIS -->
+    <canvas id="particle-canvas"></canvas>
 
     <canvas id="bg-canvas"></canvas>
     <div class="nebula"><div class="nb"></div><div class="nb"></div></div>
@@ -153,7 +244,7 @@
                 <input type="text" id="otp-input" class="auth-input" placeholder="123456">
                 <button class="btn-auth btn-phone" onclick="verifyOTP()">Verifye Kòd</button>
             </div>
-            <button style="background:transparent;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.65rem;margin-top:20px;text-transform:uppercase;letter-spacing:1px" onclick="toggleAuthModal(false)">Anile</button>
+            <button style="background:transparent;border:none;color:rgba(255,255,255,0.4);cursor:none;font-size:0.65rem;margin-top:20px;text-transform:uppercase;letter-spacing:1px" onclick="toggleAuthModal(false)">Anile</button>
         </div>
     </div>
 
@@ -162,25 +253,12 @@
         <p class="hero-sub">Lidè nan Inovasyon ak Ekselans</p>
         <div class="big-sphere"></div>
 
-        <!-- ═══════════════════════════════════════════════════════
-             BLOC CITASYON + SALITASYON + STATUT MAGAZEN
-             Ajoute sèlman — pa gen chanjman nan rès paj la
-        ═══════════════════════════════════════════════════════ -->
         <div id="home-info-bloc" style="width:100%;max-width:580px;margin:26px auto 0;display:flex;flex-direction:column;gap:12px;padding:0 16px">
-
-          <!-- Citasyon jounen (kache si pa gen citasyon) -->
-          <div id="quote-bloc" style="
-            background:rgba(201,168,76,0.05);
-            border:1px solid rgba(201,168,76,0.18);
-            border-radius:16px;padding:20px 24px;text-align:center;
-            display:none;animation:fadeIn 0.6s ease;
-          ">
+          <div id="quote-bloc" style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.18);border-radius:16px;padding:20px 24px;text-align:center;display:none;animation:fadeIn 0.6s ease;">
             <div id="quote-date" style="font-size:0.52rem;color:rgba(201,168,76,0.45);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px"></div>
             <blockquote id="quote-text" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:rgba(255,255,255,0.85);line-height:1.75;margin-bottom:12px;quotes:none"></blockquote>
             <div id="quote-author" style="font-size:0.6rem;color:var(--gold);font-weight:700;letter-spacing:2px;text-transform:uppercase"></div>
           </div>
-
-          <!-- Salitasyon + statut magazen -->
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:13px 20px">
             <div id="greeting-txt" style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.72)">Bonjou 👋</div>
             <div id="store-status-badge" style="display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:6px 16px;font-size:0.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase">
@@ -188,13 +266,11 @@
               <span id="store-label"></span>
             </div>
           </div>
-
         </div>
-        <!-- ═══════════════════════════════════════════════════════ -->
     </header>
 
     <main class="main-grid">
-        <div class="card-wrap reveal" onclick="location.href='lavri.html'">
+        <div class="card-wrap reveal section-parallax" onclick="location.href='lavri.html'">
             <div class="liquid-border">
                 <div class="item-icon">🧺</div>
                 <h2 class="item-title">Lavri Zetwal</h2>
@@ -202,7 +278,7 @@
                 <span class="btn-gold">Antre nan Lavri</span>
             </div>
         </div>
-        <div class="card-wrap reveal" onclick="location.href='shop.html'">
+        <div class="card-wrap reveal section-parallax" onclick="location.href='shop.html'">
             <div class="liquid-border">
                 <div class="item-icon">🛒</div>
                 <h2 class="item-title">Shop Zetwal</h2>
@@ -210,7 +286,7 @@
                 <span class="btn-gold">Vizite Shop la</span>
             </div>
         </div>
-        <div class="card-wrap reveal" onclick="location.href='mall.html'">
+        <div class="card-wrap reveal section-parallax" onclick="location.href='mall.html'">
             <div class="liquid-border">
                 <div class="item-icon">🏛️</div>
                 <h2 class="item-title">Zetwal Mall</h2>
@@ -218,7 +294,7 @@
                 <span class="btn-gold">Dekouvri Mall la</span>
             </div>
         </div>
-        <div class="card-wrap reveal" onclick="location.href='cinema.html'">
+        <div class="card-wrap reveal section-parallax" onclick="location.href='cinema.html'">
             <div class="liquid-border">
                 <div class="item-icon">🎬</div>
                 <h2 class="item-title">Sinema Zetwal</h2>
@@ -226,7 +302,7 @@
                 <span class="btn-gold">Gade yon Fim</span>
             </div>
         </div>
-        <div class="card-wrap reveal" onclick="location.href='technopark.html'">
+        <div class="card-wrap reveal section-parallax" onclick="location.href='technopark.html'">
             <div class="liquid-border">
                 <div class="item-icon">🚀</div>
                 <h2 class="item-title">Technopark</h2>
@@ -234,7 +310,7 @@
                 <span class="btn-gold">Eksplore Inovasyon</span>
             </div>
         </div>
-        <div class="card-wrap reveal" onclick="location.href='games.html'">
+        <div class="card-wrap reveal section-parallax" onclick="location.href='games.html'">
             <div class="liquid-border">
                 <div class="item-icon">🎮</div>
                 <h2 class="item-title">Jwèt Zetwal</h2>
@@ -246,6 +322,7 @@
 
     <footer>
         <div class="footer-logo">ZETWAL <span>ORGANISATION</span></div>
+        <p style="font-size:0.65rem;color:rgba(201,168,76,0.5);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">📍 5, 3ème Imp, Ruelle Yamoul</p>
         <div class="social-icons">
             <a href="https://wa.me/79961103506" target="_blank" class="social-icon">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
@@ -258,172 +335,337 @@
     </footer>
 
     <script>
-        // ── CONFIG FIREBASE (inchangé) ────────────────────────────
-        const firebaseConfig = {
-            apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-            authDomain: "lavrizetwal.firebaseapp.com", projectId: "lavrizetwal",
-            storageBucket: "lavrizetwal.firebasestorage.app",
-            messagingSenderId: "291921316186",
-            appId: "1:291921316186:web:f55e8b34526960df394b63"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db   = firebase.firestore();
+    // ══════════════════════════════════════════════════════════════
+    // CURSEUR DORÉ AVEC TRAÎNÉE LUMINEUSE
+    // ══════════════════════════════════════════════════════════════
+    const cursorDot  = document.getElementById('cursor-dot');
+    const cursorRing = document.getElementById('cursor-ring');
+    const TRAIL_COUNT = 18;
+    const trails = [];
+    for(let i=0;i<TRAIL_COUNT;i++){
+        const t=document.createElement('div');
+        t.classList.add('cursor-trail');
+        document.body.appendChild(t);
+        trails.push({el:t,x:0,y:0});
+    }
+    let mouseX=0,mouseY=0;
+    let ringX=0,ringY=0;
+    document.addEventListener('mousemove',e=>{
+        mouseX=e.clientX;mouseY=e.clientY;
+        cursorDot.style.left=mouseX+'px';cursorDot.style.top=mouseY+'px';
+    });
+    // Hover state
+    document.querySelectorAll('a,button,.btn-gold,.card-wrap').forEach(el=>{
+        el.addEventListener('mouseenter',()=>{
+            cursorDot.style.width='20px';cursorDot.style.height='20px';
+            cursorDot.style.background='#f0d060';
+            cursorRing.style.width='56px';cursorRing.style.height='56px';
+            cursorRing.style.borderColor='rgba(240,208,96,0.9)';
+        });
+        el.addEventListener('mouseleave',()=>{
+            cursorDot.style.width='12px';cursorDot.style.height='12px';
+            cursorDot.style.background='var(--gold)';
+            cursorRing.style.width='36px';cursorRing.style.height='36px';
+            cursorRing.style.borderColor='rgba(201,168,76,0.6)';
+        });
+    });
+    // Traînée animée
+    let trailPositions=Array(TRAIL_COUNT).fill().map(()=>({x:0,y:0}));
+    function animateCursor(){
+        ringX+=(mouseX-ringX)*0.12;
+        ringY+=(mouseY-ringY)*0.12;
+        cursorRing.style.left=ringX+'px';cursorRing.style.top=ringY+'px';
+        trailPositions.unshift({x:mouseX,y:mouseY});
+        trailPositions=trailPositions.slice(0,TRAIL_COUNT);
+        trails.forEach((t,i)=>{
+            const p=trailPositions[i]||trailPositions[trailPositions.length-1];
+            t.x+=(p.x-t.x)*0.25;
+            t.y+=(p.y-t.y)*0.25;
+            t.el.style.left=t.x+'px';t.el.style.top=t.y+'px';
+            const alpha=(1-(i/TRAIL_COUNT))*0.5;
+            const size=6*(1-(i/TRAIL_COUNT));
+            t.el.style.opacity=alpha;
+            t.el.style.width=size+'px';t.el.style.height=size+'px';
+        });
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
 
-        // ── CONFIG SUPABASE (inchangé) ────────────────────────────
-        const SUPABASE_URL = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
-        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ══════════════════════════════════════════════════════════════
+    // PARTICULES 2D RÉACTIVES À LA SOURIS
+    // ══════════════════════════════════════════════════════════════
+    const pCanvas=document.getElementById('particle-canvas');
+    const pCtx=pCanvas.getContext('2d');
+    let pW=window.innerWidth,pH=window.innerHeight;
+    pCanvas.width=pW;pCanvas.height=pH;
+    let pMouseX=pW/2,pMouseY=pH/2;
+    document.addEventListener('mousemove',e=>{pMouseX=e.clientX;pMouseY=e.clientY;});
 
-        let confirmationResult;
+    const NUM_PARTICLES=220;
+    const particles=[];
+    for(let i=0;i<NUM_PARTICLES;i++){
+        particles.push({
+            x:Math.random()*pW,y:Math.random()*pH,
+            ox:0,oy:0,
+            vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,
+            size:Math.random()*2.2+0.4,
+            alpha:Math.random()*0.5+0.1,
+            color:`rgba(201,168,76,${(Math.random()*0.4+0.1).toFixed(2)})`,
+            speed:Math.random()*0.5+0.1
+        });
+        particles[i].ox=particles[i].x;
+        particles[i].oy=particles[i].y;
+    }
 
-        // ── AUTH UI (inchangé) ────────────────────────────────────
-        function toggleAuthModal(show) { document.getElementById('auth-modal').style.display = show ? 'flex' : 'none'; }
-        function toggleInfoCard() { const c = document.getElementById('user-info-card'); c.style.display = c.style.display === 'block' ? 'none' : 'block'; }
-
-        async function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try { await auth.signInWithPopup(provider); toggleAuthModal(false); } catch (e) { alert(e.message); }
-        }
-        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
-        async function loginWithPhone() {
-            const phone = document.getElementById('phone-input').value;
-            try { confirmationResult = await auth.signInWithPhoneNumber(phone, window.recaptchaVerifier); document.getElementById('auth-main-view').style.display='none'; document.getElementById('otp-view').style.display='block'; } catch(e) { alert(e.message); }
-        }
-        async function verifyOTP() {
-            const code = document.getElementById('otp-input').value;
-            try { await confirmationResult.confirm(code); toggleAuthModal(false); } catch(e) { alert("Kòd la pa bon"); }
-        }
-        function handleLogout() { auth.signOut(); location.reload(); }
-
-        // ── AUTH STATE (inchangé + updateGreeting ajouté) ─────────
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                document.getElementById('login-trigger-btn').style.display = 'none';
-                document.getElementById('user-profile-btn').style.display  = 'flex';
-                const name = user.displayName || user.phoneNumber || "Itilizatè";
-                document.getElementById('display-name-nav').textContent = name;
-                document.getElementById('card-name').textContent = name;
-                updateGreeting(name);  // ← NOUVO: salitasyon pèsonalize
-                db.collection("users").doc(user.uid).onSnapshot(doc => {
-                    document.getElementById('card-points').textContent = doc.exists ? (doc.data().points||0).toFixed(1) : '0.0';
-                });
-                const admins = ['mikenestorlive@gmail.com','schnaydernaderice1@gmail.com'];
-                let status = "Utilisateur";
-                if (user.email && admins.includes(user.email)) {
-                    status = "Admin";
-                    document.getElementById('admin-access').style.display = 'block';
-                } else {
-                    const { data: p } = await sb.from('products').select('id').eq('client_email', user.email).limit(1);
-                    const { data: w } = await sb.from('wash_records').select('id').eq('client_name', name).limit(1);
-                    if ((p&&p.length)||(w&&w.length)) status = "Client";
+    // Connexions entre particules proches
+    function drawConnections(){
+        const MAX_DIST=110;
+        for(let i=0;i<particles.length;i++){
+            for(let j=i+1;j<particles.length;j++){
+                const dx=particles[i].x-particles[j].x;
+                const dy=particles[i].y-particles[j].y;
+                const d=Math.sqrt(dx*dx+dy*dy);
+                if(d<MAX_DIST){
+                    const alpha=(1-d/MAX_DIST)*0.12;
+                    pCtx.beginPath();
+                    pCtx.moveTo(particles[i].x,particles[i].y);
+                    pCtx.lineTo(particles[j].x,particles[j].y);
+                    pCtx.strokeStyle=`rgba(201,168,76,${alpha})`;
+                    pCtx.lineWidth=0.5;
+                    pCtx.stroke();
                 }
-                document.getElementById('card-status').textContent = status;
-            } else {
-                document.getElementById('login-trigger-btn').style.display = 'block';
-                document.getElementById('user-profile-btn').style.display  = 'none';
-                updateGreeting(null);  // ← salitasyon jeneral
+            }
+        }
+    }
+
+    function animateParticles(){
+        pCtx.clearRect(0,0,pW,pH);
+        drawConnections();
+        particles.forEach(p=>{
+            // Répulsion souris
+            const dx=pMouseX-p.x,dy=pMouseY-p.y;
+            const dist=Math.sqrt(dx*dx+dy*dy);
+            const REPEL=120;
+            if(dist<REPEL){
+                const force=(REPEL-dist)/REPEL;
+                p.vx-=(dx/dist)*force*1.5;
+                p.vy-=(dy/dist)*force*1.5;
+            }
+            // Retour position originale (élasticité)
+            p.vx+=(p.ox-p.x)*0.004;
+            p.vy+=(p.oy-p.y)*0.004;
+            p.vx*=0.96;p.vy*=0.96;
+            p.x+=p.vx;p.y+=p.vy;
+            // Bord
+            if(p.x<0)p.x=pW;if(p.x>pW)p.x=0;
+            if(p.y<0)p.y=pH;if(p.y>pH)p.y=0;
+            // Dessin
+            pCtx.beginPath();
+            pCtx.arc(p.x,p.y,p.size,0,Math.PI*2);
+            pCtx.fillStyle=p.color;
+            pCtx.shadowColor='#c9a84c';
+            pCtx.shadowBlur=6;
+            pCtx.fill();
+            pCtx.shadowBlur=0;
+        });
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+    window.addEventListener('resize',()=>{
+        pW=window.innerWidth;pH=window.innerHeight;
+        pCanvas.width=pW;pCanvas.height=pH;
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // PARALLAXE CINÉMATIQUE AU SCROLL
+    // ══════════════════════════════════════════════════════════════
+    const heroEl=document.querySelector('.hero');
+    const bgText=document.getElementById('bg-text-zetwal');
+    window.addEventListener('scroll',()=>{
+        const sy=window.scrollY;
+        // Hero parallaxe subtil
+        if(heroEl) heroEl.style.transform=`translateY(${sy*0.35}px)`;
+        // Texte fond parallaxe inverse
+        if(bgText) bgText.style.transform=`translateY(${sy*-0.12}px)`;
+    },{ passive:true });
+
+    // Entrée en vue des cartes (cinématique)
+    const parallaxEls=document.querySelectorAll('.section-parallax');
+    const observer=new IntersectionObserver(entries=>{
+        entries.forEach((entry,i)=>{
+            if(entry.isIntersecting){
+                setTimeout(()=>entry.target.classList.add('in-view'),i*80);
             }
         });
+    },{threshold:0.1});
+    parallaxEls.forEach(el=>observer.observe(el));
 
-        // ════════════════════════════════════════════════════════
-        // NOUVO — CITASYON + SALITASYON + STATUT MAGAZEN
-        // ════════════════════════════════════════════════════════
+    // Halo souris dans cartes
+    document.querySelectorAll('.card-wrap').forEach(card=>{
+        card.addEventListener('mousemove',e=>{
+            const rect=card.querySelector('.liquid-border').getBoundingClientRect();
+            const mx=((e.clientX-rect.left)/rect.width*100).toFixed(1)+'%';
+            const my=((e.clientY-rect.top)/rect.height*100).toFixed(1)+'%';
+            card.querySelector('.liquid-border').style.setProperty('--mx',mx);
+            card.querySelector('.liquid-border').style.setProperty('--my',my);
+        });
+    });
 
-        // Heure courante en Haïti (UTC-5)
-        function haitiHour() {
-            const now = new Date();
-            return new Date(now.getTime() + now.getTimezoneOffset()*60000 - 5*3600000).getHours();
-        }
+    // ══════════════════════════════════════════════════════════════
+    // CONFIG FIREBASE (inchangé)
+    // ══════════════════════════════════════════════════════════════
+    const firebaseConfig = {
+        apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+        authDomain: "lavrizetwal.firebaseapp.com", projectId: "lavrizetwal",
+        storageBucket: "lavrizetwal.firebasestorage.app",
+        messagingSenderId: "291921316186",
+        appId: "1:291921316186:web:f55e8b34526960df394b63"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
 
-        // Salitasyon selon heure Haiti
-        function updateGreeting(name) {
-            const h = haitiHour();
-            const [word, emoji] = h < 12 ? ['Bonjou','☀️'] : h < 18 ? ['Bon aprèmidi','🌤️'] : ['Bonswa','🌙'];
-            const el = document.getElementById('greeting-txt');
-            if (el) el.textContent = name ? `${word}, ${name.split(' ')[0]} ${emoji}` : `${word} ${emoji}`;
-        }
-        updateGreeting(null); // Appel immédiat avant Firebase
+    // CONFIG SUPABASE (inchangé)
+    const SUPABASE_URL = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Statut magazen (8h-20h Haiti) + override admin
-        async function updateStoreStatus() {
-            const dot   = document.getElementById('store-dot');
-            const label = document.getElementById('store-label');
-            const badge = document.getElementById('store-status-badge');
-            if (!dot) return;
+    let confirmationResult;
 
-            let force = null;
-            try {
-                const { data } = await sb.from('site_settings').select('value').eq('key','store_force').single();
-                if (data && data.value && data.value !== 'null') force = data.value;
-            } catch(e) {}
+    // AUTH UI (inchangé)
+    function toggleAuthModal(show) { document.getElementById('auth-modal').style.display = show ? 'flex' : 'none'; }
+    function toggleInfoCard() { const c = document.getElementById('user-info-card'); c.style.display = c.style.display === 'block' ? 'none' : 'block'; }
 
-            const h      = haitiHour();
-            const isOpen = force === 'open' ? true : force === 'closed' ? false : (h >= 8 && h < 20);
+    async function loginWithGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        try { await auth.signInWithPopup(provider); toggleAuthModal(false); } catch (e) { alert(e.message); }
+    }
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
+    async function loginWithPhone() {
+        const phone = document.getElementById('phone-input').value;
+        try { confirmationResult = await auth.signInWithPhoneNumber(phone, window.recaptchaVerifier); document.getElementById('auth-main-view').style.display='none'; document.getElementById('otp-view').style.display='block'; } catch(e) { alert(e.message); }
+    }
+    async function verifyOTP() {
+        const code = document.getElementById('otp-input').value;
+        try { await confirmationResult.confirm(code); toggleAuthModal(false); } catch(e) { alert("Kòd la pa bon"); }
+    }
+    function handleLogout() { auth.signOut(); location.reload(); }
 
-            if (isOpen) {
-                dot.style.cssText   = 'width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;background:#00ff88;box-shadow:0 0 8px #00ff88';
-                badge.style.cssText = 'display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:6px 16px;font-size:0.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.25);color:#00ff88';
-                label.textContent   = 'Magazen nou yo ouvri';
+    // AUTH STATE (inchangé)
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            document.getElementById('login-trigger-btn').style.display = 'none';
+            document.getElementById('user-profile-btn').style.display  = 'flex';
+            const name = user.displayName || user.phoneNumber || "Itilizatè";
+            document.getElementById('display-name-nav').textContent = name;
+            document.getElementById('card-name').textContent = name;
+            updateGreeting(name);
+            db.collection("users").doc(user.uid).onSnapshot(doc => {
+                document.getElementById('card-points').textContent = doc.exists ? (doc.data().points||0).toFixed(1) : '0.0';
+            });
+            const admins = ['mikenestorlive@gmail.com','schnaydernaderice1@gmail.com'];
+            let status = "Utilisateur";
+            if (user.email && admins.includes(user.email)) {
+                status = "Admin";
+                document.getElementById('admin-access').style.display = 'block';
             } else {
-                const hoursLeft = h < 8 ? 8 - h : (24 - h) + 8;
-                dot.style.cssText   = 'width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;background:#ff4444;box-shadow:0 0 8px #ff4444';
-                badge.style.cssText = 'display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:6px 16px;font-size:0.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);color:#ff6666';
-                label.textContent   = `Magazen nou yo ap ouvri nan ${hoursLeft}h`;
+                const { data: p } = await sb.from('products').select('id').eq('client_email', user.email).limit(1);
+                const { data: w } = await sb.from('wash_records').select('id').eq('client_name', name).limit(1);
+                if ((p&&p.length)||(w&&w.length)) status = "Client";
             }
+            document.getElementById('card-status').textContent = status;
+        } else {
+            document.getElementById('login-trigger-btn').style.display = 'block';
+            document.getElementById('user-profile-btn').style.display  = 'none';
+            updateGreeting(null);
         }
-        updateStoreStatus();
+    });
 
-        // Citasyon journalière depuis Supabase
-        async function loadDailyQuote() {
-            try {
-                const [rWeek, rDay] = await Promise.all([
-                    sb.from('site_settings').select('value').eq('key','quote_week').single(),
-                    sb.from('site_settings').select('value').eq('key','quote_active_day').single()
-                ]);
-                if (!rWeek.data || !rDay.data) return;
-                const quotes = JSON.parse(rWeek.data.value || '[]');
-                const idx    = parseInt(rDay.data.value  || '0');
-                const q      = quotes[idx] || quotes[0];
-                if (!q || !q.text) return;
+    // CITASYON + SALITASYON + STATUT (inchangé)
+    function haitiHour() {
+        const now = new Date();
+        return new Date(now.getTime() + now.getTimezoneOffset()*60000 - 5*3600000).getHours();
+    }
+    function updateGreeting(name) {
+        const h = haitiHour();
+        const [word, emoji] = h < 12 ? ['Bonjou','☀️'] : h < 18 ? ['Bon aprèmidi','🌤️'] : ['Bonswa','🌙'];
+        const el = document.getElementById('greeting-txt');
+        if (el) el.textContent = name ? `${word}, ${name.split(' ')[0]} ${emoji}` : `${word} ${emoji}`;
+    }
+    updateGreeting(null);
 
-                const dateStr = new Date().toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-                document.getElementById('quote-date').textContent   = dateStr;
-                document.getElementById('quote-text').textContent   = `" ${q.text} "`;
-                document.getElementById('quote-author').textContent = q.author ? `— ${q.author}` : '';
-                document.getElementById('quote-bloc').style.display = 'block';
-            } catch(e) { /* Pas de citasyon → bloc reste caché */ }
+    async function updateStoreStatus() {
+        const dot   = document.getElementById('store-dot');
+        const label = document.getElementById('store-label');
+        const badge = document.getElementById('store-status-badge');
+        if (!dot) return;
+        let force = null;
+        try {
+            const { data } = await sb.from('site_settings').select('value').eq('key','store_force').single();
+            if (data && data.value && data.value !== 'null') force = data.value;
+        } catch(e) {}
+        const h      = haitiHour();
+        const isOpen = force === 'open' ? true : force === 'closed' ? false : (h >= 8 && h < 20);
+        if (isOpen) {
+            dot.style.cssText   = 'width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;background:#00ff88;box-shadow:0 0 8px #00ff88';
+            badge.style.cssText = 'display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:6px 16px;font-size:0.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.25);color:#00ff88';
+            label.textContent   = 'Magazen nou yo ouvri';
+        } else {
+            const hoursLeft = h < 8 ? 8 - h : (24 - h) + 8;
+            dot.style.cssText   = 'width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;background:#ff4444;box-shadow:0 0 8px #ff4444';
+            badge.style.cssText = 'display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:6px 16px;font-size:0.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);color:#ff6666';
+            label.textContent   = `Magazen nou yo ap ouvri nan ${hoursLeft}h`;
         }
-        loadDailyQuote();
-        // ════════════════════════════════════════════════════════
+    }
+    updateStoreStatus();
 
-        // ── THEME (inchangé) ──────────────────────────────────────
-        function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark'); }
-        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+    async function loadDailyQuote() {
+        try {
+            const [rWeek, rDay] = await Promise.all([
+                sb.from('site_settings').select('value').eq('key','quote_week').single(),
+                sb.from('site_settings').select('value').eq('key','quote_active_day').single()
+            ]);
+            if (!rWeek.data || !rDay.data) return;
+            const quotes = JSON.parse(rWeek.data.value || '[]');
+            const idx    = parseInt(rDay.data.value  || '0');
+            const q      = quotes[idx] || quotes[0];
+            if (!q || !q.text) return;
+            const dateStr = new Date().toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+            document.getElementById('quote-date').textContent   = dateStr;
+            document.getElementById('quote-text').textContent   = `" ${q.text} "`;
+            document.getElementById('quote-author').textContent = q.author ? `— ${q.author}` : '';
+            document.getElementById('quote-bloc').style.display = 'block';
+        } catch(e) {}
+    }
+    loadDailyQuote();
 
-        // ── THREE.JS (inchangé) ───────────────────────────────────
-        const canvas = document.querySelector('#bg-canvas');
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
-        const geo = new THREE.BufferGeometry();
-        const count = 1500;
-        const posArr = new Float32Array(count * 3);
-        for (let i=0; i<count*3; i++) posArr[i] = (Math.random()-.5)*15;
-        geo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
-        const mat = new THREE.PointsMaterial({ size: 0.005, color: 0xc9a84c, transparent: true, opacity: 0.4 });
-        const pts = new THREE.Points(geo, mat);
-        scene.add(pts);
-        function anim() { requestAnimationFrame(anim); pts.rotation.y += 0.001; renderer.render(scene, camera); }
-        anim();
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
-        renderer.setSize(window.innerWidth, window.innerHeight);
+    // THEME (inchangé)
+    function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark'); }
+    if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
 
-        // ── REVEAL (inchangé) ─────────────────────────────────────
-        function reveal() { document.querySelectorAll(".reveal").forEach(el => { if(el.getBoundingClientRect().top < window.innerHeight-100) el.classList.add("active"); }); }
-        window.addEventListener("scroll", reveal);
-        reveal();
+    // THREE.JS (inchangé — particules 3D fond)
+    const canvas = document.querySelector('#bg-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+    const geo = new THREE.BufferGeometry();
+    const count = 1500;
+    const posArr = new Float32Array(count * 3);
+    for (let i=0; i<count*3; i++) posArr[i] = (Math.random()-.5)*15;
+    geo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+    const mat = new THREE.PointsMaterial({ size: 0.005, color: 0xc9a84c, transparent: true, opacity: 0.4 });
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    function anim() { requestAnimationFrame(anim); pts.rotation.y += 0.001; renderer.render(scene, camera); }
+    anim();
+    window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // REVEAL (inchangé)
+    function reveal() { document.querySelectorAll(".reveal").forEach(el => { if(el.getBoundingClientRect().top < window.innerHeight-100) el.classList.add("active"); }); }
+    window.addEventListener("scroll", reveal);
+    reveal();
     </script>
 </body>
 </html>
