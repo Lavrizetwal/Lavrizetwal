@@ -5,1322 +5,384 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>LAVRI ZETWAL | Pi Pwòp, Pi Santi Bon!</title>
-  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300&family=Montserrat:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
-    /* ============================================================
-       ROOT VARIABLES
-    ============================================================ */
     :root {
-      --gold:        #ffd700;
-      --gold-deep:   #b8860b;
-      --gold-light:  #fff8dc;
-      --gold-glow:   rgba(255,215,0,0.25);
-      --gold-glow2:  rgba(255,215,0,0.08);
-      --bg:          #010101;
-      --text:        #ffffff;
-      --glass-bg:    rgba(255,255,255,0.07);
-      --glass-border:rgba(255,215,0,0.25);
-      --transition:  all 0.45s cubic-bezier(0.165,0.84,0.44,1);
-      --neon-blue:   rgba(100,180,255,0.15);
-      --neon-purple: rgba(180,100,255,0.12);
+      --gold:#ffd700;--gold-deep:#b8860b;--gold-light:#fff8dc;--gold-glow:rgba(255,215,0,0.25);
+      --gold-glow2:rgba(255,215,0,0.08);--bg:#010101;--text:#ffffff;
+      --glass-bg:rgba(255,255,255,0.07);--glass-border:rgba(255,215,0,0.25);
+      --transition:all 0.45s cubic-bezier(0.165,0.84,0.44,1);
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;overflow-x:hidden;cursor:none}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:var(--gold-deep);border-radius:2px}
+    ::selection{background:rgba(255,215,0,0.25);color:#fff}
 
-    /* ============================================================
-       RESET & BASE
-    ============================================================ */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Montserrat', sans-serif;
-      overflow-x: hidden;
-      cursor: default;
-    }
+    /* ═══════════════════════════ CURSEUR DORÉ ═══════════════════════════ */
+    #cursor-dot{position:fixed;width:12px;height:12px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 12px var(--gold),0 0 24px rgba(255,215,0,0.5);mix-blend-mode:screen;transition:width .2s,height .2s}
+    #cursor-ring{position:fixed;width:36px;height:36px;border:1.5px solid rgba(255,215,0,0.6);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
+    .cursor-trail{position:fixed;pointer-events:none;z-index:99990;border-radius:50%;width:6px;height:6px;background:var(--gold);opacity:0;transform:translate(-50%,-50%);mix-blend-mode:screen}
 
-    /* ============================================================
-       CUSTOM SCROLLBAR
-    ============================================================ */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: #000; }
-    ::-webkit-scrollbar-thumb { background: var(--gold-deep); border-radius: 2px; }
+    /* ═══════════════════════════ ZETWAL FOND ═══════════════════════════ */
+    #bg-text-lavri{position:fixed;inset:0;z-index:-8;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
+    #bg-text-lavri span{font-family:'Cormorant Garamond',serif;font-size:clamp(8rem,18vw,18rem);font-weight:700;letter-spacing:.05em;text-transform:uppercase;user-select:none;background:linear-gradient(135deg,rgba(255,215,0,0.03) 0%,rgba(255,215,0,0.07) 50%,rgba(255,215,0,0.03) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:bgPulse 8s ease-in-out infinite;white-space:nowrap}
+    @keyframes bgPulse{0%,100%{opacity:.6;transform:scale(1) translateY(0)}50%{opacity:1;transform:scale(1.02) translateY(-8px)}}
 
-    /* ============================================================
-       CANVAS BACKGROUND (THREE.JS)
-    ============================================================ */
-    #webgl-canvas {
-      position: fixed;
-      inset: 0;
-      z-index: -10;
-      pointer-events: none;
-    }
+    /* ═══════════════════════════ VIGNETTE + SCAN ═══════════════════════ */
+    #vignette{position:fixed;inset:0;pointer-events:none;z-index:9990;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,0.6) 100%)}
+    #scanlines{position:fixed;inset:0;pointer-events:none;z-index:9989;opacity:.02;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.5) 2px,rgba(0,0,0,.5) 4px)}
 
-    /* ============================================================
-       NEBULA / BRUME LUMINEUSE MULTICOLORE (couche fixe)
-    ============================================================ */
-    .nebula-layer {
-      position: fixed;
-      inset: 0;
-      z-index: -9;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .nebula-blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(90px);
-      animation: nebula-drift 18s ease-in-out infinite alternate;
-    }
-    .nebula-blob:nth-child(1) {
-      width: 500px; height: 500px;
-      top: -100px; left: -100px;
-      background: radial-gradient(circle, rgba(100,60,200,0.18) 0%, transparent 70%);
-      animation-duration: 20s;
-    }
-    .nebula-blob:nth-child(2) {
-      width: 600px; height: 400px;
-      top: 30%; right: -150px;
-      background: radial-gradient(circle, rgba(255,180,0,0.10) 0%, transparent 70%);
-      animation-duration: 25s; animation-delay: -8s;
-    }
-    .nebula-blob:nth-child(3) {
-      width: 450px; height: 450px;
-      bottom: 10%; left: 20%;
-      background: radial-gradient(circle, rgba(0,150,255,0.10) 0%, transparent 70%);
-      animation-duration: 22s; animation-delay: -5s;
-    }
-    .nebula-blob:nth-child(4) {
-      width: 350px; height: 350px;
-      top: 60%; right: 25%;
-      background: radial-gradient(circle, rgba(255,80,150,0.08) 0%, transparent 70%);
-      animation-duration: 30s; animation-delay: -12s;
-    }
-    @keyframes nebula-drift {
-      0%   { transform: translate(0,0) scale(1); }
-      50%  { transform: translate(40px,-30px) scale(1.08); }
-      100% { transform: translate(-20px,20px) scale(0.95); }
-    }
+    /* ═══════════════════════════ CANVAS ═══════════════════════════════ */
+    #webgl-canvas{position:fixed;inset:0;z-index:-10;pointer-events:none}
+    #particle-canvas{position:fixed;inset:0;z-index:-7;pointer-events:none}
 
-    /* ============================================================
-       NAVIGATION
-    ============================================================ */
-    .nav {
-      position: fixed;
-      top: 0; width: 100%;
-      z-index: 1000;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-bottom: 1px solid rgba(255,215,0,0.2);
-    }
-    /* Ligne dorée animée sous la nav */
-    .nav::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%);
-      background-size: 200% 100%;
-      animation: nav-line 4s linear infinite;
-    }
-    @keyframes nav-line { to { background-position: 200% 0; } }
+    /* ═══════════════════════════ NEBULA ════════════════════════════════ */
+    .nebula-layer{position:fixed;inset:0;z-index:-9;pointer-events:none;overflow:hidden}
+    .nebula-blob{position:absolute;border-radius:50%;filter:blur(90px);animation:nd 18s ease-in-out infinite alternate}
+    .nebula-blob:nth-child(1){width:500px;height:500px;top:-100px;left:-100px;background:radial-gradient(circle,rgba(100,60,200,.18) 0%,transparent 70%);animation-duration:20s}
+    .nebula-blob:nth-child(2){width:600px;height:400px;top:30%;right:-150px;background:radial-gradient(circle,rgba(255,180,0,.10) 0%,transparent 70%);animation-duration:25s;animation-delay:-8s}
+    .nebula-blob:nth-child(3){width:450px;height:450px;bottom:10%;left:20%;background:radial-gradient(circle,rgba(0,150,255,.10) 0%,transparent 70%);animation-duration:22s;animation-delay:-5s}
+    .nebula-blob:nth-child(4){width:350px;height:350px;top:60%;right:25%;background:radial-gradient(circle,rgba(255,80,150,.08) 0%,transparent 70%);animation-duration:30s;animation-delay:-12s}
+    @keyframes nd{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,-20px) scale(1.05)}}
 
-    .nav-content {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 12px 20px 10px;
-    }
-    .auth-container {
-      position: absolute;
-      right: 20px; top: 14px;
-      text-align: right;
-    }
-    #user-name    { font-size: 0.72rem; font-weight: 600; color: var(--gold); }
-    #user-points  { font-size: 0.58rem; color: rgba(255,215,0,0.7); }
+    /* ═══════════════════════════ NAV ═══════════════════════════════════ */
+    .nav{position:fixed;top:0;width:100%;z-index:2000;background:rgba(1,1,1,0.85);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,215,0,.2)}
+    .nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold-light),var(--gold),transparent);background-size:200% 100%;animation:nl 4s linear infinite}
+    @keyframes nl{to{background-position:200% 0}}
+    .nav-content{display:flex;flex-direction:column;align-items:center;padding:12px 20px 10px;position:relative}
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .nav-logo-img { width: 28px; height: 28px; }
-    .logo-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-    }
-    .logo-text span { color: var(--gold); }
+    /* Auth zone nav */
+    .auth-container{position:absolute;right:20px;top:14px;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+    #login-trigger-btn{padding:8px 18px;font-size:.62rem;border-radius:20px;cursor:none;background:var(--gold);border:none;font-weight:800;text-transform:uppercase;transition:.3s;letter-spacing:1px}
+    #login-trigger-btn:hover{box-shadow:0 0 20px var(--gold-glow);transform:scale(1.04)}
+    #user-profile-area{display:none;flex-direction:column;align-items:flex-end;gap:1px;cursor:none}
+    #user-profile-area:hover{opacity:.85}
+    #nav-user-name{font-size:.72rem;font-weight:700;color:var(--gold);letter-spacing:.5px}
+    #nav-user-points{font-size:.58rem;color:rgba(255,215,0,.7);font-weight:600}
 
-    /* Nav links */
-    .nav-links {
-      display: flex;
-      list-style: none;
-      gap: 8px;
-      padding: 4px 0;
-      overflow-x: auto;
-      width: 100%;
-      justify-content: center;
-      white-space: nowrap;
-      scrollbar-width: none;
-    }
-    .nav-links::-webkit-scrollbar { display: none; }
-    .nav-links li { flex-shrink: 0; }
-    .nav-links a {
-      color: rgba(255,255,255,0.75);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.58rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      padding: 7px 14px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,215,0,0.25);
-      transition: var(--transition);
-      display: block;
-      position: relative;
-      overflow: hidden;
-    }
-    /* Hover shimmer sweep */
-    .nav-links a::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,215,0,0.18), transparent);
-      transition: left 0.5s ease;
-    }
-    .nav-links a:hover::before { left: 100%; }
-    .nav-links a:hover {
-      color: var(--gold);
-      border-color: rgba(255,215,0,0.7);
-      box-shadow: 0 0 12px rgba(255,215,0,0.2), inset 0 0 8px rgba(255,215,0,0.06);
-      transform: translateY(-1px);
-    }
-    /* État actif lumineux */
-    .nav-links a.active {
-      background: linear-gradient(135deg, var(--gold) 0%, #e8b800 100%);
-      color: #000;
-      border-color: var(--gold);
-      box-shadow: 0 0 18px rgba(255,215,0,0.45), 0 0 40px rgba(255,215,0,0.15);
-      font-weight: 800;
-    }
-    .nav-links a.active::before { display: none; }
+    /* Info card */
+    #user-info-card{position:fixed;top:115px;right:20px;width:270px;background:rgba(1,1,1,.98);backdrop-filter:blur(30px);border:1px solid var(--gold);border-radius:20px;padding:22px;z-index:2005;display:none;box-shadow:0 20px 50px rgba(0,0,0,.8);animation:fadeIn .3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .info-row{margin-bottom:12px;border-bottom:1px solid rgba(255,215,0,.1);padding-bottom:10px;text-align:left}
+    .info-label{font-size:.58rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+    .info-value{font-size:.82rem;font-weight:600}
+    .admin-link{display:none;margin-top:12px}
+    .btn-logout{margin-top:12px;width:100%;padding:10px;border-radius:10px;border:1px solid #ff4444;color:#ff4444;background:transparent;cursor:none;font-weight:700;font-size:.68rem;transition:.3s}
+    .btn-logout:hover{background:#ff4444;color:#fff}
 
-    /* Bouton login */
-    .login-btn {
-      padding: 9px 20px;
-      border: 1px solid var(--gold);
-      border-radius: 20px;
-      color: var(--gold);
-      text-decoration: none;
-      font-size: 0.65rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: var(--transition);
-      cursor: pointer;
-      background: transparent;
-      display: inline-block;
-    }
-    .login-btn:hover {
-      background: var(--gold);
-      color: #000;
-      box-shadow: 0 0 20px var(--gold-glow);
-    }
+    /* Auth modal */
+    .auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(15px)}
+    .auth-modal{background:#0d0c08;border:1px solid var(--gold);border-radius:28px;padding:38px;width:90%;max-width:400px;text-align:center}
+    .auth-input-modal{width:100%;padding:14px;border-radius:12px;border:1px solid var(--gold);background:rgba(255,255,255,.05);color:#fff;margin-bottom:14px;outline:none;font-family:'Montserrat',sans-serif}
+    .btn-auth{width:100%;padding:14px;border-radius:50px;border:none;font-weight:800;text-transform:uppercase;cursor:none;transition:.3s;margin-bottom:10px;font-size:.72rem}
+    .btn-google{background:#fff;color:#000}
+    .btn-phone{background:var(--gold);color:#000}
 
-    /* ============================================================
-       HERO SECTION
-    ============================================================ */
-    .hero-container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 100px 20px 60px;
-      text-align: center;
-      overflow: hidden;
-    }
+    .logo-container{display:flex;align-items:center;gap:10px;margin-bottom:10px;text-decoration:none;color:inherit}
+    .nav-logo-img{width:28px;height:28px}
+    .logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;letter-spacing:2px}
+    .logo-text span{color:var(--gold)}
+    .nav-links{display:flex;list-style:none;gap:8px;padding:4px 0;overflow-x:auto;width:100%;justify-content:center;white-space:nowrap;scrollbar-width:none}
+    .nav-links::-webkit-scrollbar{display:none}
+    .nav-links li{flex-shrink:0}
+    .nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-weight:600;font-size:.58rem;text-transform:uppercase;letter-spacing:1.5px;padding:7px 14px;border-radius:20px;border:1px solid rgba(255,215,0,.25);transition:var(--transition);display:block;position:relative;overflow:hidden;cursor:none}
+    .nav-links a::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,215,0,.18),transparent);transition:left .5s ease}
+    .nav-links a:hover::before{left:100%}
+    .nav-links a:hover{color:var(--gold);border-color:rgba(255,215,0,.7);box-shadow:0 0 12px rgba(255,215,0,.2),inset 0 0 8px rgba(255,215,0,.06);transform:translateY(-1px)}
+    .nav-links a.active{background:linear-gradient(135deg,var(--gold) 0%,#e8b800 100%);color:#000;border-color:var(--gold);box-shadow:0 0 18px rgba(255,215,0,.45),0 0 40px rgba(255,215,0,.15);font-weight:800}
+    .nav-links a.active::before{display:none}
 
-    /* ------- BOULE (Sun Core) ------- */
-    .sun-wrapper {
-      position: relative;
-      width: 160px; height: 160px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 10px;
-    }
-    /* Les deux moitiés qui se rejoignent */
-    .sun-half {
-      position: absolute;
-      width: 80px; height: 160px;
-      overflow: hidden;
-      opacity: 0;
-    }
-    .sun-half.left  { left: 0;  transform: translateX(-120px); }
-    .sun-half.right { right: 0; transform: translateX(120px); }
-    .sun-half-inner {
-      width: 160px; height: 160px;
-      background: radial-gradient(circle at 50% 50%, #ffffff 0%, #ffe066 25%, var(--gold) 55%, var(--gold-deep) 100%);
-      border-radius: 50%;
-      box-shadow:
-        0 0 40px rgba(255,215,0,0.9),
-        0 0 80px rgba(255,215,0,0.5),
-        0 0 120px rgba(255,180,0,0.3);
-    }
-    .sun-half.right .sun-half-inner { margin-left: -80px; }
-    /* Boule finale après fusion */
-    .sun-core {
-      width: 160px; height: 160px;
-      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ffe066 20%, var(--gold) 50%, var(--gold-deep) 100%);
-      border-radius: 50%;
-      box-shadow:
-        0 0 40px rgba(255,215,0,0.9),
-        0 0 80px rgba(255,215,0,0.5),
-        0 0 140px rgba(255,180,0,0.3),
-        inset 0 0 30px rgba(255,255,255,0.2);
-      position: relative;
-      opacity: 0;
-      filter: blur(1px);
-    }
-    /* Effet énergie interne – anneaux */
-    .sun-core::before {
-      content: '';
-      position: absolute;
-      inset: -15px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,215,0,0.35);
-      animation: ring-pulse 3s ease-in-out infinite;
-    }
-    .sun-core::after {
-      content: '';
-      position: absolute;
-      inset: -30px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,215,0,0.18);
-      animation: ring-pulse 3s ease-in-out infinite 0.8s;
-    }
-    @keyframes ring-pulse {
-      0%, 100% { transform: scale(1);   opacity: 1; }
-      50%       { transform: scale(1.12); opacity: 0.4; }
-    }
+    /* ═══════════════════════════ HERO ══════════════════════════════════ */
+    .hero-container{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:120px 20px 60px;text-align:center;overflow:hidden;will-change:transform}
+    .sun-wrapper{position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+    .sun-half{position:absolute;width:80px;height:160px;overflow:hidden;opacity:0}
+    .sun-half.left{left:0;transform:translateX(-120px)}
+    .sun-half.right{right:0;transform:translateX(120px)}
+    .sun-half-inner{width:160px;height:160px;background:radial-gradient(circle at 50% 50%,#ffffff 0%,#ffe066 25%,var(--gold) 55%,var(--gold-deep) 100%);border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,.9),0 0 80px rgba(255,215,0,.5),0 0 120px rgba(255,180,0,.3)}
+    .sun-half.right .sun-half-inner{margin-left:-80px}
+    .sun-core{width:160px;height:160px;background:radial-gradient(circle at 35% 35%,#ffffff 0%,#ffe066 20%,var(--gold) 50%,var(--gold-deep) 100%);border-radius:50%;box-shadow:0 0 40px rgba(255,215,0,.9),0 0 80px rgba(255,215,0,.5),0 0 140px rgba(255,180,0,.3),inset 0 0 30px rgba(255,255,255,.2);position:relative;opacity:0;filter:blur(1px)}
+    .sun-core::before{content:'';position:absolute;inset:-15px;border-radius:50%;border:1px solid rgba(255,215,0,.35);animation:ring-pulse 3s ease-in-out infinite}
+    .sun-core::after{content:'';position:absolute;inset:-30px;border-radius:50%;border:1px solid rgba(255,215,0,.18);animation:ring-pulse 3s ease-in-out infinite .8s}
+    @keyframes ring-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:.4}}
+    .title-wrapper{position:relative;display:inline-block;margin:28px 0 0}
+    .title-glass-bg{position:absolute;inset:-20px -30px;border-radius:20px;backdrop-filter:blur(8px);background:rgba(0,0,0,.25);border:1px solid rgba(255,215,0,.12);overflow:hidden}
+    .title-glass-bg::before{content:'';position:absolute;width:60%;height:200%;top:-50%;background:conic-gradient(from 0deg,transparent,rgba(255,215,0,.15),rgba(100,150,255,.10),rgba(255,80,200,.10),transparent);animation:aura-rotate 6s linear infinite;transform-origin:center}
+    @keyframes aura-rotate{to{transform:rotate(360deg)}}
+    .gold-shimmer{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,8vw,5rem);background:linear-gradient(90deg,#c8950a 0%,var(--gold) 30%,#fffbe0 50%,var(--gold) 70%,#c8950a 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 5s linear infinite;position:relative;z-index:1;display:inline-block;line-height:1.2;white-space:nowrap}
+    @keyframes shimmer{to{background-position:200% center}}
+    .typewriter-cursor{display:inline-block;width:3px;height:.85em;background:var(--gold);margin-left:4px;vertical-align:middle;animation:blink-cursor .75s step-end infinite;box-shadow:0 0 8px var(--gold);position:relative;z-index:1}
+    @keyframes blink-cursor{50%{opacity:0}}
+    .glass-info{background:rgba(255,215,0,.08);backdrop-filter:blur(18px);border:1px solid rgba(255,215,0,.25);border-radius:20px;padding:14px 40px;margin-top:18px;text-align:center;position:relative;overflow:hidden}
+    .glass-info::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);animation:glass-sweep 4s ease-in-out infinite}
+    @keyframes glass-sweep{to{left:140%}}
+    .slogan-text{letter-spacing:5px;font-weight:600;font-size:.85rem;margin:0}
+    .machine-status-hero{margin-top:22px;background:rgba(0,0,0,.4);backdrop-filter:blur(12px);border:1px solid rgba(255,215,0,.2);border-radius:16px;padding:16px 28px;text-align:center}
+    .machine-status-row{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:6px}
+    .machine-dot{width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:dot-pulse 2s ease-in-out infinite}
+    @keyframes dot-pulse{0%,100%{box-shadow:0 0 5px #00ff88}50%{box-shadow:0 0 18px #00ff88,0 0 30px rgba(0,255,136,.4)}}
+    .machine-count-text{font-size:.8rem;font-weight:600;color:var(--gold)}
+    #available-machines{font-size:1.4rem;font-weight:800;color:#00ff88}
+    .machine-timer-text{font-size:.72rem;color:rgba(255,215,0,.7);font-style:italic}
 
-    /* ------- TITRE PRINCIPAL avec effet machine à écrire ------- */
-    .title-wrapper {
-      position: relative;
-      display: inline-block;
-      margin: 28px 0 0;
-    }
-    /* Glassmorphism derrière le titre */
-    .title-glass-bg {
-      position: absolute;
-      inset: -20px -30px;
-      border-radius: 20px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      background: rgba(0,0,0,0.25);
-      border: 1px solid rgba(255,215,0,0.12);
-      overflow: hidden;
-    }
-    /* Lumière multicolore qui se déplace */
-    .title-glass-bg::before {
-      content: '';
-      position: absolute;
-      width: 60%; height: 200%;
-      top: -50%;
-      background: conic-gradient(from 0deg, transparent, rgba(255,215,0,0.15), rgba(100,150,255,0.10), rgba(255,80,200,0.10), transparent);
-      animation: aura-rotate 6s linear infinite;
-      transform-origin: center;
-    }
-    @keyframes aura-rotate { to { transform: rotate(360deg); } }
+    /* ═══════════════════════════ SECTION MACHINES ══════════════════════ */
+    .section-machines{padding:80px 20px 60px;max-width:1100px;margin:0 auto}
+    .section-title{text-align:center;font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:10px}
+    .section-subtitle{text-align:center;font-size:.75rem;color:rgba(255,215,0,.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:50px}
+    .machines-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+    .machine-card{background:rgba(0,0,0,.5);border:1px solid rgba(255,215,0,.2);border-radius:16px;padding:24px;position:relative;overflow:hidden;transition:var(--transition)}
+    .machine-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+    .machine-card:hover{border-color:rgba(255,215,0,.5);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 30px rgba(255,215,0,.08)}
+    .machine-hud-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .machine-id{font-size:.65rem;color:rgba(255,215,0,.5);letter-spacing:2px;font-weight:600}
+    .machine-status-badge{padding:4px 12px;border-radius:20px;font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+    .badge-available{background:rgba(0,255,136,.12);color:#00ff88;border:1px solid rgba(0,255,136,.3)}
+    .badge-busy{background:rgba(255,100,0,.12);color:#ff8844;border:1px solid rgba(255,100,0,.3)}
+    .badge-soon{background:rgba(255,215,0,.1);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
+    .machine-progress-bar{width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin:10px 0}
+    .machine-progress-fill{height:100%;border-radius:2px;transition:width 1s ease}
+    .fill-green{background:linear-gradient(90deg,#00c866,#00ff88);box-shadow:0 0 8px rgba(0,255,136,.5)}
+    .fill-orange{background:linear-gradient(90deg,#ff6600,#ffaa00);box-shadow:0 0 8px rgba(255,150,0,.4)}
+    .fill-gold{background:linear-gradient(90deg,var(--gold-deep),var(--gold));box-shadow:0 0 8px var(--gold-glow)}
+    .machine-info-text{font-size:.72rem;color:rgba(255,255,255,.6)}
+    .machine-countdown{font-size:1.4rem;font-weight:800;color:var(--gold);font-family:'Montserrat',monospace;margin:8px 0;text-shadow:0 0 15px var(--gold-glow)}
+    .machine-card::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,215,0,.01) 2px,rgba(255,215,0,.01) 4px);pointer-events:none}
+    .machine-card.is-available{cursor:none}
+    .machine-card.is-available:hover{border-color:rgba(0,255,136,.6);box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 35px rgba(0,255,136,.15);transform:translateY(-6px) scale(1.01)}
+    .machine-card.is-available:hover .machine-card-cta{opacity:1;transform:translateY(0)}
+    .machine-card-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding:9px 16px;background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(0,200,100,.08));border:1px solid rgba(0,255,136,.35);border-radius:10px;font-size:.68rem;font-weight:700;color:#00ff88;letter-spacing:1px;text-transform:uppercase;opacity:0;transform:translateY(6px);transition:var(--transition)}
 
-    .gold-shimmer {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.8rem, 8vw, 5rem);
-      background: linear-gradient(90deg, #c8950a 0%, var(--gold) 30%, #fffbe0 50%, var(--gold) 70%, #c8950a 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 5s linear infinite;
-      position: relative;
-      z-index: 1;
-      display: inline-block;
-      line-height: 1.2;
-      white-space: nowrap;
-    }
-    @keyframes shimmer { to { background-position: 200% center; } }
+    /* ═══════════════════════════ PRICING ═══════════════════════════════ */
+    .pricing-section{padding:80px 20px}
+    .pricing-wrapper{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;max-width:1200px;margin:0 auto}
+    .magic-card{flex:1;min-width:min(320px,90vw);max-width:360px;background:linear-gradient(135deg,#D4AF37,#7a5c0e,#D4AF37,#5c4000,#D4AF37);background-size:400% 400%;border-radius:22px;padding:3px;animation:liquidGold 5s ease infinite;transition:transform .45s cubic-bezier(.165,.84,.44,1),box-shadow .45s ease;position:relative}
+    .magic-card:hover{transform:scale(1.04) translateY(-6px);box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 50px rgba(255,215,0,.15)}
+    @keyframes liquidGold{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .card-inner{background:linear-gradient(160deg,#0d0d0d 0%,#111108 100%);border-radius:19px;padding:36px 24px;height:100%;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden}
+    .card-inner::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(255,215,0,.06) 0%,transparent 60%);pointer-events:none}
+    .card-plan-label{font-size:.6rem;letter-spacing:3px;color:rgba(255,215,0,.6);text-transform:uppercase;margin-bottom:8px}
+    .card-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--gold);margin-bottom:4px;background:linear-gradient(90deg,#c8950a,var(--gold),#fffbe0,var(--gold),#c8950a);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite}
+    .card-weight{font-size:.75rem;color:rgba(255,255,255,.5);margin-bottom:20px;letter-spacing:1px}
+    .card-price{font-size:3rem;font-weight:900;line-height:1;background:linear-gradient(90deg,#c8950a,var(--gold),#fffbe0,var(--gold),#c8950a);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3.5s linear infinite;filter:drop-shadow(0 0 15px rgba(255,215,0,.4))}
+    .card-price span{font-size:1rem;font-weight:400;color:rgba(255,215,0,.6);-webkit-text-fill-color:rgba(255,215,0,.6)}
+    .card-divider{width:60%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.4),transparent);margin:20px auto}
+    .card-features{list-style:none;width:100%;margin-bottom:28px}
+    .card-features li{font-size:.78rem;color:rgba(255,255,255,.75);padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:10px;text-align:left}
+    .card-features li:last-child{border-bottom:none}
+    .feat-icon{width:22px;height:22px;border-radius:50%;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.25);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+    .card-desc-shimmer{font-size:.72rem;background:linear-gradient(90deg,rgba(255,255,255,.6),rgba(255,215,0,.9),rgba(255,255,255,.6));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite}
+    .btn-gold-card{display:inline-block;padding:12px 30px;background:var(--gold);color:#000;text-decoration:none;border-radius:50px;font-weight:800;text-transform:uppercase;font-size:.72rem;letter-spacing:2px;transition:var(--transition);box-shadow:0 5px 15px rgba(255,215,0,.3);cursor:none;width:82%;text-align:center}
+    .btn-gold-card:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(255,215,0,.5)}
 
-    /* Curseur clignotant pour l'effet machine à écrire */
-    .typewriter-cursor {
-      display: inline-block;
-      width: 3px;
-      height: 0.85em;
-      background: var(--gold);
-      margin-left: 4px;
-      vertical-align: middle;
-      animation: blink-cursor 0.75s step-end infinite;
-      box-shadow: 0 0 8px var(--gold);
-      position: relative;
-      z-index: 1;
-    }
-    @keyframes blink-cursor { 50% { opacity: 0; } }
+    /* ═══════════════════════════ CALCULATEUR ════════════════════════════ */
+    .calc-section{padding:60px 20px;max-width:700px;margin:0 auto}
+    .calc-wrapper{background:linear-gradient(135deg,#D4AF37,#7a5c0e,#D4AF37);background-size:400% 400%;border-radius:22px;padding:3px;animation:liquidGold 5s ease infinite}
+    .calc-inner{background:linear-gradient(160deg,#0b0b09,#111108);border-radius:19px;padding:36px 32px;position:relative;overflow:hidden}
+    .calc-inner::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(255,215,0,.05) 0%,transparent 60%);pointer-events:none}
+    .calc-title{font-family:'Playfair Display',serif;font-size:1.4rem;text-align:center;margin-bottom:28px;background:linear-gradient(90deg,#c8950a,var(--gold),#fffbe0,var(--gold),#c8950a);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite}
+    .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    @media(max-width:500px){.calc-grid{grid-template-columns:1fr}}
+    .calc-field{display:flex;flex-direction:column;gap:6px}
+    .calc-field.full{grid-column:1 / -1}
+    .calc-label{font-size:.65rem;color:rgba(255,215,0,.7);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+    .calc-input{width:100%;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,215,0,.25);border-radius:10px;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:.85rem;transition:var(--transition);outline:none}
+    .calc-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,215,0,.08),0 0 15px rgba(255,215,0,.1)}
+    .calc-input option{background:#111}
+    .calc-checkbox-row{display:flex;align-items:center;gap:10px;cursor:none}
+    .calc-checkbox{width:18px;height:18px;accent-color:var(--gold);cursor:none}
+    .calc-checkbox-label{font-size:.78rem;color:rgba(255,255,255,.8)}
+    .calc-total-box{margin:20px 0;padding:20px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:14px;text-align:center;transition:var(--transition)}
+    .calc-total-label{font-size:.65rem;color:rgba(255,215,0,.6);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+    .calc-total-amount{font-size:2.4rem;font-weight:900;background:linear-gradient(90deg,#c8950a,var(--gold),#fffbe0,var(--gold),#c8950a);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite;filter:drop-shadow(0 0 12px rgba(255,215,0,.35))}
+    .calc-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold) 0%,#e8b800 50%,var(--gold) 100%);background-size:200% auto;color:#000;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:none;transition:var(--transition);position:relative;overflow:hidden}
+    .calc-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transition:left .5s}
+    .calc-btn:hover::before{left:100%}
+    .calc-btn:hover{box-shadow:0 0 30px rgba(255,215,0,.5),0 8px 20px rgba(0,0,0,.3);transform:translateY(-2px)}
+    .calc-receipt{display:none;margin-top:24px;padding:24px;background:rgba(0,0,0,.6);border:1px solid rgba(255,215,0,.3);border-radius:16px;position:relative;overflow:hidden}
+    .calc-receipt.visible{display:block;animation:receipt-appear .5s ease}
+    @keyframes receipt-appear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .receipt-header{text-align:center;border-bottom:1px dashed rgba(255,215,0,.25);padding-bottom:14px;margin-bottom:16px}
+    .receipt-logo{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);letter-spacing:2px}
+    .receipt-date{font-size:.65rem;color:rgba(255,255,255,.4);margin-top:4px}
+    .receipt-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:.75rem;border-bottom:1px solid rgba(255,255,255,.04)}
+    .receipt-row-key{color:rgba(255,255,255,.6)}
+    .receipt-row-val{color:var(--gold);font-weight:600}
+    .receipt-total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0 0;font-weight:800}
+    .receipt-total-key{font-size:.8rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.9)}
+    .receipt-total-val{font-size:1.4rem;background:linear-gradient(90deg,var(--gold-deep),var(--gold),#fffbe0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .receipt-print-btn{display:block;width:100%;margin-top:16px;padding:12px;text-align:center;background:transparent;border:1px solid rgba(255,215,0,.35);border-radius:10px;color:var(--gold);font-size:.7rem;font-family:'Montserrat',sans-serif;letter-spacing:1.5px;text-transform:uppercase;cursor:none;transition:var(--transition)}
+    .receipt-print-btn:hover{background:rgba(255,215,0,.1);box-shadow:0 0 15px rgba(255,215,0,.15)}
 
-    /* ------- SLOGAN ------- */
-    .glass-info {
-      background: rgba(255,215,0,0.08);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,215,0,0.25);
-      border-radius: 20px;
-      padding: 14px 40px;
-      margin-top: 18px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .glass-info::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 60%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
-      animation: glass-sweep 4s ease-in-out infinite;
-    }
-    @keyframes glass-sweep { to { left: 140%; } }
-    .slogan-text {
-      letter-spacing: 5px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      margin: 0;
-    }
+    /* ═══════════════════════════ CAROUSEL ══════════════════════════════ */
+    .carousel-section{padding:80px 0}
+    .carousel-track-wrapper{position:relative;width:100%;overflow:hidden;padding:20px 0}
+    .carousel-track{display:flex;gap:20px;padding:10px 40px;transition:transform .5s cubic-bezier(.165,.84,.44,1);will-change:transform}
+    .carousel-slide{flex-shrink:0;width:clamp(200px,28vw,280px);aspect-ratio:4/3;border-radius:16px;background:linear-gradient(135deg,#1a1500,#0d0d0d);border:1px solid rgba(255,215,0,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:none;transition:var(--transition);position:relative;overflow:hidden}
+    .carousel-slide::before{content:'';position:absolute;inset:-1px;border-radius:17px;background:linear-gradient(135deg,#D4AF37,transparent,#D4AF37,transparent);background-size:400% 400%;animation:liquidGold 6s ease infinite;z-index:0;opacity:0;transition:opacity .4s}
+    .carousel-slide:hover::before{opacity:1}
+    .carousel-slide:hover{transform:scale(1.04);box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 30px rgba(255,215,0,.1)}
+    .carousel-slide-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;height:100%;padding:20px}
+    .carousel-placeholder-icon{width:56px;height:56px;border-radius:50%;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+    .carousel-img-name{font-size:.65rem;color:rgba(255,215,0,.5);letter-spacing:1px}
+    .carousel-machine-label{font-size:.8rem;font-weight:600;color:rgba(255,255,255,.7)}
+    .carousel-controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px}
+    .carousel-btn{width:44px;height:44px;border-radius:50%;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3);color:var(--gold);font-size:1.2rem;cursor:none;transition:var(--transition);display:flex;align-items:center;justify-content:center}
+    .carousel-btn:hover{background:rgba(255,215,0,.2);box-shadow:0 0 20px rgba(255,215,0,.2);transform:scale(1.1)}
+    .carousel-dots{display:flex;gap:8px;align-items:center}
+    .carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,215,0,.3);cursor:none;transition:var(--transition)}
+    .carousel-dot.active{width:20px;border-radius:3px;background:var(--gold);box-shadow:0 0 8px var(--gold-glow)}
 
-    /* ------- MACHINES STATUS ------- */
-    .machine-status-hero {
-      margin-top: 22px;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,215,0,0.2);
-      border-radius: 16px;
-      padding: 16px 28px;
-      text-align: center;
-    }
-    .machine-status-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 6px;
-    }
-    .machine-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #00ff88;
-      box-shadow: 0 0 8px #00ff88;
-      animation: dot-pulse 2s ease-in-out infinite;
-    }
-    @keyframes dot-pulse {
-      0%,100% { box-shadow: 0 0 5px #00ff88; }
-      50%      { box-shadow: 0 0 18px #00ff88, 0 0 30px rgba(0,255,136,0.4); }
-    }
-    .machine-count-text {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--gold);
-    }
-    #available-machines { font-size: 1.4rem; font-weight: 800; color: #00ff88; }
-    .machine-timer-text {
-      font-size: 0.72rem;
-      color: rgba(255,215,0,0.7);
-      font-style: italic;
-    }
+    /* ═══════════════════════════ SECTION CINÉMATIQUE ═══════════════════ */
+    .section-parallax{opacity:0;transform:translateY(60px) scale(.97);transition:opacity .9s cubic-bezier(.165,.84,.44,1),transform .9s cubic-bezier(.165,.84,.44,1)}
+    .section-parallax.in-view{opacity:1;transform:translateY(0) scale(1)}
+    .reveal{opacity:0;transform:translateY(50px);transition:opacity .8s cubic-bezier(.165,.84,.44,1),transform .8s cubic-bezier(.165,.84,.44,1)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .reveal-left{opacity:0;transform:translateX(-60px);transition:opacity .8s cubic-bezier(.165,.84,.44,1),transform .8s cubic-bezier(.165,.84,.44,1)}
+    .reveal-left.visible{opacity:1;transform:translateX(0)}
+    .reveal-right{opacity:0;transform:translateX(60px);transition:opacity .8s cubic-bezier(.165,.84,.44,1),transform .8s cubic-bezier(.165,.84,.44,1)}
+    .reveal-right.visible{opacity:1;transform:translateX(0)}
 
-    /* ============================================================
-       SECTION MACHINES (HUD)
-    ============================================================ */
-    .section-machines {
-      padding: 80px 20px 60px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .section-title {
-      text-align: center;
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.6rem, 4vw, 2.4rem);
-      margin-bottom: 10px;
-    }
-    .section-subtitle {
-      text-align: center;
-      font-size: 0.75rem;
-      color: rgba(255,215,0,0.6);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 50px;
-    }
-    .machines-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-    }
-    .machine-card {
-      background: rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,215,0,0.2);
-      border-radius: 16px;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-      transition: var(--transition);
-    }
-    .machine-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    }
-    .machine-card:hover {
-      border-color: rgba(255,215,0,0.5);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255,215,0,0.08);
-    }
-    .machine-hud-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .machine-id {
-      font-size: 0.65rem;
-      color: rgba(255,215,0,0.5);
-      letter-spacing: 2px;
-      font-weight: 600;
-    }
-    .machine-status-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.6rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    .badge-available {
-      background: rgba(0,255,136,0.12);
-      color: #00ff88;
-      border: 1px solid rgba(0,255,136,0.3);
-    }
-    .badge-busy {
-      background: rgba(255,100,0,0.12);
-      color: #ff8844;
-      border: 1px solid rgba(255,100,0,0.3);
-    }
-    .badge-soon {
-      background: rgba(255,215,0,0.1);
-      color: var(--gold);
-      border: 1px solid rgba(255,215,0,0.3);
-    }
-    .machine-hud-body { margin: 12px 0; }
-    .machine-progress-bar {
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 2px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
-    .machine-progress-fill {
-      height: 100%;
-      border-radius: 2px;
-      transition: width 1s ease;
-    }
-    .fill-green  { background: linear-gradient(90deg, #00c866, #00ff88); box-shadow: 0 0 8px rgba(0,255,136,0.5); }
-    .fill-orange { background: linear-gradient(90deg, #ff6600, #ffaa00); box-shadow: 0 0 8px rgba(255,150,0,0.4); }
-    .fill-gold   { background: linear-gradient(90deg, var(--gold-deep), var(--gold)); box-shadow: 0 0 8px var(--gold-glow); }
-    .machine-info-text {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.6);
-    }
-    .machine-countdown {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--gold);
-      font-family: 'Montserrat', monospace;
-      margin: 8px 0;
-      text-shadow: 0 0 15px var(--gold-glow);
-    }
-    /* Scanline HUD effect */
-    .machine-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,215,0,0.01) 2px, rgba(255,215,0,0.01) 4px);
-      pointer-events: none;
-    }
-    /* Machine disponible = cliquable vers WhatsApp */
-    .machine-card.is-available {
-      cursor: pointer;
-    }
-    .machine-card.is-available:hover {
-      border-color: rgba(0,255,136,0.6);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 35px rgba(0,255,136,0.15);
-      transform: translateY(-6px) scale(1.01);
-    }
-    .machine-card.is-available:hover .machine-card-cta {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .machine-card-cta {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 12px;
-      padding: 9px 16px;
-      background: linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,200,100,0.08));
-      border: 1px solid rgba(0,255,136,0.35);
-      border-radius: 10px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: #00ff88;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: var(--transition);
-    }
-    /* Ripple au clic */
-    @keyframes machine-ripple {
-      from { transform: scale(0); opacity: 0.6; }
-      to   { transform: scale(3); opacity: 0; }
-    }
+    /* ═══════════════════════════ FOOTER ════════════════════════════════ */
+    footer{background:#000;padding:60px 5%;text-align:center;border-top:1px solid rgba(255,215,0,.2);position:relative}
+    footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,var(--gold) 30%,#fffbe0 50%,var(--gold) 70%,transparent 100%);background-size:200% 100%;animation:nl 5s linear infinite}
+    .footer-title{font-family:'Playfair Display',serif;font-size:1.1rem;background:linear-gradient(90deg,var(--gold-deep),var(--gold),#fffbe0,var(--gold),var(--gold-deep));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 5s linear infinite;letter-spacing:3px;text-transform:uppercase;margin-bottom:24px}
+    .footer-socials{display:flex;justify-content:center;gap:24px;margin:20px 0 30px}
+    .footer-socials a{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);transition:var(--transition);cursor:none}
+    .footer-socials a:hover{background:rgba(255,215,0,.15);box-shadow:0 0 20px rgba(255,215,0,.2);transform:translateY(-3px)}
+    .footer-socials img{width:28px}
+    .footer-copy{font-size:.65rem;color:rgba(255,215,0,.5);letter-spacing:2px;text-transform:uppercase}
+    .footer-adresse{font-size:.62rem;color:rgba(255,215,0,.4);letter-spacing:1px;margin-top:8px}
 
-    /* ============================================================
-       TARIFS (PRICING)
-    ============================================================ */
-    .pricing-section {
-      padding: 80px 20px;
-    }
-    .pricing-wrapper {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 28px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    /* Carte dorée animée */
-    .magic-card {
-      flex: 1;
-      min-width: min(320px, 90vw);
-      max-width: 360px;
-      background: linear-gradient(135deg, #D4AF37, #7a5c0e, #D4AF37, #5c4000, #D4AF37);
-      background-size: 400% 400%;
-      border-radius: 22px;
-      padding: 3px;
-      animation: liquidGold 5s ease infinite;
-      transition: transform 0.45s cubic-bezier(0.165,0.84,0.44,1), box-shadow 0.45s ease;
-      position: relative;
-    }
-    .magic-card:hover {
-      transform: scale(1.04) translateY(-6px);
-      box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 50px rgba(255,215,0,0.15);
-    }
-    @keyframes liquidGold {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .card-inner {
-      background: linear-gradient(160deg, #0d0d0d 0%, #111108 100%);
-      border-radius: 19px;
-      padding: 36px 24px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    /* Effet lumière interne de la carte */
-    .card-inner::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(ellipse at 30% 20%, rgba(255,215,0,0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .card-plan-label {
-      font-size: 0.6rem;
-      letter-spacing: 3px;
-      color: rgba(255,215,0,0.6);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--gold);
-      margin-bottom: 4px;
-      /* Shimmer sur le titre */
-      background: linear-gradient(90deg, #c8950a, var(--gold), #fffbe0, var(--gold), #c8950a);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 4s linear infinite;
-    }
-    .card-weight {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 20px;
-      letter-spacing: 1px;
-    }
-    .card-price {
-      font-size: 3rem;
-      font-weight: 900;
-      line-height: 1;
-      /* Shimmer sur le prix */
-      background: linear-gradient(90deg, #c8950a, var(--gold), #fffbe0, var(--gold), #c8950a);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3.5s linear infinite;
-      filter: drop-shadow(0 0 15px rgba(255,215,0,0.4));
-    }
-    .card-price span {
-      font-size: 1rem;
-      font-weight: 400;
-      color: rgba(255,215,0,0.6);
-      -webkit-text-fill-color: rgba(255,215,0,0.6);
-    }
-    .card-divider {
-      width: 60%; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,215,0,0.4), transparent);
-      margin: 20px auto;
-    }
-    .card-features {
-      list-style: none;
-      width: 100%;
-      margin-bottom: 28px;
-    }
-    .card-features li {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.75);
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-align: left;
-    }
-    .card-features li:last-child { border-bottom: none; }
-    .card-features .feat-icon {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: rgba(255,215,0,0.12);
-      border: 1px solid rgba(255,215,0,0.25);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem;
-      flex-shrink: 0;
-    }
-    /* Description shimmer */
-    .card-desc-shimmer {
-      font-size: 0.72rem;
-      background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,215,0,0.9), rgba(255,255,255,0.6));
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 4s linear infinite;
-    }
-
-    /* ============================================================
-       CALCULATEUR
-    ============================================================ */
-    .calc-section {
-      padding: 60px 20px;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    .calc-wrapper {
-      background: linear-gradient(135deg, #D4AF37, #7a5c0e, #D4AF37);
-      background-size: 400% 400%;
-      border-radius: 22px;
-      padding: 3px;
-      animation: liquidGold 5s ease infinite;
-    }
-    .calc-inner {
-      background: linear-gradient(160deg, #0b0b09, #111108);
-      border-radius: 19px;
-      padding: 36px 32px;
-      position: relative;
-      overflow: hidden;
-    }
-    .calc-inner::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(ellipse at 30% 20%, rgba(255,215,0,0.05) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .calc-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      text-align: center;
-      margin-bottom: 28px;
-      background: linear-gradient(90deg, #c8950a, var(--gold), #fffbe0, var(--gold), #c8950a);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 4s linear infinite;
-    }
-    .calc-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    @media (max-width: 500px) { .calc-grid { grid-template-columns: 1fr; } }
-    .calc-field { display: flex; flex-direction: column; gap: 6px; }
-    .calc-field.full { grid-column: 1 / -1; }
-    .calc-label {
-      font-size: 0.65rem;
-      color: rgba(255,215,0,0.7);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 600;
-    }
-    .calc-input {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,215,0,0.25);
-      border-radius: 10px;
-      color: var(--gold);
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.85rem;
-      transition: var(--transition);
-      outline: none;
-    }
-    .calc-input:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(255,215,0,0.08), 0 0 15px rgba(255,215,0,0.1);
-    }
-    .calc-input option { background: #111; }
-    .calc-checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
-    .calc-checkbox {
-      width: 18px; height: 18px;
-      accent-color: var(--gold);
-      cursor: pointer;
-    }
-    .calc-checkbox-label {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.8);
-      cursor: pointer;
-    }
-    .calc-total-box {
-      margin: 20px 0;
-      padding: 20px;
-      background: rgba(255,215,0,0.06);
-      border: 1px solid rgba(255,215,0,0.2);
-      border-radius: 14px;
-      text-align: center;
-      transition: var(--transition);
-    }
-    .calc-total-label {
-      font-size: 0.65rem;
-      color: rgba(255,215,0,0.6);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 8px;
-    }
-    .calc-total-amount {
-      font-size: 2.4rem;
-      font-weight: 900;
-      background: linear-gradient(90deg, #c8950a, var(--gold), #fffbe0, var(--gold), #c8950a);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s linear infinite;
-      filter: drop-shadow(0 0 12px rgba(255,215,0,0.35));
-    }
-    .calc-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--gold) 0%, #e8b800 50%, var(--gold) 100%);
-      background-size: 200% auto;
-      color: #000;
-      border: none;
-      border-radius: 12px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-    .calc-btn::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transition: left 0.5s;
-    }
-    .calc-btn:hover::before { left: 100%; }
-    .calc-btn:hover {
-      box-shadow: 0 0 30px rgba(255,215,0,0.5), 0 8px 20px rgba(0,0,0,0.3);
-      transform: translateY(-2px);
-    }
-    .calc-btn:active { transform: scale(0.98); }
-
-    /* Fiche résultat */
-    .calc-receipt {
-      display: none;
-      margin-top: 24px;
-      padding: 24px;
-      background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,215,0,0.3);
-      border-radius: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-    .calc-receipt.visible { display: block; animation: receipt-appear 0.5s ease; }
-    @keyframes receipt-appear {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .receipt-header {
-      text-align: center;
-      border-bottom: 1px dashed rgba(255,215,0,0.25);
-      padding-bottom: 14px;
-      margin-bottom: 16px;
-    }
-    .receipt-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1rem;
-      color: var(--gold);
-      letter-spacing: 2px;
-    }
-    .receipt-date { font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
-    .receipt-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 7px 0;
-      font-size: 0.75rem;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-    .receipt-row-key { color: rgba(255,255,255,0.6); }
-    .receipt-row-val { color: var(--gold); font-weight: 600; }
-    .receipt-total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 0 0;
-      font-weight: 800;
-    }
-    .receipt-total-key {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,0.9);
-    }
-    .receipt-total-val {
-      font-size: 1.4rem;
-      background: linear-gradient(90deg, var(--gold-deep), var(--gold), #fffbe0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .receipt-print-btn {
-      display: block;
-      width: 100%;
-      margin-top: 16px;
-      padding: 12px;
-      text-align: center;
-      background: transparent;
-      border: 1px solid rgba(255,215,0,0.35);
-      border-radius: 10px;
-      color: var(--gold);
-      font-size: 0.7rem;
-      font-family: 'Montserrat', sans-serif;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .receipt-print-btn:hover {
-      background: rgba(255,215,0,0.1);
-      box-shadow: 0 0 15px rgba(255,215,0,0.15);
-    }
-
-    /* ============================================================
-       CAROUSEL MACHINES
-    ============================================================ */
-    .carousel-section {
-      padding: 80px 0 80px;
-      overflow: hidden;
-    }
-    .carousel-track-wrapper {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      padding: 20px 0;
-    }
-    .carousel-track {
-      display: flex;
-      gap: 20px;
-      padding: 10px 40px;
-      transition: transform 0.5s cubic-bezier(0.165,0.84,0.44,1);
-      will-change: transform;
-    }
-    .carousel-slide {
-      flex-shrink: 0;
-      width: clamp(200px, 28vw, 280px);
-      aspect-ratio: 4/3;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #1a1500, #0d0d0d);
-      border: 1px solid rgba(255,215,0,0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-    /* Glow léger gold */
-    .carousel-slide::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      border-radius: 17px;
-      background: linear-gradient(135deg, #D4AF37, transparent, #D4AF37, transparent);
-      background-size: 400% 400%;
-      animation: liquidGold 6s ease infinite;
-      z-index: 0;
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-    .carousel-slide:hover::before { opacity: 1; }
-    .carousel-slide:hover {
-      transform: scale(1.04);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.1);
-    }
-    .carousel-slide-inner {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-      height: 100%;
-      padding: 20px;
-    }
-    .carousel-placeholder-icon {
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      background: rgba(255,215,0,0.08);
-      border: 1px solid rgba(255,215,0,0.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem;
-    }
-    .carousel-img-name {
-      font-size: 0.65rem;
-      color: rgba(255,215,0,0.5);
-      letter-spacing: 1px;
-    }
-    .carousel-machine-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.7);
-    }
-    /* Boutons navigation */
-    .carousel-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 24px;
-    }
-    .carousel-btn {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: rgba(255,215,0,0.08);
-      border: 1px solid rgba(255,215,0,0.3);
-      color: var(--gold);
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .carousel-btn:hover {
-      background: rgba(255,215,0,0.2);
-      box-shadow: 0 0 20px rgba(255,215,0,0.2);
-      transform: scale(1.1);
-    }
-    .carousel-dots {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .carousel-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: rgba(255,215,0,0.3);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .carousel-dot.active {
-      width: 20px;
-      border-radius: 3px;
-      background: var(--gold);
-      box-shadow: 0 0 8px var(--gold-glow);
-    }
-
-    /* ============================================================
-       SCROLL REVEAL (SECTIONS)
-    ============================================================ */
-    .reveal {
-      opacity: 0;
-      transform: translateY(50px);
-      transition: opacity 0.8s cubic-bezier(0.165,0.84,0.44,1),
-                  transform 0.8s cubic-bezier(0.165,0.84,0.44,1);
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .reveal-left {
-      opacity: 0;
-      transform: translateX(-60px);
-      transition: opacity 0.8s cubic-bezier(0.165,0.84,0.44,1),
-                  transform 0.8s cubic-bezier(0.165,0.84,0.44,1);
-    }
-    .reveal-left.visible { opacity: 1; transform: translateX(0); }
-    .reveal-right {
-      opacity: 0;
-      transform: translateX(60px);
-      transition: opacity 0.8s cubic-bezier(0.165,0.84,0.44,1),
-                  transform 0.8s cubic-bezier(0.165,0.84,0.44,1);
-    }
-    .reveal-right.visible { opacity: 1; transform: translateX(0); }
-
-    /* ============================================================
-       FOOTER
-    ============================================================ */
-    footer {
-      background: #000;
-      padding: 60px 5%;
-      text-align: center;
-      border-top: 1px solid rgba(255,215,0,0.2);
-      position: relative;
-    }
-    footer::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, #fffbe0 50%, var(--gold) 70%, transparent 100%);
-      background-size: 200% 100%;
-      animation: nav-line 5s linear infinite;
-    }
-    .footer-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      background: linear-gradient(90deg, var(--gold-deep), var(--gold), #fffbe0, var(--gold), var(--gold-deep));
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 5s linear infinite;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 24px;
-    }
-    .footer-socials {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin: 20px 0 30px;
-    }
-    .footer-socials a {
-      display: flex; align-items: center; justify-content: center;
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: rgba(255,215,0,0.06);
-      border: 1px solid rgba(255,215,0,0.2);
-      transition: var(--transition);
-    }
-    .footer-socials a:hover {
-      background: rgba(255,215,0,0.15);
-      box-shadow: 0 0 20px rgba(255,215,0,0.2);
-      transform: translateY(-3px);
-    }
-    .footer-socials img { width: 28px; }
-    .footer-copy {
-      font-size: 0.65rem;
-      color: rgba(255,215,0,0.5);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
-    @media (max-width: 600px) {
-      .gold-shimmer { font-size: clamp(2.2rem, 9vw, 3rem); white-space: normal; }
-      .card-price { font-size: 2.4rem; }
-      .calc-inner { padding: 24px 18px; }
-      .section-machines { padding: 60px 16px 40px; }
-    }
-
-    /* ============================================================
-       MICRO-INTERACTIONS & MISC
-    ============================================================ */
-    /* Sélection de texte dorée */
-    ::selection { background: rgba(255,215,0,0.25); color: #fff; }
-    /* Focus global */
-    *:focus-visible { outline: 2px solid rgba(255,215,0,0.5); outline-offset: 3px; }
+    @media(max-width:600px){.gold-shimmer{font-size:clamp(2.2rem,9vw,3rem);white-space:normal}.card-price{font-size:2.4rem}.calc-inner{padding:24px 18px}.section-machines{padding:60px 16px 40px}}
   </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       CANVAS THREE.JS (galaxies + étoiles)
-  ============================================================ -->
+  <!-- CURSEUR DORÉ -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+  <!-- VIGNETTE + SCANLINES -->
+  <div id="vignette"></div>
+  <div id="scanlines"></div>
+  <!-- ZETWAL FOND IMPOSANT -->
+  <div id="bg-text-lavri"><span>LAVRI</span></div>
+  <!-- PARTICULES 2D SOURIS -->
+  <canvas id="particle-canvas"></canvas>
+  <!-- THREE.JS -->
   <canvas id="webgl-canvas"></canvas>
-
-  <!-- ============================================================
-       BRUME LUMINEUSE MULTICOLORE
-  ============================================================ -->
+  <!-- NEBULA -->
   <div class="nebula-layer" aria-hidden="true">
-    <div class="nebula-blob"></div>
-    <div class="nebula-blob"></div>
-    <div class="nebula-blob"></div>
-    <div class="nebula-blob"></div>
+    <div class="nebula-blob"></div><div class="nebula-blob"></div>
+    <div class="nebula-blob"></div><div class="nebula-blob"></div>
   </div>
 
-  <!-- ============================================================
-       NAVIGATION
-  ============================================================ -->
-  <nav class="nav" role="navigation" aria-label="Navigation principale">
+  <!-- ═══ AUTH MODAL ═══ -->
+  <div class="auth-overlay" id="auth-modal">
+    <div class="auth-modal">
+      <h2 style="color:var(--gold);margin-bottom:25px;font-family:'Playfair Display',serif;letter-spacing:2px">KONEKSYON</h2>
+      <div id="auth-main-view">
+        <button class="btn-auth btn-google" onclick="loginWithGoogle()">Konekte ak Google</button>
+        <div style="margin:18px 0;color:rgba(255,255,255,.3);font-size:.68rem;letter-spacing:2px">OSWA</div>
+        <input type="tel" id="phone-input" class="auth-input-modal" placeholder="+509 XXXX XXXX">
+        <div id="recaptcha-container"></div>
+        <button class="btn-auth btn-phone" onclick="loginWithPhone()">Konekte ak Telefòn</button>
+      </div>
+      <div id="otp-view" style="display:none">
+        <p style="font-size:.8rem;margin-bottom:15px;opacity:.7">Antre kòd ou resevwa a :</p>
+        <input type="text" id="otp-input" class="auth-input-modal" placeholder="123456">
+        <button class="btn-auth btn-phone" onclick="verifyOTP()">Verifye Kòd</button>
+      </div>
+      <button style="background:transparent;border:none;color:rgba(255,255,255,.4);cursor:none;font-size:.65rem;margin-top:18px;text-transform:uppercase;letter-spacing:1px" onclick="toggleAuthModal(false)">Anile</button>
+    </div>
+  </div>
+
+  <!-- ═══ USER INFO CARD ═══ -->
+  <div id="user-info-card">
+    <div class="info-row"><div class="info-label">Non</div><div class="info-value" id="card-name">—</div></div>
+    <div class="info-row"><div class="info-label">Statit</div><div class="info-value" id="card-status">Itilizatè</div></div>
+    <div class="info-row"><div class="info-label">Pwen ou genyen</div><div class="info-value" id="card-points" style="color:var(--gold);font-size:1.2rem">0.0</div></div>
+    <div class="admin-link" id="admin-access">
+      <a href="admin.html" style="display:block;padding:10px 0;font-size:.6rem;text-align:center;background:var(--gold);color:#000;border-radius:10px;font-weight:800;text-decoration:none">Aksè Admin</a>
+    </div>
+    <button class="btn-logout" onclick="handleLogout()">Dekonekte</button>
+  </div>
+
+  <!-- ═══════════════════════════ NAV ═══════════════════════════════════ -->
+  <nav class="nav">
     <div class="nav-content">
-      <!-- User info -->
       <div class="auth-container">
-        <div id="user-display">
-          <span id="user-name">Salut Mike</span><br>
-          <span id="user-points">1 000 Pwen</span>
+        <button id="login-trigger-btn" onclick="toggleAuthModal(true)">Koneksyon</button>
+        <div id="user-profile-area" onclick="toggleInfoCard()">
+          <span id="nav-user-name"></span>
+          <span id="nav-user-points"></span>
         </div>
       </div>
-      <!-- Logo -->
-      <div class="logo-container">
+      <a href="index.html" class="logo-container">
         <img src="logo.png" alt="Logo Zetwal" class="nav-logo-img">
         <div class="logo-text">ZETWAL <span>ORGANISATION</span></div>
-      </div>
-      <!-- Liens (corrigés + complets) -->
-      <ul class="nav-links" role="list">
-        <li><a href="https://zetwal.org/index.html">Akèy</a></li>
-        <li><a href="https://zetwal.org/lavri.html" class="active" aria-current="page">Lavri</a></li>
-        <li><a href="https://zetwal.org/cinema.html">Sinema</a></li>
-        <li><a href="https://zetwal.org/mall.html">Mall</a></li>
-        <li><a href="https://zetwal.org/technopark.html">Technopark</a></li>
-        <li><a href="https://zetwal.org/games.html">Jwèt</a></li>
-        <li><a href="https://zetwal.org/association.html">Asosye</a></li>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Akèy</a></li>
+        <li><a href="lavri.html" class="active" aria-current="page">Lavri</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="mall.html">Mall</a></li>
+        <li><a href="cinema.html">Sinema</a></li>
+        <li><a href="technopark.html">Technopark</a></li>
+        <li><a href="association.html">Asosye</a></li>
+        <li><a href="games.html">Jwèt</a></li>
       </ul>
     </div>
   </nav>
 
-  <!-- ============================================================
-       MAIN CONTENT
-  ============================================================ -->
+  <!-- ═══════════════════════════ MAIN ═════════════════════════════════ -->
   <main>
 
-    <!-- ==================== HERO ==================== -->
-    <section class="hero-container" aria-label="Accueil Lavri">
-      <!-- Boule animée (fusion 2 moitiés + respiration) -->
+    <!-- HERO -->
+    <section class="hero-container" aria-label="Akèy Lavri">
       <div class="sun-wrapper" aria-hidden="true">
-        <div class="sun-half left">
-          <div class="sun-half-inner"></div>
-        </div>
-        <div class="sun-half right">
-          <div class="sun-half-inner"></div>
-        </div>
+        <div class="sun-half left"><div class="sun-half-inner"></div></div>
+        <div class="sun-half right"><div class="sun-half-inner"></div></div>
         <div class="sun-core" id="sunCore"></div>
       </div>
-
-      <!-- Titre avec effet machine à écrire + glassmorphism -->
       <div class="title-wrapper">
         <div class="title-glass-bg" aria-hidden="true"></div>
         <h1 class="gold-shimmer" id="heroTitle" aria-label="Lavri Zetwal"></h1><span class="typewriter-cursor" id="typeCursor" aria-hidden="true"></span>
       </div>
-
-      <!-- Slogan -->
       <div class="glass-info">
         <p class="slogan-text gold-shimmer">Pi Pwòp, Pi Santi Bon</p>
       </div>
-
-      <!-- Status machines -->
       <div class="machine-status-hero" aria-live="polite">
         <div class="machine-status-row">
           <div class="machine-dot" aria-hidden="true"></div>
-          <span class="machine-count-text">
-            <span id="available-machines">3</span> / 10 Machin Disponib
-          </span>
+          <span class="machine-count-text"><span id="available-machines">3</span> / 10 Machin Disponib</span>
         </div>
-        <div class="machine-timer-text" id="timer-simulation">
-          Yon machin pral disponib nan 12:00
-        </div>
+        <div class="machine-timer-text" id="timer-simulation">Chajman...</div>
       </div>
     </section>
 
-    <!-- ==================== SECTION MACHINES HUD ==================== -->
-    <section class="section-machines" aria-label="Statut des machines">
+    <!-- MACHINES HUD -->
+    <section class="section-machines" aria-label="Statut machin yo">
       <div class="reveal">
         <p class="section-subtitle">Sistèm Entèlijan</p>
         <h2 class="section-title gold-shimmer">Machin yo</h2>
       </div>
-      <div class="machines-grid" id="machinesGrid">
-        <!-- Les 5 machines seront générées par JS -->
-      </div>
+      <div class="machines-grid" id="machinesGrid"></div>
     </section>
 
-    <!-- ==================== TARIFS ==================== -->
-    <section class="pricing-section" aria-label="Tarifs">
+    <!-- PRICING -->
+    <section class="pricing-section" aria-label="Pri">
       <div class="reveal">
         <p class="section-subtitle">Ofri nou</p>
         <h2 class="section-title gold-shimmer">Chwa nou yo</h2>
       </div>
       <div class="pricing-wrapper">
-
-        <!-- LE PETIT -->
         <div class="magic-card reveal-left">
           <div class="card-inner">
             <p class="card-plan-label">Plan Esansyèl</p>
@@ -1329,25 +391,14 @@
             <div class="card-price">650<span> HTG</span></div>
             <div class="card-divider"></div>
             <ul class="card-features">
-              <li>
-                <span class="feat-icon">⚡</span>
-                <span><span class="card-desc-shimmer">Pi rapid nan tout</span> — lave ak seche vit</span>
-              </li>
-              <li>
-                <span class="feat-icon">💰</span>
-                <span><span class="card-desc-shimmer">Pi ekonomik</span> — mwens depans</span>
-              </li>
-              <li>
-                <span class="feat-icon">✓</span>
-                <span>Pafè pou yon moun oswa koup</span>
-              </li>
+              <li><span class="feat-icon">⚡</span><span><span class="card-desc-shimmer">Pi rapid nan tout</span> — lave ak seche vit</span></li>
+              <li><span class="feat-icon">💰</span><span><span class="card-desc-shimmer">Pi ekonomik</span> — mwens depans</span></li>
+              <li><span class="feat-icon">✓</span><span>Pafè pou yon moun oswa koup</span></li>
             </ul>
-            <a href="#calculateur" class="login-btn" style="width:82%; text-align:center; background:var(--gold); color:#000;">Chwazi Plan sa</a>
+            <a href="#calculateur" class="btn-gold-card">Chwazi Plan sa</a>
           </div>
         </div>
-
-        <!-- LE MALIN -->
-        <div class="magic-card reveal" style="transition-delay:0.15s">
+        <div class="magic-card reveal" style="transition-delay:.15s">
           <div class="card-inner">
             <p class="card-plan-label">Plan Familyal</p>
             <h3 class="card-title">LE MALIN</h3>
@@ -1355,24 +406,13 @@
             <div class="card-price">850<span> HTG</span></div>
             <div class="card-divider"></div>
             <ul class="card-features">
-              <li>
-                <span class="feat-icon">✨</span>
-                <span><span class="card-desc-shimmer">Balans pafè</span> — pri ak pwa</span>
-              </li>
-              <li>
-                <span class="feat-icon">🏠</span>
-                <span><span class="card-desc-shimmer">Ideyal pou fanmi</span> — chak semèn</span>
-              </li>
-              <li>
-                <span class="feat-icon">✓</span>
-                <span>Pwogram favori kliyan nou yo</span>
-              </li>
+              <li><span class="feat-icon">✨</span><span><span class="card-desc-shimmer">Balans pafè</span> — pri ak pwa</span></li>
+              <li><span class="feat-icon">🏠</span><span><span class="card-desc-shimmer">Ideyal pou fanmi</span> — chak semèn</span></li>
+              <li><span class="feat-icon">✓</span><span>Pwogram favori kliyan nou yo</span></li>
             </ul>
-            <a href="#calculateur" class="login-btn" style="width:82%; text-align:center; background:var(--gold); color:#000;">Chwazi Plan sa</a>
+            <a href="#calculateur" class="btn-gold-card">Chwazi Plan sa</a>
           </div>
         </div>
-
-        <!-- LE GÉANT -->
         <div class="magic-card reveal-right">
           <div class="card-inner">
             <p class="card-plan-label">Plan Premium</p>
@@ -1381,45 +421,26 @@
             <div class="card-price">1 000<span> HTG</span></div>
             <div class="card-divider"></div>
             <ul class="card-features">
-              <li>
-                <span class="feat-icon">🧺</span>
-                <span><span class="card-desc-shimmer">Tout ansanm</span> — kapasité maksimòm</span>
-              </li>
-              <li>
-                <span class="feat-icon">🔥</span>
-                <span><span class="card-desc-shimmer">Sechaj gratis</span> — valè ekstra</span>
-              </li>
-              <li>
-                <span class="feat-icon">👑</span>
-                <span>Pou gwo fanmi ak biznis</span>
-              </li>
+              <li><span class="feat-icon">🧺</span><span><span class="card-desc-shimmer">Tout ansanm</span> — kapasité maksimòm</span></li>
+              <li><span class="feat-icon">🔥</span><span><span class="card-desc-shimmer">Sechaj gratis</span> — valè ekstra</span></li>
+              <li><span class="feat-icon">👑</span><span>Pou gwo fanmi ak biznis</span></li>
             </ul>
-            <a href="#calculateur" class="login-btn" style="width:82%; text-align:center; background:var(--gold); color:#000;">Chwazi Plan sa</a>
+            <a href="#calculateur" class="btn-gold-card">Chwazi Plan sa</a>
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- ==================== CALCULATEUR ==================== -->
-    <section class="calc-section" id="calculateur" aria-label="Calculateur de services">
+    <!-- CALCULATEUR -->
+    <section class="calc-section" id="calculateur" aria-label="Kalkile sèvis ou">
       <div class="calc-wrapper reveal">
         <div class="calc-inner">
           <h2 class="calc-title">🧮 Kalkile Sèvis Ou</h2>
           <div class="calc-grid">
-            <!-- Kilogrammes -->
             <div class="calc-field">
               <label class="calc-label" for="user-kg">Konbyen Kilo rad?</label>
-              <input
-                type="number"
-                id="user-kg"
-                class="calc-input"
-                placeholder="Ex: 10"
-                min="1" max="22"
-                oninput="calculateTotal()"
-              >
+              <input type="number" id="user-kg" class="calc-input" placeholder="Ex: 10" min="1" max="22" oninput="calculateTotal()">
             </div>
-            <!-- Type de lavage -->
             <div class="calc-field">
               <label class="calc-label" for="wash-type">Type Lavaj</label>
               <select id="wash-type" class="calc-input" onchange="calculateTotal()">
@@ -1427,39 +448,21 @@
                 <option value="premium">Lavaj + Sechaj (gratis &gt;15kg)</option>
               </select>
             </div>
-            <!-- Pliage -->
             <div class="calc-field full">
               <label class="calc-label">Opsyon Siplemantè</label>
-              <div style="display:flex; flex-wrap:wrap; gap:16px; margin-top:4px;">
-                <label class="calc-checkbox-row">
-                  <input type="checkbox" id="opt-pliage" class="calc-checkbox" onchange="calculateTotal()">
-                  <span class="calc-checkbox-label">Pliyaj rad <span style="color:var(--gold)">(+150 HTG)</span></span>
-                </label>
-                <label class="calc-checkbox-row">
-                  <input type="checkbox" id="opt-draps" class="calc-checkbox" onchange="calculateTotal()">
-                  <span class="calc-checkbox-label">Dra / Lòt twal <span style="color:var(--gold)">(+100 HTG)</span></span>
-                </label>
-                <label class="calc-checkbox-row">
-                  <input type="checkbox" id="opt-express" class="calc-checkbox" onchange="calculateTotal()">
-                  <span class="calc-checkbox-label">Sèvis Ekspres <span style="color:var(--gold)">(+200 HTG)</span></span>
-                </label>
+              <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:4px">
+                <label class="calc-checkbox-row"><input type="checkbox" id="opt-pliage" class="calc-checkbox" onchange="calculateTotal()"><span class="calc-checkbox-label">Pliyaj rad <span style="color:var(--gold)">(+150 HTG)</span></span></label>
+                <label class="calc-checkbox-row"><input type="checkbox" id="opt-draps" class="calc-checkbox" onchange="calculateTotal()"><span class="calc-checkbox-label">Dra / Lòt twal <span style="color:var(--gold)">(+100 HTG)</span></span></label>
+                <label class="calc-checkbox-row"><input type="checkbox" id="opt-express" class="calc-checkbox" onchange="calculateTotal()"><span class="calc-checkbox-label">Sèvis Ekspres <span style="color:var(--gold)">(+200 HTG)</span></span></label>
               </div>
             </div>
           </div>
-
-          <!-- Total dynamique -->
           <div class="calc-total-box" id="totalBox">
             <div class="calc-total-label">Total Estimasyon</div>
             <div class="calc-total-amount" id="totalAmount">— HTG</div>
-            <div style="font-size:0.68rem; color:rgba(255,255,255,0.35); margin-top:6px;" id="planLabel"></div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.35);margin-top:6px" id="planLabel"></div>
           </div>
-
-          <!-- Bouton générer fiche -->
-          <button class="calc-btn" onclick="generateReceipt()">
-            ✦ Jenere Fich Sèvis Ou
-          </button>
-
-          <!-- Fiche résultat -->
+          <button class="calc-btn" onclick="generateReceipt()">✦ Jenere Fich Sèvis Ou</button>
           <div class="calc-receipt" id="calcReceipt">
             <div class="receipt-header">
               <div class="receipt-logo">✦ LAVRI ZETWAL ✦</div>
@@ -1476,615 +479,484 @@
       </div>
     </section>
 
-    <!-- ==================== CAROUSEL ==================== -->
-    <section class="carousel-section" aria-label="Galerie machines">
-      <div class="reveal" style="padding: 0 20px;">
+    <!-- CAROUSEL -->
+    <section class="carousel-section" aria-label="Galri machin yo">
+      <div class="reveal" style="padding:0 20px">
         <p class="section-subtitle">Ekipman nou</p>
         <h2 class="section-title gold-shimmer">Machin nou yo</h2>
       </div>
       <div class="carousel-track-wrapper">
-        <div class="carousel-track" id="carouselTrack">
-          <!-- 10 slides générés par JS -->
-        </div>
+        <div class="carousel-track" id="carouselTrack"></div>
       </div>
       <div class="carousel-controls">
-        <button class="carousel-btn" onclick="carouselPrev()" aria-label="Précédent">&#8592;</button>
+        <button class="carousel-btn" onclick="carouselPrev()" aria-label="Anvan">&#8592;</button>
         <div class="carousel-dots" id="carouselDots"></div>
-        <button class="carousel-btn" onclick="carouselNext()" aria-label="Suivant">&#8594;</button>
+        <button class="carousel-btn" onclick="carouselNext()" aria-label="Aprè">&#8594;</button>
       </div>
     </section>
 
   </main>
 
-  <!-- ============================================================
-       FOOTER
-  ============================================================ -->
   <footer>
     <p class="footer-title">Rete Konekte Ak Nou</p>
     <div class="footer-socials">
       <a href="https://wa.me/79961103506" aria-label="WhatsApp" target="_blank" rel="noopener">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
       </a>
-      <a href="https://t.me/mikenestor14" aria-label="Telegram" target="_blank" rel="noopener">
+      <a href="https://t.me/MikeNestor14" aria-label="Telegram" target="_blank" rel="noopener">
         <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
       </a>
     </div>
     <p class="footer-copy">ZETWAL ORGANISATION 2026 — Modènite ak Tradisyon</p>
+    <p class="footer-adresse">📍 5, 3ème Imp, Ruelle Yamoul</p>
   </footer>
 
-
-  <!-- ============================================================
-       SCRIPTS
-  ============================================================ -->
   <script>
-    /* ============================================================
-       1. THREE.JS — GALAXIES + ÉTOILES DYNAMIQUES
-    ============================================================ */
-    (function initThree() {
-      const canvas = document.getElementById('webgl-canvas');
-      const scene    = new THREE.Scene();
-      const camera   = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  /* ════════════════════════════════════════════════════════════
+     FIREBASE + SUPABASE (identiques à index.html)
+  ════════════════════════════════════════════════════════════ */
+  const firebaseConfig = {
+    apiKey:"AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+    authDomain:"lavrizetwal.firebaseapp.com",projectId:"lavrizetwal",
+    storageBucket:"lavrizetwal.firebasestorage.app",
+    messagingSenderId:"291921316186",
+    appId:"1:291921316186:web:f55e8b34526960df394b63"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
 
-      renderer.setSize(innerWidth, innerHeight);
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-      camera.position.z = 30;
+  const SUPABASE_URL = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      /* --- Couche 1 : Étoiles blanches fixes --- */
-      const starGeo = new THREE.BufferGeometry();
-      const sP = [];
-      for (let i = 0; i < 3000; i++) {
-        sP.push(
-          (Math.random() - 0.5) * 120,
-          (Math.random() - 0.5) * 120,
-          (Math.random() - 0.5) * 120
-        );
-      }
-      starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sP, 3));
-      const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
-        color: 0xffffff, size: 0.06, transparent: true, opacity: 0.8
-      }));
-      scene.add(stars);
+  let confirmationResult;
 
-      /* --- Couche 2 : Galaxie dorée spirale --- */
-      const galGeo = new THREE.BufferGeometry();
-      const gP = [];
-      for (let i = 0; i < 1500; i++) {
-        const r     = Math.random() * 25 + 5;
-        const theta = Math.random() * Math.PI * 2;
-        const arm   = (Math.floor(Math.random() * 3) * (Math.PI * 2 / 3));
-        const spiral = theta + arm + r * 0.08;
-        gP.push(
-          Math.cos(spiral) * r,
-          (Math.random() - 0.5) * 2.5,
-          Math.sin(spiral) * r
-        );
-      }
-      galGeo.setAttribute('position', new THREE.Float32BufferAttribute(gP, 3));
-      const galaxy = new THREE.Points(galGeo, new THREE.PointsMaterial({
-        color: 0xffd700, size: 0.1, transparent: true, opacity: 0.55
-      }));
-      scene.add(galaxy);
+  /* ── AUTH UI ── */
+  function toggleAuthModal(show){ document.getElementById('auth-modal').style.display=show?'flex':'none'; }
+  function toggleInfoCard(){ const c=document.getElementById('user-info-card'); c.style.display=c.style.display==='block'?'none':'block'; }
 
-      /* --- Couche 3 : Particules bleues lointaines --- */
-      const blueGeo = new THREE.BufferGeometry();
-      const bP = [];
-      for (let i = 0; i < 800; i++) {
-        bP.push(
-          (Math.random() - 0.5) * 150,
-          (Math.random() - 0.5) * 150,
-          (Math.random() - 0.5) * 150
-        );
-      }
-      blueGeo.setAttribute('position', new THREE.Float32BufferAttribute(bP, 3));
-      const blueStars = new THREE.Points(blueGeo, new THREE.PointsMaterial({
-        color: 0x88bbff, size: 0.045, transparent: true, opacity: 0.45
-      }));
-      scene.add(blueStars);
+  async function loginWithGoogle(){
+    const provider=new firebase.auth.GoogleAuthProvider();
+    try{ await auth.signInWithPopup(provider); toggleAuthModal(false); }catch(e){ alert(e.message); }
+  }
+  window.recaptchaVerifier=new firebase.auth.RecaptchaVerifier('recaptcha-container',{size:'invisible'});
+  async function loginWithPhone(){
+    const phone=document.getElementById('phone-input').value;
+    try{ confirmationResult=await auth.signInWithPhoneNumber(phone,window.recaptchaVerifier); document.getElementById('auth-main-view').style.display='none'; document.getElementById('otp-view').style.display='block'; }catch(e){ alert(e.message); }
+  }
+  async function verifyOTP(){
+    const code=document.getElementById('otp-input').value;
+    try{ await confirmationResult.confirm(code); toggleAuthModal(false); }catch(e){ alert("Kòd la pa bon"); }
+  }
+  function handleLogout(){ auth.signOut(); location.reload(); }
 
-      /* --- Parallax léger sur la souris --- */
-      let mouseX = 0, mouseY = 0;
-      window.addEventListener('mousemove', e => {
-        mouseX = (e.clientX / innerWidth  - 0.5) * 0.015;
-        mouseY = (e.clientY / innerHeight - 0.5) * 0.015;
+  /* ── AUTH STATE — données réelles Firebase/Supabase ── */
+  auth.onAuthStateChanged(async(user)=>{
+    if(user){
+      document.getElementById('login-trigger-btn').style.display='none';
+      const pa=document.getElementById('user-profile-area');
+      pa.style.display='flex';
+      const name=user.displayName||user.phoneNumber||"Itilizatè";
+      document.getElementById('nav-user-name').textContent=name;
+      document.getElementById('card-name').textContent=name;
+
+      /* Points temps réel depuis Firestore */
+      db.collection("users").doc(user.uid).onSnapshot(doc=>{
+        const pts=doc.exists?(doc.data().points||0).toFixed(1):'0.0';
+        document.getElementById('nav-user-points').textContent=pts+' Pwen';
+        document.getElementById('card-points').textContent=pts;
       });
 
-      /* --- Animation loop --- */
-      let t = 0;
-      function animate() {
-        requestAnimationFrame(animate);
-        t += 0.0004;
-        stars.rotation.y     += 0.00018;
-        stars.rotation.x     += 0.00006;
-        galaxy.rotation.y    += 0.0008;
-        galaxy.rotation.x    += 0.0001;
-        blueStars.rotation.y -= 0.0003;
-
-        /* Légère dérive parallax caméra */
-        camera.position.x += (mouseX - camera.position.x) * 0.04;
-        camera.position.y += (-mouseY - camera.position.y) * 0.04;
-
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      /* --- Resize --- */
-      window.addEventListener('resize', () => {
-        camera.aspect = innerWidth / innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(innerWidth, innerHeight);
-      });
-    })();
-
-
-    /* ============================================================
-       2. ANIMATION BOULE (fusion + respiration)
-    ============================================================ */
-    (function animateSun() {
-      const halfLeft  = document.querySelector('.sun-half.left');
-      const halfRight = document.querySelector('.sun-half.right');
-      const core      = document.getElementById('sunCore');
-
-      /* Phase 1 : apparition des moitiés */
-      setTimeout(() => {
-        halfLeft.style.transition  = 'transform 0.01s, opacity 0.4s';
-        halfRight.style.transition = 'transform 0.01s, opacity 0.4s';
-        halfLeft.style.opacity  = '1';
-        halfRight.style.opacity = '1';
-      }, 300);
-
-      /* Phase 2 : les moitiés glissent vers le centre */
-      setTimeout(() => {
-        halfLeft.style.transition  = 'transform 1s cubic-bezier(0.165,0.84,0.44,1), opacity 0.5s';
-        halfRight.style.transition = 'transform 1s cubic-bezier(0.165,0.84,0.44,1), opacity 0.5s';
-        halfLeft.style.transform   = 'translateX(0)';
-        halfRight.style.transform  = 'translateX(0)';
-      }, 600);
-
-      /* Phase 3 : fusion → core apparaît */
-      setTimeout(() => {
-        halfLeft.style.opacity  = '0';
-        halfRight.style.opacity = '0';
-        core.style.transition   = 'opacity 0.5s ease';
-        core.style.opacity      = '1';
-
-        /* Respiration GSAP */
-        gsap.to(core, {
-          scale: 1.08,
-          duration: 2.5,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut'
-        });
-        /* Glow pulsé */
-        gsap.to(core, {
-          filter: 'blur(2px) brightness(1.2)',
-          duration: 2.5,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: 0.5
-        });
-      }, 1650);
-    })();
-
-
-    /* ============================================================
-       3. MACHINE À ÉCRIRE — TITRE "Lavri Zetwal"
-    ============================================================ */
-    (function typewriterEffect() {
-      const el     = document.getElementById('heroTitle');
-      const cursor = document.getElementById('typeCursor');
-      const text   = 'Lavri Zetwal';
-      let i = 0;
-
-      /* Délai avant de commencer (laisser la boule entrer) */
-      setTimeout(function type() {
-        if (i < text.length) {
-          el.textContent += text[i];
-          i++;
-          setTimeout(type, 100 + Math.random() * 60);
-        } else {
-          /* Curseur disparaît après fin de frappe */
-          setTimeout(() => { cursor.style.animation = 'none'; cursor.style.opacity = '0'; }, 2500);
-        }
-      }, 1800);
-    })();
-
-
-    /* ============================================================
-       4. MACHINES STATUS — 10 MACHINES SYNCHRONISÉES
-       Logique :
-       - 10 machines toujours affichées (X / 10)
-       - Les timers sont des vrais comptes à rebours JS en temps réel
-       - Le hero affiche EXACTEMENT le timer de la machine la plus proche
-       - Clic sur machine disponible → WhatsApp
-    ============================================================ */
-    const WA_NUMBER = '79961103506'; /* Numéro WhatsApp existant */
-
-    /* Génère un temps entre 9 et 15 min en secondes */
-    function randTimer() { return (9 + Math.floor(Math.random() * 7)) * 60; }
-
-    /* Données initiales des 10 machines */
-    const machinesData = [
-      { id: 'MCH-01', name: 'Machine 1',  status: 'available', progress: 100, kg: null,  timer: 0 },
-      { id: 'MCH-02', name: 'Machine 2',  status: 'available', progress: 100, kg: null,  timer: 0 },
-      { id: 'MCH-03', name: 'Machine 3',  status: 'available', progress: 100, kg: null,  timer: 0 },
-      { id: 'MCH-04', name: 'Machine 4',  status: 'busy',      progress: 45,  kg: '8kg', timer: randTimer() },
-      { id: 'MCH-05', name: 'Machine 5',  status: 'busy',      progress: 62,  kg: '11kg',timer: randTimer() },
-      { id: 'MCH-06', name: 'Machine 6',  status: 'busy',      progress: 30,  kg: '6kg', timer: randTimer() },
-      { id: 'MCH-07', name: 'Machine 7',  status: 'soon',      progress: 82,  kg: '9kg', timer: randTimer() },
-      { id: 'MCH-08', name: 'Machine 8',  status: 'soon',      progress: 88,  kg: '14kg',timer: randTimer() },
-      { id: 'MCH-09', name: 'Machine 9',  status: 'busy',      progress: 20,  kg: '7kg', timer: randTimer() },
-      { id: 'MCH-10', name: 'Machine 10', status: 'busy',      progress: 55,  kg: '12kg',timer: randTimer() },
-    ];
-
-    /* Rend les 10 cartes machines */
-    function renderMachines() {
-      const grid = document.getElementById('machinesGrid');
-      grid.innerHTML = '';
-
-      machinesData.forEach((m, idx) => {
-        const card = document.createElement('div');
-        const isAvail = m.status === 'available';
-        card.className = 'machine-card reveal' + (isAvail ? ' is-available' : '');
-        card.style.transitionDelay = (idx * 0.07) + 's';
-
-        /* Clic WhatsApp uniquement si disponible */
-        if (isAvail) {
-          card.setAttribute('role', 'button');
-          card.setAttribute('tabindex', '0');
-          card.setAttribute('aria-label', m.name + ' — Klike pou rezève sou WhatsApp');
-          card.onclick = () => openWhatsApp(m.name);
-          card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') openWhatsApp(m.name); };
-        }
-
-        let badgeHTML, progressClass, bodyHTML;
-
-        if (isAvail) {
-          badgeHTML     = '<span class="machine-status-badge badge-available">✓ Disponib</span>';
-          progressClass = 'fill-green';
-          bodyHTML      = `
-            <div class="machine-info-text">Prè pou itilize — Klike pou rezève</div>
-            <div class="machine-card-cta">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#00ff88"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.001-1.369l-.36-.213-3.735.861.879-3.638-.234-.375A9.788 9.788 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
-              Rezève sou WhatsApp
-            </div>
-          `;
-        } else if (m.status === 'busy') {
-          const pct = Math.round(m.progress);
-          badgeHTML     = '<span class="machine-status-badge badge-busy">● Okipe</span>';
-          progressClass = 'fill-orange';
-          bodyHTML      = `
-            <div class="machine-info-text">Pwa : <strong style="color:var(--gold)">${m.kg}</strong></div>
-          `;
-        } else { /* soon */
-          const sec = m.timer;
-          const mm  = String(Math.floor(sec / 60)).padStart(2, '0');
-          const ss  = String(sec % 60).padStart(2, '0');
-          badgeHTML     = '<span class="machine-status-badge badge-soon">◎ Byento lib</span>';
-          progressClass = 'fill-gold';
-          bodyHTML      = `
-            <div class="machine-info-text">Disponib nan :</div>
-            <div class="machine-countdown" id="countdown-${m.id}">${mm}:${ss}</div>
-          `;
-        }
-
-        card.innerHTML = `
-          <div class="machine-hud-header">
-            <span class="machine-id">${m.id}</span>
-            ${badgeHTML}
-          </div>
-          <div style="font-size:0.82rem;font-weight:600;margin-bottom:6px;color:rgba(255,255,255,0.85)">${m.name}</div>
-          <div class="machine-progress-bar">
-            <div class="machine-progress-fill ${progressClass}" style="width:${m.progress}%"></div>
-          </div>
-          <div class="machine-hud-body">${bodyHTML}</div>
-        `;
-        grid.appendChild(card);
-      });
-
-      triggerReveal();
-    }
-    renderMachines();
-
-    /* Ouvre WhatsApp avec un message pré-rempli */
-    function openWhatsApp(machineName) {
-      const msg = encodeURIComponent(
-        'Bonjou! Mwen vle rezève ' + machineName + ' ki disponib la. Kijan mwen ka fè sa?'
-      );
-      window.open('https://wa.me/' + WA_NUMBER + '?text=' + msg, '_blank');
-    }
-
-    /* ============================================================
-       MOTEUR PRINCIPAL — Compte à rebours synchronisé
-       Toutes les secondes :
-         1. Décrémente les timers des machines busy/soon
-         2. Passe "soon" → "available" quand timer = 0
-         3. Hero affiche EXACTEMENT le timer minimum (machine la + proche)
-    ============================================================ */
-    setInterval(() => {
-      let needRender = false;
-
-      machinesData.forEach(m => {
-        if (m.status === 'busy' || m.status === 'soon') {
-          m.timer--;
-
-          if (m.timer <= 0) {
-            /* La machine devient disponible */
-            m.status   = 'available';
-            m.progress = 100;
-            m.timer    = 0;
-            m.kg       = null;
-            needRender = true;
-          } else {
-            /* Mise à jour du countdown dans le DOM sans re-render */
-            if (m.status === 'soon') {
-              const el = document.getElementById('countdown-' + m.id);
-              if (el) {
-                const mm = String(Math.floor(m.timer / 60)).padStart(2, '0');
-                const ss = String(m.timer % 60).padStart(2, '0');
-                el.textContent = mm + ':' + ss;
-              }
-            }
-            /* Mise à jour progressive de la barre de progression */
-            m.progress = Math.min(100, m.progress + 0.1);
-          }
-        }
-      });
-
-      if (needRender) renderMachines();
-      updateHeroCounts();
-    }, 1000);
-
-    /* Met à jour le hero : compteur disponibles + timer synchronisé */
-    function updateHeroCounts() {
-      const avail = machinesData.filter(m => m.status === 'available').length;
-      document.getElementById('available-machines').textContent = avail;
-
-      /* Timer hero = machine la plus proche de devenir libre */
-      const notAvail = machinesData.filter(m => m.status !== 'available' && m.timer > 0);
-      if (notAvail.length > 0) {
-        const minTimer = Math.min(...notAvail.map(m => m.timer));
-        const mm = String(Math.floor(minTimer / 60)).padStart(2, '0');
-        const ss = String(minTimer % 60).padStart(2, '0');
-        document.getElementById('timer-simulation').textContent =
-          'Yon machine pral disponib nan ' + mm + ':' + ss;
+      /* Statut admin ou client via Supabase */
+      const admins=['mikenestorlive@gmail.com','schnaydernaderice1@gmail.com'];
+      let status="Itilizatè";
+      if(user.email&&admins.includes(user.email)){
+        status="Admin";
+        document.getElementById('admin-access').style.display='block';
       } else {
-        document.getElementById('timer-simulation').textContent =
-          'Tout machin yo disponib!';
+        const {data:p}=await sb.from('products').select('id').eq('client_email',user.email).limit(1);
+        const {data:w}=await sb.from('wash_records').select('id').eq('client_name',name).limit(1);
+        if((p&&p.length)||(w&&w.length)) status="Kliyan";
       }
+      document.getElementById('card-status').textContent=status;
+    } else {
+      document.getElementById('login-trigger-btn').style.display='block';
+      document.getElementById('user-profile-area').style.display='none';
     }
-    updateHeroCounts();
+  });
 
+  /* ════════════════════════════════════════════════════════════
+     CURSEUR DORÉ + TRAÎNÉE
+  ════════════════════════════════════════════════════════════ */
+  const cursorDot=document.getElementById('cursor-dot');
+  const cursorRing=document.getElementById('cursor-ring');
+  const TRAIL_COUNT=18;
+  const trails=[];
+  for(let i=0;i<TRAIL_COUNT;i++){
+    const t=document.createElement('div');
+    t.classList.add('cursor-trail');
+    document.body.appendChild(t);
+    trails.push({el:t,x:0,y:0});
+  }
+  let mouseX=0,mouseY=0,ringX=0,ringY=0;
+  document.addEventListener('mousemove',e=>{
+    mouseX=e.clientX;mouseY=e.clientY;
+    cursorDot.style.left=mouseX+'px';cursorDot.style.top=mouseY+'px';
+  });
+  document.querySelectorAll('a,button,.btn-gold-card,.magic-card,.machine-card,.carousel-slide').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{
+      cursorDot.style.width='20px';cursorDot.style.height='20px';cursorDot.style.background='#ffe066';
+      cursorRing.style.width='56px';cursorRing.style.height='56px';cursorRing.style.borderColor='rgba(255,224,102,.9)';
+    });
+    el.addEventListener('mouseleave',()=>{
+      cursorDot.style.width='12px';cursorDot.style.height='12px';cursorDot.style.background='var(--gold)';
+      cursorRing.style.width='36px';cursorRing.style.height='36px';cursorRing.style.borderColor='rgba(255,215,0,.6)';
+    });
+  });
+  let trailPositions=Array(TRAIL_COUNT).fill().map(()=>({x:0,y:0}));
+  function animateCursor(){
+    ringX+=(mouseX-ringX)*.12;ringY+=(mouseY-ringY)*.12;
+    cursorRing.style.left=ringX+'px';cursorRing.style.top=ringY+'px';
+    trailPositions.unshift({x:mouseX,y:mouseY});
+    trailPositions=trailPositions.slice(0,TRAIL_COUNT);
+    trails.forEach((t,i)=>{
+      const p=trailPositions[i]||trailPositions[trailPositions.length-1];
+      t.x+=(p.x-t.x)*.25;t.y+=(p.y-t.y)*.25;
+      t.el.style.left=t.x+'px';t.el.style.top=t.y+'px';
+      t.el.style.opacity=(1-(i/TRAIL_COUNT))*.5;
+      const s=6*(1-(i/TRAIL_COUNT));
+      t.el.style.width=s+'px';t.el.style.height=s+'px';
+    });
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
 
-    /* ============================================================
-       5. CALCULATEUR
-    ============================================================ */
-    const PRICES = {
-      petit:   { min: 5,  max: 9,  price: 650  },
-      malin:   { min: 10, max: 14, price: 850  },
-      geant:   { min: 15, max: 22, price: 1000 },
-      pliage:  150,
-      draps:   100,
-      express: 200,
-    };
+  /* ════════════════════════════════════════════════════════════
+     PARTICULES 2D RÉACTIVES À LA SOURIS
+  ════════════════════════════════════════════════════════════ */
+  const pCanvas=document.getElementById('particle-canvas');
+  const pCtx=pCanvas.getContext('2d');
+  let pW=innerWidth,pH=innerHeight;
+  pCanvas.width=pW;pCanvas.height=pH;
+  let pMouseX=pW/2,pMouseY=pH/2;
+  document.addEventListener('mousemove',e=>{pMouseX=e.clientX;pMouseY=e.clientY;});
+  const NUM_P=220;
+  const pArr=[];
+  for(let i=0;i<NUM_P;i++){
+    const x=Math.random()*pW,y=Math.random()*pH;
+    pArr.push({x,y,ox:x,oy:y,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,size:Math.random()*2.2+.4,color:`rgba(255,215,0,${(Math.random()*.4+.1).toFixed(2)})`});
+  }
+  function drawConn(){
+    for(let i=0;i<pArr.length;i++) for(let j=i+1;j<pArr.length;j++){
+      const dx=pArr[i].x-pArr[j].x,dy=pArr[i].y-pArr[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<110){pCtx.beginPath();pCtx.moveTo(pArr[i].x,pArr[i].y);pCtx.lineTo(pArr[j].x,pArr[j].y);pCtx.strokeStyle=`rgba(255,215,0,${(1-d/110)*.12})`;pCtx.lineWidth=.5;pCtx.stroke();}
+    }
+  }
+  function animP(){
+    pCtx.clearRect(0,0,pW,pH);drawConn();
+    pArr.forEach(p=>{
+      const dx=pMouseX-p.x,dy=pMouseY-p.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){const f=(120-dist)/120;p.vx-=(dx/dist)*f*1.5;p.vy-=(dy/dist)*f*1.5;}
+      p.vx+=(p.ox-p.x)*.004;p.vy+=(p.oy-p.y)*.004;p.vx*=.96;p.vy*=.96;
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=pW;if(p.x>pW)p.x=0;if(p.y<0)p.y=pH;if(p.y>pH)p.y=0;
+      pCtx.beginPath();pCtx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      pCtx.fillStyle=p.color;pCtx.shadowColor='#ffd700';pCtx.shadowBlur=6;pCtx.fill();pCtx.shadowBlur=0;
+    });
+    requestAnimationFrame(animP);
+  }
+  animP();
+  window.addEventListener('resize',()=>{pW=innerWidth;pH=innerHeight;pCanvas.width=pW;pCanvas.height=pH;});
 
-    function calculateTotal() {
-      const kg       = parseFloat(document.getElementById('user-kg').value) || 0;
-      const washType = document.getElementById('wash-type').value;
-      const pliage   = document.getElementById('opt-pliage').checked;
-      const draps    = document.getElementById('opt-draps').checked;
-      const express  = document.getElementById('opt-express').checked;
+  /* ════════════════════════════════════════════════════════════
+     PARALLAXE CINÉMATIQUE
+  ════════════════════════════════════════════════════════════ */
+  const heroEl=document.querySelector('.hero-container');
+  const bgTextEl=document.getElementById('bg-text-lavri');
+  window.addEventListener('scroll',()=>{
+    const sy=window.scrollY;
+    if(heroEl) heroEl.style.transform=`translateY(${sy*.35}px)`;
+    if(bgTextEl) bgTextEl.style.transform=`translateY(${sy*-.12}px)`;
+  },{passive:true});
 
-      if (kg <= 0) {
-        document.getElementById('totalAmount').textContent = '— HTG';
-        document.getElementById('planLabel').textContent   = '';
-        return;
+  /* ════════════════════════════════════════════════════════════
+     THREE.JS — GALAXIES + ÉTOILES
+  ════════════════════════════════════════════════════════════ */
+  (function initThree(){
+    const canvas=document.getElementById('webgl-canvas');
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,1000);
+    const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:false});
+    renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    camera.position.z=30;
+    const starGeo=new THREE.BufferGeometry();const sP=[];
+    for(let i=0;i<3000;i++) sP.push((Math.random()-.5)*120,(Math.random()-.5)*120,(Math.random()-.5)*120);
+    starGeo.setAttribute('position',new THREE.Float32BufferAttribute(sP,3));
+    const stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:.06,transparent:true,opacity:.8}));
+    scene.add(stars);
+    const galGeo=new THREE.BufferGeometry();const gP=[];
+    for(let i=0;i<1500;i++){const r=Math.random()*25+5,theta=Math.random()*Math.PI*2,arm=Math.floor(Math.random()*3)*(Math.PI*2/3),spiral=theta+arm+r*.08;gP.push(Math.cos(spiral)*r,(Math.random()-.5)*2.5,Math.sin(spiral)*r);}
+    galGeo.setAttribute('position',new THREE.Float32BufferAttribute(gP,3));
+    const galaxy=new THREE.Points(galGeo,new THREE.PointsMaterial({color:0xffd700,size:.1,transparent:true,opacity:.55}));
+    scene.add(galaxy);
+    const blueGeo=new THREE.BufferGeometry();const bP=[];
+    for(let i=0;i<800;i++) bP.push((Math.random()-.5)*150,(Math.random()-.5)*150,(Math.random()-.5)*150);
+    blueGeo.setAttribute('position',new THREE.Float32BufferAttribute(bP,3));
+    const blueStars=new THREE.Points(blueGeo,new THREE.PointsMaterial({color:0x88bbff,size:.045,transparent:true,opacity:.45}));
+    scene.add(blueStars);
+    let mx=0,my=0;
+    window.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*.015;my=(e.clientY/innerHeight-.5)*.015;});
+    function animate(){
+      requestAnimationFrame(animate);
+      stars.rotation.y+=.00018;stars.rotation.x+=.00006;
+      galaxy.rotation.y+=.0008;galaxy.rotation.x+=.0001;
+      blueStars.rotation.y-=.0003;
+      camera.position.x+=(mx-camera.position.x)*.04;camera.position.y+=(-my-camera.position.y)*.04;
+      renderer.render(scene,camera);
+    }
+    animate();
+    window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+  })();
+
+  /* ════════════════════════════════════════════════════════════
+     ANIMATION BOULE (fusion + respiration GSAP)
+  ════════════════════════════════════════════════════════════ */
+  (function animateSun(){
+    const hl=document.querySelector('.sun-half.left'),hr=document.querySelector('.sun-half.right'),core=document.getElementById('sunCore');
+    setTimeout(()=>{hl.style.transition=hr.style.transition='transform .01s,opacity .4s';hl.style.opacity=hr.style.opacity='1';},300);
+    setTimeout(()=>{hl.style.transition=hr.style.transition='transform 1s cubic-bezier(.165,.84,.44,1),opacity .5s';hl.style.transform='translateX(0)';hr.style.transform='translateX(0)';},600);
+    setTimeout(()=>{
+      hl.style.opacity=hr.style.opacity='0';
+      core.style.transition='opacity .5s ease';core.style.opacity='1';
+      gsap.to(core,{scale:1.08,duration:2.5,repeat:-1,yoyo:true,ease:'sine.inOut'});
+      gsap.to(core,{filter:'blur(2px) brightness(1.2)',duration:2.5,repeat:-1,yoyo:true,ease:'sine.inOut',delay:.5});
+    },1650);
+  })();
+
+  /* ════════════════════════════════════════════════════════════
+     MACHINE À ÉCRIRE
+  ════════════════════════════════════════════════════════════ */
+  (function typewriter(){
+    const el=document.getElementById('heroTitle'),cursor=document.getElementById('typeCursor');
+    const text='Lavri Zetwal';let i=0;
+    setTimeout(function type(){
+      if(i<text.length){el.textContent+=text[i];i++;setTimeout(type,100+Math.random()*60);}
+      else setTimeout(()=>{cursor.style.animation='none';cursor.style.opacity='0';},2500);
+    },1800);
+  })();
+
+  /* ════════════════════════════════════════════════════════════
+     MACHINES — LOGIQUE TEMPS RÉEL
+  ════════════════════════════════════════════════════════════ */
+  const WA_NUMBER='79961103506';
+  function randTimer(){return(9+Math.floor(Math.random()*7))*60;}
+  const machinesData=[
+    {id:'MCH-01',name:'Machine 1', status:'available',progress:100,kg:null, timer:0},
+    {id:'MCH-02',name:'Machine 2', status:'available',progress:100,kg:null, timer:0},
+    {id:'MCH-03',name:'Machine 3', status:'available',progress:100,kg:null, timer:0},
+    {id:'MCH-04',name:'Machine 4', status:'busy',     progress:45,  kg:'8kg', timer:randTimer()},
+    {id:'MCH-05',name:'Machine 5', status:'busy',     progress:62,  kg:'11kg',timer:randTimer()},
+    {id:'MCH-06',name:'Machine 6', status:'busy',     progress:30,  kg:'6kg', timer:randTimer()},
+    {id:'MCH-07',name:'Machine 7', status:'soon',     progress:82,  kg:'9kg', timer:Math.floor(randTimer()/3)},
+    {id:'MCH-08',name:'Machine 8', status:'soon',     progress:88,  kg:'14kg',timer:Math.floor(randTimer()/4)},
+    {id:'MCH-09',name:'Machine 9', status:'busy',     progress:20,  kg:'7kg', timer:randTimer()},
+    {id:'MCH-10',name:'Machine 10',status:'busy',     progress:55,  kg:'12kg',timer:randTimer()},
+  ];
+
+  function renderMachines(){
+    const grid=document.getElementById('machinesGrid');
+    grid.innerHTML='';
+    machinesData.forEach((m,idx)=>{
+      const card=document.createElement('div');
+      const isA=m.status==='available';
+      card.className='machine-card reveal section-parallax'+(isA?' is-available':'');
+      card.style.transitionDelay=(idx*.07)+'s';
+      if(isA){
+        card.setAttribute('role','button');card.setAttribute('tabindex','0');
+        card.setAttribute('aria-label',m.name+' — Klike pou rezève');
+        card.onclick=()=>openWA(m.name);
+        card.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')openWA(m.name);};
       }
-
-      let base = 0, planName = '';
-      if      (kg <= 9)  { base = PRICES.petit.price; planName = 'LE PETIT (5–9kg)'; }
-      else if (kg <= 14) { base = PRICES.malin.price; planName = 'LE MALIN (10–14kg)'; }
-      else if (kg <= 22) { base = PRICES.geant.price; planName = 'LE GÉANT (15–22kg)'; }
-      else               { base = PRICES.geant.price + Math.ceil((kg - 22) / 5) * 200; planName = 'Chaj Ekstra'; }
-
-      let total = base;
-      if (pliage)  total += PRICES.pliage;
-      if (draps)   total += PRICES.draps;
-      if (express) total += PRICES.express;
-
-      document.getElementById('totalAmount').textContent = total.toLocaleString('fr-HT') + ' HTG';
-      document.getElementById('planLabel').textContent   = planName;
-
-      /* Animation légère sur le total */
-      const box = document.getElementById('totalBox');
-      box.style.borderColor = 'rgba(255,215,0,0.55)';
-      box.style.boxShadow   = '0 0 20px rgba(255,215,0,0.12)';
-      setTimeout(() => {
-        box.style.borderColor = '';
-        box.style.boxShadow   = '';
-      }, 600);
-    }
-
-    function generateReceipt() {
-      const kg       = parseFloat(document.getElementById('user-kg').value) || 0;
-      const washType = document.getElementById('wash-type').value;
-      const pliage   = document.getElementById('opt-pliage').checked;
-      const draps    = document.getElementById('opt-draps').checked;
-      const express  = document.getElementById('opt-express').checked;
-      const total    = document.getElementById('totalAmount').textContent;
-      const plan     = document.getElementById('planLabel').textContent;
-
-      if (kg <= 0 || total === '— HTG') {
-        alert('Tanpri antre konbyen kilo rad ou genyen!');
-        return;
+      let badge,pClass,body;
+      if(isA){
+        badge='<span class="machine-status-badge badge-available">✓ Disponib</span>';
+        pClass='fill-green';
+        body=`<div class="machine-info-text">Prè pou itilize — Klike pou rezève</div>
+              <div class="machine-card-cta">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#00ff88"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.001-1.369l-.36-.213-3.735.861.879-3.638-.234-.375A9.788 9.788 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
+                Rezève sou WhatsApp
+              </div>`;
+      } else if(m.status==='busy'){
+        badge='<span class="machine-status-badge badge-busy">● Okipe</span>';
+        pClass='fill-orange';
+        body=`<div class="machine-info-text">Pwa : <strong style="color:var(--gold)">${m.kg}</strong></div>`;
+      } else {
+        const mm=String(Math.floor(m.timer/60)).padStart(2,'0'),ss=String(m.timer%60).padStart(2,'0');
+        badge='<span class="machine-status-badge badge-soon">◎ Byento lib</span>';
+        pClass='fill-gold';
+        body=`<div class="machine-info-text">Disponib nan :</div><div class="machine-countdown" id="countdown-${m.id}">${mm}:${ss}</div>`;
       }
-
-      /* Date + heure */
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('fr-FR') + ' — ' + now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('receiptDate').textContent = dateStr;
-
-      /* Corps de la fiche */
-      const rows = [
-        { k: 'Pwa rad',        v: kg + ' kg' },
-        { k: 'Plan chwazi',    v: plan },
-        { k: 'Type lavaj',     v: washType === 'premium' ? 'Lavaj + Sechaj' : 'Lavaj Estanda' },
-        { k: 'Pliyaj',         v: pliage  ? '✓ Wi (+150 HTG)'  : '✗ Non' },
-        { k: 'Dra / Twal',     v: draps   ? '✓ Wi (+100 HTG)'  : '✗ Non' },
-        { k: 'Sèvis Ekspres',  v: express ? '✓ Wi (+200 HTG)'  : '✗ Non' },
-      ];
-      document.getElementById('receiptBody').innerHTML = rows
-        .map(r => `<div class="receipt-row"><span class="receipt-row-key">${r.k}</span><span class="receipt-row-val">${r.v}</span></div>`)
-        .join('');
-
-      document.getElementById('receiptTotal').textContent = total;
-
-      const receipt = document.getElementById('calcReceipt');
-      receipt.classList.add('visible');
-      receipt.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-
-    /* ============================================================
-       6. CAROUSEL — 10 MACHINES
-    ============================================================ */
-    const CAROUSEL_ITEMS = [
-      { name: 'Machine Lave #1',    img: 'machine1.jpg',  icon: '🫧' },
-      { name: 'Machine Lave #2',    img: 'machine2.jpg',  icon: '🫧' },
-      { name: 'Machine Seche #1',   img: 'machine3.jpg',  icon: '🌀' },
-      { name: 'Machine Seche #2',   img: 'machine4.jpg',  icon: '🌀' },
-      { name: 'Station Premium',    img: 'machine5.jpg',  icon: '⭐' },
-      { name: 'Machine Pro #1',     img: 'machine6.jpg',  icon: '🔧' },
-      { name: 'Machine Pro #2',     img: 'machine7.jpg',  icon: '🔧' },
-      { name: 'Machine Géante #1',  img: 'machine8.jpg',  icon: '🏭' },
-      { name: 'Machine Géante #2',  img: 'machine9.jpg',  icon: '🏭' },
-      { name: 'Machine Spécialisée',img: 'machine10.jpg', icon: '💎' },
-    ];
-
-    let carouselIndex = 0;
-    const VISIBLE_COUNT = () => window.innerWidth < 600 ? 1 : window.innerWidth < 900 ? 2 : 3;
-
-    function buildCarousel() {
-      const track = document.getElementById('carouselTrack');
-      const dots  = document.getElementById('carouselDots');
-      track.innerHTML = '';
-      dots.innerHTML  = '';
-
-      CAROUSEL_ITEMS.forEach((item, i) => {
-        const slide = document.createElement('div');
-        slide.className = 'carousel-slide';
-        slide.innerHTML = `
-          <div class="carousel-slide-inner">
-            <div class="carousel-placeholder-icon">${item.icon}</div>
-            <div class="carousel-machine-label">${item.name}</div>
-            <div class="carousel-img-name">${item.img}</div>
-          </div>
-        `;
-        track.appendChild(slide);
-      });
-
-      const numDots = Math.ceil(CAROUSEL_ITEMS.length / VISIBLE_COUNT());
-      for (let d = 0; d < numDots; d++) {
-        const dot = document.createElement('div');
-        dot.className = 'carousel-dot' + (d === 0 ? ' active' : '');
-        dot.onclick = () => { carouselIndex = d; updateCarousel(); };
-        dots.appendChild(dot);
-      }
-      updateCarousel();
-    }
-
-    function updateCarousel() {
-      const vc     = VISIBLE_COUNT();
-      const slides = document.querySelectorAll('.carousel-slide');
-      if (!slides.length) return;
-      const slideW = slides[0].offsetWidth + 20; /* width + gap */
-      const maxIdx = Math.ceil(CAROUSEL_ITEMS.length / vc) - 1;
-      carouselIndex = Math.max(0, Math.min(carouselIndex, maxIdx));
-
-      document.getElementById('carouselTrack').style.transform =
-        `translateX(-${carouselIndex * vc * slideW}px)`;
-
-      document.querySelectorAll('.carousel-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === carouselIndex);
-      });
-    }
-
-    function carouselNext() {
-      const maxIdx = Math.ceil(CAROUSEL_ITEMS.length / VISIBLE_COUNT()) - 1;
-      carouselIndex = carouselIndex >= maxIdx ? 0 : carouselIndex + 1;
-      updateCarousel();
-    }
-    function carouselPrev() {
-      const maxIdx = Math.ceil(CAROUSEL_ITEMS.length / VISIBLE_COUNT()) - 1;
-      carouselIndex = carouselIndex <= 0 ? maxIdx : carouselIndex - 1;
-      updateCarousel();
-    }
-
-    /* Swipe tactile */
-    let touchStartX = 0;
-    const track = document.getElementById('carouselTrack');
-    if (track) {
-      track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-      track.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(dx) > 40) dx < 0 ? carouselNext() : carouselPrev();
-      });
-    }
-
-    buildCarousel();
-    window.addEventListener('resize', () => { buildCarousel(); });
-
-
-    /* ============================================================
-       7. SCROLL REVEAL — INTERSECTION OBSERVER
-    ============================================================ */
-    function triggerReveal() {
-      const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
-      const obs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            obs.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-      revealEls.forEach(el => obs.observe(el));
-    }
+      card.innerHTML=`
+        <div class="machine-hud-header"><span class="machine-id">${m.id}</span>${badge}</div>
+        <div style="font-size:.82rem;font-weight:600;margin-bottom:6px;color:rgba(255,255,255,.85)">${m.name}</div>
+        <div class="machine-progress-bar"><div class="machine-progress-fill ${pClass}" style="width:${m.progress}%"></div></div>
+        <div class="machine-hud-body">${body}</div>`;
+      grid.appendChild(card);
+    });
     triggerReveal();
+  }
+  renderMachines();
 
+  function openWA(name){
+    const msg=encodeURIComponent('Bonjou! Mwen vle rezève '+name+' ki disponib la. Kijan mwen ka fè sa?');
+    window.open('https://wa.me/'+WA_NUMBER+'?text='+msg,'_blank');
+  }
 
-    /* ============================================================
-       8. MICRO-INTERACTIONS : curseur étoilé
-    ============================================================ */
-    (function starCursor() {
-      document.addEventListener('click', e => {
-        for (let i = 0; i < 6; i++) {
-          const s = document.createElement('div');
-          s.style.cssText = `
-            position:fixed;
-            left:${e.clientX}px;top:${e.clientY}px;
-            width:5px;height:5px;
-            border-radius:50%;
-            background:var(--gold);
-            pointer-events:none;
-            z-index:9999;
-            transform:translate(-50%,-50%);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-          `;
-          document.body.appendChild(s);
-          const angle = (Math.PI * 2 / 6) * i;
-          const dist  = 30 + Math.random() * 20;
-          setTimeout(() => {
-            s.style.transform = `translate(${Math.cos(angle)*dist - 2.5}px, ${Math.sin(angle)*dist - 2.5}px) scale(0)`;
-            s.style.opacity   = '0';
-          }, 10);
-          setTimeout(() => s.remove(), 650);
+  setInterval(()=>{
+    let need=false;
+    machinesData.forEach(m=>{
+      if(m.status==='busy'||m.status==='soon'){
+        m.timer--;
+        if(m.timer<=0){m.status='available';m.progress=100;m.timer=0;m.kg=null;need=true;}
+        else{
+          if(m.status==='soon'){
+            const el=document.getElementById('countdown-'+m.id);
+            if(el){el.textContent=String(Math.floor(m.timer/60)).padStart(2,'0')+':'+String(m.timer%60).padStart(2,'0');}
+          }
+          m.progress=Math.min(100,m.progress+.1);
         }
-      });
-    })();
+      }
+    });
+    if(need) renderMachines();
+    updateHero();
+  },1000);
 
+  function updateHero(){
+    const avail=machinesData.filter(m=>m.status==='available').length;
+    document.getElementById('available-machines').textContent=avail;
+    const notA=machinesData.filter(m=>m.status!=='available'&&m.timer>0);
+    if(notA.length>0){
+      const min=Math.min(...notA.map(m=>m.timer));
+      document.getElementById('timer-simulation').textContent='Yon machin pral disponib nan '+String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0');
+    } else {
+      document.getElementById('timer-simulation').textContent='Tout machin yo disponib!';
+    }
+  }
+  updateHero();
+
+  /* ════════════════════════════════════════════════════════════
+     CALCULATEUR
+  ════════════════════════════════════════════════════════════ */
+  const PRICES={petit:{price:650},malin:{price:850},geant:{price:1000},pliage:150,draps:100,express:200};
+  function calculateTotal(){
+    const kg=parseFloat(document.getElementById('user-kg').value)||0;
+    if(kg<=0){document.getElementById('totalAmount').textContent='— HTG';document.getElementById('planLabel').textContent='';return;}
+    let base=0,plan='';
+    if(kg<=9){base=PRICES.petit.price;plan='LE PETIT (5–9kg)';}
+    else if(kg<=14){base=PRICES.malin.price;plan='LE MALIN (10–14kg)';}
+    else if(kg<=22){base=PRICES.geant.price;plan='LE GÉANT (15–22kg)';}
+    else{base=PRICES.geant.price+Math.ceil((kg-22)/5)*200;plan='Chaj Ekstra';}
+    let total=base;
+    if(document.getElementById('opt-pliage').checked) total+=PRICES.pliage;
+    if(document.getElementById('opt-draps').checked)  total+=PRICES.draps;
+    if(document.getElementById('opt-express').checked) total+=PRICES.express;
+    document.getElementById('totalAmount').textContent=total.toLocaleString('fr-HT')+' HTG';
+    document.getElementById('planLabel').textContent=plan;
+    const box=document.getElementById('totalBox');
+    box.style.borderColor='rgba(255,215,0,.55)';box.style.boxShadow='0 0 20px rgba(255,215,0,.12)';
+    setTimeout(()=>{box.style.borderColor='';box.style.boxShadow='';},600);
+  }
+  function generateReceipt(){
+    const kg=parseFloat(document.getElementById('user-kg').value)||0;
+    const total=document.getElementById('totalAmount').textContent;
+    const plan=document.getElementById('planLabel').textContent;
+    if(kg<=0||total==='— HTG'){alert('Tanpri antre konbyen kilo rad ou genyen!');return;}
+    const now=new Date();
+    document.getElementById('receiptDate').textContent=now.toLocaleDateString('fr-FR')+' — '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const rows=[
+      {k:'Pwa rad',v:kg+' kg'},{k:'Plan chwazi',v:plan},
+      {k:'Type lavaj',v:document.getElementById('wash-type').value==='premium'?'Lavaj + Sechaj':'Lavaj Estanda'},
+      {k:'Pliyaj',v:document.getElementById('opt-pliage').checked?'✓ Wi (+150 HTG)':'✗ Non'},
+      {k:'Dra / Twal',v:document.getElementById('opt-draps').checked?'✓ Wi (+100 HTG)':'✗ Non'},
+      {k:'Sèvis Ekspres',v:document.getElementById('opt-express').checked?'✓ Wi (+200 HTG)':'✗ Non'},
+    ];
+    document.getElementById('receiptBody').innerHTML=rows.map(r=>`<div class="receipt-row"><span class="receipt-row-key">${r.k}</span><span class="receipt-row-val">${r.v}</span></div>`).join('');
+    document.getElementById('receiptTotal').textContent=total;
+    const rec=document.getElementById('calcReceipt');rec.classList.add('visible');rec.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     CAROUSEL
+  ════════════════════════════════════════════════════════════ */
+  const SLIDES=[
+    {name:'Machine Lave #1',icon:'🫧'},{name:'Machine Lave #2',icon:'🫧'},
+    {name:'Machine Seche #1',icon:'🌀'},{name:'Machine Seche #2',icon:'🌀'},
+    {name:'Station Premium',icon:'⭐'},{name:'Machine Pro #1',icon:'🔧'},
+    {name:'Machine Pro #2',icon:'🔧'},{name:'Machine Géante #1',icon:'🏭'},
+    {name:'Machine Géante #2',icon:'🏭'},{name:'Machine Spécialisée',icon:'💎'},
+  ];
+  let carouselIndex=0;
+  const VC=()=>innerWidth<600?1:innerWidth<900?2:3;
+  function buildCarousel(){
+    const track=document.getElementById('carouselTrack'),dots=document.getElementById('carouselDots');
+    track.innerHTML='';dots.innerHTML='';
+    SLIDES.forEach(s=>{
+      const sl=document.createElement('div');sl.className='carousel-slide';
+      sl.innerHTML=`<div class="carousel-slide-inner"><div class="carousel-placeholder-icon">${s.icon}</div><div class="carousel-machine-label">${s.name}</div></div>`;
+      track.appendChild(sl);
+    });
+    const nd=Math.ceil(SLIDES.length/VC());
+    for(let d=0;d<nd;d++){
+      const dot=document.createElement('div');dot.className='carousel-dot'+(d===0?' active':'');
+      dot.onclick=()=>{carouselIndex=d;updateCarousel();};dots.appendChild(dot);
+    }
+    updateCarousel();
+  }
+  function updateCarousel(){
+    const vc=VC(),slides=document.querySelectorAll('.carousel-slide');
+    if(!slides.length) return;
+    const sw=slides[0].offsetWidth+20,max=Math.ceil(SLIDES.length/vc)-1;
+    carouselIndex=Math.max(0,Math.min(carouselIndex,max));
+    document.getElementById('carouselTrack').style.transform=`translateX(-${carouselIndex*vc*sw}px)`;
+    document.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===carouselIndex));
+  }
+  function carouselNext(){const max=Math.ceil(SLIDES.length/VC())-1;carouselIndex=carouselIndex>=max?0:carouselIndex+1;updateCarousel();}
+  function carouselPrev(){const max=Math.ceil(SLIDES.length/VC())-1;carouselIndex=carouselIndex<=0?max:carouselIndex-1;updateCarousel();}
+  const ctrack=document.getElementById('carouselTrack');
+  let touchSX=0;
+  if(ctrack){
+    ctrack.addEventListener('touchstart',e=>{touchSX=e.touches[0].clientX;},{passive:true});
+    ctrack.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchSX;if(Math.abs(dx)>40) dx<0?carouselNext():carouselPrev();});
+  }
+  buildCarousel();
+  window.addEventListener('resize',buildCarousel);
+
+  /* ════════════════════════════════════════════════════════════
+     SCROLL REVEAL + INTERSECTION OBSERVER
+  ════════════════════════════════════════════════════════════ */
+  function triggerReveal(){
+    const els=document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.section-parallax');
+    const obs=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{if(e.isIntersecting){setTimeout(()=>{e.target.classList.add('visible','in-view');},50);obs.unobserve(e.target);}});
+    },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+    els.forEach(el=>obs.observe(el));
+  }
+  triggerReveal();
+
+  /* ════════════════════════════════════════════════════════════
+     ÉTOILES AU CLIC
+  ════════════════════════════════════════════════════════════ */
+  document.addEventListener('click',e=>{
+    for(let i=0;i<6;i++){
+      const s=document.createElement('div');
+      s.style.cssText=`position:fixed;left:${e.clientX}px;top:${e.clientY}px;width:5px;height:5px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:opacity .6s ease,transform .6s ease;`;
+      document.body.appendChild(s);
+      const angle=(Math.PI*2/6)*i,dist=30+Math.random()*20;
+      setTimeout(()=>{s.style.transform=`translate(${Math.cos(angle)*dist-2.5}px,${Math.sin(angle)*dist-2.5}px) scale(0)`;s.style.opacity='0';},10);
+      setTimeout(()=>s.remove(),650);
+    }
+  });
   </script>
 </body>
 </html>
