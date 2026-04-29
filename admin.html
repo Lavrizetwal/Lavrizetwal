@@ -1090,7 +1090,11 @@
       </section>
     </main>
 
-    <main id="app-shell" class="app-shell screen" hidden>
+    <div id="dashboard-root"></div>
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+
+    <template id="dashboard-template">
+    <main id="app-shell" class="app-shell screen">
       <aside class="sidebar" aria-label="Navigation admin">
         <div class="admin-mark">
           <strong>Zetwal</strong>
@@ -1391,8 +1395,6 @@
       </section>
     </main>
 
-    <div id="toast-region" class="toast-region" aria-live="polite"></div>
-
     <div id="sale-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sale-modal-title">
       <section class="modal-panel">
         <div class="modal-head"><div><p class="kicker">Vente rapide</p><h3 id="sale-modal-title">Valider une vente</h3></div><button class="btn ghost" type="button" data-close-modal="sale-modal">Fermer</button></div>
@@ -1433,6 +1435,7 @@
         <div class="qr-box"><div id="qr-output"></div><code id="qr-value"></code><a id="qr-download" class="btn primary" download="zetwal-qr.png">Telecharger PNG</a></div>
       </section>
     </div>
+    </template>
 
     <script>
       (function () {
@@ -1471,7 +1474,8 @@
           pollingTimer: null,
           calcValue: "0",
           quoteDrafts: [],
-          lastUnauthorizedAttempt: null
+          lastUnauthorizedAttempt: null,
+          dashboardMounted: false
         };
 
         let db = null;
@@ -1494,7 +1498,6 @@
           initSupabase();
           initFirebase();
           bindStaticEvents();
-          renderCalculatorKeys();
           setAuthMessage("Verification de la session Firebase...", "");
           showOnly("auth-screen");
         }
@@ -1521,6 +1524,7 @@
               if (!user) {
                 state.user = null;
                 localStorage.removeItem("zetwal_admin_user");
+                unmountDashboard();
                 if (state.lastUnauthorizedAttempt && Date.now() - state.lastUnauthorizedAttempt.at < 15000) {
                   showDenied(state.lastUnauthorizedAttempt.email || "inconnu");
                   return;
@@ -1539,14 +1543,19 @@
         /** Shows one top-level screen and hides the others. */
         function showOnly(id) {
           ["auth-screen", "denied-screen", "app-shell"].forEach((screen) => {
-            $(screen).hidden = screen !== id;
+            const node = $(screen);
+            if (node) node.hidden = screen !== id;
           });
         }
 
-        /** Connects static DOM events once; dynamic row buttons use delegation. */
+        /** Connects only the startup page events; the dashboard is not mounted yet. */
         function bindStaticEvents() {
           $("login-form").addEventListener("submit", handleLogin);
           $("denied-logout").addEventListener("click", logout);
+        }
+
+        /** Connects dashboard events after the secondary page is mounted into the DOM. */
+        function bindDashboardEvents() {
           $("logout-button").addEventListener("click", logout);
           $("refresh-button").addEventListener("click", () => reloadEverything(true));
           document.querySelectorAll("[data-tab]").forEach((button) => button.addEventListener("click", () => switchTab(button.dataset.tab)));
@@ -1707,10 +1716,34 @@
           }
         }
 
+        /** Mounts the dashboard as a secondary autonomous page only after Firebase authorization. */
+        function mountDashboard() {
+          if (state.dashboardMounted && $("app-shell")) return;
+          const root = $("dashboard-root");
+          const template = $("dashboard-template");
+          if (!root || !template) throw new Error("Template dashboard introuvable.");
+          root.replaceChildren(template.content.cloneNode(true));
+          state.dashboardMounted = true;
+          state.activeTab = "overview";
+          bindDashboardEvents();
+          renderCalculatorKeys();
+        }
+
+        /** Removes the secondary dashboard page so startup returns to an auth-only state. */
+        function unmountDashboard() {
+          if (!state.dashboardMounted && !$("app-shell")) return;
+          Object.values(state.charts).forEach((chart) => chart && chart.destroy());
+          state.charts = {};
+          const root = $("dashboard-root");
+          if (root) root.replaceChildren();
+          state.dashboardMounted = false;
+        }
+
         /** Stores the authenticated admin, loads data and starts polling. */
         async function enterApp(user) {
           state.user = user;
           state.lastUnauthorizedAttempt = null;
+          mountDashboard();
           writeLocal("zetwal_admin_user", user);
           $("admin-email").textContent = user.email || "Admin";
           $("manual-sale-client").value = user.email || "";
@@ -1731,6 +1764,7 @@
           try {
             if (window.firebase && window.firebase.auth) await window.firebase.auth().signOut();
           } catch (error) {}
+          unmountDashboard();
           showOnly("auth-screen");
         }
 
@@ -2531,6 +2565,7 @@
 
         function renderCalculatorKeys() {
           const keys = ["C", "(", ")", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "0", ".", "DEL", "="];
+          if (!$("calc-keys")) return;
           $("calc-keys").innerHTML = keys.map((key) => `<button class="btn ${key === "=" ? "primary" : ""}" type="button" data-key="${key}">${key}</button>`).join("");
         }
 
@@ -2646,7 +2681,7 @@
             if (error) throw error;
             state.notifications.unshift(data || payload);
             writeLocal(cacheKey("notifications"), state.notifications);
-            renderNotifications();
+            if ($("notifications-list")) renderNotifications();
           } catch (error) {}
         }
 
