@@ -421,6 +421,15 @@
             </select>
           </div>
 
+          <!-- Localisation (visible si disponible) -->
+          <div id="field-location" class="field" style="border-left:3px solid var(--gold);padding-left:12px">
+            <label>📍 Localisation du produit</label>
+            <select id="product-location">
+              <option value="haiti">🇭🇹 Haïti</option>
+              <option value="rd">🇩🇴 République Dominicaine</option>
+            </select>
+          </div>
+
           <!-- Champ délai (affiché si "coming") -->
           <div id="field-delay" class="field" style="display:none;border-left:3px solid var(--gold);padding-left:12px">
             <label>Délai de disponibilité</label>
@@ -439,6 +448,33 @@
               <option value="no">🚫 Non livrable</option>
               <option value="yes">🚚 Livraison possible</option>
             </select>
+          </div>
+
+          <!-- ── PRIX MULTI-MONNAIE ── -->
+          <div class="field" style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
+            <label style="color:var(--gold);font-weight:700;font-size:0.72rem">💱 Affichage prix — Monnaies actives</label>
+            <div style="font-size:0.62rem;color:var(--text-muted);margin-bottom:10px">L'admin peut activer 1, 2 ou 3 monnaies. Les prix sont calculés automatiquement selon les taux dans Paramètres.</div>
+            <div style="display:flex;flex-direction:column;gap:8px;padding:12px;background:rgba(255,215,0,0.03);border:1px solid rgba(255,215,0,0.12);border-radius:var(--radius-sm)">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.75rem">
+                <input type="checkbox" id="price-show-htg" checked style="width:auto;margin:0;accent-color:var(--gold)">
+                <span>🇭🇹 Gourdes (HTG)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.75rem">
+                <input type="checkbox" id="price-show-usd" style="width:auto;margin:0;accent-color:var(--gold)">
+                <span>🇺🇸 Dollars (USD)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.75rem">
+                <input type="checkbox" id="price-show-peso" style="width:auto;margin:0;accent-color:var(--gold)">
+                <span>🇩🇴 Pesos (DOP)</span>
+              </label>
+            </div>
+            <!-- Aperçu calculé en temps réel -->
+            <div id="price-preview-block" style="margin-top:10px;padding:10px 14px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius-sm);display:none">
+              <div style="font-size:0.58rem;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Aperçu Prix Affiché</div>
+              <div id="price-preview-htg" style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:3px"></div>
+              <div id="price-preview-usd" style="font-size:0.75rem;color:#60b4ff;font-weight:600;margin-bottom:3px;display:none"></div>
+              <div id="price-preview-peso" style="font-size:0.75rem;color:#a78bfa;font-weight:600;display:none"></div>
+            </div>
           </div>
 
           <button class="btn btn-gold" id="save-product-btn" onclick="saveProduct()" style="margin-top:8px">
@@ -1301,7 +1337,12 @@ window.confirmSellQty = async () => {
   sellQtyProductId = null;
   await loadProducts();
   await loadSales();
+  await loadNotifications();
   loadStats();
+  // Rafraîchir analytics si l'onglet est ouvert
+  if (document.getElementById('tab-analytics')?.classList.contains('active')) {
+    await refreshAnalytics();
+  }
 };
 
 // Vente simple (depuis modal détail)
