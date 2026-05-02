@@ -47,6 +47,7 @@
     .auth-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,215,0,0.08)}
     .auth-input::placeholder{color:var(--text-muted)}
     .auth-err{font-size:0.72rem;color:var(--red);margin-top:8px;display:none}
+    .auth-err{font-size:0.72rem;color:var(--red);margin-top:10px;padding:8px 12px;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:8px;display:none}
     .auth-err.show{display:block}
 
     /* BUTTONS */
@@ -274,7 +275,7 @@
       </div>
     </div>
     <button class="btn btn-gold" id="login-btn" onclick="handleLogin()" style="margin-top:8px">Connexion</button>
-    <div class="auth-err" id="login-err" style="font-size:0.72rem;color:var(--red);margin-top:10px;display:none;padding:8px 12px;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:8px"></div>
+    <div class="auth-err" id="login-err"></div>
   </div>
 </div>
 
@@ -836,7 +837,8 @@ window.handleLogin = async () => {
   err.classList.remove('show');
   if (!emailVal || !passVal) {
     err.textContent = 'Email et mot de passe requis.';
-    err.classList.add('show'); return;
+    err.classList.add('show');
+    return;
   }
 
   btn.disabled = true;
@@ -940,8 +942,12 @@ window.togglePasswordVisibility = () => {
 document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') handleLogin(); });
 document.getElementById('login-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-pass').focus(); });
 
-// Lancer l'initialisation
-initAuth();
+// Lancer l'initialisation après chargement complet
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => initAuth());
+} else {
+  initAuth();
+}
 
 // ============================================================
 // PRODUITS
