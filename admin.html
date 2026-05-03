@@ -652,7 +652,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Prix/u</th><th>Total</th><th>Client</th><th>Date</th><th>Statut</th></tr></thead>
+            <thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Prix/u</th><th>Total</th><th>Client</th><th>Email</th><th>Date</th><th>Statut</th></tr></thead>
             <tbody id="sales-table-body"><tr><td colspan="8" style="color:var(--text-muted);padding:20px">Chargement...</td></tr></tbody>
           </table>
         </div>
@@ -1702,7 +1702,7 @@ function loadStats(){
   const salesRvEl = document.getElementById('stat-sales-revenue');
   const ordersEl  = document.getElementById('stat-orders-count');
   if(salesNbEl) salesNbEl.textContent = salesCount;
-  if(salesRvEl) salesRvEl.textContent = fmtP(salesRevenue)+' HTG';
+  if(salesRvEl) salesRvEl.innerHTML = `${fmtP(salesRevenue)} HTG<div style="font-size:0.58rem;color:#60b4ff;margin-top:1px">$${htgToUSD(salesRevenue)} · ${htgToPeso(salesRevenue)} $RD</div>`;
   if(ordersEl)  ordersEl.textContent  = ordersCount;
   // Badge notifications non lues
   const unreadNotifs = allNotifications.filter(n=>!n.read).length;
@@ -2031,30 +2031,45 @@ async function loadSales(){
 }
 
 function updateSalesKPIs(){
-  const nb  = allSales.length;
-  const units = allSales.reduce((s,v)=>s+(v.quantity_sold||0),0);
-  const rev   = allSales.reduce((s,v)=>s+(v.total_price||0),0);
-  const ordRev= allOrders.filter(o=>o.status==='accepted').reduce((s,o)=>s+(o.total_estimated||0),0);
+  const nb     = allSales.length;
+  const units  = allSales.reduce((s,v)=>s+(v.quantity_sold||0),0);
+  const rev    = allSales.reduce((s,v)=>s+(v.total_price||0),0);
+  const ordRev = allOrders.filter(o=>o.status==='accepted').reduce((s,o)=>s+(o.total_estimated||0),0);
   const e1=document.getElementById('kpi-sales-nb');    if(e1) e1.textContent=nb;
   const e2=document.getElementById('kpi-sales-units'); if(e2) e2.textContent=units;
-  const e3=document.getElementById('kpi-sales-rev');   if(e3) e3.textContent=fmtP(rev)+' HTG';
-  const e4=document.getElementById('kpi-sales-orders-rev'); if(e4) e4.textContent=fmtP(ordRev)+' HTG';
+  const e3=document.getElementById('kpi-sales-rev');
+  if(e3) e3.innerHTML=`${fmtP(rev)} HTG<div style="font-size:0.65rem;font-weight:400;color:#60b4ff;margin-top:2px">$${htgToUSD(rev)}</div><div style="font-size:0.65rem;font-weight:400;color:#a78bfa">  ${htgToPeso(rev)} $RD</div>`;
+  const e4=document.getElementById('kpi-sales-orders-rev');
+  if(e4) e4.innerHTML=`${fmtP(ordRev)} HTG<div style="font-size:0.65rem;font-weight:400;color:#60b4ff;margin-top:2px">$${htgToUSD(ordRev)}</div><div style="font-size:0.65rem;font-weight:400;color:#a78bfa">${htgToPeso(ordRev)} $RD</div>`;
 }
 
 function renderSalesTable(list){
   const tbody=document.getElementById('sales-table-body');
   if(!tbody) return;
-  if(!list.length){tbody.innerHTML='<tr><td colspan="8" style="color:var(--text-muted);padding:20px">Aucune vente enregistrée.</td></tr>';return;}
-  tbody.innerHTML=list.map((v,i)=>`<tr>
+  if(!list.length){tbody.innerHTML='<tr><td colspan="10" style="color:var(--text-muted);padding:20px">Aucune vente enregistrée.</td></tr>';return;}
+  tbody.innerHTML=list.map((v,i)=>{
+    const htg = v.total_price||0;
+    const uPrice = v.product_price||0;
+    return `<tr>
     <td style="color:var(--text-muted);font-size:0.65rem">${i+1}</td>
-    <td style="font-weight:600;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(v.product_name||'—')}</td>
+    <td style="font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(v.product_name||'—')}</td>
     <td style="text-align:center">${v.quantity_sold??0}</td>
-    <td style="color:var(--text-muted)">${fmtP(v.product_price||0)} HTG</td>
-    <td style="color:var(--gold);font-weight:700">${fmtP(v.total_price||0)} HTG</td>
+    <td style="color:var(--text-muted);font-size:0.72rem">
+      <div>${fmtP(uPrice)} HTG</div>
+      <div style="color:#60b4ff;font-size:0.6rem">$${htgToUSD(uPrice)}</div>
+      <div style="color:#a78bfa;font-size:0.6rem">${htgToPeso(uPrice)} $RD</div>
+    </td>
+    <td style="font-weight:700">
+      <div style="color:var(--gold)">${fmtP(htg)} HTG</div>
+      <div style="color:#60b4ff;font-size:0.68rem">$${htgToUSD(htg)}</div>
+      <div style="color:#a78bfa;font-size:0.68rem">${htgToPeso(htg)} $RD</div>
+    </td>
     <td style="font-size:0.68rem;color:var(--text-muted)">${escH(v.client_name||'—')}</td>
+    <td style="font-size:0.65rem;color:var(--text-muted)">${v.client_email?`<div style="font-size:0.6rem">${escH(v.client_email)}</div>`:''}</td>
     <td style="font-size:0.65rem;color:var(--text-muted)">${v.created_at?new Date(v.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—'}</td>
     <td><span style="background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:2px 8px;font-size:0.58rem;font-weight:700">✅ Validée</span></td>
-  </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 window.filterSales=()=>{
@@ -2259,12 +2274,18 @@ async function refreshAnalytics(){
   const ordPending = allOrders.filter(o=>o.status==='pending').length;
 
   grid.innerHTML=[
-    {label:'Revenus Ventes',  val:fmtP(sR)+' HTG',   icon:'💰',color:'#ffd700',sub:allSales.length+' ventes enregistrées'},
-    {label:'Revenus Lavage',  val:fmtP(wR)+' HTG',   icon:'🧺',color:'#00b4ff',sub:allWashRecords.length+' fiches'},
-    {label:'Revenus Totaux',  val:fmtP(sR+wR)+' HTG',icon:'📊',color:'#00ff88',sub:'Tout combiné'},
-    {label:'Stock Potentiel', val:fmtP(avail.reduce((s,p)=>s+(p.price||0),0))+' HTG',icon:'📦',color:'#a855f7',sub:avail.length+' produits'},
-    {label:'Commandes Attente',val:ordPending,         icon:'📋',color:'#fbbf24',sub:'à traiter'},
-    {label:"Ajouts Aujourd'hui",val:tn,                icon:'✨',color:'#ff6b9d',sub:'nouveaux produits'},
+    {label:'Revenus Ventes HTG',  val:`${fmtP(sR)} HTG`, icon:'💰',color:'#ffd700',
+      sub:`$${htgToUSD(sR)} · ${htgToPeso(sR)} $RD`},
+    {label:'Revenus Lavage',      val:`${fmtP(wR)} HTG`,  icon:'🧺',color:'#00b4ff',
+      sub:`$${htgToUSD(wR)} · ${allWashRecords.length} fiches`},
+    {label:'Revenus Totaux',      val:`${fmtP(sR+wR)} HTG`,icon:'📊',color:'#00ff88',
+      sub:`$${htgToUSD(sR+wR)} · ${htgToPeso(sR+wR)} $RD`},
+    {label:'Stock Potentiel',     val:`${fmtP(avail.reduce((s,p)=>s+(p.price||0),0))} HTG`,icon:'📦',color:'#a855f7',
+      sub:`$${htgToUSD(avail.reduce((s,p)=>s+(p.price||0),0))} · ${avail.length} produits`},
+    {label:'Commandes Attente',   val:ordPending, icon:'📋',color:'#fbbf24',
+      sub:'à traiter'},
+    {label:"Ajouts Aujourd'hui",  val:tn, icon:'✨',color:'#ff6b9d',
+      sub:'nouveaux produits'},
   ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-icon">${k.icon}</div><div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
 
   Object.values(acharts).forEach(c=>{try{c.destroy();}catch(e){}});acharts={};
