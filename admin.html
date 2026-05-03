@@ -376,7 +376,7 @@
             <img id="img-preview" class="img-preview" alt="Aperçu">
           </div>
           <div class="field"><label>Nom du produit *</label><input type="text" id="product-name" placeholder="Ex: Chemise blanche homme L"></div>
-          <div class="field"><label>Prix (HTG) *</label><input type="number" id="product-price" placeholder="Ex: 1500" min="0" step="0.01"></div>
+          <div class="field"><label>Prix (HTG) *</label><input type="number" id="product-price" placeholder="Ex: 1500" min="0" step="0.01" oninput="updatePricePreview()"></div>
           <div class="field">
             <label>Catégorie *</label>
             <select id="product-category">
@@ -456,15 +456,15 @@
             <div style="font-size:0.62rem;color:var(--text-muted);margin-bottom:10px">L'admin peut activer 1, 2 ou 3 monnaies. Les prix sont calculés automatiquement selon les taux dans Paramètres.</div>
             <div style="display:flex;flex-direction:column;gap:8px;padding:12px;background:rgba(255,215,0,0.03);border:1px solid rgba(255,215,0,0.12);border-radius:var(--radius-sm)">
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.75rem">
-                <input type="checkbox" id="price-show-htg" checked style="width:auto;margin:0;accent-color:var(--gold)">
+                <input type="checkbox" id="price-show-htg" checked style="width:auto;margin:0;accent-color:var(--gold)" onchange="updatePricePreview()">
                 <span>🇭🇹 Gourdes (HTG)</span>
               </label>
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.75rem">
-                <input type="checkbox" id="price-show-usd" style="width:auto;margin:0;accent-color:var(--gold)">
+                <input type="checkbox" id="price-show-usd" style="width:auto;margin:0;accent-color:var(--gold)" onchange="updatePricePreview()">
                 <span>🇺🇸 Dollars (USD)</span>
               </label>
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.75rem">
-                <input type="checkbox" id="price-show-peso" style="width:auto;margin:0;accent-color:var(--gold)">
+                <input type="checkbox" id="price-show-peso" style="width:auto;margin:0;accent-color:var(--gold)" onchange="updatePricePreview()">
                 <span>🇩🇴 Pesos (DOP)</span>
               </label>
             </div>
@@ -736,7 +736,7 @@
             <div style="font-size:2rem;margin-bottom:6px">🇺🇸</div>
             <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">1 USD = ? HTG</div>
             <div style="display:flex;align-items:center;gap:6px;justify-content:center">
-              <input type="number" id="setting-rate-usd" min="1" step="0.5"
+              <input type="number" id="setting-rate-usd" min="1" step="0.5" oninput="updateRatePreviews()"
                 style="width:90px;padding:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#60b4ff;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;text-align:center;outline:none">
               <span style="font-size:0.65rem;color:var(--text-muted)">HTG</span>
             </div>
@@ -747,7 +747,7 @@
             <div style="font-size:2rem;margin-bottom:6px">🇩🇴</div>
             <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">1 DOP = ? HTG</div>
             <div style="display:flex;align-items:center;gap:6px;justify-content:center">
-              <input type="number" id="setting-rate-peso" min="0.01" step="0.01"
+              <input type="number" id="setting-rate-peso" min="0.01" step="0.01" oninput="updateRatePreviews()"
                 style="width:90px;padding:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(168,85,247,0.3);border-radius:6px;color:#a78bfa;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;text-align:center;outline:none">
               <span style="font-size:0.65rem;color:var(--text-muted)">HTG</span>
             </div>
@@ -864,6 +864,42 @@ let scannedProductId=null, qrScanner=null, lastSavedProduct=null;
 // ── Nouvelles listes globales ────────────────────────────────
 let allSales=[], allOrders=[], allNotifications=[];
 let auth = null;
+// ── Taux de change globaux (mis à jour depuis Supabase site_settings) ──
+let RATE_USD  = 136;   // 1 USD = X HTG
+let RATE_PESO = 2.3;   // 1 DOP = X HTG
+
+// Helpers conversion
+function htgToUSD(htg)  { return ((htg||0)/RATE_USD).toFixed(2); }
+function htgToPeso(htg) { return ((htg||0)/RATE_PESO).toFixed(0); }
+function fmtUSD(htg)    { return `$${htgToUSD(htg)}`; }
+function fmtPeso(htg)   { return `${htgToPeso(htg)} $RD`; }
+function fmtMulti(htg, currencies='HTG') {
+  const parts = [];
+  const c = currencies.split(',').map(s=>s.trim());
+  if(c.includes('HTG'))  parts.push(`${fmtP(htg)} HTG`);
+  if(c.includes('USD'))  parts.push(`$${htgToUSD(htg)}`);
+  if(c.includes('DOP'))  parts.push(`${htgToPeso(htg)} $RD`);
+  return parts.join(' · ') || `${fmtP(htg)} HTG`;
+}
+
+// Charger les taux depuis site_settings au démarrage
+async function loadRates() {
+  try {
+    const { data } = await db.from('site_settings')
+      .select('key,value')
+      .in('key', ['rate_usd','rate_peso']);
+    if(data) data.forEach(r => {
+      if(r.key==='rate_usd')   RATE_USD  = parseFloat(r.value)||136;
+      if(r.key==='rate_peso')  RATE_PESO = parseFloat(r.value)||2.3;
+    });
+  } catch(e){}
+  // Pré-remplir les champs dans paramètres
+  const eu = document.getElementById('setting-rate-usd');
+  const ep = document.getElementById('setting-rate-peso');
+  if(eu) eu.value = RATE_USD;
+  if(ep) ep.value = RATE_PESO;
+  updateRatePreviews();
+}
 
 // ============================================================
 // AUTH — Double stratégie:
@@ -902,7 +938,7 @@ async function onUserChange(user) {
   currentUser = user;
   hide('auth-wall'); hide('denied-wall'); showEl('app');
   document.getElementById('nav-email').textContent = user.email;
-  await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications()]);
+  await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
   loadStats();
 }
 
@@ -1003,7 +1039,7 @@ window.handleLogin = async () => {
     document.getElementById('denied-wall').classList.remove('show');
     document.getElementById('app').classList.add('show');
     document.getElementById('nav-email').textContent = data.email;
-    await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications()]);
+    await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
     loadStats();
 
   } catch(fetchErr) {
@@ -2283,7 +2319,81 @@ async function refreshAnalytics(){
     if(!s.length){tp.innerHTML='<div style="color:var(--text-muted);font-size:0.75rem;padding:10px">Aucun produit.</div>';}
     else tp.innerHTML=`<table class="top-table"><thead><tr><th>#</th><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th></tr></thead><tbody>${s.map((p,i)=>`<tr><td><span class="rank-badge ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${i+1}</span></td><td style="font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(p.name)}</td><td style="font-size:0.68rem;color:var(--text-muted)">${escH(p.category||'—')}</td><td style="color:var(--gold);font-weight:700">${fmtP(p.price)} HTG</td><td style="font-size:0.68rem">${p.stock_quantity??0}</td><td><span class="product-status ${p.status==='sold'?'status-sold':'status-available'}">${p.status==='sold'?'● Vendu':'● Dispo'}</span></td></tr>`).join('')}</tbody></table>`;}
 }
-window.refreshAnalytics=refreshAnalytics;
+window.refreshAnalytics=refreshAnalytics;// ============================================================
+// TAUX DE CHANGE — Sauvegarde + aperçus
+// ============================================================
+window.saveRates = async () => {
+  const usdEl  = document.getElementById('setting-rate-usd');
+  const pesoEl = document.getElementById('setting-rate-peso');
+  const msgEl  = document.getElementById('rates-saved-msg');
+  const newUSD  = parseFloat(usdEl?.value);
+  const newPeso = parseFloat(pesoEl?.value);
+  if(isNaN(newUSD)||newUSD<=0)  { toast('Taux USD invalide','error'); return; }
+  if(isNaN(newPeso)||newPeso<=0){ toast('Taux Peso invalide','error'); return; }
+
+  try {
+    await db.from('site_settings').upsert([
+      { key:'rate_usd',   value: String(newUSD),  updated_at: new Date().toISOString() },
+      { key:'rate_peso',  value: String(newPeso), updated_at: new Date().toISOString() }
+    ],{ onConflict:'key' });
+    RATE_USD  = newUSD;
+    RATE_PESO = newPeso;
+    updateRatePreviews();
+    if(msgEl){ msgEl.style.display='block'; setTimeout(()=>msgEl.style.display='none',3500); }
+    toast(`✅ 1 USD = ${newUSD} HTG · 1 $RD = ${newPeso} HTG`, 'success');
+    // Rafraîchir les tables qui affichent les monnaies
+    renderSalesTable(allSales);
+    if(document.getElementById('tab-analytics')?.classList.contains('active')) refreshAnalytics();
+  } catch(e) {
+    toast('Erreur: '+e.message,'error');
+  }
+};
+
+function updateRatePreviews() {
+  const usdEl  = document.getElementById('setting-rate-usd');
+  const pesoEl = document.getElementById('setting-rate-peso');
+  const u = parseFloat(usdEl?.value)||RATE_USD;
+  const p = parseFloat(pesoEl?.value)||RATE_PESO;
+  const pUSD  = document.getElementById('rate-usd-preview');
+  const pPeso = document.getElementById('rate-peso-preview');
+  if(pUSD)  pUSD.textContent  = `Ex: 500 HTG = $${(500/u).toFixed(2)}`;
+  if(pPeso) pPeso.textContent = `Ex: 500 HTG = ${(500/p).toFixed(0)} $RD`;
+  updateConvPreview();
+}
+
+window.updateConvPreview = () => {
+  const usdEl  = document.getElementById('setting-rate-usd');
+  const pesoEl = document.getElementById('setting-rate-peso');
+  const u = parseFloat(usdEl?.value)||RATE_USD;
+  const p = parseFloat(pesoEl?.value)||RATE_PESO;
+  const htg = parseFloat(document.getElementById('conv-test-htg')?.value)||0;
+  const ru = document.getElementById('conv-result-usd');
+  const rp = document.getElementById('conv-result-peso');
+  if(ru) ru.textContent = `🇺🇸 ${(htg/u).toFixed(2)} USD`;
+  if(rp) rp.textContent = `🇩🇴 ${(htg/p).toFixed(0)} Pesos`;
+};
+
+// Aperçu prix en temps réel dans le formulaire produit
+window.updatePricePreview = () => {
+  const priceEl  = document.getElementById('product-price');
+  const htg = parseFloat(priceEl?.value)||0;
+  const showHTG  = document.getElementById('price-show-htg')?.checked !== false;
+  const showUSD  = document.getElementById('price-show-usd')?.checked === true;
+  const showPeso = document.getElementById('price-show-peso')?.checked === true;
+  const block    = document.getElementById('price-preview-block');
+  const eHTG     = document.getElementById('price-preview-htg');
+  const eUSD     = document.getElementById('price-preview-usd');
+  const ePeso    = document.getElementById('price-preview-peso');
+
+  if(!block) return;
+  if(!htg){ block.style.display='none'; return; }
+  block.style.display = 'block';
+
+  if(eHTG){ eHTG.textContent = showHTG  ? `🇭🇹 ${fmtP(htg)} HTG` : ''; eHTG.style.display=showHTG?'block':'none'; }
+  if(eUSD){ eUSD.textContent = showUSD  ? `🇺🇸 $${htgToUSD(htg)}` : ''; eUSD.style.display=showUSD?'block':'none'; }
+  if(ePeso){ ePeso.textContent= showPeso ? `🇩🇴 ${htgToPeso(htg)} $RD` : ''; ePeso.style.display=showPeso?'block':'none'; }
+};
+
 </script>
 </body>
 </html>
