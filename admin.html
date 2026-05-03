@@ -718,6 +718,62 @@
         </div>
       </div>
 
+      <!-- ═══ TAUX DE CHANGE ═══ -->
+      <div class="card" style="max-width:700px;margin-bottom:20px">
+        <div class="card-title">💱 Taux de Change — 3 Monnaies</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:16px">Ces taux sont utilisés pour convertir automatiquement les prix HTG → USD et HTG → Pesos dans tout le panneau admin.</div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px">
+          <!-- HTG base -->
+          <div style="background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center">
+            <div style="font-size:2rem;margin-bottom:6px">🇭🇹</div>
+            <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Gourde HTG</div>
+            <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--gold)">BASE</div>
+            <div style="font-size:0.6rem;color:var(--text-muted);margin-top:4px">Monnaie de référence</div>
+          </div>
+          <!-- USD -->
+          <div style="background:rgba(0,180,255,0.04);border:1px solid rgba(0,180,255,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center">
+            <div style="font-size:2rem;margin-bottom:6px">🇺🇸</div>
+            <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">1 USD = ? HTG</div>
+            <div style="display:flex;align-items:center;gap:6px;justify-content:center">
+              <input type="number" id="setting-rate-usd" min="1" step="0.5"
+                style="width:90px;padding:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(0,180,255,0.3);border-radius:6px;color:#60b4ff;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;text-align:center;outline:none">
+              <span style="font-size:0.65rem;color:var(--text-muted)">HTG</span>
+            </div>
+            <div id="rate-usd-preview" style="font-size:0.6rem;color:rgba(0,180,255,0.6);margin-top:6px"></div>
+          </div>
+          <!-- Peso -->
+          <div style="background:rgba(168,85,247,0.04);border:1px solid rgba(168,85,247,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center">
+            <div style="font-size:2rem;margin-bottom:6px">🇩🇴</div>
+            <div style="font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">1 DOP = ? HTG</div>
+            <div style="display:flex;align-items:center;gap:6px;justify-content:center">
+              <input type="number" id="setting-rate-peso" min="0.01" step="0.01"
+                style="width:90px;padding:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(168,85,247,0.3);border-radius:6px;color:#a78bfa;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;text-align:center;outline:none">
+              <span style="font-size:0.65rem;color:var(--text-muted)">HTG</span>
+            </div>
+            <div id="rate-peso-preview" style="font-size:0.6rem;color:rgba(168,85,247,0.6);margin-top:6px"></div>
+          </div>
+        </div>
+
+        <!-- Calculatrice rapide de conversion -->
+        <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px">
+          <div style="font-size:0.62rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🧮 Test de Conversion Rapide</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <input type="number" id="conv-test-htg" placeholder="Montant HTG" min="0" oninput="updateConvPreview()"
+              style="flex:1;min-width:120px;padding:10px 14px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:8px;color:var(--gold);font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;outline:none">
+            <div style="display:flex;flex-direction:column;gap:4px;flex:2;min-width:180px">
+              <div id="conv-result-usd" style="font-size:0.75rem;color:#60b4ff;font-weight:600;padding:5px 10px;background:rgba(0,180,255,0.05);border-radius:6px;border:1px solid rgba(0,180,255,0.1)">🇺🇸 — USD</div>
+              <div id="conv-result-peso" style="font-size:0.75rem;color:#a78bfa;font-weight:600;padding:5px 10px;background:rgba(168,85,247,0.05);border-radius:6px;border:1px solid rgba(168,85,247,0.1)">🇩🇴 — Pesos</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-gold" onclick="saveRates()" style="max-width:280px">
+          💾 Sauvegarder les Taux
+        </button>
+        <div id="rates-saved-msg" style="font-size:0.72rem;color:var(--green);margin-top:10px;display:none">✅ Taux enregistrés et appliqués!</div>
+      </div>
+
       <!-- CITATIONS SEMAINE -->
       <div class="card" style="max-width:800px">
         <div class="card-title">💬 Citations de la Semaine</div>
@@ -1043,7 +1099,10 @@ window.filterProducts = () => {
 window.toggleAvailFields = () => {
   const val = document.getElementById('product-avail')?.value;
   const fd  = document.getElementById('field-delay');
+  const fl  = document.getElementById('field-location');
   if (fd) fd.style.display = val === 'coming' ? 'block' : 'none';
+  if (fl) fl.style.display = val === 'coming' ? 'none' : 'block';
+  updatePricePreview();
 };
 
 window.handleImageSelect = (e) => {
@@ -1068,7 +1127,14 @@ window.saveProduct = async () => {
   const avail    = document.getElementById('product-avail')?.value || 'available';
   const delay    = parseInt(document.getElementById('product-delay')?.value) || 30;
   const delivery = document.getElementById('product-delivery')?.value || 'no';
+  const location = document.getElementById('product-location')?.value || 'haiti';
   const btn      = document.getElementById('save-product-btn');
+
+  // Monnaies activées
+  const showHTG  = document.getElementById('price-show-htg')?.checked !== false;
+  const showUSD  = document.getElementById('price-show-usd')?.checked === true;
+  const showPeso = document.getElementById('price-show-peso')?.checked === true;
+  const priceCurrencies = [showHTG?'HTG':null, showUSD?'USD':null, showPeso?'DOP':null].filter(Boolean).join(',') || 'HTG';
 
   // Collecter couleurs cochées
   const colorChecks = document.querySelectorAll('#color-checkboxes input[type="checkbox"]:checked');
@@ -1103,6 +1169,8 @@ window.saveProduct = async () => {
       availability: avail,
       delay_days: avail === 'coming' ? delay : null,
       delivery_available: delivery === 'yes',
+      location: location,
+      price_currencies: priceCurrencies,
       qr_code_value: null
     }).select().single();
 
