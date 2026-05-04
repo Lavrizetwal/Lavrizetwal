@@ -823,9 +823,20 @@
     <div id="sell-qty-product-info" style="margin-bottom:16px;padding:12px;background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.15);border-radius:var(--radius-sm)"></div>
     <div class="field">
       <label>Quantité vendue *</label>
-      <input type="number" id="sell-qty-input" min="1" value="1" style="font-size:1.2rem;text-align:center;font-weight:700">
+      <input type="number" id="sell-qty-input" min="1" value="1"
+        style="font-size:1.2rem;text-align:center;font-weight:700"
+        oninput="updateSellTotal()">
     </div>
-    <div id="sell-qty-stock-info" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:16px;text-align:center"></div>
+    <div id="sell-qty-stock-info" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;text-align:center"></div>
+    <!-- Total multi-monnaie en temps réel -->
+    <div id="sell-total-preview" style="display:none;margin-bottom:16px;padding:12px 14px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.15);border-radius:var(--radius-sm)">
+      <div style="font-size:0.58rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">💰 Total de la vente</div>
+      <div id="sell-total-htg"  style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--gold)"></div>
+      <div style="display:flex;gap:14px;margin-top:6px">
+        <div id="sell-total-usd"  style="font-size:0.75rem;color:#60b4ff;font-weight:600"></div>
+        <div id="sell-total-peso" style="font-size:0.75rem;color:#a78bfa;font-weight:600"></div>
+      </div>
+    </div>
     <div class="modal-btns">
       <button class="btn btn-green" onclick="confirmSellQty()">✅ Confirmer la Vente</button>
       <button class="btn btn-outline" onclick="closeModal('sell-qty-modal')">Annuler</button>
@@ -1099,6 +1110,9 @@ function renderProducts(list) {
       <div class="product-body">
         <div class="product-name">${escH(p.name)}</div>
         <div class="product-price">${fmtP(p.price)} HTG</div>
+        ${(p.price_currencies||'HTG').includes('USD')?`<div style="font-size:0.72rem;color:#60b4ff;font-weight:600;margin-top:-2px">$${htgToUSD(p.price)}</div>`:''}
+        ${(p.price_currencies||'HTG').includes('DOP')?`<div style="font-size:0.72rem;color:#a78bfa;font-weight:600;margin-top:-1px">${htgToPeso(p.price)} $RD</div>`:''}
+        ${p.location?`<div style="display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:2px 8px;background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.15);border-radius:20px;font-size:0.55rem;color:rgba(255,215,0,0.7);font-weight:600">${p.location==='rd'?'🇩🇴 Rép. Dominicaine':'🇭🇹 Haïti'}</div>`:''}
         ${p.description?`<div class="product-desc">${escH(p.description)}</div>`:''}
         <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${sB}${dB}</div>
         ${p.colors?`<div style="font-size:0.58rem;color:var(--text-muted);margin-bottom:6px">🎨 ${escH(p.colors)}</div>`:''}
@@ -1376,12 +1390,36 @@ window.openSellQtyModal = (id) => {
   const p = allProducts.find(x=>x.id===id); if(!p) return;
   sellQtyProductId = id;
   const infoEl = document.getElementById('sell-qty-product-info');
-  if(infoEl) infoEl.innerHTML = `<div style="font-weight:700">${escH(p.name)}</div><div style="color:var(--gold);font-family:'Playfair Display',serif">${fmtP(p.price)} HTG</div>`;
+  if(infoEl) infoEl.innerHTML = `
+    <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">${escH(p.name)}</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold)">${fmtP(p.price)} HTG</div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <span style="font-size:0.68rem;color:#60b4ff">$${htgToUSD(p.price)}</span>
+      <span style="font-size:0.68rem;color:#a78bfa">${htgToPeso(p.price)} $RD</span>
+      ${p.location?`<span style="font-size:0.68rem;color:rgba(255,215,0,0.6)">${p.location==='rd'?'🇩🇴 RD':'🇭🇹 Haïti'}</span>`:''}
+    </div>`;
   const stockEl = document.getElementById('sell-qty-stock-info');
   if(stockEl) stockEl.textContent = `Stock disponible: ${p.stock_quantity ?? '?'} unités`;
   const qtyEl = document.getElementById('sell-qty-input');
   if(qtyEl){ qtyEl.value='1'; qtyEl.max=p.stock_quantity||9999; }
+  // Init preview
+  setTimeout(updateSellTotal, 50);
   document.getElementById('sell-qty-modal').classList.add('open');
+};
+
+window.updateSellTotal = () => {
+  const p = allProducts.find(x=>x.id===sellQtyProductId); if(!p) return;
+  const qty = parseInt(document.getElementById('sell-qty-input')?.value)||1;
+  const total = qty * (p.price||0);
+  const block = document.getElementById('sell-total-preview');
+  const eHTG  = document.getElementById('sell-total-htg');
+  const eUSD  = document.getElementById('sell-total-usd');
+  const ePeso = document.getElementById('sell-total-peso');
+  if(!block) return;
+  block.style.display = total > 0 ? 'block' : 'none';
+  if(eHTG)  eHTG.textContent  = `${fmtP(total)} HTG`;
+  if(eUSD)  eUSD.textContent  = `🇺🇸 $${htgToUSD(total)}`;
+  if(ePeso) ePeso.textContent = `🇩🇴 ${htgToPeso(total)} $RD`;
 };
 
 window.confirmSellQty = async () => {
