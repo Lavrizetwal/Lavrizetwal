@@ -1483,11 +1483,28 @@ window.confirmSellQty = async () => {
   toast(`✅ ${qty} unité(s) vendue(s) — Stock restant: ${newStock} — Vente enregistrée`, 'success');
   closeModal('sell-qty-modal');
   sellQtyProductId = null;
+
+  // Ajouter la vente directement dans allSales sans attendre Supabase
+  // pou ke tab "Ventes" soit déjà à jour quand l'admin switche dessus
+  allSales.unshift({
+    product_id:    id,
+    product_name:  p.name,
+    product_price: p.price || 0,
+    quantity_sold: qty,
+    total_price:   totalPrice,
+    client_name:   currentUser?.email || 'Admin',
+    client_email:  currentUser?.email || null,
+    status:        'validated',
+    created_at:    new Date().toISOString()
+  });
+  renderSalesTable(allSales);
+  updateSalesKPIs();
+  loadStats();
+
+  // Refresh complet en arrière-plan
   await loadProducts();
   await loadSales();
   await loadNotifications();
-  loadStats();
-  // Rafraîchir analytics si l'onglet est ouvert
   if (document.getElementById('tab-analytics')?.classList.contains('active')) {
     await refreshAnalytics();
   }
