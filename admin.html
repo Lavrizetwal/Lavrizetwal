@@ -1240,6 +1240,12 @@ window.saveProduct = async () => {
     const catEl = document.getElementById('product-category'); if(catEl) catEl.value='';
     const avEl  = document.getElementById('product-avail'); if(avEl) avEl.value='available';
     const dvEl  = document.getElementById('product-delivery'); if(dvEl) dvEl.value='no';
+    const locEl = document.getElementById('product-location'); if(locEl) locEl.value='haiti';
+    const flEl  = document.getElementById('field-location'); if(flEl) flEl.style.display='block';
+    const htgCk = document.getElementById('price-show-htg'); if(htgCk) htgCk.checked=true;
+    const usdCk = document.getElementById('price-show-usd'); if(usdCk) usdCk.checked=false;
+    const pesoCk= document.getElementById('price-show-peso'); if(pesoCk) pesoCk.checked=false;
+    const ppB   = document.getElementById('price-preview-block'); if(ppB) ppB.style.display='none';
     document.querySelectorAll('#color-checkboxes input[type="checkbox"]').forEach(c=>c.checked=false);
     const fd=document.getElementById('field-delay'); if(fd) fd.style.display='none';
     const prev=document.getElementById('img-preview'); if(prev) prev.style.display='none';
@@ -2380,7 +2386,7 @@ async function refreshAnalytics(){
   const tp=document.getElementById('top-products-tbl');
   if(tp){const s=[...allProducts].sort((a,b)=>(b.price||0)-(a.price||0)).slice(0,6);
     if(!s.length){tp.innerHTML='<div style="color:var(--text-muted);font-size:0.75rem;padding:10px">Aucun produit.</div>';}
-    else tp.innerHTML=`<table class="top-table"><thead><tr><th>#</th><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th></tr></thead><tbody>${s.map((p,i)=>`<tr><td><span class="rank-badge ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${i+1}</span></td><td style="font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(p.name)}</td><td style="font-size:0.68rem;color:var(--text-muted)">${escH(p.category||'—')}</td><td style="color:var(--gold);font-weight:700">${fmtP(p.price)} HTG</td><td style="font-size:0.68rem">${p.stock_quantity??0}</td><td><span class="product-status ${p.status==='sold'?'status-sold':'status-available'}">${p.status==='sold'?'● Vendu':'● Dispo'}</span></td></tr>`).join('')}</tbody></table>`;}
+    else tp.innerHTML=`<table class="top-table"><thead><tr><th>#</th><th>Produit</th><th>Catégorie</th><th>🇭🇹 HTG</th><th>🇺🇸 USD</th><th>🇩🇴 DOP</th><th>Loc.</th><th>Stock</th><th>Statut</th></tr></thead><tbody>${s.map((p,i)=>`<tr><td><span class="rank-badge ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${i+1}</span></td><td style="font-weight:600;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(p.name)}</td><td style="font-size:0.68rem;color:var(--text-muted)">${escH(p.category||'—')}</td><td style="color:var(--gold);font-weight:700">${fmtP(p.price)}</td><td style="color:#60b4ff;font-size:0.72rem">$${htgToUSD(p.price)}</td><td style="color:#a78bfa;font-size:0.72rem">${htgToPeso(p.price)}</td><td style="font-size:0.8rem">${p.location==='rd'?'🇩🇴':'🇭🇹'}</td><td style="font-size:0.68rem">${p.stock_quantity??0}</td><td><span class="product-status ${p.status==='sold'?'status-sold':'status-available'}">${p.status==='sold'?'● Vendu':'● Dispo'}</span></td></tr>`).join('')}</tbody></table>`;}
 }
 window.refreshAnalytics=refreshAnalytics;// ============================================================
 // TAUX DE CHANGE — Sauvegarde + aperçus
