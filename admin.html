@@ -1785,7 +1785,7 @@ window.switchTab=(name)=>{
   const panel=document.getElementById('tab-'+name); if(panel) panel.classList.add('active');
   if(name==='products')      loadProducts();
   if(name==='coming')        loadProducts();
-  if(name==='sales')         { loadSales(); }
+  if(name==='sales')         { renderSalesTable(allSales); updateSalesKPIs(); loadSales(); }
   if(name==='orders')        { loadOrders(); }
   if(name==='notifications') { loadNotifications(); }
   if(name==='history')       loadWashRecords();
