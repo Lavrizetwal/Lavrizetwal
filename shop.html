@@ -27,6 +27,7 @@
       --text-gold: #d4af37;
       --green: #00ff88;
       --blue: #00d4ff;
+      --red: #ff4444;
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 20px;
@@ -38,10 +39,16 @@
       --shadow-md: 0 8px 30px rgba(0,0,0,0.4);
       --shadow-lg: 0 20px 50px rgba(0,0,0,0.5);
       --shadow-gold: 0 0 30px rgba(212,175,55,0.15);
+      /* Admin vars */
+      --surface2: #141414;
+      --border-admin: rgba(255,215,0,0.18);
+      --border-hover: rgba(255,215,0,0.4);
+      --radius-admin: 14px;
+      --tr: all 0.3s cubic-bezier(0.165,0.84,0.44,1);
+      --shadow-admin: 0 8px 32px rgba(0,0,0,0.5);
     }
     *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
     html { scroll-behavior:smooth; scroll-padding-top:80px; }
-    /* NO background on body — Three.js canvas handles it completely */
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: transparent;
@@ -61,7 +68,6 @@
       width: 100%; height: 100%;
       z-index: -10;
       pointer-events: none;
-      /* Intentionally NO opacity reduction — full immersive galaxy */
     }
 
     /* ── OVERLAY gradient pour lisibilité du contenu ── */
@@ -277,88 +283,128 @@
 
     /* ── PRODUCTS GRID ── */
     .products-section { max-width:1400px; margin:0 auto; padding:0 24px 100px; }
-    .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:32px; }
+    .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
 
-    /* ── PRODUCT CARD ── */
+    /* ══════════════════════════════════════════
+       PRODUCT CARD — Style Admin (copie exacte)
+       ══════════════════════════════════════════ */
     .product-card {
-      background:linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-      backdrop-filter:blur(20px) saturate(160%);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:var(--radius-xl); overflow:hidden;
-      transition:var(--transition-smooth); cursor:pointer;
-      position:relative; transform:translateY(0);
+      background: var(--surface2);
+      border: 1px solid var(--border-admin);
+      border-radius: var(--radius-admin);
+      overflow: hidden;
+      transition: var(--tr);
+      cursor: pointer;
     }
-    .product-card::after {
-      content:''; position:absolute; inset:0; border-radius:var(--radius-xl);
-      background:linear-gradient(135deg, rgba(212,175,55,0.08) 0%, transparent 100%);
-      opacity:0; transition:opacity 0.4s;
+    .product-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-admin);
     }
-    .product-card:hover { transform:translateY(-10px); border-color:rgba(212,175,55,0.35); box-shadow:var(--shadow-lg), 0 0 40px rgba(212,175,55,0.1); }
-    .product-card:hover::after { opacity:1; }
     .product-img {
-      position:relative; width:100%; height:260px; overflow:hidden;
-      background:rgba(255,255,255,0.02);
-      display:flex; align-items:center; justify-content:center;
+      width: 100%;
+      height: 160px;
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      position: relative;
+      overflow: hidden;
     }
-    .product-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
-    .product-card:hover .product-img img { transform:scale(1.1); }
-    .product-img-placeholder { font-size:4rem; opacity:0.3; }
-    .product-badge {
-      position:absolute; top:14px; left:14px;
-      background:rgba(0,0,0,0.75); backdrop-filter:blur(10px);
-      padding:5px 12px; border-radius:20px;
-      font-size:0.55rem; font-weight:700; color:var(--gold);
-      border:1px solid rgba(212,175,55,0.35);
-      letter-spacing:1px;
+    .product-img img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
     }
-    .product-coming-badge {
-      position:absolute; top:14px; right:14px;
-      background:rgba(212,175,55,0.18); backdrop-filter:blur(10px);
-      padding:5px 12px; border-radius:20px;
-      font-size:0.55rem; font-weight:700; color:var(--gold);
-      border:1px solid rgba(212,175,55,0.35);
-    }
-    .product-img-overlay {
-      position:absolute; inset:0;
-      background:linear-gradient(to top, rgba(5,5,10,0.6) 0%, transparent 50%);
-      opacity:0; transition:opacity 0.4s;
-    }
-    .product-card:hover .product-img-overlay { opacity:1; }
-    .product-body { padding:22px; position:relative; z-index:1; }
+    .product-body { padding: 14px; }
     .product-name {
-      font-family:'Cormorant Garamond',serif; font-size:1.25rem; font-weight:700;
-      margin-bottom:8px; line-height:1.2;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
     }
     .product-price {
-      font-size:1.5rem; font-weight:700; color:var(--gold); margin-bottom:12px;
-      text-shadow:0 0 15px rgba(212,175,55,0.3);
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 6px;
+      font-family: 'Cormorant Garamond', serif;
     }
-    .product-price span { font-size:0.72rem; font-weight:400; color:var(--text-muted); }
     .product-desc {
-      font-size:0.76rem; color:var(--text-muted); line-height:1.6; margin-bottom:18px;
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-    .product-arrival {
-      font-size:0.65rem; color:var(--gold); margin-bottom:18px;
-      display:flex; align-items:center; gap:6px;
+    .product-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 1px;
     }
-    .product-actions { display:flex; gap:12px; }
-    .btn-buy, .btn-cart {
-      flex:1; padding:11px 16px; border-radius:var(--radius-md);
-      font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:1px;
-      cursor:pointer; transition:var(--transition-fast); text-align:center;
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      font-family:inherit;
+    .status-available {
+      background: rgba(0,255,136,0.1);
+      color: var(--green);
+      border: 1px solid rgba(0,255,136,0.2);
     }
-    .btn-buy {
-      background:linear-gradient(135deg,#25D366,#128C7E); color:#fff; border:none;
+    .status-coming {
+      background: rgba(251,191,36,0.1);
+      color: #fbbf24;
+      border: 1px solid rgba(251,191,36,0.2);
     }
-    .btn-buy:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(37,211,102,0.35); }
-    .btn-cart {
-      background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); color:var(--gold);
+    .status-sold {
+      background: rgba(255,68,68,0.1);
+      color: var(--red);
+      border: 1px solid rgba(255,68,68,0.2);
     }
-    .btn-cart:hover { background:rgba(212,175,55,0.2); transform:translateY(-2px); }
-    .btn-cart.in-cart { background:rgba(212,175,55,0.25); border-color:var(--gold); color:var(--gold-light); }
+    .product-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-admin {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--tr);
+      border: none;
+      flex: 1;
+    }
+    .btn-admin-green {
+      background: linear-gradient(135deg,#00c866,var(--green));
+      color: #000;
+    }
+    .btn-admin-green:hover { box-shadow: 0 0 20px rgba(0,255,136,0.35); transform: translateY(-1px); }
+    .btn-admin-gold {
+      background: rgba(212,175,55,0.1);
+      border: 1px solid rgba(212,175,55,0.3) !important;
+      color: var(--gold);
+    }
+    .btn-admin-gold:hover { background: rgba(212,175,55,0.2); transform: translateY(-1px); }
+    .btn-admin-gold.in-cart {
+      background: rgba(212,175,55,0.25);
+      border-color: var(--gold) !important;
+      color: var(--gold-light);
+    }
 
     /* ── CART PANEL ── */
     .cart-overlay {
@@ -496,7 +542,7 @@
     .back-to-top:hover { transform:translateY(-4px); box-shadow:0 8px 30px rgba(212,175,55,0.6); }
 
     /* ── REVEAL ANIMATION ── */
-    .reveal { opacity:0; transform:translateY(50px); transition:all 0.9s cubic-bezier(0.2,0.9,0.4,1.1); }
+    .reveal { opacity:0; transform:translateY(30px); transition:all 0.6s cubic-bezier(0.2,0.9,0.4,1.1); }
     .reveal.visible { opacity:1; transform:translateY(0); }
 
     /* ── EMPTY STATE ── */
@@ -508,7 +554,7 @@
 
     /* ── RESPONSIVE ── */
     @media(max-width:768px) {
-      .products-grid { grid-template-columns:repeat(2,1fr); gap:16px; }
+      .products-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
       .stats-grid { grid-template-columns:repeat(2,1fr); gap:14px; }
       .filter-bar { flex-direction:column; align-items:stretch; }
       .user-email { display:none; }
@@ -518,7 +564,6 @@
     @media(max-width:480px) {
       .products-grid { grid-template-columns:1fr; }
       .hero-title { font-size:2.4rem; }
-      .product-img { height:200px; }
     }
   </style>
 </head>
@@ -690,11 +735,30 @@ let currentCategory = '';
 let currentSearch = '';
 let currentSort = 'newest';
 
+// Taux de change (chargés depuis Supabase)
+let RATE_USD  = 136;
+let RATE_PESO = 2.3;
+
+function htgToUSD(htg)  { return ((htg||0)/RATE_USD).toFixed(2); }
+function htgToPeso(htg) { return ((htg||0)/RATE_PESO).toFixed(0); }
+
+async function loadRates() {
+  try {
+    const { data } = await supabaseClient.from('site_settings')
+      .select('key,value')
+      .in('key', ['rate_usd','rate_peso']);
+    if(data) data.forEach(r => {
+      if(r.key==='rate_usd')   RATE_USD  = parseFloat(r.value)||136;
+      if(r.key==='rate_peso')  RATE_PESO = parseFloat(r.value)||2.3;
+    });
+  } catch(e){}
+}
+
 // ── THREE.JS GALAXIE IMMERSIVE ────────────────────────────────
 (function initGalaxy() {
   const canvas = document.getElementById('bg-canvas');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
-  renderer.setClearColor(0x05050a, 1); // deep space background
+  renderer.setClearColor(0x05050a, 1);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -702,10 +766,8 @@ let currentSort = 'newest';
   const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.set(0, 0, 14);
 
-  // Nebula-like fog
   scene.fog = new THREE.FogExp2(0x05050a, 0.012);
 
-  // ── BACKGROUND STARS (distant) ──
   const starGeo = new THREE.BufferGeometry();
   const starCount = 3000;
   const starPos = new Float32Array(starCount * 3);
@@ -724,7 +786,6 @@ let currentSort = 'newest';
   const starMat = new THREE.PointsMaterial({ size:0.06, vertexColors:true, transparent:true, opacity:0.8 });
   scene.add(new THREE.Points(starGeo, starMat));
 
-  // ── GOLDEN GALAXY SPIRAL ──
   const spiralCount = 2000;
   const spiralGeo = new THREE.BufferGeometry();
   const spiralPos = new Float32Array(spiralCount * 3);
@@ -750,7 +811,6 @@ let currentSort = 'newest';
   spiral.rotation.x = 0.35;
   scene.add(spiral);
 
-  // ── GLOWING CORE ──
   const coreGeo = new THREE.BufferGeometry();
   const coreCount = 400;
   const corePos = new Float32Array(coreCount * 3);
@@ -766,7 +826,6 @@ let currentSort = 'newest';
   const coreMat = new THREE.PointsMaterial({ color:0xffe080, size:0.2, transparent:true, opacity:0.9 });
   scene.add(new THREE.Points(coreGeo, coreMat));
 
-  // ── DUST RING ──
   const dustCount = 800;
   const dustGeo = new THREE.BufferGeometry();
   const dustPos = new Float32Array(dustCount * 3);
@@ -784,7 +843,6 @@ let currentSort = 'newest';
   dustRing.rotation.x = 0.35;
   scene.add(dustRing);
 
-  // ── NEBULA CLOUDS ──
   function makeNebula(x, y, z, color, count) {
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(count * 3);
@@ -800,7 +858,6 @@ let currentSort = 'newest';
   makeNebula(8, -2, -8, 0xff4466, 250);
   makeNebula(0, 4, -12, 0x44ffaa, 200);
 
-  // ── SHOOTING STARS ──
   const shootingStars = [];
   function spawnShootingStar() {
     const geo = new THREE.BufferGeometry();
@@ -822,14 +879,12 @@ let currentSort = 'newest';
   }
   setTimeout(() => spawnShootingStar(), 2000);
 
-  // ── MOUSE PARALLAX ──
   let mouseX = 0, mouseY = 0;
   document.addEventListener('mousemove', e => {
     mouseX = (e.clientX/window.innerWidth - 0.5) * 0.6;
     mouseY = (e.clientY/window.innerHeight - 0.5) * 0.4;
   });
 
-  // ── SCROLL PARALLAX ──
   let scrollY = 0;
   window.addEventListener('scroll', () => { scrollY = window.scrollY; });
 
@@ -837,20 +892,12 @@ let currentSort = 'newest';
   function animate() {
     requestAnimationFrame(animate);
     time += 0.003;
-
-    // Galaxy slow rotation
     spiral.rotation.y += 0.0006;
     dustRing.rotation.y += 0.0009;
-
-    // Breathing effect on core
     coreMat.opacity = 0.7 + Math.sin(time * 2) * 0.2;
-
-    // Camera parallax
     camera.position.x += (mouseX * 2 - camera.position.x) * 0.04;
     camera.position.y += (-mouseY * 1.5 - camera.position.y - scrollY * 0.002) * 0.04;
     camera.lookAt(0, 0, 0);
-
-    // Shooting stars
     for (let i = shootingStars.length - 1; i >= 0; i--) {
       const s = shootingStars[i];
       s.line.position.x += s.vx;
@@ -859,7 +906,6 @@ let currentSort = 'newest';
       s.mat.opacity = s.life * 0.8;
       if (s.life <= 0) { scene.remove(s.line); shootingStars.splice(i, 1); }
     }
-
     renderer.render(scene, camera);
   }
   animate();
@@ -926,6 +972,7 @@ auth.onAuthStateChanged(user => { currentUser = user; updateUIForUser(); if(user
 // ── PRODUCTS ──────────────────────────────────────────────────
 async function loadProducts() {
   try {
+    await loadRates();
     const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
     if (error) throw error;
     allProducts = (data || []).filter(p => p.status !== 'sold');
@@ -960,7 +1007,7 @@ function filterAndRender() {
   renderProducts(list);
 }
 
-// ── RENDER PRODUCTS ───────────────────────────────────────────
+// ── RENDER PRODUCTS — Style Admin (copie exacte de admin.html) ────────────────────────────────
 function renderProducts(products) {
   const grid = document.getElementById('productsGrid');
   if (!products.length) {
@@ -968,31 +1015,60 @@ function renderProducts(products) {
     return;
   }
   grid.innerHTML = products.map(p => {
-    const shortId = (p.id||'').replace(/-/g,'').substring(0,8).toUpperCase();
+    const sid = p.id ? p.id.replace(/-/g,'').substring(0,8).toUpperCase() : '—';
     const isComing = p.status === 'coming';
     const inCart = cart.has(p.id);
+
+    // Badge stock (comme admin)
+    const stockBadge = (p.stock_quantity??0) > 0
+      ? `<span style="font-size:0.58rem;color:var(--green);background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:2px 7px">📦 ${p.stock_quantity}</span>`
+      : `<span style="font-size:0.58rem;color:var(--red);background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.2);border-radius:10px;padding:2px 7px">Stock: 0</span>`;
+
+    // Badge livraison (comme admin)
+    const deliveryBadge = p.delivery_available
+      ? `<span style="font-size:0.58rem;color:var(--blue);background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.2);border-radius:10px;padding:2px 7px">🚚</span>`
+      : '';
+
+    // Status badge (comme admin)
+    let statusClass, statusLabel;
+    if (p.status === 'sold') { statusClass = 'status-sold'; statusLabel = '● Vendu'; }
+    else if (p.status === 'coming') { statusClass = 'status-coming'; statusLabel = '● Ap vini'; }
+    else { statusClass = 'status-available'; statusLabel = '● Disponib'; }
+
     return `<div class="product-card reveal" data-product-id="${p.id}">
       <div class="product-img" onclick="goToProductPage('${p.id}')">
-        ${p.image_url ? `<img src="${escHtml(p.image_url)}" alt="${escHtml(p.name)}" loading="lazy">` : '<div class="product-img-placeholder">📦</div>'}
-        <div class="product-img-overlay"></div>
-        <div class="product-badge">#${shortId}</div>
-        ${isComing ? '<div class="product-coming-badge">🕐 Bientôt</div>' : ''}
+        ${p.image_url ? `<img src="${escHtml(p.image_url)}" alt="${escHtml(p.name)}" loading="lazy">` : '<span>📦</span>'}
+        <!-- Badge ID (comme admin) -->
+        <div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.75);border:1px solid rgba(255,215,0,0.4);border-radius:6px;padding:2px 8px;font-size:0.55rem;font-weight:700;color:var(--gold);letter-spacing:1px;backdrop-filter:blur(4px)">#${sid}</div>
+        <!-- Badge catégorie bas droite (comme admin) -->
+        ${p.category ? `<div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);border-radius:6px;padding:2px 8px;font-size:0.52rem;color:rgba(255,255,255,0.8)">${escHtml(p.category)}</div>` : ''}
+        ${isComing ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:#fbbf24">BIENTÔT</div>` : ''}
       </div>
       <div class="product-body">
-        <h3 class="product-name" onclick="goToProductPage('${p.id}')">${escHtml(p.name)}</h3>
-        <div class="product-price">${formatPrice(p.price)} <span>HTG</span></div>
-        ${p.description ? `<p class="product-desc">${escHtml(p.description.substring(0,90))}${p.description.length>90?'...':''}</p>` : ''}
-        ${isComing && p.arrival_date ? `<div class="product-arrival">📅 Disponib: ${new Date(p.arrival_date).toLocaleDateString('fr-FR')}</div>` : ''}
-        <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('${p.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+        <div class="product-name" onclick="goToProductPage('${p.id}')" style="cursor:pointer">${escHtml(p.name)}</div>
+        <div class="product-price">${formatPrice(p.price)} HTG</div>
+        ${(p.price_currencies||'HTG').includes('USD') ? `<div style="font-size:0.72rem;color:#60b4ff;font-weight:600;margin-top:-2px">$${htgToUSD(p.price)}</div>` : ''}
+        ${(p.price_currencies||'HTG').includes('DOP') ? `<div style="font-size:0.72rem;color:#a78bfa;font-weight:600;margin-top:-1px">${htgToPeso(p.price)} $RD</div>` : ''}
+        ${p.location ? `<div style="display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:2px 8px;background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.15);border-radius:20px;font-size:0.55rem;color:rgba(255,215,0,0.7);font-weight:600">${p.location==='rd'?'🇩🇴 Rép. Dominicaine':'🇭🇹 Haïti'}</div>` : ''}
+        ${p.description ? `<div class="product-desc">${escHtml(p.description.substring(0,90))}${p.description.length>90?'...':''}</div>` : ''}
+        <!-- Badges stock + livraison (comme admin) -->
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${stockBadge}${deliveryBadge}</div>
+        ${p.colors ? `<div style="font-size:0.58rem;color:var(--text-muted);margin-bottom:6px">🎨 ${escHtml(p.colors)}</div>` : ''}
+        ${isComing && p.delay_days ? `<div style="font-size:0.65rem;color:#fbbf24;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:3px 10px;display:inline-block;margin-bottom:8px">⏱ Disponib nan: ${p.delay_days} jou</div>` : ''}
+        <!-- Status badge (comme admin) -->
+        <span class="product-status ${statusClass}">${statusLabel}</span>
+        <!-- Actions (WhatsApp + Panier — fonctionnalité shop conservée) -->
+        <div class="product-actions" onclick="event.stopPropagation()">
+          <button class="btn-admin btn-admin-green" onclick="buyNow('${p.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
             Achte
           </button>
-          <button class="btn-cart ${inCart?'in-cart':''}" onclick="event.stopPropagation();addToCart('${p.id}')">${inCart?'✓ Nan panye':'🛍️ + Panye'}</button>
+          <button class="btn-admin btn-admin-gold ${inCart?'in-cart':''}" onclick="addToCart('${p.id}')">${inCart?'✓ Nan panye':'🛍️ + Panye'}</button>
         </div>
       </div>
     </div>`;
   }).join('');
+
   // Reveal animation
   document.querySelectorAll('.product-card.reveal').forEach((el, i) => {
     setTimeout(() => {
@@ -1036,7 +1112,7 @@ function addToCart(id) {
   if (cart.has(id)) { cart.delete(id); showToast(`"${p.name}" retire nan panye`); }
   else { cart.set(id, { product: p, quantity: 1 }); showToast(`"${p.name}" ajoute nan panye!`); }
   saveCart(); updateCartUI();
-  const btn = document.querySelector(`.product-card[data-product-id="${id}"] .btn-cart`);
+  const btn = document.querySelector(`.product-card[data-product-id="${id}"] .btn-admin-gold`);
   if (btn) { btn.classList.toggle('in-cart', cart.has(id)); btn.textContent = cart.has(id) ? '✓ Nan panye' : '🛍️ + Panye'; }
 }
 function updateCartQuantity(id, delta) {
@@ -1107,7 +1183,6 @@ const backBtn = document.getElementById('backToTop');
 window.addEventListener('scroll', () => {
   document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
   backBtn.classList.toggle('visible', window.scrollY > 500);
-  // Stats reveal
   document.querySelectorAll('.reveal').forEach(el => {
     if (el.getBoundingClientRect().top < window.innerHeight - 60) el.classList.add('visible');
   });
