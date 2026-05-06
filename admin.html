@@ -1452,7 +1452,7 @@ window.confirmSellQty = async () => {
   if(error){toast('Erreur: '+error.message,'error');return;}
 
   // 2. Enregistrer la vente dans la table sales
-  const {error: saleErr} = await db.from('sales').insert({
+  const {data: saleData, error: saleErr} = await db.from('sales').insert({
     product_id:    id,
     product_name:  p.name,
     product_price: p.price || 0,
@@ -1460,9 +1460,31 @@ window.confirmSellQty = async () => {
     total_price:   totalPrice,
     client_name:   currentUser?.email || 'Admin',
     client_email:  currentUser?.email || null,
-    status:        'validated'
-  });
-  if(saleErr) console.error('Sale record error:', saleErr.message);
+    status:        'validated',
+    created_at:    new Date().toISOString()
+  }).select().single();
+
+  if(saleErr) {
+    toast('⚠️ Vente non enregistrée: ' + saleErr.message, 'error');
+    console.error('Sale insert error:', saleErr);
+  } else {
+    // Ajouter immédiatement dans allSales pour affichage instantané
+    const newSale = saleData || {
+      product_id:    id,
+      product_name:  p.name,
+      product_price: p.price || 0,
+      quantity_sold: qty,
+      total_price:   totalPrice,
+      client_name:   currentUser?.email || 'Admin',
+      client_email:  currentUser?.email || null,
+      status:        'validated',
+      created_at:    new Date().toISOString()
+    };
+    allSales.unshift(newSale);
+    renderSalesTable(allSales);
+    updateSalesKPIs();
+    loadStats();
+  }
 
   // 3. Notification admin : vente validée
   await createNotification('new_sale',
@@ -1480,26 +1502,9 @@ window.confirmSellQty = async () => {
     );
   }
 
-  toast(`✅ ${qty} unité(s) vendue(s) — Stock restant: ${newStock} — Vente enregistrée`, 'success');
+  toast(`✅ ${qty} unité(s) vendue(s) — Stock restant: ${newStock}`, 'success');
   closeModal('sell-qty-modal');
   sellQtyProductId = null;
-
-  // Ajouter la vente directement dans allSales sans attendre Supabase
-  // pou ke tab "Ventes" soit déjà à jour quand l'admin switche dessus
-  allSales.unshift({
-    product_id:    id,
-    product_name:  p.name,
-    product_price: p.price || 0,
-    quantity_sold: qty,
-    total_price:   totalPrice,
-    client_name:   currentUser?.email || 'Admin',
-    client_email:  currentUser?.email || null,
-    status:        'validated',
-    created_at:    new Date().toISOString()
-  });
-  renderSalesTable(allSales);
-  updateSalesKPIs();
-  loadStats();
 
   // Refresh complet en arrière-plan
   await loadProducts();
@@ -2084,7 +2089,12 @@ window.f4=()=>{const el=document.getElementById('f4-result');if(!el)return;const
 async function loadSales(){
   try {
     const {data,error}=await db.from('sales').select('*').order('created_at',{ascending:false}).limit(500);
-    if(error) throw error;
+    if(error){
+      console.error('loadSales error:', error);
+      const tbody=document.getElementById('sales-table-body');
+      if(tbody) tbody.innerHTML=`<tr><td colspan="9" style="color:var(--red);padding:16px">⚠️ Erreur table sales: ${error.message}<br><small style="color:var(--text-muted)">Vérifiez que la table "sales" existe dans Supabase et que RLS autorise SELECT.</small></td></tr>`;
+      return;
+    }
     allSales = data||[];
     renderSalesTable(allSales);
     updateSalesKPIs();
