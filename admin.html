@@ -1455,7 +1455,6 @@ window.confirmSellQty = async () => {
   const {data: saleData, error: saleErr} = await db.from('sales').insert({
     product_id:    id,
     product_name:  p.name,
-    product_price: p.price || 0,
     quantity_sold: qty,
     total_price:   totalPrice,
     client_name:   currentUser?.email || 'Admin',
