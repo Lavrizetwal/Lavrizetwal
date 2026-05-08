@@ -652,8 +652,8 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Prix/u</th><th>Total</th><th>Client</th><th>Email</th><th>Date</th><th>Statut</th></tr></thead>
-            <tbody id="sales-table-body"><tr><td colspan="8" style="color:var(--text-muted);padding:20px">Chargement...</td></tr></tbody>
+            <thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Total HTG</th><th>Total USD</th><th>Total Pesos</th><th>Client</th><th>Date</th><th>Statut</th></tr></thead>
+            <tbody id="sales-table-body"><tr><td colspan="9" style="color:var(--text-muted);padding:20px">Chargement...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -2116,26 +2116,17 @@ function updateSalesKPIs(){
 function renderSalesTable(list){
   const tbody=document.getElementById('sales-table-body');
   if(!tbody) return;
-  if(!list.length){tbody.innerHTML='<tr><td colspan="10" style="color:var(--text-muted);padding:20px">Aucune vente enregistrée.</td></tr>';return;}
+  if(!list.length){tbody.innerHTML='<tr><td colspan="9" style="color:var(--text-muted);padding:20px;text-align:center">Aucune vente enregistrée.</td></tr>';return;}
   tbody.innerHTML=list.map((v,i)=>{
     const htg = v.total_price||0;
-    const uPrice = v.product_price||0;
     return `<tr>
     <td style="color:var(--text-muted);font-size:0.65rem">${i+1}</td>
     <td style="font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(v.product_name||'—')}</td>
-    <td style="text-align:center">${v.quantity_sold??0}</td>
-    <td style="color:var(--text-muted);font-size:0.72rem">
-      <div>${fmtP(uPrice)} HTG</div>
-      <div style="color:#60b4ff;font-size:0.6rem">$${htgToUSD(uPrice)}</div>
-      <div style="color:#a78bfa;font-size:0.6rem">${htgToPeso(uPrice)} $RD</div>
-    </td>
-    <td style="font-weight:700">
-      <div style="color:var(--gold)">${fmtP(htg)} HTG</div>
-      <div style="color:#60b4ff;font-size:0.68rem">$${htgToUSD(htg)}</div>
-      <div style="color:#a78bfa;font-size:0.68rem">${htgToPeso(htg)} $RD</div>
-    </td>
+    <td style="text-align:center;font-weight:700">${v.quantity_sold??0}</td>
+    <td style="color:var(--gold);font-weight:700">${fmtP(htg)} HTG</td>
+    <td style="color:#60b4ff;font-size:0.72rem">$${htgToUSD(htg)}</td>
+    <td style="color:#a78bfa;font-size:0.72rem">${htgToPeso(htg)} $RD</td>
     <td style="font-size:0.68rem;color:var(--text-muted)">${escH(v.client_name||'—')}</td>
-    <td style="font-size:0.65rem;color:var(--text-muted)">${v.client_email?`<div style="font-size:0.6rem">${escH(v.client_email)}</div>`:''}</td>
     <td style="font-size:0.65rem;color:var(--text-muted)">${v.created_at?new Date(v.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—'}</td>
     <td><span style="background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:2px 8px;font-size:0.58rem;font-weight:700">✅ Validée</span></td>
     </tr>`;
