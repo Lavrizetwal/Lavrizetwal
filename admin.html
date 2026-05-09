@@ -1452,53 +1452,34 @@ window.confirmSellQty = async () => {
   if(error){toast('Erreur: '+error.message,'error');return;}
 
   // 2. Enregistrer la vente dans la table sales
+  // Insert vente — toutes colonnes présentes après sql-fix-sales-columns.sql
   const {data: saleData, error: saleErr} = await db.from('sales').insert({
     product_id:    id,
     product_name:  p.name,
+    product_price: p.price || 0,
     quantity_sold: qty,
     total_price:   totalPrice,
     client_name:   currentUser?.email || 'Admin',
     client_email:  currentUser?.email || null,
     status:        'validated',
-    created_at:    new Date().toISOString()
+    notes:         `Qté: ${qty} × ${fmtP(p.price)} HTG`
   }).select().single();
 
-  if(saleErr) {
-    toast('⚠️ Vente non enregistrée: ' + saleErr.message, 'error');
-    console.error('Sale insert error:', saleErr);
+  if(saleErr){
+    toast('⚠️ ' + saleErr.message, 'error');
+    console.error('Sale error:', saleErr);
   } else {
-    // Ajouter immédiatement dans allSales pour affichage instantané
     const newSale = saleData || {
-      product_id:    id,
-      product_name:  p.name,
-      product_price: p.price || 0,
-      quantity_sold: qty,
-      total_price:   totalPrice,
-      client_name:   currentUser?.email || 'Admin',
-      client_email:  currentUser?.email || null,
-      status:        'validated',
-      created_at:    new Date().toISOString()
+      product_id: id, product_name: p.name,
+      product_price: p.price||0, quantity_sold: qty,
+      total_price: totalPrice,
+      client_name: currentUser?.email||'Admin',
+      status:'validated', created_at: new Date().toISOString()
     };
     allSales.unshift(newSale);
     renderSalesTable(allSales);
     updateSalesKPIs();
     loadStats();
-  }
-
-  // 3. Notification admin : vente validée
-  await createNotification('new_sale',
-    `💰 Vente validée — ${p.name}`,
-    `${qty} unité(s) vendue(s) × ${fmtP(p.price)} HTG = ${fmtP(totalPrice)} HTG`,
-    'admin', { product_id: id }
-  );
-
-  // 4. Notification rupture si stock = 0
-  if(newStock === 0){
-    await createNotification('out_of_stock',
-      `⚠️ Rupture de stock — ${p.name}`,
-      `Le stock est à 0. Pensez à réapprovisionner ou déplacer en "À venir".`,
-      'admin', { product_id: id }
-    );
   }
 
   toast(`✅ ${qty} unité(s) vendue(s) — Stock restant: ${newStock}`, 'success');
