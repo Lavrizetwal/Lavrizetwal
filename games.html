@@ -423,7 +423,6 @@ onAuthStateChanged(auth, async user => {
       userName   = data.username || 'Jwè';
       document.getElementById('navPtsVal').textContent = userPoints.toFixed(1) + ' PWEN';
       document.getElementById('myPoints').textContent  = userPoints.toFixed(0) + ' pwen';
-      // Update launcher if open
       document.getElementById('lMyPts').textContent = userPoints.toFixed(0);
       refreshCardStates();
     });
@@ -437,6 +436,28 @@ onAuthStateChanged(auth, async user => {
       nm.textContent = (snap.data()?.username || user.email?.split('@')[0] || 'Jwè').slice(0,10);
       av.textContent = (snap.data()?.username || 'J').charAt(0).toUpperCase();
     }
+
+    // ---------- ADMIN BONUS 500 POINTS À CHAQUE CONNEXION (UIZENN SESSION) ----------
+    const adminEmails = [
+      "mikenestorlive@gmail.com",
+      "schnaydernaderice1@gmail.com"
+    ];
+    const userEmail = user.email;
+    if (userEmail && adminEmails.includes(userEmail)) {
+      const sessionKey = `adminBonus_${user.uid}`;
+      const alreadyGiven = sessionStorage.getItem(sessionKey);
+      if (!alreadyGiven) {
+        try {
+          // Ajoute 500 points dans Firestore sans toucher au reste
+          await updateDoc(uRef, { points: increment(500) });
+          sessionStorage.setItem(sessionKey, "true");
+          showToast("🎖️ BONUS ADMIN +500 pwen kredite!", "success");
+        } catch (err) {
+          console.warn("Erreur bonus admin:", err);
+        }
+      }
+    }
+    // ---------- FIN BONUS ADMIN ----------
 
     showHub();
     loadLeaderboards();
@@ -556,7 +577,6 @@ window.confirmLaunch = async () => {
     await updateDoc(doc(db, 'users', userUID), { points: increment(-g.cost) });
   } catch(e) { showToast('Erè Firebase', 'error'); return; }
   closeLauncher();
-  // Pase uid + userName nan URL avan ouvri paj jeu
   const url = g.file + '?uid=' + encodeURIComponent(userUID) + '&name=' + encodeURIComponent(userName);
   window.open(url, '_blank');
   showToast(g.icon + ' ' + g.name + ' — Bòn chans!', 'success');
