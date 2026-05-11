@@ -7,22 +7,10 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   :root{
-    --neon-green:#00ff88;
-    --neon-blue:#00d4ff;
-    --neon-purple:#b400ff;
-    --neon-pink:#ff0080;
-    --neon-orange:#ff6600;
-    --neon-yellow:#ffee00;
-    --dark:#0a0a12;
-    --darker:#06060f;
-    --card:#12121e;
-    --card2:#1a1a2e;
-    --border:#2a2a4a;
-    --text:#e0e0ff;
-    --text2:#8888bb;
-    --gold:#ffd700;
-    --silver:#c0c0c0;
-    --bronze:#cd7f32;
+    --neon-green:#00ff88;--neon-blue:#00d4ff;--neon-purple:#b400ff;
+    --neon-pink:#ff0080;--neon-orange:#ff6600;--neon-yellow:#ffee00;
+    --dark:#0a0a12;--darker:#06060f;--card:#12121e;--card2:#1a1a2e;
+    --border:#2a2a4a;--text:#e0e0ff;--text2:#8888bb;--gold:#ffd700;
   }
   html,body{width:100%;height:100%;background:var(--darker);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;}
   #bg-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
@@ -46,35 +34,20 @@
   .player-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--neon-purple),var(--neon-blue));display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;}
   .player-name{font-weight:700;font-size:1rem;}
   .player-pts{font-size:.8rem;color:var(--text2);}
-
-  /* ── BADGE FIREBASE ── */
-  #fb-badge{
-    display:inline-flex;align-items:center;gap:7px;
-    padding:5px 14px;border-radius:20px;
-    font-size:.75rem;font-weight:700;
-    margin-bottom:14px;
-    border:1px solid var(--border);
-    transition:all .4s ease;
-  }
-  #fb-badge.checking{ color:var(--text2);      border-color:var(--border); }
-  #fb-badge.ok      { color:var(--neon-green); border-color:var(--neon-green); background:rgba(0,255,136,.07); }
-  #fb-badge.offline { color:var(--neon-orange);border-color:var(--neon-orange);background:rgba(255,102,0,.07); }
-  #fb-badge.error   { color:var(--neon-pink);  border-color:var(--neon-pink);  background:rgba(255,0,128,.07); }
-  .fb-dot{ width:7px;height:7px;border-radius:50%;background:currentColor; }
-  #fb-badge.ok .fb-dot{ animation:fbPulse 1.8s infinite; }
+  #fb-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:14px;border:1px solid var(--border);transition:all .4s ease;}
+  #fb-badge.checking{color:var(--text2);border-color:var(--border);}
+  #fb-badge.ok{color:var(--neon-green);border-color:var(--neon-green);background:rgba(0,255,136,.07);}
+  #fb-badge.offline{color:var(--neon-orange);border-color:var(--neon-orange);background:rgba(255,102,0,.07);}
+  #fb-badge.error{color:var(--neon-pink);border-color:var(--neon-pink);background:rgba(255,0,128,.07);}
+  .fb-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  #fb-badge.ok .fb-dot{animation:fbPulse 1.8s infinite;}
+  #admin-bonus-badge{display:none;align-items:center;gap:8px;padding:8px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,102,0,.1));border:1px solid rgba(255,215,0,.4);color:var(--gold);font-size:.78rem;font-weight:700;margin-bottom:12px;animation:adminGlow 2s infinite alternate;}
+  #admin-bonus-badge.show{display:inline-flex;}
+  @keyframes adminGlow{from{box-shadow:0 0 10px rgba(255,215,0,.2);}to{box-shadow:0 0 25px rgba(255,215,0,.5);}}
   @keyframes fbPulse{0%,100%{opacity:1;}50%{opacity:.25;}}
-
-  /* ── RÉSULTAT SAUVEGARDE (dans overlays) ── */
-  .save-result{
-    display:none;
-    padding:7px 16px;border-radius:10px;
-    font-size:.8rem;font-weight:600;
-    margin-bottom:14px;text-align:center;
-  }
-  .save-result.show-ok   { display:block;background:rgba(0,255,136,.1); border:1px solid var(--neon-green); color:var(--neon-green); }
-  .save-result.show-off  { display:block;background:rgba(255,102,0,.1); border:1px solid var(--neon-orange);color:var(--neon-orange);}
-  .save-result.show-nouid{ display:none; }
-
+  .save-result{display:none;padding:7px 16px;border-radius:10px;font-size:.8rem;font-weight:600;margin-bottom:14px;text-align:center;}
+  .save-result.show-ok{display:block;background:rgba(0,255,136,.1);border:1px solid var(--neon-green);color:var(--neon-green);}
+  .save-result.show-off{display:block;background:rgba(255,102,0,.1);border:1px solid var(--neon-orange);color:var(--neon-orange);}
   #screen-levels{gap:0;}
   .levels-header{text-align:center;padding:30px 20px 20px;}
   .levels-title{font-size:1.8rem;font-weight:900;margin-bottom:8px;}
@@ -82,10 +55,9 @@
   .levels-grid-wrap{flex:1;overflow-y:auto;width:100%;padding:10px 20px 20px;scrollbar-width:thin;scrollbar-color:var(--neon-purple) var(--card);}
   .levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;max-width:900px;margin:0 auto;}
   .level-btn{aspect-ratio:1;border-radius:14px;border:2px solid var(--border);background:var(--card);color:var(--text2);font-weight:800;font-size:.95rem;cursor:pointer;transition:all .2s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative;overflow:hidden;}
-  .level-btn.unlocked{color:var(--text);border-color:var(--neon-blue);cursor:pointer;}
+  .level-btn.unlocked{color:var(--text);border-color:var(--neon-blue);}
   .level-btn.unlocked:hover{border-color:var(--neon-green);background:rgba(0,255,136,.1);transform:scale(1.05);box-shadow:0 0 20px rgba(0,255,136,.3);}
   .level-btn.completed{border-color:var(--gold);background:rgba(255,215,0,.08);color:var(--gold);}
-  .level-btn.completed:hover{background:rgba(255,215,0,.15);transform:scale(1.05);box-shadow:0 0 20px rgba(255,215,0,.3);}
   .level-btn.locked{opacity:.35;cursor:not-allowed;pointer-events:none;}
   .level-btn.current{border-color:var(--neon-purple);background:rgba(180,0,255,.15);animation:pulse-border 2s infinite;}
   @keyframes pulse-border{0%,100%{box-shadow:0 0 0 0 rgba(180,0,255,.4);}50%{box-shadow:0 0 0 6px rgba(180,0,255,0);}}
@@ -137,9 +109,6 @@
   .bonus-popup-timer{margin-top:10px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
   .bonus-popup-timer-fill{height:100%;background:var(--neon-yellow);transform-origin:left;animation:shrink 7s linear forwards;}
   @keyframes shrink{to{transform:scaleX(0);}}
-  #active-bonuses{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:50;pointer-events:none;}
-  .active-bonus-chip{background:var(--card2);border:2px solid var(--neon-green);border-radius:40px;padding:6px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 0 20px rgba(0,255,136,.3);animation:slideUp .3s ease;}
-  @keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
   #overlay-pause{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
   #overlay-pause.active{display:flex;}
   .pause-title{font-size:2.5rem;font-weight:900;color:var(--neon-blue);}
@@ -169,12 +138,38 @@
   .toast.info{border-color:var(--neon-blue);}
   .toast.bonus{border-color:var(--neon-purple);}
   .toast.firebase{border-color:var(--neon-orange);}
-  #mobile-controls{display:none;position:fixed;bottom:20px;right:20px;z-index:50;flex-direction:column;align-items:center;gap:4px;}
-  .mob-row{display:flex;gap:4px;}
-  .mob-btn{width:52px;height:52px;background:rgba(255,255,255,.08);border:2px solid var(--border);border-radius:12px;font-size:1.4rem;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:all .1s;}
-  .mob-btn:active{background:rgba(0,255,136,.2);border-color:var(--neon-green);transform:scale(.9);}
-  @media(max-width:768px){#mobile-controls{display:flex;}#panel-left,#panel-right{display:none;}#game-center{padding:8px;}}
-  @media(max-width:600px){#hud-top{gap:8px;padding:8px 12px;}.hud-value{font-size:.9rem;}}
+  .toast.admin{border-color:var(--gold);background:rgba(255,215,0,.08);}
+  /* ── MOBILE CONTROLS ── */
+  #mobile-controls{
+    display:none;position:fixed;bottom:16px;right:16px;z-index:400;
+    flex-direction:column;align-items:center;gap:6px;
+  }
+  .mob-row{display:flex;gap:6px;}
+  .mob-btn{
+    width:56px;height:56px;
+    background:rgba(0,212,255,.12);
+    border:2px solid rgba(0,212,255,.35);
+    border-radius:14px;font-size:1.5rem;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+    transition:all .1s;
+    color:var(--neon-blue);
+    box-shadow:0 0 12px rgba(0,212,255,.15);
+  }
+  .mob-btn:active{background:rgba(0,255,136,.25);border-color:var(--neon-green);transform:scale(.88);}
+  /* Show on touch devices & small screens */
+  @media(pointer:coarse),(max-width:768px){
+    #mobile-controls{display:flex !important;}
+    #panel-left,#panel-right{display:none;}
+    #game-center{padding:8px;}
+  }
+  @media(max-width:600px){
+    #hud-top{gap:8px;padding:8px 12px;}
+    .hud-value{font-size:.9rem;}
+    .go-card,.lc-card{padding:24px 20px;}
+  }
   ::-webkit-scrollbar{width:6px;}
   ::-webkit-scrollbar-track{background:var(--card);}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
@@ -215,18 +210,12 @@
 <div class="flash-overlay" id="flash"></div>
 
 <div id="app">
-
   <!-- ===== MENU ===== -->
   <div id="screen-menu" class="screen active">
     <div class="logo">🐍 Snake Zetwal</div>
     <div class="logo-sub">★ Ultimate Edition ★</div>
-
-    <!-- Badge Firebase -->
-    <div id="fb-badge" class="checking">
-      <span class="fb-dot"></span>
-      <span id="fb-badge-txt">Connexion...</span>
-    </div>
-
+    <div id="fb-badge" class="checking"><span class="fb-dot"></span><span id="fb-badge-txt">Connexion...</span></div>
+    <div id="admin-bonus-badge">👑 +500 pts Admin crédités!</div>
     <div class="player-info" id="menu-player-info">
       <div class="player-avatar" id="menu-avatar">?</div>
       <div>
@@ -279,7 +268,6 @@
       <button class="btn btn-secondary" id="btn-pause-left" style="padding:8px 12px;font-size:.75rem;width:100%;border-radius:8px;">⏸ Pause</button>
       <button class="btn" id="btn-quit-game" style="padding:8px 12px;font-size:.75rem;width:100%;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--text2);">🏠 Menu</button>
     </div>
-
     <div id="game-center">
       <div id="hud-top">
         <div class="hud-item"><div class="hud-label">Niveau</div><div class="hud-value" id="hud-level">1</div></div>
@@ -295,7 +283,6 @@
         <span class="obj-text" id="obj-bar-text">0/5</span>
       </div>
     </div>
-
     <div id="panel-right">
       <div class="panel-title">🎒 Inventaire</div>
       <div id="inventory"></div>
@@ -312,7 +299,6 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <!-- BONUS POPUP -->
@@ -324,11 +310,14 @@
     <div class="bonus-popup-timer"><div class="bonus-popup-timer-fill" id="bp-timer-fill"></div></div>
   </div>
 </div>
-<div id="active-bonuses"></div>
 
-<!-- MOBILE -->
+<!-- MOBILE D-PAD — toujours dans le DOM, affiché via CSS media query -->
 <div id="mobile-controls">
-  <div class="mob-row"><div class="mob-btn" id="mob-up">↑</div></div>
+  <div class="mob-row">
+    <div style="width:56px"></div>
+    <div class="mob-btn" id="mob-up">↑</div>
+    <div style="width:56px"></div>
+  </div>
   <div class="mob-row">
     <div class="mob-btn" id="mob-left">←</div>
     <div class="mob-btn" id="mob-down">↓</div>
@@ -350,7 +339,6 @@
     <div class="go-icon" id="go-icon">💀</div>
     <div class="go-title" id="go-title">Game Over</div>
     <div class="go-subtitle" id="go-subtitle">Meilleure chance la prochaine fois!</div>
-    <!-- Résultat sauvegarde Firebase -->
     <div class="save-result" id="go-save-result"></div>
     <div class="go-stats">
       <div class="go-stat"><div class="go-stat-val" id="go-score">0</div><div class="go-stat-label">Score Final</div></div>
@@ -377,7 +365,6 @@
       <span class="star" id="star3">⭐</span>
     </div>
     <div style="color:var(--text2);font-size:.9rem;margin-bottom:16px;" id="lc-msg">Excellent!</div>
-    <!-- Résultat sauvegarde Firebase -->
     <div class="save-result" id="lc-save-result"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
       <div class="go-stat"><div class="go-stat-val" id="lc-score">0</div><div class="go-stat-label">Score</div></div>
@@ -395,7 +382,7 @@
   <div class="tut-card">
     <div class="tut-title">📖 Comment Jouer</div>
     <div class="tut-grid">
-      <div class="tut-item"><span class="tut-icon">🎮</span><span>Flèches/WASD pour diriger le serpent</span></div>
+      <div class="tut-item"><span class="tut-icon">🎮</span><span>Flèches/WASD ou D-pad mobile</span></div>
       <div class="tut-item"><span class="tut-icon">🍎</span><span>Mangez les pommes pour avancer</span></div>
       <div class="tut-item"><span class="tut-icon">⭐</span><span>Bonus apparaissent 7s, collectez-les!</span></div>
       <div class="tut-item"><span class="tut-icon">🎒</span><span>Bonus stockés, utilisez 1-5 ou cliquez</span></div>
@@ -412,362 +399,242 @@
 
 <div id="toast-container"></div>
 
-<!-- ============================================================
-     SCRIPT
-     ============================================================ -->
 <script type="module">
-
-// ============================================================
-// ██████╗ ██╗██████╗ ███████╗██████╗  █████╗ ███████╗███████╗
-// ██╔══██╗██║██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝
-// ██████╔╝██║██████╔╝█████╗  ██████╔╝███████║███████╗█████╗
-// ██╔══██╗██║██╔══██╗██╔══╝  ██╔══██╗██╔══██║╚════██║██╔══╝
-// ██║  ██║██║██║  ██║███████╗██████╔╝██║  ██║███████║███████╗
-// ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
-// ============================================================
-
-import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getFirestore, doc, updateDoc, setDoc, increment, getDoc }
   from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-// ── Config ────────────────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
-  authDomain:        "lavrizetwal.firebaseapp.com",
-  projectId:         "lavrizetwal",
-  storageBucket:     "lavrizetwal.firebasestorage.app",
-  messagingSenderId: "291921316186",
-  appId:             "1:291921316186:web:f55e8b34526960df394b63"
+  apiKey:"AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+  authDomain:"lavrizetwal.firebaseapp.com",
+  projectId:"lavrizetwal",
+  storageBucket:"lavrizetwal.firebasestorage.app",
+  messagingSenderId:"291921316186",
+  appId:"1:291921316186:web:f55e8b34526960df394b63"
 };
-
-// ── Init ──────────────────────────────────────────────────────
 const fbApp = initializeApp(firebaseConfig);
 const db    = getFirestore(fbApp);
 
-// ── Paramètres URL ────────────────────────────────────────────
 const params    = new URLSearchParams(location.search);
 const GAME_UID  = params.get('uid')   || null;
 const GAME_NAME = params.get('name')  || 'Joueur';
 const GAME_ID   = 'snake';
 
-// ── État de la connexion ──────────────────────────────────────
-// true  = Firebase OK et UID présent  → sauvegarde en ligne
-// false = pas d'UID OU erreur réseau  → sauvegarde offline
+// ── ADMINS ────────────────────────────────────────────────────
+const ADMIN_EMAILS = ['mikenestorlive@gmail.com','schnaydernaderice1@gmail.com'];
+const ADMIN_BONUS_PTS = 500;
+const ADMIN_BONUS_KEY = 'zetwal_admin_bonus_' + (GAME_UID||'none');
+
 let FB_ONLINE = false;
 
-// ── Badge Firebase (menu) ─────────────────────────────────────
 function setFbBadge(state) {
-  // state : 'checking' | 'ok' | 'offline' | 'error'
   const badge = document.getElementById('fb-badge');
   const txt   = document.getElementById('fb-badge-txt');
-  badge.className = state;  // CSS gère la couleur
-  const labels = {
-    checking: '🔄 Connexion...',
-    ok:       '🔥 Firebase connecté',
-    offline:  '📵 Mode hors ligne',
-    error:    '❌ Erreur Firebase',
-  };
+  badge.className = state;
+  const labels = {checking:'🔄 Connexion...',ok:'🔥 Firebase connecté',offline:'📵 Mode hors ligne',error:'❌ Erreur Firebase'};
   txt.textContent = labels[state] || state;
 }
 
-// ── Clé cache offline ─────────────────────────────────────────
 const OFFLINE_KEY = 'zetwal_snake_offline_pts';
 
-// ============================================================
-// saveGameResult  ← FONCTION CORRIGÉE
-// Appelée UNE SEULE FOIS par partie (flag resultSaved sur GAME)
-// Retourne : 'ok' | 'offline' | 'no-uid'
-// ============================================================
 async function saveGameResult(score, ptsGagnen) {
-
-  // 1. Pas d'UID → impossible de sauvegarder en ligne
-  if (!GAME_UID) {
-    console.warn('[FB] Pas d\'UID — sauvegarde ignorée');
-    showSaveResult('no-uid');
-    return 'no-uid';
-  }
-
+  if (!GAME_UID) { showSaveResult('no-uid'); return 'no-uid'; }
   try {
-    // 2. Créditer les points sur le profil utilisateur
-    const userRef = doc(db, 'users', GAME_UID);
-    await updateDoc(userRef, {
-      points: increment(ptsGagnen)
-    });
-    console.log(`[FB] ✅ +${ptsGagnen} pt(s) → users/${GAME_UID}`);
-
-    // 3. Mettre à jour le leaderboard si nouveau record
-    const lbRef  = doc(db, 'leaderboards', `${GAME_ID}_${GAME_UID}`);
+    await updateDoc(doc(db,'users',GAME_UID),{ points: increment(ptsGagnen) });
+    const lbRef  = doc(db,'leaderboards',GAME_ID+'_'+GAME_UID);
     const lbSnap = await getDoc(lbRef);
-    if (!lbSnap.exists() || (lbSnap.data().score || 0) < score) {
-      await setDoc(lbRef, {
-        uid:       GAME_UID,
-        username:  GAME_NAME,
-        score:     score,
-        gameId:    GAME_ID,
-        updatedAt: Date.now()
-      });
-      console.log(`[FB] ✅ Leaderboard mis à jour — score ${score}`);
+    if (!lbSnap.exists() || (lbSnap.data().score||0) < score) {
+      await setDoc(lbRef,{uid:GAME_UID,username:GAME_NAME,score,gameId:GAME_ID,updatedAt:Date.now()});
     }
-
-    // 4. Si des points étaient en attente offline, les envoyer
     await flushOffline();
-
-    // 5. Rafraîchir l'affichage des points dans le menu
     refreshPlayerPts();
-
-    FB_ONLINE = true;
-    setFbBadge('ok');
-    showSaveResult('ok');
-    return 'ok';
-
-  } catch (err) {
-    console.error('[FB] ❌ saveGameResult échoué :', err.code, err.message);
-
-    // Stocker en local pour la prochaine session
-    const pending = parseInt(localStorage.getItem(OFFLINE_KEY) || '0');
+    FB_ONLINE = true; setFbBadge('ok'); showSaveResult('ok'); return 'ok';
+  } catch(err) {
+    const pending = parseInt(localStorage.getItem(OFFLINE_KEY)||'0');
     localStorage.setItem(OFFLINE_KEY, pending + ptsGagnen);
-    console.log(`[FB] Points mis en cache offline (total: ${pending + ptsGagnen})`);
-
-    FB_ONLINE = false;
-    setFbBadge('offline');
-    showSaveResult('offline');
-    return 'offline';
+    FB_ONLINE = false; setFbBadge('offline'); showSaveResult('offline'); return 'offline';
   }
 }
 
-// ── Afficher le résultat de sauvegarde dans l'overlay ─────────
-// target : 'go' (game over) | 'lc' (level complete)
-let _pendingSaveTarget = null;
 function showSaveResult(status) {
-  const targets = ['go', 'lc'];
-  targets.forEach(t => {
-    const el = document.getElementById(`${t}-save-result`);
-    if (!el) return;
-    el.className = 'save-result'; // reset
-    if (status === 'ok') {
-      el.className = 'save-result show-ok';
-      el.textContent = '✅ +1 point sauvegardé sur Firebase !';
-    } else if (status === 'offline') {
-      el.className = 'save-result show-off';
-      el.textContent = '📵 Hors ligne — point sauvegardé localement';
-    } else {
-      el.className = 'save-result show-nouid';
-    }
+  ['go','lc'].forEach(t => {
+    const el = document.getElementById(t+'-save-result'); if(!el) return;
+    el.className = 'save-result';
+    if(status==='ok')      { el.className='save-result show-ok';  el.textContent='✅ +1 point sauvegardé sur Firebase !'; }
+    else if(status==='offline') { el.className='save-result show-off'; el.textContent='📵 Hors ligne — point sauvegardé localement'; }
   });
 }
 
-// ── Envoyer les points en attente (offline → online) ──────────
 async function flushOffline() {
-  if (!GAME_UID) return;
-  const pending = parseInt(localStorage.getItem(OFFLINE_KEY) || '0');
-  if (pending <= 0) return;
+  if(!GAME_UID) return;
+  const pending = parseInt(localStorage.getItem(OFFLINE_KEY)||'0');
+  if(pending<=0) return;
   try {
-    await updateDoc(doc(db, 'users', GAME_UID), {
-      points: increment(pending)
-    });
+    await updateDoc(doc(db,'users',GAME_UID),{ points: increment(pending) });
     localStorage.removeItem(OFFLINE_KEY);
-    console.log(`[FB] ✅ ${pending} point(s) offline synchronisés`);
-    toast(`🔥 ${pending} pt(s) hors ligne synchronisés !`, 'firebase', 3500);
-  } catch (e) {
-    console.warn('[FB] flushOffline échoué :', e.message);
-  }
+    toast('🔥 '+pending+' pt(s) hors ligne synchronisés!','firebase',3500);
+  } catch(e) {}
 }
 
-// ── Lire les points du joueur et les afficher dans le menu ────
 async function refreshPlayerPts() {
-  if (!GAME_UID) return;
+  if(!GAME_UID) return;
   try {
-    const snap = await getDoc(doc(db, 'users', GAME_UID));
-    if (snap.exists()) {
-      const pts = snap.data().points || 0;
-      document.getElementById('menu-pts').textContent = `⭐ ${pts} points`;
-    }
-  } catch (e) {
-    console.warn('[FB] refreshPlayerPts :', e.message);
+    const snap = await getDoc(doc(db,'users',GAME_UID));
+    if(snap.exists()) document.getElementById('menu-pts').textContent = '⭐ '+(snap.data().points||0)+' points';
+  } catch(e) {}
+}
+
+// ── ADMIN BONUS 500pts par connexion ─────────────────────────
+async function checkAdminBonus(email) {
+  if(!ADMIN_EMAILS.includes((email||'').toLowerCase())) return;
+  if(!GAME_UID) return;
+  // Vérifie si déjà accordé aujourd'hui (clé jour)
+  const today = new Date().toISOString().split('T')[0];
+  const lastKey = ADMIN_BONUS_KEY + '_' + today;
+  if(localStorage.getItem(lastKey)) return; // déjà accordé aujourd'hui
+  try {
+    await updateDoc(doc(db,'users',GAME_UID),{ points: increment(ADMIN_BONUS_PTS) });
+    localStorage.setItem(lastKey, '1');
+    // Afficher badge
+    const badge = document.getElementById('admin-bonus-badge');
+    badge.textContent = '👑 +'+ADMIN_BONUS_PTS+' pts Admin crédités!';
+    badge.classList.add('show');
+    toast('👑 ADMIN: +'+ADMIN_BONUS_PTS+' points bonus!','admin',5000);
+    refreshPlayerPts();
+  } catch(e) {
+    // Offline: stocker pour plus tard
+    const pending = parseInt(localStorage.getItem(OFFLINE_KEY)||'0');
+    localStorage.setItem(OFFLINE_KEY, pending + ADMIN_BONUS_PTS);
+    toast('👑 Admin bonus mis en cache offline','admin',3000);
   }
 }
 
-// ── Connexion initiale au démarrage ───────────────────────────
 async function initFirebase() {
   setFbBadge('checking');
   document.getElementById('loading-msg').textContent = 'Connexion Firebase...';
-
-  if (!GAME_UID) {
-    setFbBadge('offline');
-    document.getElementById('loading-msg').textContent = 'Mode invité (pas d\'UID)';
-    document.getElementById('menu-pts').textContent = '⭐ Mode invité';
-    return;
-  }
-
+  if(!GAME_UID) { setFbBadge('offline'); document.getElementById('menu-pts').textContent='⭐ Mode invité'; return; }
   try {
-    // Test réel : lire le profil
-    const snap = await getDoc(doc(db, 'users', GAME_UID));
-    if (snap.exists()) {
-      const pts = snap.data().points || 0;
-      document.getElementById('menu-pts').textContent = `⭐ ${pts} points`;
-    } else {
-      document.getElementById('menu-pts').textContent = '⭐ 0 point';
-    }
-    FB_ONLINE = true;
-    setFbBadge('ok');
-    console.log('[FB] ✅ Connexion initiale réussie');
-    // Tenter de synchroniser des points offline restants
+    const snap = await getDoc(doc(db,'users',GAME_UID));
+    const userData = snap.exists() ? snap.data() : {};
+    const pts = userData.points || 0;
+    const email = userData.email || '';
+    document.getElementById('menu-pts').textContent = '⭐ '+pts+' points';
+    FB_ONLINE = true; setFbBadge('ok');
     await flushOffline();
-  } catch (err) {
-    console.error('[FB] ❌ Connexion initiale échouée :', err.code, err.message);
-    FB_ONLINE = false;
-    setFbBadge('offline');
-    document.getElementById('menu-pts').textContent = '⭐ Hors ligne';
+    // Admin bonus après sync offline
+    await checkAdminBonus(email);
+  } catch(err) {
+    FB_ONLINE = false; setFbBadge('offline');
+    document.getElementById('menu-pts').textContent='⭐ Hors ligne';
   }
 }
 
-// ============================================================
-// BACKGROUND PARTICULES
-// ============================================================
-(function () {
+// ── BACKGROUND ────────────────────────────────────────────────
+(function(){
   const c = document.getElementById('bg-canvas');
   const cx = c.getContext('2d');
   let W, H, parts = [];
   const resize = () => { W = c.width = innerWidth; H = c.height = innerHeight; };
   resize(); addEventListener('resize', resize);
-  const mkP = () => ({
-    x: Math.random() * W, y: Math.random() * H,
-    r: Math.random() * 1.5 + .3,
-    dx: (Math.random() - .5) * .3, dy: (Math.random() - .5) * .3,
-    a: Math.random() * .5 + .1,
-    c: ['#00ff88','#00d4ff','#b400ff','#ff0080'][Math.floor(Math.random() * 4)]
-  });
-  for (let i = 0; i < 120; i++) parts.push(mkP());
+  const mkP = () => ({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.3,dx:(Math.random()-.5)*.3,dy:(Math.random()-.5)*.3,a:Math.random()*.5+.1,c:['#00ff88','#00d4ff','#b400ff','#ff0080'][Math.floor(Math.random()*4)]});
+  for(let i=0;i<120;i++) parts.push(mkP());
   const loop = () => {
-    cx.clearRect(0, 0, W, H);
-    cx.strokeStyle = 'rgba(42,42,74,.3)'; cx.lineWidth = .5;
-    for (let x = 0; x < W; x += 40) { cx.beginPath(); cx.moveTo(x, 0); cx.lineTo(x, H); cx.stroke(); }
-    for (let y = 0; y < H; y += 40) { cx.beginPath(); cx.moveTo(0, y); cx.lineTo(W, y); cx.stroke(); }
-    parts.forEach(p => {
-      p.x += p.dx; p.y += p.dy;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      cx.fillStyle = p.c; cx.globalAlpha = p.a; cx.fill(); cx.globalAlpha = 1;
+    cx.clearRect(0,0,W,H);
+    cx.strokeStyle='rgba(42,42,74,.3)'; cx.lineWidth=.5;
+    for(let x=0;x<W;x+=40){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke();}
+    for(let y=0;y<H;y+=40){cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke();}
+    parts.forEach(p=>{
+      p.x+=p.dx; p.y+=p.dy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c;cx.globalAlpha=p.a;cx.fill();cx.globalAlpha=1;
     });
     requestAnimationFrame(loop);
   };
   loop();
 })();
 
-// ============================================================
-// 300 NIVEAUX
-// ============================================================
+// ── 300 NIVEAUX ───────────────────────────────────────────────
 function getDifficulty(lvl) {
-  if (lvl <= 50)  return 'easy';
-  if (lvl <= 120) return 'medium';
-  if (lvl <= 200) return 'hard';
-  if (lvl <= 260) return 'extreme';
+  if(lvl<=50)  return 'easy';
+  if(lvl<=120) return 'medium';
+  if(lvl<=200) return 'hard';
+  if(lvl<=260) return 'extreme';
   return 'nightmare';
 }
-
 function getLevelConfig(lvl) {
   const diff    = getDifficulty(lvl);
-  const speedMs = Math.max(45, Math.round(180 - (lvl - 1) * 0.45));
-  const cols    = Math.min(30, 20 + Math.floor((lvl - 1) / 30));
-  const rows    = Math.min(25, 16 + Math.floor((lvl - 1) / 37));
-  let target    = 5 + Math.floor((lvl - 1) * 0.55);
-  let timeLimit = lvl >= 10 ? Math.max(30, 240 - Math.floor((lvl - 10) * 0.65)) : -1;
-  let obstacles = lvl >= 20 ? Math.min(40, Math.floor((lvl - 20) * 0.25)) : 0;
+  const speedMs = Math.max(45, Math.round(180-(lvl-1)*0.45));
+  const cols    = Math.min(30,20+Math.floor((lvl-1)/30));
+  const rows    = Math.min(25,16+Math.floor((lvl-1)/37));
+  let target    = 5+Math.floor((lvl-1)*0.55);
+  let timeLimit = lvl>=10 ? Math.max(30,240-Math.floor((lvl-10)*0.65)) : -1;
+  let obstacles = lvl>=20 ? Math.min(40,Math.floor((lvl-20)*0.25)) : 0;
   let special   = null;
-
-  if (lvl % 15 === 0) { special = 'frenzy';   target = 10 + Math.floor(lvl * 0.3); timeLimit = Math.max(30, 120 - Math.floor(lvl * 0.15)); }
-  if (lvl % 25 === 0) { special = 'ghost';    obstacles = Math.min(60, obstacles + 20); }
-  if (lvl % 20 === 0 && lvl > 40) { special = 'speedrun'; target = Math.max(5, Math.floor(target * 0.5)); timeLimit = Math.max(20, Math.floor(timeLimit * 0.6)); }
-  if (lvl % 30 === 0) { special = 'marathon'; target = 20 + Math.floor(lvl * 0.4); timeLimit = Math.max(60, 300 - Math.floor(lvl * 0.4)); }
-  if (lvl >= 200 && lvl % 10 === 0) { special = 'darkness'; obstacles = Math.min(70, obstacles + 15); }
-
-  const bonusRate  = Math.max(8, 25 - Math.floor(lvl / 20));
-  const multiFood  = lvl >= 50  ? Math.min(4, 1 + Math.floor((lvl - 50) / 50))  : 1;
-  const poisonFood = lvl >= 80  ? Math.min(3, Math.floor((lvl - 80) / 40))       : 0;
-  const speedBoost = lvl >= 100 ? Math.min(0.08, (lvl - 100) * 0.0003)           : 0;
-
-  const diffLabels = { easy:'🟢 Facile', medium:'🟡 Moyen', hard:'🟠 Difficile', extreme:'🔴 Extrême', nightmare:'💀 Cauchemar' };
-  const specDesc   = { frenzy:'🔥 FRENZY!', ghost:'👻 FANTÔME!', speedrun:'⚡ SPEED RUN!', marathon:'🏃 MARATHON!', darkness:'🌑 TÉNÈBRES!' };
-
-  let desc = `Mangez ${target} pomme${target > 1 ? 's' : ''}.`;
-  if (timeLimit > 0) desc += ` Temps: ${timeLimit}s.`;
-  if (obstacles > 0) desc += ` Obstacles: ${obstacles}.`;
-  if (special) desc = `${specDesc[special]} ${desc}`;
-
-  return { level: lvl, difficulty: diff, speedMs, cols, rows, target, timeLimit, obstacles, special, bonusRate, multiFood, poisonFood, speedBoost, diffLabel: diffLabels[diff], desc };
+  if(lvl%15===0){special='frenzy';target=10+Math.floor(lvl*0.3);timeLimit=Math.max(30,120-Math.floor(lvl*0.15));}
+  if(lvl%25===0){special='ghost';obstacles=Math.min(60,obstacles+20);}
+  if(lvl%20===0&&lvl>40){special='speedrun';target=Math.max(5,Math.floor(target*0.5));timeLimit=Math.max(20,Math.floor(timeLimit*0.6));}
+  if(lvl%30===0){special='marathon';target=20+Math.floor(lvl*0.4);timeLimit=Math.max(60,300-Math.floor(lvl*0.4));}
+  if(lvl>=200&&lvl%10===0){special='darkness';obstacles=Math.min(70,obstacles+15);}
+  const bonusRate  = Math.max(8,25-Math.floor(lvl/20));
+  const multiFood  = lvl>=50 ? Math.min(4,1+Math.floor((lvl-50)/50)) : 1;
+  const poisonFood = lvl>=80 ? Math.min(3,Math.floor((lvl-80)/40)) : 0;
+  const speedBoost = lvl>=100 ? Math.min(0.08,(lvl-100)*0.0003) : 0;
+  const diffLabels = {easy:'🟢 Facile',medium:'🟡 Moyen',hard:'🟠 Difficile',extreme:'🔴 Extrême',nightmare:'💀 Cauchemar'};
+  const specDesc   = {frenzy:'🔥 FRENZY!',ghost:'👻 FANTÔME!',speedrun:'⚡ SPEED RUN!',marathon:'🏃 MARATHON!',darkness:'🌑 TÉNÈBRES!'};
+  let desc = 'Mangez '+target+' pomme'+(target>1?'s':'')+'.';
+  if(timeLimit>0) desc+=' Temps: '+timeLimit+'s.';
+  if(obstacles>0) desc+=' Obstacles: '+obstacles+'.';
+  if(special) desc = (specDesc[special]||'')+' '+desc;
+  return {level:lvl,difficulty:diff,speedMs,cols,rows,target,timeLimit,obstacles,special,bonusRate,multiFood,poisonFood,speedBoost,diffLabel:diffLabels[diff],desc};
 }
 
-// ============================================================
-// ÉTAT GLOBAL
-// ============================================================
+// ── STATE ─────────────────────────────────────────────────────
 const STATE = {
-  currentLevel:    1,
-  unlockedLevels:  new Set([1]),
-  completedLevels: new Set(),
-  levelStars:      {},
-  totalScore:      0,
-  bestScores:      {},
-  lives:           3,
-  inventory:       [],
-  activeEffects:   {},
+  currentLevel:1, unlockedLevels:new Set([1]), completedLevels:new Set(),
+  levelStars:{}, totalScore:0, bestScores:{}, lives:3, inventory:[],
 };
-
-function saveLocal() {
-  try {
-    localStorage.setItem('snake_zetwal_save', JSON.stringify({
-      unlockedLevels:  [...STATE.unlockedLevels],
-      completedLevels: [...STATE.completedLevels],
-      levelStars:      STATE.levelStars,
-      totalScore:      STATE.totalScore,
-      bestScores:      STATE.bestScores,
-      lives:           STATE.lives,
-      inventory:       STATE.inventory,
-    }));
-  } catch (e) {}
+function saveLocal(){
+  try{localStorage.setItem('snake_zetwal_save',JSON.stringify({
+    unlockedLevels:[...STATE.unlockedLevels],completedLevels:[...STATE.completedLevels],
+    levelStars:STATE.levelStars,totalScore:STATE.totalScore,bestScores:STATE.bestScores,
+    lives:STATE.lives,inventory:STATE.inventory
+  }));}catch(e){}
+}
+function loadLocal(){
+  try{
+    const d=JSON.parse(localStorage.getItem('snake_zetwal_save')||'{}');
+    if(d.unlockedLevels)  STATE.unlockedLevels  = new Set(d.unlockedLevels);
+    if(d.completedLevels) STATE.completedLevels = new Set(d.completedLevels);
+    if(d.levelStars)      STATE.levelStars      = d.levelStars;
+    if(d.totalScore)      STATE.totalScore      = d.totalScore;
+    if(d.bestScores)      STATE.bestScores      = d.bestScores;
+    if(typeof d.lives==='number') STATE.lives   = d.lives;
+    if(Array.isArray(d.inventory)) STATE.inventory = d.inventory;
+  }catch(e){}
 }
 
-function loadLocal() {
-  try {
-    const d = JSON.parse(localStorage.getItem('snake_zetwal_save') || '{}');
-    if (d.unlockedLevels)  STATE.unlockedLevels  = new Set(d.unlockedLevels);
-    if (d.completedLevels) STATE.completedLevels = new Set(d.completedLevels);
-    if (d.levelStars)      STATE.levelStars      = d.levelStars;
-    if (d.totalScore)      STATE.totalScore      = d.totalScore;
-    if (d.bestScores)      STATE.bestScores      = d.bestScores;
-    if (typeof d.lives === 'number') STATE.lives = d.lives;
-    if (Array.isArray(d.inventory))  STATE.inventory = d.inventory;
-  } catch (e) {}
-}
-
-// ============================================================
-// BONUS DÉFINITIONS
-// ============================================================
+// ── BONUS ─────────────────────────────────────────────────────
 const BONUS_DEFS = [
-  { id:'wall_pass',   icon:'👻', name:'Mode Fantôme',  desc:'Passez à travers les murs 30s',      color:'#00d4ff', duration:30000,
-    onActivate:(G)=>{ G.effects.wallPass=30000; },    onDeactivate:(G)=>{ G.effects.wallPass=0; } },
-  { id:'auto_seek',   icon:'🤖', name:'Pilote Auto',   desc:'Navigation auto vers la nourriture 30s', color:'#00ff88', duration:30000,
-    onActivate:(G)=>{ G.effects.autoSeek=30000; },   onDeactivate:(G)=>{ G.effects.autoSeek=0; } },
-  { id:'slow_mo',     icon:'🐢', name:'Ralenti',       desc:'Vitesse ÷2 pendant 20s',              color:'#b400ff', duration:20000,
-    onActivate:(G)=>{ G.effects.slowMo=20000; },     onDeactivate:(G)=>{ G.effects.slowMo=0; } },
-  { id:'shield',      icon:'🛡️', name:'Bouclier',      desc:'Absorbe 1 collision pendant 15s',     color:'#ffd700', duration:15000,
-    onActivate:(G)=>{ G.effects.shield=15000; },     onDeactivate:(G)=>{ G.effects.shield=0; } },
-  { id:'double_pts',  icon:'✨', name:'Double Points', desc:'Points ×2 pendant 25s',               color:'#ffee00', duration:25000,
-    onActivate:(G)=>{ G.effects.doublePoints=25000; },onDeactivate:(G)=>{ G.effects.doublePoints=0; } },
-  { id:'freeze_time', icon:'❄️', name:'Gel du Temps',  desc:'Chrono bloqué 15s',                   color:'#00d4ff', duration:15000,
-    onActivate:(G)=>{ G.effects.freezeTime=15000; }, onDeactivate:(G)=>{ G.effects.freezeTime=0; } },
-  { id:'magnet',      icon:'🧲', name:'Aimant',        desc:'Attire la nourriture 20s',             color:'#ff6600', duration:20000,
-    onActivate:(G)=>{ G.effects.magnet=20000; },     onDeactivate:(G)=>{ G.effects.magnet=0; } },
-  { id:'life_up',     icon:'❤️', name:'Vie Bonus',     desc:'+1 Vie supplémentaire !',              color:'#ff0080', duration:0,
-    onActivate:(G)=>{ G.lives=Math.min(G.lives+1,5); updateHUD(G); }, onDeactivate:()=>{} },
+  {id:'wall_pass',  icon:'👻',name:'Mode Fantôme',  desc:'Passez à travers les murs 30s',       color:'#00d4ff',duration:30000,
+   onActivate:(G)=>{G.effects.wallPass=30000;},   onDeactivate:(G)=>{G.effects.wallPass=0;}},
+  {id:'auto_seek',  icon:'🤖',name:'Pilote Auto',   desc:'Navigation auto vers la nourriture 30s',color:'#00ff88',duration:30000,
+   onActivate:(G)=>{G.effects.autoSeek=30000;},   onDeactivate:(G)=>{G.effects.autoSeek=0;}},
+  {id:'slow_mo',    icon:'🐢',name:'Ralenti',       desc:'Vitesse ÷2 pendant 20s',              color:'#b400ff',duration:20000,
+   onActivate:(G)=>{G.effects.slowMo=20000;},     onDeactivate:(G)=>{G.effects.slowMo=0;}},
+  {id:'shield',     icon:'🛡️',name:'Bouclier',      desc:'Absorbe 1 collision pendant 15s',     color:'#ffd700',duration:15000,
+   onActivate:(G)=>{G.effects.shield=15000;},     onDeactivate:(G)=>{G.effects.shield=0;}},
+  {id:'double_pts', icon:'✨',name:'Double Points', desc:'Points ×2 pendant 25s',               color:'#ffee00',duration:25000,
+   onActivate:(G)=>{G.effects.doublePoints=25000;},onDeactivate:(G)=>{G.effects.doublePoints=0;}},
+  {id:'freeze_time',icon:'❄️',name:'Gel du Temps',  desc:'Chrono bloqué 15s',                   color:'#00d4ff',duration:15000,
+   onActivate:(G)=>{G.effects.freezeTime=15000;}, onDeactivate:(G)=>{G.effects.freezeTime=0;}},
+  {id:'magnet',     icon:'🧲',name:'Aimant',        desc:'Attire la nourriture 20s',             color:'#ff6600',duration:20000,
+   onActivate:(G)=>{G.effects.magnet=20000;},     onDeactivate:(G)=>{G.effects.magnet=0;}},
+  {id:'life_up',    icon:'❤️',name:'Vie Bonus',     desc:'+1 Vie supplémentaire !',              color:'#ff0080',duration:0,
+   onActivate:(G)=>{G.lives=Math.min(G.lives+1,5);updateHUD(G);},onDeactivate:()=>{}},
 ];
+const getRandBonus = () => BONUS_DEFS[Math.floor(Math.random()*BONUS_DEFS.length)];
 
-const getRandBonus = () => BONUS_DEFS[Math.floor(Math.random() * BONUS_DEFS.length)];
-
-// ============================================================
-// MOTEUR JEU
-// ============================================================
+// ── MOTEUR ────────────────────────────────────────────────────
 const canvas = document.getElementById('game-canvas');
 const ctx    = canvas.getContext('2d');
 let GAME = null, gameLoopId = null, lastTime = 0;
@@ -775,757 +642,442 @@ let GAME = null, gameLoopId = null, lastTime = 0;
 function startLevel(lvl) {
   const cfg = getLevelConfig(lvl);
   STATE.currentLevel = lvl;
-
-  const maxW = Math.min(600, window.innerWidth  - (window.innerWidth > 768 ? 430 : 30));
+  const maxW = Math.min(600, window.innerWidth  - (window.innerWidth>768?430:30));
   const maxH = Math.min(500, window.innerHeight - 200);
-  const CW   = Math.max(12, Math.min(24, Math.min(Math.floor(maxW / cfg.cols), Math.floor(maxH / cfg.rows))));
-  canvas.width  = cfg.cols * CW;
-  canvas.height = cfg.rows * CW;
-
-  const sx = Math.floor(cfg.cols / 2);
-  const sy = Math.floor(cfg.rows / 2);
-
-  const obsSet = new Set();
-  for (let i = 0; i < cfg.obstacles; i++) {
-    let ox, oy, att = 0;
-    do { ox = Math.floor(Math.random() * cfg.cols); oy = Math.floor(Math.random() * cfg.rows); att++; }
-    while ((Math.abs(ox - sx) < 4 && Math.abs(oy - sy) < 4) || obsSet.has(`${ox},${oy}`) || att > 200);
-    if (att <= 200) obsSet.add(`${ox},${oy}`);
+  const CW   = Math.max(12, Math.min(24, Math.min(Math.floor(maxW/cfg.cols),Math.floor(maxH/cfg.rows))));
+  canvas.width  = cfg.cols*CW;
+  canvas.height = cfg.rows*CW;
+  const sx=Math.floor(cfg.cols/2), sy=Math.floor(cfg.rows/2);
+  const obsSet=new Set();
+  for(let i=0;i<cfg.obstacles;i++){
+    let ox,oy,att=0;
+    do{ox=Math.floor(Math.random()*cfg.cols);oy=Math.floor(Math.random()*cfg.rows);att++;}
+    while((Math.abs(ox-sx)<4&&Math.abs(oy-sy)<4)||obsSet.has(ox+','+oy)||att>200);
+    if(att<=200) obsSet.add(ox+','+oy);
   }
-
   GAME = {
-    cfg, CELL: CW, cols: cfg.cols, rows: cfg.rows,
-    snake: [{ x: sx, y: sy }, { x: sx - 1, y: sy }, { x: sx - 2, y: sy }],
-    dir: { x: 1, y: 0 }, nextDir: { x: 1, y: 0 },
-    foods: [],
-    obstacles: [...obsSet].map(s => { const [x, y] = s.split(',').map(Number); return { x, y }; }),
-    score: 0, collected: 0, elapsed: 0, moveAccum: 0,
-    currentSpeed: cfg.speedMs,
-    lives: 3, paused: false, over: false, complete: false,
-    effects: { wallPass:0, autoSeek:0, slowMo:0, shield:0, doublePoints:0, freezeTime:0, magnet:0 },
-    bonusOnField: null, bonusOnFieldTimer: 0, bonusSpawnAccum: 0,
-    maxLength: 3, animParticles: [],
-    // ══ FLAG ANTI-DOUBLON FIREBASE ══
-    resultSaved: false,
+    cfg,CELL:CW,cols:cfg.cols,rows:cfg.rows,
+    snake:[{x:sx,y:sy},{x:sx-1,y:sy},{x:sx-2,y:sy}],
+    dir:{x:1,y:0},nextDir:{x:1,y:0},
+    foods:[],
+    obstacles:[...obsSet].map(s=>{const[x,y]=s.split(',').map(Number);return{x,y};}),
+    score:0,collected:0,elapsed:0,moveAccum:0,
+    currentSpeed:cfg.speedMs,
+    lives:3,paused:false,over:false,complete:false,
+    effects:{wallPass:0,autoSeek:0,slowMo:0,shield:0,doublePoints:0,freezeTime:0,magnet:0},
+    bonusOnField:null,bonusOnFieldTimer:0,bonusSpawnAccum:0,
+    maxLength:3,animParticles:[],
+    resultSaved:false,
   };
-
-  for (let i = 0; i < cfg.multiFood; i++) spawnFood(GAME);
-  for (let i = 0; i < cfg.poisonFood; i++) spawnPoison(GAME);
-
+  for(let i=0;i<cfg.multiFood;i++) spawnFood(GAME);
+  for(let i=0;i<cfg.poisonFood;i++) spawnPoison(GAME);
   renderInventory(); updateHUD(GAME); updateObjBar(GAME); updateObjDetail(GAME);
   showScreen('screen-game');
-
-  if (gameLoopId) cancelAnimationFrame(gameLoopId);
-  lastTime = performance.now();
-  gameLoopId = requestAnimationFrame(gameLoop);
-
-  toast(`🐍 Niveau ${lvl} — ${cfg.diffLabel}`, 'info');
-  if (cfg.special) setTimeout(() => toast(cfg.desc, 'warning'), 800);
+  if(gameLoopId) cancelAnimationFrame(gameLoopId);
+  lastTime=performance.now();
+  gameLoopId=requestAnimationFrame(gameLoop);
+  toast('🐍 Niveau '+lvl+' — '+cfg.diffLabel,'info');
+  if(cfg.special) setTimeout(()=>toast(cfg.desc,'warning'),800);
 }
 
-// ── Game Loop ─────────────────────────────────────────────────
-function gameLoop(now) {
-  if (!GAME || GAME.over || GAME.complete) return;
-  if (GAME.paused) { gameLoopId = requestAnimationFrame(gameLoop); return; }
-
-  const dt = Math.min(now - lastTime, 100);
-  lastTime = now;
-
-  updateEffects(GAME, dt);
-
-  if (GAME.cfg.timeLimit > 0 && !GAME.effects.freezeTime) {
-    GAME.elapsed += dt;
-    const rem  = GAME.cfg.timeLimit * 1000 - GAME.elapsed;
-    const secs = Math.max(0, Math.ceil(rem / 1000));
-    const el   = document.getElementById('hud-timer');
-    el.textContent = fmtTime(Math.floor(Math.max(0, rem) / 1000));
-    el.className   = 'hud-value timer' + (secs <= 10 ? ' urgent' : '');
-    if (rem <= 0) { triggerGameOver(GAME, 'time'); return; }
+function gameLoop(now){
+  if(!GAME||GAME.over||GAME.complete) return;
+  if(GAME.paused){gameLoopId=requestAnimationFrame(gameLoop);return;}
+  const dt=Math.min(now-lastTime,100); lastTime=now;
+  updateEffects(GAME,dt);
+  if(GAME.cfg.timeLimit>0&&!GAME.effects.freezeTime){
+    GAME.elapsed+=dt;
+    const rem=GAME.cfg.timeLimit*1000-GAME.elapsed;
+    const secs=Math.max(0,Math.ceil(rem/1000));
+    const el=document.getElementById('hud-timer');
+    el.textContent=fmtTime(Math.floor(Math.max(0,rem)/1000));
+    el.className='hud-value timer'+(secs<=10?' urgent':'');
+    if(rem<=0){triggerGameOver(GAME,'time');return;}
   } else {
-    GAME.elapsed += dt;
-    document.getElementById('hud-timer').textContent = fmtTime(Math.floor(GAME.elapsed / 1000));
+    GAME.elapsed+=dt;
+    document.getElementById('hud-timer').textContent=fmtTime(Math.floor(GAME.elapsed/1000));
   }
-
-  if (GAME.bonusOnField) {
-    GAME.bonusOnFieldTimer -= dt;
-    if (GAME.bonusOnFieldTimer <= 0) { GAME.bonusOnField = null; hideBonusPopup(); }
-  }
-  GAME.bonusSpawnAccum += dt;
-  if (GAME.bonusSpawnAccum >= GAME.cfg.bonusRate * 1000 && !GAME.bonusOnField) {
-    GAME.bonusSpawnAccum = 0; spawnFieldBonus(GAME);
-  }
-
-  const speed = GAME.effects.slowMo > 0 ? GAME.currentSpeed * 2 : GAME.currentSpeed;
-  GAME.moveAccum += dt;
-  if (GAME.moveAccum >= speed) {
-    GAME.moveAccum = 0;
-    if (GAME.effects.autoSeek > 0) autoSeekDir(GAME);
-    moveSnake(GAME);
-  }
-
-  if (GAME.effects.magnet > 0) applyMagnet(GAME);
-  renderGame(GAME);
-  updateParticles(GAME, dt);
-  gameLoopId = requestAnimationFrame(gameLoop);
+  if(GAME.bonusOnField){GAME.bonusOnFieldTimer-=dt;if(GAME.bonusOnFieldTimer<=0){GAME.bonusOnField=null;hideBonusPopup();}}
+  GAME.bonusSpawnAccum+=dt;
+  if(GAME.bonusSpawnAccum>=GAME.cfg.bonusRate*1000&&!GAME.bonusOnField){GAME.bonusSpawnAccum=0;spawnFieldBonus(GAME);}
+  const speed=GAME.effects.slowMo>0?GAME.currentSpeed*2:GAME.currentSpeed;
+  GAME.moveAccum+=dt;
+  if(GAME.moveAccum>=speed){GAME.moveAccum=0;if(GAME.effects.autoSeek>0)autoSeekDir(GAME);moveSnake(GAME);}
+  if(GAME.effects.magnet>0) applyMagnet(GAME);
+  renderGame(GAME); updateParticles(GAME,dt);
+  gameLoopId=requestAnimationFrame(gameLoop);
 }
 
-// ── Mouvement ─────────────────────────────────────────────────
-function moveSnake(G) {
-  G.dir = { ...G.nextDir };
-  const head = G.snake[0];
-  let nx = head.x + G.dir.x;
-  let ny = head.y + G.dir.y;
-
-  const passWall = G.effects.wallPass > 0 || G.cfg.special === 'ghost';
-  if (passWall) {
-    if (nx < 0) nx = G.cols - 1; if (nx >= G.cols) nx = 0;
-    if (ny < 0) ny = G.rows - 1; if (ny >= G.rows) ny = 0;
-  } else {
-    if (nx < 0 || nx >= G.cols || ny < 0 || ny >= G.rows) { handleCollision(G); return; }
-  }
-
-  if (G.snake.slice(1).some(s => s.x === nx && s.y === ny)) { handleCollision(G); return; }
-  if (G.obstacles.some(o => o.x === nx && o.y === ny))       { handleCollision(G); return; }
-
-  G.snake.unshift({ x: nx, y: ny });
-
-  let ate = false;
-  for (let i = G.foods.length - 1; i >= 0; i--) {
-    const f = G.foods[i];
-    if (f.x === nx && f.y === ny) {
-      if (f.type === 'poison') {
-        G.foods.splice(i, 1); spawnPoison(G); handleCollision(G, true); return;
-      } else if (f.type === 'bonus') {
-        G.foods.splice(i, 1); collectFieldBonus(G, f.bonusDef); ate = true; spawnFood(G);
-      } else {
-        G.foods.splice(i, 1); ate = true; G.collected++;
-        const pts = G.effects.doublePoints > 0 ? 20 : 10;
-        G.score += pts;
-        G.currentSpeed = Math.max(45, G.currentSpeed - G.cfg.speedBoost * G.currentSpeed);
-        addParticles(G, nx, ny, '#00ff88'); flash('green');
-        if (G.foods.filter(f2 => f2.type === 'normal').length < G.cfg.multiFood) spawnFood(G);
-        updateHUD(G); updateObjBar(G);
-        if (G.collected >= G.cfg.target) { triggerComplete(G); return; }
+function moveSnake(G){
+  G.dir={...G.nextDir};
+  const head=G.snake[0];
+  let nx=head.x+G.dir.x, ny=head.y+G.dir.y;
+  const passWall=G.effects.wallPass>0||G.cfg.special==='ghost';
+  if(passWall){if(nx<0)nx=G.cols-1;if(nx>=G.cols)nx=0;if(ny<0)ny=G.rows-1;if(ny>=G.rows)ny=0;}
+  else{if(nx<0||nx>=G.cols||ny<0||ny>=G.rows){handleCollision(G);return;}}
+  if(G.snake.slice(1).some(s=>s.x===nx&&s.y===ny)){handleCollision(G);return;}
+  if(G.obstacles.some(o=>o.x===nx&&o.y===ny)){handleCollision(G);return;}
+  G.snake.unshift({x:nx,y:ny});
+  let ate=false;
+  for(let i=G.foods.length-1;i>=0;i--){
+    const f=G.foods[i];
+    if(f.x===nx&&f.y===ny){
+      if(f.type==='poison'){G.foods.splice(i,1);spawnPoison(G);handleCollision(G,true);return;}
+      else if(f.type==='bonus'){G.foods.splice(i,1);collectFieldBonus(G,f.bonusDef);ate=true;spawnFood(G);}
+      else{G.foods.splice(i,1);ate=true;G.collected++;
+        const pts=G.effects.doublePoints>0?20:10;
+        G.score+=pts;G.currentSpeed=Math.max(45,G.currentSpeed-G.cfg.speedBoost*G.currentSpeed);
+        addParticles(G,nx,ny,'#00ff88');flash('green');
+        if(G.foods.filter(f2=>f2.type==='normal').length<G.cfg.multiFood) spawnFood(G);
+        updateHUD(G);updateObjBar(G);
+        if(G.collected>=G.cfg.target){triggerComplete(G);return;}
       }
     }
   }
-
-  if (G.bonusOnField && G.bonusOnField.x === nx && G.bonusOnField.y === ny) {
-    collectFieldBonus(G, G.bonusOnField.bonusDef);
-    G.bonusOnField = null; hideBonusPopup(); ate = true;
-  }
-
-  if (!ate) G.snake.pop();
-  else G.maxLength = Math.max(G.maxLength, G.snake.length);
-  document.getElementById('stat-length').textContent = G.snake.length;
+  if(G.bonusOnField&&G.bonusOnField.x===nx&&G.bonusOnField.y===ny){collectFieldBonus(G,G.bonusOnField.bonusDef);G.bonusOnField=null;hideBonusPopup();ate=true;}
+  if(!ate) G.snake.pop();
+  else G.maxLength=Math.max(G.maxLength,G.snake.length);
+  document.getElementById('stat-length').textContent=G.snake.length;
 }
 
-function handleCollision(G, soft = false) {
-  if (G.effects.shield > 0 && !soft) {
-    G.effects.shield = 0;
-    toast('🛡️ Bouclier brisé!', 'warning'); flash('gold');
-    addParticles(G, G.snake[0].x, G.snake[0].y, '#ffd700'); return;
-  }
-  G.lives--; flash('red');
-  addParticles(G, G.snake[0].x, G.snake[0].y, '#ff0080');
-  updateHUD(G);
-  if (G.lives <= 0) { triggerGameOver(G); return; }
-  toast(`💥 Aïe! Vies restantes: ${G.lives}`, 'danger');
-  const sx = Math.floor(G.cols / 2), sy = Math.floor(G.rows / 2);
-  G.snake = [{ x: sx, y: sy }, { x: sx - 1, y: sy }, { x: sx - 2, y: sy }];
-  G.dir = { x: 1, y: 0 }; G.nextDir = { x: 1, y: 0 };
+function handleCollision(G,soft=false){
+  if(G.effects.shield>0&&!soft){G.effects.shield=0;toast('🛡️ Bouclier brisé!','warning');flash('gold');addParticles(G,G.snake[0].x,G.snake[0].y,'#ffd700');return;}
+  G.lives--;flash('red');addParticles(G,G.snake[0].x,G.snake[0].y,'#ff0080');updateHUD(G);
+  if(G.lives<=0){triggerGameOver(G);return;}
+  toast('💥 Aïe! Vies restantes: '+G.lives,'danger');
+  const sx=Math.floor(G.cols/2),sy=Math.floor(G.rows/2);
+  G.snake=[{x:sx,y:sy},{x:sx-1,y:sy},{x:sx-2,y:sy}];
+  G.dir={x:1,y:0};G.nextDir={x:1,y:0};
 }
 
-// ── Nourriture ────────────────────────────────────────────────
-function freeCell(G) {
-  const occ = new Set([
-    ...G.snake.map(s => `${s.x},${s.y}`),
-    ...G.obstacles.map(o => `${o.x},${o.y}`),
-    ...G.foods.map(f => `${f.x},${f.y}`),
-  ]);
-  if (G.bonusOnField) occ.add(`${G.bonusOnField.x},${G.bonusOnField.y}`);
-  let x, y, att = 0;
-  do { x = Math.floor(Math.random() * G.cols); y = Math.floor(Math.random() * G.rows); att++; }
-  while (occ.has(`${x},${y}`) && att < 500);
-  return { x, y };
+function freeCell(G){
+  const occ=new Set([...G.snake.map(s=>s.x+','+s.y),...G.obstacles.map(o=>o.x+','+o.y),...G.foods.map(f=>f.x+','+f.y)]);
+  if(G.bonusOnField) occ.add(G.bonusOnField.x+','+G.bonusOnField.y);
+  let x,y,att=0;
+  do{x=Math.floor(Math.random()*G.cols);y=Math.floor(Math.random()*G.rows);att++;}
+  while(occ.has(x+','+y)&&att<500);
+  return{x,y};
 }
-const spawnFood   = G => { const c = freeCell(G); G.foods.push({ x: c.x, y: c.y, type: 'normal', anim: 0 }); };
-const spawnPoison = G => { const c = freeCell(G); G.foods.push({ x: c.x, y: c.y, type: 'poison', anim: 0 }); };
+const spawnFood   = G=>{const c=freeCell(G);G.foods.push({x:c.x,y:c.y,type:'normal',anim:0});};
+const spawnPoison = G=>{const c=freeCell(G);G.foods.push({x:c.x,y:c.y,type:'poison',anim:0});};
 
-function spawnFieldBonus(G) {
-  const bd = getRandBonus(), c = freeCell(G);
-  G.bonusOnField = { x: c.x, y: c.y, bonusDef: bd, anim: 0 };
-  G.bonusOnFieldTimer = 7000;
-  showBonusPopup(bd, 7000);
-  toast(`⭐ Bonus: ${bd.icon} ${bd.name} (7s)!`, 'bonus');
+function spawnFieldBonus(G){
+  const bd=getRandBonus(),c=freeCell(G);
+  G.bonusOnField={x:c.x,y:c.y,bonusDef:bd,anim:0};G.bonusOnFieldTimer=7000;
+  showBonusPopup(bd,7000);toast('⭐ Bonus: '+bd.icon+' '+bd.name+' (7s)!','bonus');
 }
-
-function collectFieldBonus(G, bd) {
-  const cell = G.bonusOnField || G.snake[0];
-  addParticles(G, cell.x, cell.y, bd.color || '#ffee00'); flash('gold');
-  const ex = STATE.inventory.find(b => b.id === bd.id);
-  if (ex) ex.count = (ex.count || 1) + 1;
-  else STATE.inventory.push({ ...bd, count: 1 });
-  saveLocal(); renderInventory();
-  toast(`🎒 ${bd.icon} ${bd.name} → inventaire!`, 'bonus');
+function collectFieldBonus(G,bd){
+  const cell=G.bonusOnField||G.snake[0];
+  addParticles(G,cell.x,cell.y,bd.color||'#ffee00');flash('gold');
+  const ex=STATE.inventory.find(b=>b.id===bd.id);
+  if(ex) ex.count=(ex.count||1)+1; else STATE.inventory.push({...bd,count:1});
+  saveLocal();renderInventory();toast('🎒 '+bd.icon+' '+bd.name+' → inventaire!','bonus');
 }
-
-function useInventoryBonus(idx) {
-  if (!GAME || GAME.over || GAME.complete || GAME.paused) return;
-  const item = STATE.inventory[idx];
-  if (!item || (item.count || 1) <= 0) return;
-  if (item.duration > 0 && GAME.effects[item.id.replace(/_([a-z])/g, (_, l) => l.toUpperCase())] > 0) {
-    toast('⚠️ Ce bonus est déjà actif!', 'warning'); return;
-  }
-  item.count = (item.count || 1) - 1;
-  if (item.count <= 0) STATE.inventory.splice(idx, 1);
-  saveLocal(); renderInventory();
-  item.onActivate(GAME);
-  toast(`✅ ${item.icon} ${item.name} activé!`, 'bonus');
-  updateActiveList();
+function useInventoryBonus(idx){
+  if(!GAME||GAME.over||GAME.complete||GAME.paused) return;
+  const item=STATE.inventory[idx]; if(!item||(item.count||1)<=0) return;
+  item.count=(item.count||1)-1;
+  if(item.count<=0) STATE.inventory.splice(idx,1);
+  saveLocal();renderInventory();item.onActivate(GAME);
+  toast('✅ '+item.icon+' '+item.name+' activé!','bonus');updateActiveList();
 }
-
-function updateEffects(G, dt) {
-  Object.keys(G.effects).forEach(k => {
-    if (G.effects[k] > 0) {
-      G.effects[k] -= dt;
-      if (G.effects[k] <= 0) {
-        G.effects[k] = 0;
-        const bd = BONUS_DEFS.find(b => {
-          const ek = b.id.replace(/_([a-z])/g, (_, l) => l.toUpperCase());
-          return ek === k;
-        });
-        if (bd) { bd.onDeactivate(G); toast(`⏱️ ${bd.icon} ${bd.name} terminé`, 'info'); }
+function updateEffects(G,dt){
+  Object.keys(G.effects).forEach(k=>{
+    if(G.effects[k]>0){G.effects[k]-=dt;
+      if(G.effects[k]<=0){G.effects[k]=0;
+        const bd=BONUS_DEFS.find(b=>{const ek=b.id.replace(/_([a-z])/g,(_,l)=>l.toUpperCase());return ek===k;});
+        if(bd){bd.onDeactivate(G);toast('⏱️ '+bd.icon+' '+bd.name+' terminé','info');}
       }
     }
   });
   updateActiveList();
 }
-
-function updateActiveList() {
-  const el = document.getElementById('active-list');
-  if (!GAME) { el.textContent = 'Aucun bonus actif'; return; }
-  const actives = [];
-  Object.entries(GAME.effects).forEach(([k, v]) => {
-    if (v > 0) {
-      const bd = BONUS_DEFS.find(b => {
-        const ek = b.id.replace(/_([a-z])/g, (_, l) => l.toUpperCase());
-        return ek === k;
-      });
-      if (bd) actives.push(`<div style="padding:2px 0;color:var(--neon-green)">${bd.icon} ${bd.name} <span style="color:var(--text2)">${Math.ceil(v / 1000)}s</span></div>`);
-    }
+function updateActiveList(){
+  const el=document.getElementById('active-list');if(!GAME){el.textContent='Aucun bonus actif';return;}
+  const actives=[];
+  Object.entries(GAME.effects).forEach(([k,v])=>{
+    if(v>0){const bd=BONUS_DEFS.find(b=>{const ek=b.id.replace(/_([a-z])/g,(_,l)=>l.toUpperCase());return ek===k;});
+      if(bd) actives.push('<div style="padding:2px 0;color:var(--neon-green)">'+bd.icon+' '+bd.name+' <span style="color:var(--text2)">'+Math.ceil(v/1000)+'s</span></div>');}
   });
-  el.innerHTML = actives.length ? actives.join('') : 'Aucun bonus actif';
+  el.innerHTML=actives.length?actives.join(''):'Aucun bonus actif';
 }
-
-// ── Auto-seek BFS ─────────────────────────────────────────────
-function autoSeekDir(G) {
-  const food = G.foods.find(f => f.type === 'normal') || G.foods[0];
-  if (!food) return;
-  const head = G.snake[0];
-  const snakeSet = new Set(G.snake.map(s => `${s.x},${s.y}`));
-  const obsSet   = new Set(G.obstacles.map(o => `${o.x},${o.y}`));
-  const queue = [{ x: head.x, y: head.y, path: [] }];
-  const visited = new Set([`${head.x},${head.y}`]);
-  const dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
-  while (queue.length) {
-    const cur = queue.shift();
-    for (const d of dirs) {
-      let nx = cur.x + d.x, ny = cur.y + d.y;
-      if (G.effects.wallPass > 0) {
-        if (nx < 0) nx = G.cols - 1; if (nx >= G.cols) nx = 0;
-        if (ny < 0) ny = G.rows - 1; if (ny >= G.rows) ny = 0;
-      } else if (nx < 0 || nx >= G.cols || ny < 0 || ny >= G.rows) continue;
-      const key = `${nx},${ny}`;
-      if (visited.has(key) || snakeSet.has(key) || obsSet.has(key)) continue;
-      visited.add(key);
-      const path = [...cur.path, d];
-      if (nx === food.x && ny === food.y) {
-        if (path.length > 0) {
-          const f = path[0];
-          if (!(f.x === -G.dir.x && f.y === -G.dir.y)) G.nextDir = f;
-        }
-        return;
-      }
-      queue.push({ x: nx, y: ny, path });
+function autoSeekDir(G){
+  const food=G.foods.find(f=>f.type==='normal')||G.foods[0];if(!food) return;
+  const head=G.snake[0];
+  const snakeSet=new Set(G.snake.map(s=>s.x+','+s.y));
+  const obsSet  =new Set(G.obstacles.map(o=>o.x+','+o.y));
+  const queue=[{x:head.x,y:head.y,path:[]}];
+  const visited=new Set([head.x+','+head.y]);
+  const dirs=[{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
+  while(queue.length){
+    const cur=queue.shift();
+    for(const d of dirs){
+      let nx=cur.x+d.x,ny=cur.y+d.y;
+      if(G.effects.wallPass>0){if(nx<0)nx=G.cols-1;if(nx>=G.cols)nx=0;if(ny<0)ny=G.rows-1;if(ny>=G.rows)ny=0;}
+      else if(nx<0||nx>=G.cols||ny<0||ny>=G.rows) continue;
+      const key=nx+','+ny;
+      if(visited.has(key)||snakeSet.has(key)||obsSet.has(key)) continue;
+      visited.add(key);const path=[...cur.path,d];
+      if(nx===food.x&&ny===food.y){if(path.length>0){const f=path[0];if(!(f.x===-G.dir.x&&f.y===-G.dir.y))G.nextDir=f;}return;}
+      queue.push({x:nx,y:ny,path});
     }
   }
 }
+function applyMagnet(G){
+  const h=G.snake[0];
+  G.foods.forEach(f=>{
+    if(f.type!=='normal') return;
+    const dx=h.x-f.x,dy=h.y-f.y;
+    if(Math.abs(dx)+Math.abs(dy)<=4){if(Math.abs(dx)>Math.abs(dy))f.x+=Math.sign(dx);else f.y+=Math.sign(dy);}
+  });
+}
+function addParticles(G,cx,cy,color){
+  for(let i=0;i<8;i++){const a=(Math.PI*2/8)*i;G.animParticles.push({x:cx*G.CELL+G.CELL/2,y:cy*G.CELL+G.CELL/2,vx:Math.cos(a)*2,vy:Math.sin(a)*2,life:1,color,size:Math.random()*3+1});}
+}
+function updateParticles(G,dt){G.animParticles=G.animParticles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.life-=0.05;return p.life>0;});}
 
-function applyMagnet(G) {
-  const h = G.snake[0];
-  G.foods.forEach(f => {
-    if (f.type !== 'normal') return;
-    const dx = h.x - f.x, dy = h.y - f.y;
-    if (Math.abs(dx) + Math.abs(dy) <= 4) {
-      if (Math.abs(dx) > Math.abs(dy)) f.x += Math.sign(dx);
-      else f.y += Math.sign(dy);
+function renderGame(G){
+  const C=G.CELL,W=canvas.width,H=canvas.height;
+  ctx.fillStyle='#0a0a12';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(42,42,74,.5)';ctx.lineWidth=.5;
+  for(let x=0;x<G.cols;x++){ctx.beginPath();ctx.moveTo(x*C,0);ctx.lineTo(x*C,H);ctx.stroke();}
+  for(let y=0;y<G.rows;y++){ctx.beginPath();ctx.moveTo(0,y*C);ctx.lineTo(W,y*C);ctx.stroke();}
+  G.obstacles.forEach(o=>{
+    const grd=ctx.createLinearGradient(o.x*C,o.y*C,(o.x+1)*C,(o.y+1)*C);
+    grd.addColorStop(0,'#2a2a4a');grd.addColorStop(1,'#1a1a3a');
+    ctx.fillStyle=grd;roundRect(ctx,o.x*C+1,o.y*C+1,C-2,C-2,3);ctx.fill();
+    ctx.strokeStyle='#3a3a6a';ctx.lineWidth=1;ctx.stroke();
+  });
+  G.foods.forEach(f=>{
+    f.anim=(f.anim||0)+0.08;const pulse=1+Math.sin(f.anim)*0.12;
+    const cx2=f.x*C+C/2,cy2=f.y*C+C/2,r=(C/2-2)*pulse;
+    if(f.type==='normal'){
+      const grd=ctx.createRadialGradient(cx2-r*.2,cy2-r*.2,0,cx2,cy2,r);
+      grd.addColorStop(0,'#ff6b6b');grd.addColorStop(.5,'#ff0040');grd.addColorStop(1,'#cc0030');
+      ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
+      ctx.strokeStyle='#00cc44';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(cx2,cy2-r);ctx.lineTo(cx2+2,cy2-r-3);ctx.stroke();
+      ctx.beginPath();ctx.arc(cx2-r*.3,cy2-r*.3,r*.25,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.4)';ctx.fill();
+      ctx.shadowBlur=12;ctx.shadowColor='#ff0040';ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.strokeStyle='rgba(255,0,64,.3)';ctx.lineWidth=2;ctx.stroke();ctx.shadowBlur=0;
+    } else if(f.type==='poison'){
+      const grd=ctx.createRadialGradient(cx2,cy2,0,cx2,cy2,r);grd.addColorStop(0,'#9900ff');grd.addColorStop(1,'#440077');
+      ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
+      ctx.font=(C*.6)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('☠️',cx2,cy2);
+      ctx.shadowBlur=10;ctx.shadowColor='#9900ff';ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.strokeStyle='rgba(153,0,255,.4)';ctx.lineWidth=2;ctx.stroke();ctx.shadowBlur=0;
     }
   });
-}
-
-// ── Particules ────────────────────────────────────────────────
-function addParticles(G, cx, cy, color) {
-  for (let i = 0; i < 8; i++) {
-    const a = (Math.PI * 2 / 8) * i;
-    G.animParticles.push({ x: cx * G.CELL + G.CELL / 2, y: cy * G.CELL + G.CELL / 2, vx: Math.cos(a) * 2, vy: Math.sin(a) * 2, life: 1, color, size: Math.random() * 3 + 1 });
+  if(G.bonusOnField){
+    const bf=G.bonusOnField;bf.anim=(bf.anim||0)+0.1;const pulse=1+Math.sin(bf.anim)*0.2;
+    const cx2=bf.x*C+C/2,cy2=bf.y*C+C/2,r=(C/2-1)*pulse;
+    ctx.shadowBlur=20;ctx.shadowColor=bf.bonusDef.color||'#ffee00';
+    ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.fillStyle=(bf.bonusDef.color||'#ffee00')+'33';ctx.fill();
+    ctx.strokeStyle=bf.bonusDef.color||'#ffee00';ctx.lineWidth=2;ctx.stroke();ctx.shadowBlur=0;
+    ctx.font=(C*.7)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(bf.bonusDef.icon,cx2,cy2+1);
+    const frac=G.bonusOnFieldTimer/7000;
+    ctx.beginPath();ctx.arc(cx2,cy2,r+3,-Math.PI/2,-Math.PI/2+frac*Math.PI*2);ctx.strokeStyle=bf.bonusDef.color||'#ffee00';ctx.lineWidth=2;ctx.stroke();
   }
+  drawSnake(G,C);
+  G.animParticles.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fillStyle=p.color;ctx.globalAlpha=p.life;ctx.fill();ctx.globalAlpha=1;});
+  if(G.effects.shield>0){const h=G.snake[0];ctx.shadowBlur=20;ctx.shadowColor='#ffd700';ctx.beginPath();ctx.arc(h.x*C+C/2,h.y*C+C/2,C*.8,0,Math.PI*2);ctx.strokeStyle='rgba(255,215,0,.6)';ctx.lineWidth=2;ctx.stroke();ctx.shadowBlur=0;}
+  if(G.effects.wallPass>0){ctx.strokeStyle='rgba(0,212,255,.3)';ctx.lineWidth=3;ctx.strokeRect(1,1,W-2,H-2);}
 }
-function updateParticles(G, dt) {
-  G.animParticles = G.animParticles.filter(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.05; return p.life > 0; });
-}
-
-// ── Rendu ─────────────────────────────────────────────────────
-function renderGame(G) {
-  const C = G.CELL, W = canvas.width, H = canvas.height;
-  ctx.fillStyle = '#0a0a12'; ctx.fillRect(0, 0, W, H);
-  ctx.strokeStyle = 'rgba(42,42,74,.5)'; ctx.lineWidth = .5;
-  for (let x = 0; x < G.cols; x++) { ctx.beginPath(); ctx.moveTo(x * C, 0); ctx.lineTo(x * C, H); ctx.stroke(); }
-  for (let y = 0; y < G.rows; y++) { ctx.beginPath(); ctx.moveTo(0, y * C); ctx.lineTo(W, y * C); ctx.stroke(); }
-
-  G.obstacles.forEach(o => {
-    const grd = ctx.createLinearGradient(o.x * C, o.y * C, (o.x + 1) * C, (o.y + 1) * C);
-    grd.addColorStop(0, '#2a2a4a'); grd.addColorStop(1, '#1a1a3a');
-    ctx.fillStyle = grd; roundRect(ctx, o.x * C + 1, o.y * C + 1, C - 2, C - 2, 3); ctx.fill();
-    ctx.strokeStyle = '#3a3a6a'; ctx.lineWidth = 1; ctx.stroke();
-  });
-
-  G.foods.forEach(f => {
-    f.anim = (f.anim || 0) + 0.08;
-    const pulse = 1 + Math.sin(f.anim) * 0.12;
-    const cx2 = f.x * C + C / 2, cy2 = f.y * C + C / 2, r = (C / 2 - 2) * pulse;
-    if (f.type === 'normal') {
-      const grd = ctx.createRadialGradient(cx2 - r * .2, cy2 - r * .2, 0, cx2, cy2, r);
-      grd.addColorStop(0, '#ff6b6b'); grd.addColorStop(.5, '#ff0040'); grd.addColorStop(1, '#cc0030');
-      ctx.beginPath(); ctx.arc(cx2, cy2, r, 0, Math.PI * 2); ctx.fillStyle = grd; ctx.fill();
-      ctx.strokeStyle = '#00cc44'; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(cx2, cy2 - r); ctx.lineTo(cx2 + 2, cy2 - r - 3); ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx2 - r * .3, cy2 - r * .3, r * .25, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.fill();
-      ctx.shadowBlur = 12; ctx.shadowColor = '#ff0040';
-      ctx.beginPath(); ctx.arc(cx2, cy2, r, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255,0,64,.3)'; ctx.lineWidth = 2; ctx.stroke(); ctx.shadowBlur = 0;
-    } else if (f.type === 'poison') {
-      const grd = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, r);
-      grd.addColorStop(0, '#9900ff'); grd.addColorStop(1, '#440077');
-      ctx.beginPath(); ctx.arc(cx2, cy2, r, 0, Math.PI * 2); ctx.fillStyle = grd; ctx.fill();
-      ctx.font = `${C * .6}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('☠️', cx2, cy2);
-      ctx.shadowBlur = 10; ctx.shadowColor = '#9900ff';
-      ctx.beginPath(); ctx.arc(cx2, cy2, r, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(153,0,255,.4)'; ctx.lineWidth = 2; ctx.stroke(); ctx.shadowBlur = 0;
-    }
-  });
-
-  if (G.bonusOnField) {
-    const bf = G.bonusOnField;
-    bf.anim = (bf.anim || 0) + 0.1;
-    const pulse = 1 + Math.sin(bf.anim) * 0.2;
-    const cx2 = bf.x * C + C / 2, cy2 = bf.y * C + C / 2, r = (C / 2 - 1) * pulse;
-    ctx.shadowBlur = 20; ctx.shadowColor = bf.bonusDef.color || '#ffee00';
-    ctx.beginPath(); ctx.arc(cx2, cy2, r, 0, Math.PI * 2);
-    ctx.fillStyle = (bf.bonusDef.color || '#ffee00') + '33'; ctx.fill();
-    ctx.strokeStyle = bf.bonusDef.color || '#ffee00'; ctx.lineWidth = 2; ctx.stroke(); ctx.shadowBlur = 0;
-    ctx.font = `${C * .7}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(bf.bonusDef.icon, cx2, cy2 + 1);
-    const frac = G.bonusOnFieldTimer / 7000;
-    ctx.beginPath(); ctx.arc(cx2, cy2, r + 3, -Math.PI / 2, -Math.PI / 2 + frac * Math.PI * 2);
-    ctx.strokeStyle = bf.bonusDef.color || '#ffee00'; ctx.lineWidth = 2; ctx.stroke();
-  }
-
-  drawSnake(G, C);
-
-  G.animParticles.forEach(p => {
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-    ctx.fillStyle = p.color; ctx.globalAlpha = p.life; ctx.fill(); ctx.globalAlpha = 1;
-  });
-
-  if (G.effects.shield > 0) {
-    const h = G.snake[0];
-    ctx.shadowBlur = 20; ctx.shadowColor = '#ffd700';
-    ctx.beginPath(); ctx.arc(h.x * C + C / 2, h.y * C + C / 2, C * .8, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255,215,0,.6)'; ctx.lineWidth = 2; ctx.stroke(); ctx.shadowBlur = 0;
-  }
-  if (G.effects.wallPass > 0) {
-    ctx.strokeStyle = 'rgba(0,212,255,.3)'; ctx.lineWidth = 3; ctx.strokeRect(1, 1, W - 2, H - 2);
-  }
-}
-
-function drawSnake(G, C) {
-  G.snake.forEach((seg, i) => {
-    const isHead = i === 0, t = i / G.snake.length;
-    const x = seg.x * C, y = seg.y * C, pad = isHead ? 0 : 1, size = C - pad * 2;
-    let baseColor, glowColor;
-    if (G.effects.wallPass > 0)   { baseColor = `hsl(${200 + t * 60},80%,${60 - t * 20}%)`; glowColor = '#00d4ff'; }
-    else if (G.effects.autoSeek > 0) { baseColor = `hsl(${140 + t * 40},80%,${55 - t * 15}%)`; glowColor = '#00ff88'; }
-    else if (G.effects.shield > 0)   { baseColor = `hsl(${50 + t * 20},80%,${60 - t * 15}%)`;  glowColor = '#ffd700'; }
-    else { baseColor = `hsl(${140 - t * 40},70%,${50 - t * 15}%)`; glowColor = '#00ff88'; }
-    ctx.fillStyle = baseColor;
-    if (isHead) {
-      ctx.shadowBlur = 15; ctx.shadowColor = glowColor;
-      roundRect(ctx, x + 1, y + 1, C - 2, C - 2, 6); ctx.fill(); ctx.shadowBlur = 0;
-      const es = Math.max(2, C * .12), eo = C * .22, hcx = x + C / 2, hcy = y + C / 2;
-      let ex1, ey1, ex2, ey2;
-      if (G.dir.x === 1)  { ex1 = hcx + C * .2; ey1 = hcy - eo; ex2 = hcx + C * .2; ey2 = hcy + eo; }
-      else if (G.dir.x === -1) { ex1 = hcx - C * .2; ey1 = hcy - eo; ex2 = hcx - C * .2; ey2 = hcy + eo; }
-      else if (G.dir.y === -1) { ex1 = hcx - eo; ey1 = hcy - C * .2; ex2 = hcx + eo; ey2 = hcy - C * .2; }
-      else { ex1 = hcx - eo; ey1 = hcy + C * .2; ex2 = hcx + eo; ey2 = hcy + C * .2; }
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(ex1, ey1, es, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ex2, ey2, es, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#000';
-      ctx.beginPath(); ctx.arc(ex1 + G.dir.x, ey1 + G.dir.y, es * .5, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ex2 + G.dir.x, ey2 + G.dir.y, es * .5, 0, Math.PI * 2); ctx.fill();
+function drawSnake(G,C){
+  G.snake.forEach((seg,i)=>{
+    const isHead=i===0,t=i/G.snake.length;
+    const x=seg.x*C,y=seg.y*C,pad=isHead?0:1,size=C-pad*2;
+    let baseColor,glowColor;
+    if(G.effects.wallPass>0){baseColor='hsl('+(200+t*60)+',80%,'+(60-t*20)+'%)';glowColor='#00d4ff';}
+    else if(G.effects.autoSeek>0){baseColor='hsl('+(140+t*40)+',80%,'+(55-t*15)+'%)';glowColor='#00ff88';}
+    else if(G.effects.shield>0){baseColor='hsl('+(50+t*20)+',80%,'+(60-t*15)+'%)';glowColor='#ffd700';}
+    else{baseColor='hsl('+(140-t*40)+',70%,'+(50-t*15)+'%)';glowColor='#00ff88';}
+    ctx.fillStyle=baseColor;
+    if(isHead){
+      ctx.shadowBlur=15;ctx.shadowColor=glowColor;
+      roundRect(ctx,x+1,y+1,C-2,C-2,6);ctx.fill();ctx.shadowBlur=0;
+      const es=Math.max(2,C*.12),eo=C*.22,hcx=x+C/2,hcy=y+C/2;
+      let ex1,ey1,ex2,ey2;
+      if(G.dir.x===1){ex1=hcx+C*.2;ey1=hcy-eo;ex2=hcx+C*.2;ey2=hcy+eo;}
+      else if(G.dir.x===-1){ex1=hcx-C*.2;ey1=hcy-eo;ex2=hcx-C*.2;ey2=hcy+eo;}
+      else if(G.dir.y===-1){ex1=hcx-eo;ey1=hcy-C*.2;ex2=hcx+eo;ey2=hcy-C*.2;}
+      else{ex1=hcx-eo;ey1=hcy+C*.2;ex2=hcx+eo;ey2=hcy+C*.2;}
+      ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ex1,ey1,es,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(ex2,ey2,es,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#000';ctx.beginPath();ctx.arc(ex1+G.dir.x,ey1+G.dir.y,es*.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(ex2+G.dir.x,ey2+G.dir.y,es*.5,0,Math.PI*2);ctx.fill();
     } else {
-      roundRect(ctx, x + pad + .5, y + pad + .5, size - 1, size - 1, 4); ctx.fill();
-      if (C > 14 && i % 2 === 0) { ctx.fillStyle = 'rgba(255,255,255,.07)'; roundRect(ctx, x + pad + 2, y + pad + 2, size - 4, size - 4, 3); ctx.fill(); }
+      roundRect(ctx,x+pad+.5,y+pad+.5,size-1,size-1,4);ctx.fill();
+      if(C>14&&i%2===0){ctx.fillStyle='rgba(255,255,255,.07)';roundRect(ctx,x+pad+2,y+pad+2,size-4,size-4,3);ctx.fill();}
     }
   });
 }
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
 
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
-}
-
-// ============================================================
-// ██████╗ ███████╗███████╗██╗   ██╗██╗  ████████╗ █████╗ ████████╗
-// ██╔══██╗██╔════╝██╔════╝██║   ██║██║  ╚══██╔══╝██╔══██╗╚══██╔══╝
-// ██████╔╝█████╗  ███████╗██║   ██║██║     ██║   ███████║   ██║
-// ██╔══██╗██╔══╝  ╚════██║██║   ██║██║     ██║   ██╔══██║   ██║
-// ██║  ██║███████╗███████║╚██████╔╝███████╗██║   ██║  ██║   ██║
-// ╚═╝  ╚═╝╚══════╝╚══════╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝  ╚═╝   ╚═╝
-// GAME OVER & LEVEL COMPLETE — saveGameResult appelé ici
-// ============================================================
-
-async function triggerGameOver(G, reason = 'collision') {
-  // ═══ GARDE : ne jamais exécuter deux fois ═══
-  if (G.over || G.complete) return;
-  G.over = true;
-  cancelAnimationFrame(gameLoopId);
-  flash('red');
-
-  // ═══ FIREBASE — appel unique garanti par resultSaved ═══
-  if (!G.resultSaved) {
-    G.resultSaved = true;
-    // On appelle AWAIT ici — la fonction est async
-    await saveGameResult(G.score, 1);
-  }
-
-  // Remplir l'overlay
-  document.getElementById('go-icon').textContent    = reason === 'time' ? '⏰' : '💀';
-  document.getElementById('go-title').textContent   = reason === 'time' ? 'Temps Écoulé!' : 'Game Over!';
-  document.getElementById('go-subtitle').textContent = reason === 'time' ? 'Le temps vous a manqué!' : 'Meilleure chance!';
-  document.getElementById('go-score').textContent   = G.score;
-  document.getElementById('go-level').textContent   = STATE.currentLevel;
-  document.getElementById('go-length').textContent  = G.maxLength;
-  document.getElementById('go-time').textContent    = fmtTime(Math.floor(G.elapsed / 1000));
-
-  const revBtn = document.getElementById('btn-revive');
-  revBtn.style.display  = STATE.lives > 0 ? 'flex' : 'none';
-  revBtn.textContent    = `💎 Revivre (${STATE.lives} vie${STATE.lives > 1 ? 's' : ''} restante${STATE.lives > 1 ? 's' : ''})`;
-
+async function triggerGameOver(G,reason='collision'){
+  if(G.over||G.complete) return;G.over=true;cancelAnimationFrame(gameLoopId);flash('red');
+  if(!G.resultSaved){G.resultSaved=true;await saveGameResult(G.score,1);}
+  document.getElementById('go-icon').textContent   =reason==='time'?'⏰':'💀';
+  document.getElementById('go-title').textContent  =reason==='time'?'Temps Écoulé!':'Game Over!';
+  document.getElementById('go-subtitle').textContent=reason==='time'?'Le temps vous a manqué!':'Meilleure chance!';
+  document.getElementById('go-score').textContent  =G.score;
+  document.getElementById('go-level').textContent  =STATE.currentLevel;
+  document.getElementById('go-length').textContent =G.maxLength;
+  document.getElementById('go-time').textContent   =fmtTime(Math.floor(G.elapsed/1000));
+  const revBtn=document.getElementById('btn-revive');
+  revBtn.style.display=STATE.lives>0?'flex':'none';
+  revBtn.textContent='💎 Revivre ('+STATE.lives+' vie'+(STATE.lives>1?'s':'')+' restante'+(STATE.lives>1?'s':'')+')';
   document.getElementById('overlay-gameover').classList.add('active');
 }
 
-async function triggerComplete(G) {
-  // ═══ GARDE : ne jamais exécuter deux fois ═══
-  if (G.over || G.complete) return;
-  G.complete = true;
-  cancelAnimationFrame(gameLoopId);
-  flash('gold');
-
-  // ═══ FIREBASE — appel unique garanti par resultSaved ═══
-  if (!G.resultSaved) {
-    G.resultSaved = true;
-    // On appelle AWAIT ici — la fonction est async
-    await saveGameResult(G.score, 1);
-  }
-
-  // Débloquer niveau suivant
+async function triggerComplete(G){
+  if(G.over||G.complete) return;G.complete=true;cancelAnimationFrame(gameLoopId);flash('gold');
+  if(!G.resultSaved){G.resultSaved=true;await saveGameResult(G.score,1);}
   STATE.completedLevels.add(STATE.currentLevel);
-  if (STATE.currentLevel < 300) STATE.unlockedLevels.add(STATE.currentLevel + 1);
-
-  // Étoiles
-  const elapsed   = G.elapsed / 1000;
-  const timeFrac  = G.cfg.timeLimit > 0 ? elapsed / G.cfg.timeLimit : 0;
-  let stars = 1;
-  if (timeFrac < 0.6  || G.cfg.timeLimit < 0) stars = 2;
-  if ((timeFrac < 0.35 || G.cfg.timeLimit < 0) && G.maxLength >= G.cfg.target + 2) stars = 3;
-  if (!STATE.levelStars[STATE.currentLevel] || STATE.levelStars[STATE.currentLevel] < stars)
-    STATE.levelStars[STATE.currentLevel] = stars;
-
-  STATE.totalScore += G.score;
-  if (!STATE.bestScores[STATE.currentLevel] || STATE.bestScores[STATE.currentLevel] < G.score)
-    STATE.bestScores[STATE.currentLevel] = G.score;
+  if(STATE.currentLevel<300) STATE.unlockedLevels.add(STATE.currentLevel+1);
+  const elapsed=G.elapsed/1000,timeFrac=G.cfg.timeLimit>0?elapsed/G.cfg.timeLimit:0;
+  let stars=1;
+  if(timeFrac<0.6||G.cfg.timeLimit<0) stars=2;
+  if((timeFrac<0.35||G.cfg.timeLimit<0)&&G.maxLength>=G.cfg.target+2) stars=3;
+  if(!STATE.levelStars[STATE.currentLevel]||STATE.levelStars[STATE.currentLevel]<stars) STATE.levelStars[STATE.currentLevel]=stars;
+  STATE.totalScore+=G.score;
+  if(!STATE.bestScores[STATE.currentLevel]||STATE.bestScores[STATE.currentLevel]<G.score) STATE.bestScores[STATE.currentLevel]=G.score;
   saveLocal();
-
-  // Étoiles animées
-  ['star1', 'star2', 'star3'].forEach((id, i) => {
-    const el = document.getElementById(id);
-    el.textContent = i < stars ? '⭐' : '☆';
-    el.className = 'star' + (i < stars ? ' earned' : '');
-    if (i < stars) setTimeout(() => el.classList.add('earned'), i * 200);
+  ['star1','star2','star3'].forEach((id,i)=>{
+    const el=document.getElementById(id);el.textContent=i<stars?'⭐':'☆';el.className='star'+(i<stars?' earned':'');
+    if(i<stars) setTimeout(()=>el.classList.add('earned'),i*200);
   });
-
-  const msgs = ['Bien joué!', 'Excellent!', 'Parfait! 🔥'];
-  document.getElementById('lc-msg').textContent   = msgs[stars - 1];
-  document.getElementById('lc-score').textContent = G.score;
-  document.getElementById('lc-time').textContent  = fmtTime(Math.floor(G.elapsed / 1000));
-  document.getElementById('btn-next-level').style.display = STATE.currentLevel < 300 ? 'flex' : 'none';
-
+  const msgs=['Bien joué!','Excellent!','Parfait! 🔥'];
+  document.getElementById('lc-msg').textContent=msgs[stars-1];
+  document.getElementById('lc-score').textContent=G.score;
+  document.getElementById('lc-time').textContent=fmtTime(Math.floor(G.elapsed/1000));
+  document.getElementById('btn-next-level').style.display=STATE.currentLevel<300?'flex':'none';
   document.getElementById('overlay-levelcomplete').classList.add('active');
 }
 
-// ============================================================
-// HUD / UI
-// ============================================================
-function updateHUD(G) {
-  document.getElementById('hud-level').textContent  = STATE.currentLevel;
-  document.getElementById('hud-score').textContent  = G.score;
-  document.getElementById('hud-obj').textContent    = `${G.collected}/${G.cfg.target}`;
-  document.getElementById('hud-lives').textContent  = '❤️'.repeat(Math.max(0, G.lives));
-  document.getElementById('stat-level').textContent  = STATE.currentLevel;
-  document.getElementById('stat-score').textContent  = G.score;
-  document.getElementById('stat-best').textContent   = STATE.bestScores[STATE.currentLevel] || 0;
-  document.getElementById('stat-length').textContent = G.snake.length;
-  const spd = (G.cfg.speedMs / G.currentSpeed).toFixed(1);
-  document.getElementById('stat-speed').textContent  = `${spd}x`;
-  document.getElementById('stat-lives').textContent  = '❤️'.repeat(Math.max(0, G.lives)) || '💀';
+function updateHUD(G){
+  document.getElementById('hud-level').textContent =STATE.currentLevel;
+  document.getElementById('hud-score').textContent =G.score;
+  document.getElementById('hud-obj').textContent   =G.collected+'/'+G.cfg.target;
+  document.getElementById('hud-lives').textContent ='❤️'.repeat(Math.max(0,G.lives));
+  document.getElementById('stat-level').textContent =STATE.currentLevel;
+  document.getElementById('stat-score').textContent =G.score;
+  document.getElementById('stat-best').textContent  =STATE.bestScores[STATE.currentLevel]||0;
+  document.getElementById('stat-length').textContent=G.snake.length;
+  const spd=(G.cfg.speedMs/G.currentSpeed).toFixed(1);
+  document.getElementById('stat-speed').textContent=spd+'x';
+  document.getElementById('stat-lives').textContent='❤️'.repeat(Math.max(0,G.lives))||'💀';
 }
-function updateObjBar(G) {
-  const pct = Math.min(100, (G.collected / G.cfg.target) * 100);
-  document.getElementById('obj-fill').style.width   = pct + '%';
-  document.getElementById('obj-bar-text').textContent = `${G.collected}/${G.cfg.target}`;
+function updateObjBar(G){const pct=Math.min(100,(G.collected/G.cfg.target)*100);document.getElementById('obj-fill').style.width=pct+'%';document.getElementById('obj-bar-text').textContent=G.collected+'/'+G.cfg.target;}
+function updateObjDetail(G){
+  const c=G.cfg;
+  const dc={easy:'var(--neon-green)',medium:'var(--neon-yellow)',hard:'var(--neon-orange)',extreme:'var(--neon-pink)',nightmare:'var(--neon-purple)'};
+  document.getElementById('obj-detail').innerHTML='<span style="color:'+dc[c.difficulty]+'">'+c.diffLabel+'</span><br>'+c.desc+'<br>'+(c.timeLimit>0?'⏱ Temps: '+c.timeLimit+'s<br>':'')+(c.obstacles>0?'🚧 Obstacles: '+c.obstacles+'<br>':'')+(c.multiFood>1?'🍎×'+c.multiFood+' nourriture<br>':'')+(c.poisonFood>0?'☠️×'+c.poisonFood+' poison<br>':'');
 }
-function updateObjDetail(G) {
-  const c = G.cfg;
-  const diffColors = { easy:'var(--neon-green)', medium:'var(--neon-yellow)', hard:'var(--neon-orange)', extreme:'var(--neon-pink)', nightmare:'var(--neon-purple)' };
-  document.getElementById('obj-detail').innerHTML = `
-    <span style="color:${diffColors[c.difficulty]}">${c.diffLabel}</span><br>
-    ${c.desc}<br>
-    ${c.timeLimit > 0 ? `⏱ Temps: ${c.timeLimit}s<br>` : ''}
-    ${c.obstacles  > 0 ? `🚧 Obstacles: ${c.obstacles}<br>` : ''}
-    ${c.multiFood  > 1 ? `🍎×${c.multiFood} nourriture<br>` : ''}
-    ${c.poisonFood > 0 ? `☠️×${c.poisonFood} poison<br>` : ''}
-  `;
+function renderInventory(){
+  const inv=document.getElementById('inventory');
+  if(!STATE.inventory.length){inv.innerHTML='<div style="color:var(--text2);font-size:.78rem;text-align:center;padding:10px;">Inventaire vide<br>Collectez les ⭐</div>';return;}
+  inv.innerHTML=STATE.inventory.map((item,i)=>'<div class="inv-item '+(( item.count||1)<=0?'empty':'')+'" onclick="window._useBonus('+i+')" title="'+item.desc+'"><div style="display:flex;align-items:center;gap:8px;"><span class="inv-item-icon">'+item.icon+'</span><div><div class="inv-item-name">'+item.name+'</div><div style="font-size:.65rem;color:var(--text2);">'+(item.duration?item.duration/1000+'s':'Instantané')+'</div></div></div><div class="inv-item-count">'+(item.count||1)+'</div></div>').join('');
 }
+window._useBonus=idx=>useInventoryBonus(idx);
 
-function renderInventory() {
-  const inv = document.getElementById('inventory');
-  if (!STATE.inventory.length) {
-    inv.innerHTML = '<div style="color:var(--text2);font-size:.78rem;text-align:center;padding:10px;">Inventaire vide<br>Collectez les ⭐</div>';
-    return;
-  }
-  inv.innerHTML = STATE.inventory.map((item, i) => `
-    <div class="inv-item ${(item.count || 1) <= 0 ? 'empty' : ''}"
-         onclick="window._useBonus(${i})" title="${item.desc}">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span class="inv-item-icon">${item.icon}</span>
-        <div>
-          <div class="inv-item-name">${item.name}</div>
-          <div style="font-size:.65rem;color:var(--text2);">${item.duration ? item.duration / 1000 + 's' : 'Instantané'}</div>
-        </div>
-      </div>
-      <div class="inv-item-count">${item.count || 1}</div>
-    </div>
-  `).join('');
+function showBonusPopup(bd,dur){
+  document.getElementById('bp-icon').textContent=bd.icon;document.getElementById('bp-name').textContent=bd.name;document.getElementById('bp-desc').textContent=bd.desc;
+  const fill=document.getElementById('bp-timer-fill');fill.style.animation='none';void fill.offsetWidth;fill.style.animation='shrink 7s linear forwards';
+  const pop=document.getElementById('bonus-popup');pop.style.display='block';setTimeout(()=>pop.style.display='none',dur);
 }
-window._useBonus = idx => useInventoryBonus(idx);
+function hideBonusPopup(){document.getElementById('bonus-popup').style.display='none';}
 
-function showBonusPopup(bd, dur) {
-  document.getElementById('bp-icon').textContent = bd.icon;
-  document.getElementById('bp-name').textContent = bd.name;
-  document.getElementById('bp-desc').textContent = bd.desc;
-  const fill = document.getElementById('bp-timer-fill');
-  fill.style.animation = 'none'; void fill.offsetWidth;
-  fill.style.animation = 'shrink 7s linear forwards';
-  const pop = document.getElementById('bonus-popup');
-  pop.style.display = 'block';
-  setTimeout(() => pop.style.display = 'none', dur);
-}
-function hideBonusPopup() { document.getElementById('bonus-popup').style.display = 'none'; }
-
-// ── Grille niveaux ────────────────────────────────────────────
-function buildLevelsGrid() {
-  const grid = document.getElementById('levels-grid');
-  grid.innerHTML = '';
-  for (let i = 1; i <= 300; i++) {
-    const cfg        = getLevelConfig(i);
-    const isUnlocked = STATE.unlockedLevels.has(i);
-    const isCompleted= STATE.completedLevels.has(i);
-    const isCurrent  = i === STATE.currentLevel && !isCompleted;
-    const stars      = STATE.levelStars[i] || 0;
-    const cls = ['level-btn', isCompleted ? 'completed' : isUnlocked ? 'unlocked' : 'locked', isCurrent ? 'current' : ''].join(' ');
-    const starStr = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-    const diffClass = { easy:'diff-easy', medium:'diff-medium', hard:'diff-hard', extreme:'diff-extreme', nightmare:'diff-nightmare' }[cfg.difficulty];
-    const btn = document.createElement('div');
-    btn.className = cls; btn.dataset.level = i; btn.dataset.diff = cfg.difficulty;
-    btn.innerHTML = `<span style="font-size:1rem;font-weight:900">${i}</span><span class="level-star">${starStr}</span><span class="level-difficulty ${diffClass}">${cfg.difficulty}</span>`;
-    if (isUnlocked) btn.addEventListener('click', () => {
-      document.getElementById('overlay-gameover').classList.remove('active');
-      document.getElementById('overlay-levelcomplete').classList.remove('active');
-      startLevel(i);
-    });
+function buildLevelsGrid(){
+  const grid=document.getElementById('levels-grid');grid.innerHTML='';
+  for(let i=1;i<=300;i++){
+    const cfg=getLevelConfig(i);const isUnlocked=STATE.unlockedLevels.has(i);const isCompleted=STATE.completedLevels.has(i);const isCurrent=i===STATE.currentLevel&&!isCompleted;
+    const stars=STATE.levelStars[i]||0;
+    const cls=['level-btn',isCompleted?'completed':isUnlocked?'unlocked':'locked',isCurrent?'current':''].join(' ');
+    const starStr='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+    const diffClass={easy:'diff-easy',medium:'diff-medium',hard:'diff-hard',extreme:'diff-extreme',nightmare:'diff-nightmare'}[cfg.difficulty];
+    const btn=document.createElement('div');btn.className=cls;btn.dataset.level=i;btn.dataset.diff=cfg.difficulty;
+    btn.innerHTML='<span style="font-size:1rem;font-weight:900">'+i+'</span><span class="level-star">'+starStr+'</span><span class="level-difficulty '+diffClass+'">'+cfg.difficulty+'</span>';
+    if(isUnlocked) btn.addEventListener('click',()=>{document.getElementById('overlay-gameover').classList.remove('active');document.getElementById('overlay-levelcomplete').classList.remove('active');startLevel(i);});
     grid.appendChild(btn);
   }
 }
-
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const f = btn.dataset.filter;
-    document.querySelectorAll('.level-btn').forEach(lb => {
-      lb.style.display = (f === 'all' || lb.dataset.diff === f) ? '' : 'none';
-    });
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+    const f=btn.dataset.filter;
+    document.querySelectorAll('.level-btn').forEach(lb=>{lb.style.display=(f==='all'||lb.dataset.diff===f)?'':'none';});
   });
 });
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-// ── Screens ───────────────────────────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ── Clavier ───────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (!GAME || GAME.over || GAME.complete) return;
-  const km = {
-    ArrowUp:{x:0,y:-1}, ArrowDown:{x:0,y:1}, ArrowLeft:{x:-1,y:0}, ArrowRight:{x:1,y:0},
-    w:{x:0,y:-1}, s:{x:0,y:1}, a:{x:-1,y:0}, d:{x:1,y:0},
-    W:{x:0,y:-1}, S:{x:0,y:1}, A:{x:-1,y:0}, D:{x:1,y:0},
-  };
-  if (km[e.key]) {
-    e.preventDefault();
-    const d = km[e.key];
-    if (!(d.x === -GAME.dir.x && d.y === -GAME.dir.y)) GAME.nextDir = d;
-  }
-  if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') togglePause();
-  const n = parseInt(e.key);
-  if (n >= 1 && n <= 9) useInventoryBonus(n - 1);
+// ── CLAVIER ───────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(!GAME||GAME.over||GAME.complete) return;
+  const km={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0},W:{x:0,y:-1},S:{x:0,y:1},A:{x:-1,y:0},D:{x:1,y:0}};
+  if(km[e.key]){e.preventDefault();const d=km[e.key];if(!(d.x===-GAME.dir.x&&d.y===-GAME.dir.y))GAME.nextDir=d;}
+  if(e.key==='p'||e.key==='P'||e.key==='Escape') togglePause();
+  const n=parseInt(e.key);if(n>=1&&n<=9) useInventoryBonus(n-1);
 });
 
-// ── Mobile ────────────────────────────────────────────────────
-['mob-up','mob-down','mob-left','mob-right'].forEach(id => {
-  const dm = { 'mob-up':{x:0,y:-1}, 'mob-down':{x:0,y:1}, 'mob-left':{x:-1,y:0}, 'mob-right':{x:1,y:0} };
-  const el = document.getElementById(id);
-  const handler = () => {
-    if (!GAME || GAME.over || GAME.complete) return;
-    const d = dm[id];
-    if (!(d.x === -GAME.dir.x && d.y === -GAME.dir.y)) GAME.nextDir = d;
-  };
-  el.addEventListener('click', handler);
-  el.addEventListener('touchstart', e => { e.preventDefault(); handler(); }, { passive: false });
-});
-
-let txs = 0, tys = 0;
-canvas.addEventListener('touchstart', e => { txs = e.touches[0].clientX; tys = e.touches[0].clientY; }, { passive: true });
-canvas.addEventListener('touchend', e => {
-  if (!GAME) return;
-  const dx = e.changedTouches[0].clientX - txs, dy = e.changedTouches[0].clientY - tys;
-  if (Math.abs(dx) > Math.abs(dy)) { const d = dx > 0 ? {x:1,y:0} : {x:-1,y:0}; if (!(d.x === -GAME.dir.x && d.y === -GAME.dir.y)) GAME.nextDir = d; }
-  else { const d = dy > 0 ? {x:0,y:1} : {x:0,y:-1}; if (!(d.x === -GAME.dir.x && d.y === -GAME.dir.y)) GAME.nextDir = d; }
-}, { passive: true });
-
-// ── Pause ─────────────────────────────────────────────────────
-function togglePause() {
-  if (!GAME || GAME.over || GAME.complete) return;
-  GAME.paused = !GAME.paused;
-  document.getElementById('overlay-pause').classList.toggle('active', GAME.paused);
-  if (!GAME.paused) { lastTime = performance.now(); gameLoopId = requestAnimationFrame(gameLoop); }
+// ── MOBILE D-PAD ──────────────────────────────────────────────
+function bindMob(id,dx,dy){
+  const el=document.getElementById(id);if(!el) return;
+  const handler=()=>{if(!GAME||GAME.over||GAME.complete)return;if(!(dx===-GAME.dir.x&&dy===-GAME.dir.y))GAME.nextDir={x:dx,y:dy};};
+  el.addEventListener('click',handler);
+  el.addEventListener('touchstart',e=>{e.preventDefault();handler();},{passive:false});
 }
+bindMob('mob-up',   0,-1);
+bindMob('mob-down', 0, 1);
+bindMob('mob-left',-1, 0);
+bindMob('mob-right',1, 0);
 
-// ── Flash & Toast ─────────────────────────────────────────────
-function flash(color) {
-  const el = document.getElementById('flash');
-  el.className = 'flash-overlay ' + color; el.style.opacity = '1';
-  setTimeout(() => el.style.opacity = '0', 150);
-}
-function toast(msg, type = 'info', dur = 2800) {
-  const c = document.getElementById('toast-container');
-  const t = document.createElement('div');
-  t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
-  setTimeout(() => { t.style.animation = 'toastIn .3s ease reverse'; setTimeout(() => t.remove(), 300); }, dur);
-}
-function fmtTime(s) { return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`; }
+// ── SWIPE ─────────────────────────────────────────────────────
+let txs=0,tys=0;
+canvas.addEventListener('touchstart',e=>{txs=e.touches[0].clientX;tys=e.touches[0].clientY;},{passive:true});
+canvas.addEventListener('touchend',e=>{
+  if(!GAME) return;
+  const dx=e.changedTouches[0].clientX-txs,dy=e.changedTouches[0].clientY-tys;
+  if(Math.abs(dx)>Math.abs(dy)){const d=dx>0?{x:1,y:0}:{x:-1,y:0};if(!(d.x===-GAME.dir.x&&d.y===-GAME.dir.y))GAME.nextDir=d;}
+  else{const d=dy>0?{x:0,y:1}:{x:0,y:-1};if(!(d.x===-GAME.dir.x&&d.y===-GAME.dir.y))GAME.nextDir=d;}
+},{passive:true});
 
-// ── Boutons ───────────────────────────────────────────────────
-document.getElementById('btn-play').onclick = () => { buildLevelsGrid(); showScreen('screen-levels'); };
-document.getElementById('btn-tutorial').onclick = () => document.getElementById('tutorial-overlay').classList.add('active');
-document.getElementById('btn-tut-close').onclick = () => document.getElementById('tutorial-overlay').classList.remove('active');
-document.getElementById('btn-back-menu').onclick = () => showScreen('screen-menu');
-document.getElementById('btn-pause-left').onclick = togglePause;
-document.getElementById('btn-resume').onclick = togglePause;
-document.getElementById('btn-restart-pause').onclick = () => {
-  document.getElementById('overlay-pause').classList.remove('active');
-  if (GAME) GAME.paused = false;
-  startLevel(STATE.currentLevel);
-};
-document.getElementById('btn-quit-pause').onclick = () => {
-  document.getElementById('overlay-pause').classList.remove('active');
-  if (GAME) { GAME.over = true; cancelAnimationFrame(gameLoopId); }
-  showScreen('screen-menu');
-};
-document.getElementById('btn-quit-game').onclick = () => {
-  if (GAME) { GAME.over = true; cancelAnimationFrame(gameLoopId); }
-  showScreen('screen-menu');
-};
-document.getElementById('btn-revive').onclick = () => {
-  if (STATE.lives <= 0) return;
-  STATE.lives--; saveLocal();
-  document.getElementById('overlay-gameover').classList.remove('active');
-  // Réinitialiser la partie sans resauvegarder Firebase
-  GAME.over = false;
-  GAME.resultSaved = false; // autorise une future sauvegarde si on re-game-over
-  GAME.lives = 1;
-  const sx = Math.floor(GAME.cols / 2), sy = Math.floor(GAME.rows / 2);
-  GAME.snake = [{ x: sx, y: sy }, { x: sx - 1, y: sy }, { x: sx - 2, y: sy }];
-  GAME.dir = { x: 1, y: 0 }; GAME.nextDir = { x: 1, y: 0 };
-  GAME.effects = { wallPass:0, autoSeek:0, slowMo:0, shield:0, doublePoints:0, freezeTime:0, magnet:0 };
-  // Reset l'affichage save-result
-  document.getElementById('go-save-result').className = 'save-result';
-  updateHUD(GAME); lastTime = performance.now();
-  gameLoopId = requestAnimationFrame(gameLoop);
-  toast(`💎 Réanimé! Vies extra restantes: ${STATE.lives}`, 'bonus');
-};
-document.getElementById('btn-retry').onclick = () => {
-  document.getElementById('overlay-gameover').classList.remove('active');
-  startLevel(STATE.currentLevel);
-};
-document.getElementById('btn-go-menu').onclick = () => {
-  document.getElementById('overlay-gameover').classList.remove('active');
-  showScreen('screen-menu');
-};
-document.getElementById('btn-next-level').onclick = () => {
-  document.getElementById('overlay-levelcomplete').classList.remove('active');
-  if (STATE.currentLevel < 300) startLevel(STATE.currentLevel + 1);
-};
-document.getElementById('btn-lc-menu').onclick = () => {
-  document.getElementById('overlay-levelcomplete').classList.remove('active');
-  buildLevelsGrid(); showScreen('screen-levels');
-};
+// ── PAUSE ─────────────────────────────────────────────────────
+function togglePause(){if(!GAME||GAME.over||GAME.complete)return;GAME.paused=!GAME.paused;document.getElementById('overlay-pause').classList.toggle('active',GAME.paused);if(!GAME.paused){lastTime=performance.now();gameLoopId=requestAnimationFrame(gameLoop);}}
+function flash(color){const el=document.getElementById('flash');el.className='flash-overlay '+color;el.style.opacity='1';setTimeout(()=>el.style.opacity='0',150);}
+function toast(msg,type='info',dur=2800){const c=document.getElementById('toast-container');const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;c.appendChild(t);setTimeout(()=>{t.style.animation='toastIn .3s ease reverse';setTimeout(()=>t.remove(),300);},dur);}
+function fmtTime(s){return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');}
 
-// ============================================================
-// INIT
-// ============================================================
-window.addEventListener('load', async () => {
+// ── BOUTONS ───────────────────────────────────────────────────
+document.getElementById('btn-play').onclick=()=>{buildLevelsGrid();showScreen('screen-levels');};
+document.getElementById('btn-tutorial').onclick=()=>document.getElementById('tutorial-overlay').classList.add('active');
+document.getElementById('btn-tut-close').onclick=()=>document.getElementById('tutorial-overlay').classList.remove('active');
+document.getElementById('btn-back-menu').onclick=()=>showScreen('screen-menu');
+document.getElementById('btn-pause-left').onclick=togglePause;
+document.getElementById('btn-resume').onclick=togglePause;
+document.getElementById('btn-restart-pause').onclick=()=>{document.getElementById('overlay-pause').classList.remove('active');if(GAME)GAME.paused=false;startLevel(STATE.currentLevel);};
+document.getElementById('btn-quit-pause').onclick=()=>{document.getElementById('overlay-pause').classList.remove('active');if(GAME){GAME.over=true;cancelAnimationFrame(gameLoopId);}showScreen('screen-menu');};
+document.getElementById('btn-quit-game').onclick=()=>{if(GAME){GAME.over=true;cancelAnimationFrame(gameLoopId);}showScreen('screen-menu');};
+document.getElementById('btn-revive').onclick=()=>{
+  if(STATE.lives<=0) return;STATE.lives--;saveLocal();
+  document.getElementById('overlay-gameover').classList.remove('active');
+  GAME.over=false;GAME.resultSaved=false;GAME.lives=1;
+  const sx=Math.floor(GAME.cols/2),sy=Math.floor(GAME.rows/2);
+  GAME.snake=[{x:sx,y:sy},{x:sx-1,y:sy},{x:sx-2,y:sy}];GAME.dir={x:1,y:0};GAME.nextDir={x:1,y:0};
+  GAME.effects={wallPass:0,autoSeek:0,slowMo:0,shield:0,doublePoints:0,freezeTime:0,magnet:0};
+  document.getElementById('go-save-result').className='save-result';
+  updateHUD(GAME);lastTime=performance.now();gameLoopId=requestAnimationFrame(gameLoop);
+  toast('💎 Réanimé! Vies extra restantes: '+STATE.lives,'bonus');
+};
+document.getElementById('btn-retry').onclick=()=>{document.getElementById('overlay-gameover').classList.remove('active');startLevel(STATE.currentLevel);};
+document.getElementById('btn-go-menu').onclick=()=>{document.getElementById('overlay-gameover').classList.remove('active');showScreen('screen-menu');};
+document.getElementById('btn-next-level').onclick=()=>{document.getElementById('overlay-levelcomplete').classList.remove('active');if(STATE.currentLevel<300)startLevel(STATE.currentLevel+1);};
+document.getElementById('btn-lc-menu').onclick=()=>{document.getElementById('overlay-levelcomplete').classList.remove('active');buildLevelsGrid();showScreen('screen-levels');};
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('load',async()=>{
   loadLocal();
-
-  // Afficher nom/avatar
-  document.getElementById('menu-name').textContent   = GAME_NAME;
-  document.getElementById('menu-avatar').textContent = GAME_NAME.charAt(0).toUpperCase();
-
-  // ══ Connexion Firebase au démarrage ══
+  document.getElementById('menu-name').textContent =GAME_NAME;
+  document.getElementById('menu-avatar').textContent=GAME_NAME.charAt(0).toUpperCase();
   await initFirebase();
-
-  // Masquer le loading
-  setTimeout(() => document.getElementById('loading').classList.add('hidden'), 800);
+  setTimeout(()=>document.getElementById('loading').classList.add('hidden'),800);
 });
-
 </script>
 </body>
 </html>
