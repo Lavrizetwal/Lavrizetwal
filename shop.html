@@ -1257,109 +1257,95 @@ function renderGrid(list) {
   grid.innerHTML = list.map(p => {
     const isSold   = p.status === 'sold';
     const isComing = p.status === 'coming';
-    /* Numéro court — 8 chars sans tirets */
     const shortNum = (p.id || '').replace(/-/g,'').substring(0,8).toUpperCase();
     const waMsg    = encodeURIComponent(
-      `Bonjou! Mwen enterese nan pwodwi sa a:\n` +
-      `📦 ${p.name}\n💰 ${formatPrice(p.price)} HTG\n🔢 #${shortNum}\n` +
-      `🔗 ${SITE_URL}/product/${p.id}`
+      'Bonjou! Mwen enterese nan pwodwi sa a:\n' +
+      '\ud83d\udce6 ' + p.name + '\n\ud83d\udcb0 ' + formatPrice(p.price) + ' HTG\n\ud83d\udd22 #' + shortNum + '\n' +
+      '\ud83d\udd17 ' + SITE_URL + '/product/' + p.id
     );
-    const waUrl = `https://wa.me/${WA_NUMBER}?text=${waMsg}`;
+    const waUrl = 'https://wa.me/' + WA_NUMBER + '?text=' + waMsg;
 
-    /* Badge statut */
-    const statusBadgeClass = isSold ? 'badge-sold' : isComing ? 'badge-coming' : 'badge-available';
-    const statusBadgeText  = isSold ? '● VENDU' : isComing ? '● BIENTÔT' : '● DISPONIB';
-
-    // MOD 2: compute countdown
+    // MOD 2
     const daysLeft  = isComing ? getDaysRemaining(p) : null;
     const availDate = isComing ? getAvailableDate(p) : null;
-    // MOD 3: rupture = stock 0 but available status
-    const isRupture = !isSold && !isComing && (p.stock_quantity||0) === 0;
+    // MOD 3
+    const isRupture  = !isSold && !isComing && (p.stock_quantity||0) === 0;
     const isOrderable = isComing || isRupture;
+    // Cart
+    const inCart = cart.has(p.id);
 
-    return `
-    <div class="pcard" onclick="openProduct('${p.id}')">
-      <div class="pcard-img">
-        ${p.image_url
-          ? `<img src="${escH(p.image_url)}" alt="${escH(p.name)}" loading="lazy" style="${isComing?'filter:grayscale(0.3)':''}">`
-          : '<span>📦</span>'
-        }
-        <!-- Numéro produit — coin haut gauche -->
-        <div class="pcard-num">#${shortNum}</div>
-        <!-- MOD 5: Stock badge coin haut droit -->
-        ${isSold
-          ? '<div class="pcard-status-badge badge-sold">● VENDU</div>'
-          : isComing
-          ? '<div class="pcard-status-badge badge-coming">● BIENTÔT</div>'
-          : (p.stock_quantity||0) > 0
-          ? '<div class="stock-img-badge stock-img-badge-available">✅ DISPONIB</div>'
-          : '<div class="stock-img-badge stock-img-badge-rupture">❌ RUPTURE</div>'
-        }
-        ${isComing ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-family:\'Cormorant Garamond\',serif;font-size:1.4rem;font-weight:700;color:#fbbf24;letter-spacing:3px;pointer-events:none">BIENTÔT</div>' : ''}
-      </div>
+    // Build image section
+    let imgContent = p.image_url
+      ? '<img src="' + escH(p.image_url) + '" alt="' + escH(p.name) + '" loading="lazy"' + (isComing ? ' style="filter:grayscale(0.3)"' : '') + '>'
+      : '<span>\ud83d\udce6</span>';
+    let stockBadge = isSold
+      ? '<div class="pcard-status-badge badge-sold">\u25cf VENDU</div>'
+      : isComing
+      ? '<div class="pcard-status-badge badge-coming">\u25cf BIENT\u00d4T</div>'
+      : (p.stock_quantity||0) > 0
+      ? '<div class="stock-img-badge stock-img-badge-available">\u2705 DISPONIB</div>'
+      : '<div class="stock-img-badge stock-img-badge-rupture">\u274c RUPTURE</div>';
+    let comingOverlay = isComing
+      ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-family:\'Cormorant Garamond\',serif;font-size:1.4rem;font-weight:700;color:#fbbf24;letter-spacing:3px;pointer-events:none">BIENT\u00d4T</div>'
+      : '';
 
-      <div class="pcard-body">
-        <div class="pcard-name">${escH(p.name)}</div>
-        <div class="pcard-price">${formatPrice(p.price)} <span>HTG</span></div>
-        ${p.description ? `<div class="pcard-desc">${escH(p.description)}</div>` : ''}
+    // Build body sections
+    let descHtml = p.description
+      ? '<div class="pcard-desc">' + escH(p.description) + '</div>'
+      : '';
+    let countdownHtml = '';
+    if (isComing) {
+      countdownHtml = '<div class="pcard-coming-info" onclick="event.stopPropagation()">'
+        + '<div class="pcard-coming-date">\u23f1 '
+        + (daysLeft > 0 ? 'Disponib nan: <strong>' + daysLeft + ' jou</strong>' : 'Disponib byento!')
+        + '</div>'
+        + (availDate ? '<div class="pcard-coming-orders">\ud83d\udcc5 ' + availDate + '</div>' : '')
+        + '</div>';
+    }
+    let orderBtnHtml = isOrderable
+      ? '<button class="pcard-order-btn" id="order-btn-' + p.id + '" onclick="event.stopPropagation();openOrderModal(\'' + p.id + '\')">\ud83d\udccb Commander</button>'
+      : '';
+    let waBtnHtml = (!isSold && !isOrderable)
+      ? '<a href="' + waUrl + '" class="pcard-cta" target="_blank" rel="noopener" onclick="event.stopPropagation()">'
+        + '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>'
+        + 'Kontakte sou WhatsApp</a>'
+      : '';
+    let cartBtnHtml = !isSold
+      ? '<button class="pcard-add-btn' + (inCart ? ' in-cart' : '') + '" id="card-btn-' + p.id + '" onclick="event.stopPropagation();cartToggle(\'' + p.id + '\')">'
+        + (inCart ? '\u2713 Dans le panier' : '\ud83d\udecd\ufe0f Ajoute nan Panye')
+        + '</button>'
+        + '<div class="pcard-cart-badge' + (inCart ? ' show' : '') + '" id="card-badge-' + p.id + '" onclick="event.stopPropagation()">'
+        + '<div class="pcard-cart-qty">'
+        + '<button class="pcard-qty-btn" onclick="cartChangeQty(\'' + p.id + '\',-1)">\u2212</button>'
+        + '<span class="pcard-qty-num" id="card-qty-' + p.id + '">' + ((cart.get(p.id)||{qty:0}).qty||0) + '</span>'
+        + '<button class="pcard-qty-btn" onclick="cartChangeQty(\'' + p.id + '\',+1)">+</button>'
+        + '</div>'
+        + '<span class="pcard-cart-subtotal" id="card-sub-' + p.id + '">' + formatPrice(((cart.get(p.id)||{qty:0}).qty||0) * p.price) + ' HTG</span>'
+        + '</div>'
+      : '';
 
-        <!-- ID complet visible et copiable -->
-        <div class="pcard-id" onclick="event.stopPropagation()">
-          <span class="pcard-id-label">ID</span>
-          <span class="pcard-id-val">${p.id}</span>
-          <button class="copy-btn" onclick="copyText('${p.id}','ID copié!')">📋</button>
-        </div>
-
-        <!-- MOD 2: Countdown pour produits "coming" -->
-        ${isComing ? `
-        <div class="pcard-coming-info" onclick="event.stopPropagation()">
-          <div class="pcard-coming-date">
-            ⏱ ${daysLeft > 0
-              ? `Disponib nan: <strong>${daysLeft} jou</strong>`
-              : 'Disponib byento!'}
-          </div>
-          ${availDate ? `<div class="pcard-coming-orders">📅 ${availDate}</div>` : ''}
-        </div>
-        ` : ''}
-
-        <!-- MOD 3: Bouton Commander (coming OU rupture) ou Acheter (disponib) -->
-        ${isOrderable ? `
-        <button class="pcard-order-btn" id="order-btn-${p.id}"
-          onclick="event.stopPropagation();openOrderModal('${p.id}')">
-          📋 Commander
-        </button>
-        ` : ''}
-
-        <!-- Bouton WhatsApp (sèlman si disponib avec stock) -->
-        ${!isSold && !isOrderable ? `
-        <a href="${waUrl}"
-           class="pcard-cta"
-           target="_blank" rel="noopener"
-           onclick="event.stopPropagation()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.522 5.843L.044 23.956l6.296-1.452A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.001-1.369l-.36-.213-3.735.861.879-3.638-.234-.375A9.788 9.788 0 012.182 12C2.182 6.578 6.578 2.182 12 2.182S21.818 6.578 21.818 12 17.422 21.818 12 21.818z"/></svg>
-          Kontakte sou WhatsApp
-        </a>
-        ` : ''}
-
-        <!-- MOD 6: Bouton + Panier (TOUS les produits sauf vendu) -->
-        ${!isSold ? `
-        <button class="pcard-add-btn ${cart.has(p.id)?'in-cart':''}" id="card-btn-${p.id}"
-          onclick="event.stopPropagation();cartToggle('${p.id}')">
-          ${cart.has(p.id) ? '✓ Dans le panier' : '🛍️ Ajoute nan Panye'}
-        </button>
-        <div class="pcard-cart-badge ${cart.has(p.id)?'show':''}" id="card-badge-${p.id}"
-          onclick="event.stopPropagation()">
-          <div class="pcard-cart-qty">
-            <button class="pcard-qty-btn" onclick="cartChangeQty('${p.id}',-1)">−</button>
-            <span class="pcard-qty-num" id="card-qty-${p.id}">${cart.get(p.id)?.qty||0}</span>
-            <button class="pcard-qty-btn" onclick="cartChangeQty('${p.id}',+1)">+</button>
-          </div>
-          <span class="pcard-cart-subtotal" id="card-sub-${p.id}">${formatPrice((cart.get(p.id)?.qty||0)*p.price)} HTG</span>
-        </div>
-        ` : ''}
-        <!-- ── FIN PANIER ── -->
-      </div>
-    </div>`;
+    return '<div class="pcard" onclick="openProduct(\'' + p.id + '\')">'
+      + '<div class="pcard-img">'
+      + imgContent
+      + '<div class="pcard-num">#' + shortNum + '</div>'
+      + stockBadge
+      + comingOverlay
+      + '</div>'
+      + '<div class="pcard-body">'
+      + '<div class="pcard-name">' + escH(p.name) + '</div>'
+      + '<div class="pcard-price">' + formatPrice(p.price) + ' <span>HTG</span></div>'
+      + descHtml
+      + '<div class="pcard-id" onclick="event.stopPropagation()">'
+      + '<span class="pcard-id-label">ID</span>'
+      + '<span class="pcard-id-val">' + p.id + '</span>'
+      + '<button class="copy-btn" onclick="copyText(\'' + p.id + '\',\'ID copi\u00e9!\')">📋</button>'
+      + '</div>'
+      + countdownHtml
+      + orderBtnHtml
+      + waBtnHtml
+      + cartBtnHtml
+      + '</div>'
+      + '</div>';
   }).join('');
 }
 
