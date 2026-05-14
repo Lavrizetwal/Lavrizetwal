@@ -69,9 +69,10 @@
        HERO — compact, stabil
     ============================================================ */
     .hero{padding:80px 20px 36px;text-align:center;position:relative}
-    .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,3.8rem);font-weight:700;letter-spacing:4px;background:linear-gradient(135deg,var(--gold-deep),var(--gold),var(--gold-pale),var(--gold),var(--gold-deep));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 6s linear infinite;margin-bottom:8px}
-    @keyframes shimmer{to{background-position:200% center}}
-    .hero-sub{font-size:0.7rem;letter-spacing:4px;color:rgba(201,168,76,0.55);text-transform:uppercase;margin-bottom:24px}
+    .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,3.8rem);font-weight:700;letter-spacing:4px;background:linear-gradient(120deg,var(--gold-deep) 0%,var(--gold) 20%,var(--gold-pale) 40%,#fff 55%,var(--gold) 70%,var(--gold-pale) 85%,var(--gold-deep) 100%);background-size:250% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer-title 4s linear infinite;margin-bottom:8px;filter:drop-shadow(0 0 20px rgba(201,168,76,0.25))}
+    @keyframes shimmer-title{0%{background-position:0% center}100%{background-position:250% center}}
+    .hero-sub{font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;margin-bottom:24px;display:inline-block;background:linear-gradient(120deg,rgba(201,168,76,0.55) 0%,rgba(240,208,96,0.95) 30%,rgba(245,230,176,1) 50%,rgba(240,208,96,0.95) 70%,rgba(201,168,76,0.55) 100%);background-size:250% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer-sub 5s linear infinite}
+    @keyframes shimmer-sub{0%{background-position:0% center}100%{background-position:250% center}}
 
     /* ============================================================
        STATS BAR — STABILE, PAS DE CHART QUI TOMBE
@@ -216,6 +217,9 @@
     .pcard:hover .pcard-cta::before{left:100%}
     .pcard-cta:hover{box-shadow:0 0 20px rgba(37,211,102,0.4);transform:translateY(-1px)}
     .pcard-cta.sold-cta{background:rgba(255,255,255,0.06);color:var(--text-muted);cursor:default}
+    /* MOD 3: Bouton Commander pour rupture de stock */
+    .pcard-cta-commander{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:var(--radius-sm);background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08));border:1px solid rgba(251,191,36,0.45)!important;color:#fbbf24;font-family:'Montserrat',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:var(--tr);margin-top:auto;width:100%}
+    .pcard-cta-commander:hover{box-shadow:0 0 16px rgba(251,191,36,0.25);transform:translateY(-1px)}
     .pcard-cta.sold-cta:hover{transform:none;box-shadow:none}
 
     /* ============================================================
@@ -674,6 +678,10 @@
     /* ============================================================
        COMMANDES — STYLES (AJOUTÉ, pa touche rès)
     ============================================================ */
+    /* MOD 5: Stock badges on product image */
+    .stock-img-badge{position:absolute;top:8px;right:8px;z-index:6;padding:3px 10px;border-radius:6px;font-size:0.55rem;font-weight:800;letter-spacing:0.8px;backdrop-filter:blur(6px)}
+    .stock-img-badge-available{background:rgba(0,255,136,0.18);color:var(--green);border:1px solid rgba(0,255,136,0.35);text-shadow:0 0 6px rgba(0,255,136,0.4)}
+    .stock-img-badge-rupture{background:rgba(255,68,68,0.18);color:#ff6b6b;border:1px solid rgba(255,68,68,0.35);text-shadow:0 0 6px rgba(255,68,68,0.4)}
     .badge-coming{background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.35)}
     .pcard-coming-info{display:flex;flex-direction:column;gap:6px;background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.15);border-radius:8px;padding:10px 12px}
     .pcard-coming-date{font-size:0.65rem;color:#fbbf24;font-weight:600;display:flex;align-items:center;gap:5px}
@@ -956,7 +964,7 @@
 <div class="filter-section">
   <div class="filter-bar">
     <input type="text" class="search-input" id="search-input"
-      placeholder="🔍  Chèche yon pwodwi..." oninput="filterShop()">
+      placeholder="🔍  Chèche pa non, kòd (#ZW-...) oswa ID pwodwi..." oninput="filterShop()">
     <button class="filter-btn active" onclick="setFilter('all',this)">Tout</button>
     <button class="filter-btn" onclick="setFilter('available',this)">✅ Disponib</button>
     <button class="filter-btn" onclick="setFilter('sold',this)">🔴 Vendu</button>
@@ -1106,6 +1114,9 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const WA_NUMBER   = '79961103506';
 const SITE_URL    = 'https://zetwal.org';
 
+// ── INSTANCE SUPABASE UNIQUE (partagée partout) ───────────────
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 /* ============================================================
    ÉTAT
 ============================================================ */
@@ -1113,6 +1124,20 @@ let allProducts   = [];
 let filterStatus  = 'all';
 let filterCat     = '';
 let toastTimer;
+
+/* MOD 2: Countdown helpers */
+function getDaysRemaining(p){
+  if(!p.delay_days) return null;
+  if(!p.created_at) return p.delay_days;
+  const target = new Date(new Date(p.created_at).getTime() + p.delay_days * 86400000);
+  return Math.max(0, Math.ceil((target - new Date()) / 86400000));
+}
+function getAvailableDate(p){
+  if(!p.delay_days) return null;
+  const base = p.created_at ? new Date(p.created_at) : new Date();
+  const target = new Date(base.getTime() + p.delay_days * 86400000);
+  return target.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+}
 
 /* ============================================================
    INIT
@@ -1127,9 +1152,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 ============================================================ */
 async function loadProducts() {
   try {
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
     const { data, error } = await db
       .from('products')
       .select('*')
@@ -1137,7 +1159,14 @@ async function loadProducts() {
 
     if (error) throw error;
 
-    allProducts = data || [];
+    // MOD 2: Auto-flip coming->available when countdown=0
+    allProducts = (data || []).map(p => {
+      if(p.status === 'coming' && p.delay_days){
+        const d = getDaysRemaining(p);
+        if(d === 0) return {...p, status:'available'};
+      }
+      return p;
+    });
     updateStats();
     renderGrid(allProducts);
 
@@ -1188,7 +1217,14 @@ window.filterShop = () => {
 
   let list = allProducts.filter(p => {
     const matchStatus = filterStatus === 'all' || p.status === filterStatus;
-    const matchSearch = !q || p.name?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q);
+    // MOD 4: Search by name, description, category, QR code, short ID
+    const shortId4 = (p.id||'').replace(/-/g,'').substring(0,8).toLowerCase();
+    const matchSearch = !q ||
+      p.name?.toLowerCase().includes(q) ||
+      p.description?.toLowerCase().includes(q) ||
+      p.category?.toLowerCase().includes(q) ||
+      (p.qr_code_value||'').toLowerCase().includes(q) ||
+      shortId4.includes(q.replace('#',''));
     const matchCat    = !filterCat || p.category === filterCat;
     return matchStatus && matchSearch && matchCat;
   });
@@ -1234,6 +1270,13 @@ function renderGrid(list) {
     const statusBadgeClass = isSold ? 'badge-sold' : isComing ? 'badge-coming' : 'badge-available';
     const statusBadgeText  = isSold ? '● VENDU' : isComing ? '● BIENTÔT' : '● DISPONIB';
 
+    // MOD 2: compute countdown
+    const daysLeft  = isComing ? getDaysRemaining(p) : null;
+    const availDate = isComing ? getAvailableDate(p) : null;
+    // MOD 3: rupture = stock 0 but available status
+    const isRupture = !isSold && !isComing && (p.stock_quantity||0) === 0;
+    const isOrderable = isComing || isRupture;
+
     return `
     <div class="pcard" onclick="openProduct('${p.id}')">
       <div class="pcard-img">
@@ -1241,13 +1284,18 @@ function renderGrid(list) {
           ? `<img src="${escH(p.image_url)}" alt="${escH(p.name)}" loading="lazy" style="${isComing?'filter:grayscale(0.3)':''}">`
           : '<span>📦</span>'
         }
-        <!-- Numéro produit — toujours visible coin haut gauche -->
+        <!-- Numéro produit — coin haut gauche -->
         <div class="pcard-num">#${shortNum}</div>
-        <!-- Statut coin haut droit -->
-        <div class="pcard-status-badge ${statusBadgeClass}">
-          ${statusBadgeText}
-        </div>
-        ${isComing ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-family:\'Cormorant Garamond\',serif;font-size:1.4rem;font-weight:700;color:#fbbf24;letter-spacing:3px;pointer-events:none">BIENTÔT</div>' : ''}
+        <!-- MOD 5: Stock badge coin haut droit -->
+        ${isSold
+          ? '<div class="pcard-status-badge badge-sold">● VENDU</div>'
+          : isComing
+          ? '<div class="pcard-status-badge badge-coming">● BIENTÔT</div>'
+          : (p.stock_quantity||0) > 0
+          ? '<div class="stock-img-badge stock-img-badge-available">✅ DISPONIB</div>'
+          : '<div class="stock-img-badge stock-img-badge-rupture">❌ RUPTURE</div>'
+        }
+        ${isComing ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:#fbbf24;letter-spacing:3px;pointer-events:none">BIENTÔT</div>' : ''}
       </div>
 
       <div class="pcard-body">
@@ -1262,22 +1310,28 @@ function renderGrid(list) {
           <button class="copy-btn" onclick="copyText('${p.id}','ID copié!')">📋</button>
         </div>
 
-        <!-- ── PWODWI À VENIR — infos + bouton Commander ── -->
+        <!-- MOD 2: Countdown pour produits "coming" -->
         ${isComing ? `
         <div class="pcard-coming-info" onclick="event.stopPropagation()">
           <div class="pcard-coming-date">
-            ⏱ Disponib nan: ${p.delay_days ? p.delay_days+' jou' : 'dat pa défini'}
+            ⏱ ${daysLeft > 0
+              ? `Disponib nan: <strong>${daysLeft} jou</strong>`
+              : 'Disponib byento!'}
           </div>
-          ${p.availability ? `<div class="pcard-coming-orders">📅 ${escH(p.availability)}</div>` : ''}
+          ${availDate ? `<div class="pcard-coming-orders">📅 ${availDate}</div>` : ''}
         </div>
+        ` : ''}
+
+        <!-- MOD 3: Bouton Commander (coming OU rupture) ou Acheter (disponib) -->
+        ${isOrderable ? `
         <button class="pcard-order-btn" id="order-btn-${p.id}"
           onclick="event.stopPropagation();openOrderModal('${p.id}')">
           📋 Commander
         </button>
         ` : ''}
 
-        <!-- Bouton WhatsApp (sèlman si disponib) -->
-        ${!isSold && !isComing ? `
+        <!-- Bouton WhatsApp (sèlman si disponib avec stock) -->
+        ${!isSold && !isOrderable ? `
         <a href="${waUrl}"
            class="pcard-cta"
            target="_blank" rel="noopener"
@@ -1287,8 +1341,8 @@ function renderGrid(list) {
         </a>
         ` : ''}
 
-        <!-- ── BOUTON + PANIER (sèlman si disponib) ── -->
-        ${!isSold && !isComing ? `
+        <!-- MOD 6: Bouton + Panier (TOUS les produits sauf vendu) -->
+        ${!isSold ? `
         <button class="pcard-add-btn ${cart.has(p.id)?'in-cart':''}" id="card-btn-${p.id}"
           onclick="event.stopPropagation();cartToggle('${p.id}')">
           ${cart.has(p.id) ? '✓ Dans le panier' : '🛍️ Ajoute nan Panye'}
@@ -1582,6 +1636,8 @@ window.closeCart = () => {
 window.cartToggle = (id) => {
   const p = allProducts.find(x => x.id === id);
   if (!p) return;
+  // MOD 6: allow all products except sold
+  if (p.status === 'sold') { showToast('Pwodwi sa a deja vendu', 'error'); return; }
   if (cart.has(id)) {
     cart.delete(id);
   } else {
@@ -1870,8 +1926,7 @@ document.addEventListener('click', (e) => {
    PERSISTANCE PANIER
 ============================================================ */
 
-// Supabase cart table: cart_items (user_id, cart_data jsonb)
-const sbCart = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ── Panier Supabase — utilise l'instance globale db ──────────
 
 // ── SAUVEGARDER DANS SUPABASE ─────────────────────────────────
 async function cartSaveToSupabase(uid) {
@@ -1886,7 +1941,7 @@ async function cartSaveToSupabase(uid) {
       colors: item.product.colors || null,
       stock_quantity: item.product.stock_quantity ?? null
     }));
-    await sbCart.from('cart_items').upsert({
+    await db.from('cart_items').upsert({
       user_id:    uid,
       cart_data:  cartData,
       updated_at: new Date().toISOString()
@@ -1901,7 +1956,7 @@ async function cartSaveToSupabase(uid) {
 async function cartLoadFromSupabase(uid) {
   if (!uid) return;
   try {
-    const { data, error } = await sbCart.from('cart_items')
+    const { data, error } = await db.from('cart_items')
       .select('cart_data')
       .eq('user_id', uid)
       .single();
@@ -2028,7 +2083,7 @@ function cartLoadFromLocalStorage() {
    + WhatsApp pre-rempli + affichage statut dans dropdown
 ============================================================ */
 
-const sbOrders = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Orders — utilise l'instance globale db
 let orderQty   = 1;
 let orderProduct = null;
 
@@ -2158,7 +2213,7 @@ window.submitOrder = async () => {
 
   // 1. Enregistrer dans Supabase orders
   try {
-    const { error } = await sbOrders.from('orders').insert({
+    const { error } = await db.from('orders').insert({
       product_id:      p.id,
       product_name:    p.name,
       product_price:   p.price || 0,
@@ -2172,7 +2227,19 @@ window.submitOrder = async () => {
     if (error) throw error;
   } catch(e) {
     console.error('Order insert error:', e.message);
-    // On continue quand même — l'important c'est WhatsApp
+    // MOD 7: localStorage fallback si Supabase échoue
+    try {
+      const pending = JSON.parse(localStorage.getItem('zetwal_pending_orders')||'[]');
+      pending.push({
+        product_id: p.id, product_name: p.name, product_price: p.price||0,
+        quantity: orderQty, total_estimated: total,
+        client_name: clientName, client_email: currentUser.email,
+        client_phone: clientPhone, status: 'pending',
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('zetwal_pending_orders', JSON.stringify(pending));
+    } catch(_){}
+    // On continue — l'important c'est WhatsApp
   }
 
   // 2. Mettre à jour le bouton sur la carte
@@ -2233,7 +2300,7 @@ let seenOrderStatuses = {}; // {id: status} — pour détecter les changements
 async function loadMyOrders(email) {
   if (!email) return;
   try {
-    const { data, error } = await sbOrders
+    const { data, error } = await db
       .from('orders')
       .select('id,product_name,quantity,total_estimated,status,created_at,admin_note,product_price')
       .eq('client_email', email)
