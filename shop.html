@@ -1125,6 +1125,23 @@ let filterStatus  = 'all';
 let filterCat     = '';
 let toastTimer;
 
+/* Taux de change (chargés depuis site_settings) */
+let RATE_USD  = 136;
+let RATE_PESO = 2.3;
+function htgToUSD(h)  { return ((h||0)/RATE_USD).toFixed(2); }
+function htgToPeso(h) { return Math.round((h||0)/RATE_PESO).toLocaleString('fr-HT'); }
+
+async function loadRates() {
+  try {
+    const { data } = await db.from('site_settings')
+      .select('key,value').in('key',['rate_usd','rate_peso']);
+    if (data) data.forEach(r => {
+      if (r.key==='rate_usd')  RATE_USD  = parseFloat(r.value)||136;
+      if (r.key==='rate_peso') RATE_PESO = parseFloat(r.value)||2.3;
+    });
+  } catch(e){}
+}
+
 /* MOD 2: Countdown helpers */
 function getDaysRemaining(p){
   if(!p.delay_days) return null;
@@ -1152,6 +1169,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 ============================================================ */
 async function loadProducts() {
   try {
+    await loadRates();
     const { data, error } = await db
       .from('products')
       .select('*')
@@ -1334,6 +1352,10 @@ function renderGrid(list) {
       + '<div class="pcard-body">'
       + '<div class="pcard-name">' + escH(p.name) + '</div>'
       + '<div class="pcard-price">' + formatPrice(p.price) + ' <span>HTG</span></div>'
+      + '<div style="display:flex;gap:10px;margin-top:-4px;margin-bottom:2px">'
+      + '<span style="font-size:0.68rem;color:#60b4ff;font-weight:600">$' + htgToUSD(p.price) + '</span>'
+      + '<span style="font-size:0.68rem;color:#a78bfa;font-weight:600">' + htgToPeso(p.price) + ' $RD</span>'
+      + '</div>'
       + descHtml
       + '<div class="pcard-id" onclick="event.stopPropagation()">'
       + '<span class="pcard-id-label">ID</span>'
@@ -1424,6 +1446,10 @@ window.openProduct = (id) => {
 
       <div class="pmodal-name">${escH(p.name)}</div>
       <div class="pmodal-price">${formatPrice(p.price)} <span>HTG</span></div>
+      <div style="display:flex;gap:14px;margin-top:-10px;margin-bottom:14px">
+        <span style="font-size:0.82rem;color:#60b4ff;font-weight:700">$${htgToUSD(p.price)}</span>
+        <span style="font-size:0.82rem;color:#a78bfa;font-weight:700">${htgToPeso(p.price)} $RD</span>
+      </div>
 
       ${delayHtml}
 
