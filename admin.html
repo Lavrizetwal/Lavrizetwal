@@ -250,7 +250,26 @@
     .ch-expr{color:var(--text-muted)}
     .ch-val{font-weight:700;color:var(--gold)}
 
-    @media(max-width:600px){.main{padding:72px 14px 30px}.card{padding:18px 14px}.card-grid{grid-template-columns:1fr}}
+    /* ── ACCÈS TEMPORAIRES ── */
+    .access-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;position:relative;transition:var(--tr)}
+    .access-card:hover{border-color:var(--border-hover)}
+    .access-card.expired{opacity:0.45;border-color:rgba(255,68,68,0.2)}
+    .access-email{font-size:0.88rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+    .access-timer{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--gold)}
+    .access-timer.expiring{color:var(--red);animation:blink 1s ease infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+    .access-timer.expired-txt{color:var(--red);font-size:0.8rem}
+    .perm-chip{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:0.58rem;font-weight:700;letter-spacing:0.5px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);color:var(--gold);margin:2px}
+    .perm-checkbox{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.03);border:1px solid var(--border);cursor:pointer;transition:var(--tr);font-size:0.78rem;color:var(--text-muted);user-select:none}
+    .perm-checkbox:hover{border-color:var(--border-hover);color:var(--text)}
+    .perm-checkbox.checked{background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.3);color:var(--gold)}
+    .perm-checkbox input{accent-color:var(--gold);width:15px;height:15px;cursor:pointer;flex-shrink:0}
+    .dur-btn{padding:9px 18px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);font-family:'Montserrat',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:var(--tr)}
+    .dur-btn:hover{border-color:var(--border-hover);color:var(--text)}
+    .dur-btn.selected{background:rgba(255,215,0,0.12);border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(255,215,0,0.15)}
+    .access-progress{height:4px;border-radius:2px;background:rgba(255,255,255,0.08);margin-top:8px;overflow:hidden}
+    .access-progress-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold),var(--gold-deep));transition:width 1s linear}
+    .access-progress-bar.low{background:linear-gradient(90deg,var(--red),#cc0000)}
   </style>
 </head>
 <body>
@@ -323,6 +342,7 @@
       <button class="tab-btn" onclick="switchTab('analytics')">📊 Analytics</button>
       <button class="tab-btn" onclick="switchTab('calculator')">🧮 Calculatrice</button>
       <button class="tab-btn" onclick="switchTab('settings')">⚙️ Paramètres</button>
+      <button class="tab-btn" onclick="switchTab('access')" id="tab-btn-access">🔐 Accès Temporaires</button>
     </div>
 
     <!-- PRODUITS -->
@@ -796,10 +816,88 @@
       </div>
 
     </div>
-    <!-- ═══════════════════════════════════════════════ -->
+    <!-- ═══ ACCÈS TEMPORAIRES ═══ -->
+    <div class="tab-panel" id="tab-access">
 
-  </main>
-</div>
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--text)">🔐 Accès <span style="color:var(--gold)">Temporaires</span></div>
+          <div style="font-size:0.65rem;color:var(--text-muted);margin-top:3px">Donnez un accès limité dans le temps à des utilisateurs externes.</div>
+        </div>
+        <div id="access-superadmin-badge" style="display:none;padding:5px 14px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:20px;font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1px">👑 SUPER ADMIN</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
+
+        <!-- COL 1: Formulaire création accès -->
+        <div class="card" id="access-form-card">
+          <div class="card-title">➕ Créer un Accès Temporaire</div>
+
+          <!-- Email -->
+          <div class="field">
+            <label>Email de l'utilisateur *</label>
+            <input type="email" id="access-email-input" class="auth-input"
+              placeholder="utilisateur@email.com" style="margin-bottom:0">
+          </div>
+
+          <!-- Durée -->
+          <div class="field">
+            <label>Durée d'accès *</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap" id="dur-btns">
+              <button class="dur-btn" data-mins="30"   onclick="selectDur(this)">30 min</button>
+              <button class="dur-btn" data-mins="60"   onclick="selectDur(this)">1 heure</button>
+              <button class="dur-btn" data-mins="180"  onclick="selectDur(this)">3 heures</button>
+              <button class="dur-btn" data-mins="360"  onclick="selectDur(this)">6 heures</button>
+              <button class="dur-btn" data-mins="540"  onclick="selectDur(this)">9 heures</button>
+            </div>
+          </div>
+
+          <!-- Permissions -->
+          <div class="field">
+            <label>Permissions accordées *</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+              <button onclick="selectAllPerms(true)"  style="padding:4px 12px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);border-radius:20px;color:var(--gold);font-size:0.6rem;font-weight:700;cursor:pointer;font-family:inherit">Tout cocher</button>
+              <button onclick="selectAllPerms(false)" style="padding:4px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;color:var(--text-muted);font-size:0.6rem;font-weight:700;cursor:pointer;font-family:inherit">Tout décocher</button>
+            </div>
+            <div id="perm-list" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+          </div>
+
+          <!-- Note optionnelle -->
+          <div class="field">
+            <label>Note (optionnelle)</label>
+            <input type="text" id="access-note-input" class="auth-input"
+              placeholder="Ex: Accès pour vérification ventes" style="margin-bottom:0">
+          </div>
+
+          <button class="btn btn-gold" onclick="createTempAccess()" id="create-access-btn" style="margin-top:8px">
+            🔐 Créer l'Accès Temporaire
+          </button>
+          <div id="access-create-err" style="font-size:0.7rem;color:var(--red);margin-top:8px;display:none"></div>
+        </div>
+
+        <!-- COL 2: Liste accès actifs -->
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:0">⏱ Accès Actifs</div>
+            <button onclick="loadTempAccesses()" style="padding:5px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;color:var(--text-muted);font-size:0.6rem;cursor:pointer;font-family:inherit;transition:var(--tr)">↺ Actualiser</button>
+          </div>
+          <div id="access-list">
+            <div style="color:var(--text-muted);font-size:0.75rem;padding:20px;text-align:center">Chargement...</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Accès restreint (visible aux non-superadmins ayant accès à cette section) -->
+      <div id="access-restricted-msg" style="display:none;text-align:center;padding:60px 20px">
+        <div style="font-size:3rem;margin-bottom:14px">🔒</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);margin-bottom:8px">Section réservée</div>
+        <div style="font-size:0.75rem;color:var(--text-muted)">Seuls les administrateurs principaux peuvent gérer les accès temporaires.</div>
+      </div>
+
+    </div>
+    <!-- ═══════════════════════════════════════════════ -->
 
 <!-- MODAL produit (existant) -->
 <div class="modal-overlay" id="product-modal">
