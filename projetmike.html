@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Espace Nestor — Dr. Mike Nestor Sanders Duterval | Cabinet de Psychologie Clinique</title>
+<meta name="description" content="Cabinet de psychologie clinique du Dr. Mike Nestor Sanders Duterval. Consultations, tests psychologiques, articles scientifiques et communauté de soutien.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   TOKENS & RESET
+   ═══════════════════════════════════════ */
+:root {
+  --primary:    #2C3E6B;
+  --secondary:  #7B9EA6;
+  --gold:       #C9A96E;
+  --gold-light: #e8c98a;
+  --sage:       #A8C5B5;
+  --blush:      #E8D5C4;
+  --ivory:      #F4F1EC;
+  --night:      #1A1A2E;
+  --anthracite: #2D2D2D;
+  --cream:      #F8F6F2;
+  --border:     rgba(44,62,107,0.12);
+  --shadow-sm:  0 4px 16px rgba(44,62,107,0.08);
+  --shadow-md:  0 8px 32px rgba(44,62,107,0.12);
+  --shadow-lg:  0 20px 60px rgba(44,62,107,0.16);
+  --glass:      rgba(255,255,255,0.08);
+  --glass-bd:   rgba(255,255,255,0.18);
+  --tr:         all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:80px;}
+body{font-family:'Lato',sans-serif;color:var(--anthracite);background:var(--ivory);overflow-x:hidden;font-size:18px;line-height:1.8;cursor:none;}
+
+/* Custom cursor */
+.cursor{position:fixed;width:12px;height:12px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.1s,width 0.2s,height 0.2s,opacity 0.2s;mix-blend-mode:multiply;}
+.cursor-ring{position:fixed;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--gold);pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:transform 0.12s,width 0.3s,height 0.3s,opacity 0.3s;opacity:0.5;}
+body:hover .cursor{opacity:1;}
+a:hover~.cursor,.btn:hover~.cursor{width:18px;height:18px;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--ivory);}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--primary),var(--gold));border-radius:5px;}
+::selection{background:rgba(201,169,110,0.25);color:var(--primary);}
+
+/* ═══════════════════════════════════════
+   LANGUAGE SPLASH SCREEN
+   ═══════════════════════════════════════ */
+#splash{
+  position:fixed;inset:0;z-index:10000;
+  background:linear-gradient(135deg,#0d1b3e 0%,#1a1535 30%,#2e1f4a 55%,#3d2855 70%,#a0738a 85%,#d4a5b5 95%,#f0d6e0 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 0.8s ease,transform 0.8s ease;overflow:hidden;
+}
+#splash.hidden{opacity:0;pointer-events:none;transform:scale(1.04);}
+.splash-particles{position:absolute;inset:0;overflow:hidden;}
+.splash-particle{
+  position:absolute;width:3px;height:3px;border-radius:50%;
+  background:rgba(255,255,255,0.6);animation:floatPart linear infinite;
+}
+@keyframes floatPart{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:0.5}100%{transform:translateY(-10vh) translateX(var(--drift)) scale(1.5);opacity:0}}
+.splash-logo{text-align:center;z-index:1;margin-bottom:32px;}
+.splash-brain{font-size:4rem;animation:breathe 3s ease-in-out infinite;display:block;margin-bottom:12px;filter:drop-shadow(0 0 20px rgba(201,169,110,0.6));}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08);filter:drop-shadow(0 0 30px rgba(201,169,110,0.9));}}
+.splash-name{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:300;color:var(--gold-light);letter-spacing:4px;text-align:center;text-shadow:0 0 30px rgba(201,169,110,0.4);}
+.splash-title{font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:5px;color:rgba(255,255,255,0.5);text-transform:uppercase;text-align:center;margin-top:8px;}
+.splash-quote{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(0.85rem,2vw,1.05rem);color:rgba(255,255,255,0.65);
+  text-align:center;max-width:480px;padding:0 24px;margin:28px 0 40px;
+  opacity:0;animation:fadeIn 1.2s 0.8s ease forwards;z-index:1;
+}
+@keyframes fadeIn{to{opacity:1;}}
+.lang-cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;z-index:1;}
+.lang-card{
+  padding:20px 36px;border-radius:16px;cursor:pointer;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.2);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  transition:var(--tr);text-align:center;min-width:220px;
+}
+.lang-card:hover{background:rgba(201,169,110,0.15);border-color:rgba(201,169,110,0.5);transform:translateY(-6px);box-shadow:0 20px 50px rgba(0,0,0,0.3);}
+.lang-card.ru:hover{background:rgba(192,192,220,0.12);border-color:rgba(192,192,220,0.4);}
+.lang-flag{font-size:2rem;display:block;margin-bottom:10px;}
+.lang-label{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#fff;display:block;margin-bottom:4px;}
+.lang-sub{font-size:0.6rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;}
+
+/* ═══════════════════════════════════════
+   NAVBAR
+   ═══════════════════════════════════════ */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:0 40px;height:72px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(244,241,236,0.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  transition:var(--tr);
+}
+.navbar.scrolled{height:60px;background:rgba(244,241,236,0.97);box-shadow:var(--shadow-sm);}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
+.nav-logo-icon{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.nav-logo-text{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--primary);}
+.nav-logo-text span{color:var(--gold);}
+.nav-links{display:flex;align-items:center;gap:4px;list-style:none;}
+.nav-links>li{position:relative;}
+.nav-links a{
+  font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;
+  color:var(--anthracite);padding:8px 14px;border-radius:6px;
+  display:flex;align-items:center;gap:5px;transition:var(--tr);
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:0;left:50%;right:50%;height:2px;
+  background:var(--gold);border-radius:2px;transition:var(--tr);
+}
+.nav-links a:hover{color:var(--primary);}
+.nav-links a:hover::after,.nav-links li.active>a::after{left:14px;right:14px;}
+.nav-links li.active>a{color:var(--primary);}
+/* Dropdown */
+.dropdown{position:relative;}
+.dropdown-menu{
+  position:absolute;top:calc(100% + 8px);left:0;
+  background:rgba(244,241,236,0.97);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:12px;
+  padding:8px;min-width:200px;
+  box-shadow:var(--shadow-lg);opacity:0;visibility:hidden;
+  transform:translateY(-8px);transition:var(--tr);
+  list-style:none;
+}
+.dropdown:hover .dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-menu a{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:0.7rem;letter-spacing:0.5px;}
+.dropdown-menu a:hover{background:rgba(44,62,107,0.06);}
+.nav-cta{
+  padding:10px 22px;border-radius:30px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  color:var(--night)!important;font-family:'Montserrat',sans-serif;
+  font-size:0.6rem!important;font-weight:700!important;letter-spacing:1.5px;
+  border:none;cursor:pointer;box-shadow:0 4px 20px rgba(201,169,110,0.4);
+  transition:var(--tr);text-decoration:none;display:flex;align-items:center;gap:6px;
+}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,169,110,0.5);}
+.nav-cta::after{display:none!important;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:8px;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--primary);border-radius:2px;transition:var(--tr);}
+.mobile-menu{display:none;position:fixed;inset:0;z-index:999;background:var(--ivory);flex-direction:column;align-items:center;justify-content:center;gap:28px;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--primary);text-decoration:none;font-weight:600;}
+.mobile-menu-close{position:absolute;top:24px;right:24px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--anthracite);}
+
+/* ═══════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════ */
+.hero{
+  min-height:100vh;position:relative;display:flex;align-items:center;
+  overflow:hidden;padding:100px 0 60px;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:linear-gradient(135deg,#0d1b3e 0%,#1d2b5a 40%,#2C3E6B 70%,#3d5080 100%);
+}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(26,26,46,0.9) 0%,rgba(44,62,107,0.6) 60%,rgba(44,62,107,0.2) 100%);z-index:1;}
+.hero-particles{position:absolute;inset:0;z-index:2;pointer-events:none;}
+.hero-particle{position:absolute;border-radius:50%;background:rgba(201,169,110,0.4);animation:floatHero ease-in-out infinite;}
+@keyframes floatHero{0%,100%{transform:translateY(0) translateX(0) scale(1)}33%{transform:translateY(-20px) translateX(10px) scale(1.1)}66%{transform:translateY(10px) translateX(-8px) scale(0.9)}}
+.hero-inner{max-width:1300px;margin:0 auto;padding:0 40px;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:3;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 18px;border-radius:30px;margin-bottom:28px;
+  background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.4);
+  font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);
+}
+.hero-badge::before{content:'✨';font-size:0.8rem;}
+.hero-h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,5vw,5rem);font-weight:300;line-height:1.1;
+  color:#fff;margin-bottom:24px;
+}
+.hero-h1 strong{display:block;font-weight:700;color:var(--gold-light);}
+.hero-sub{font-family:'Montserrat',sans-serif;font-size:0.88rem;color:rgba(255,255,255,0.7);line-height:1.8;margin-bottom:16px;font-weight:300;}
+.hero-tags{font-size:0.72rem;color:rgba(201,169,110,0.8);margin-bottom:40px;letter-spacing:1px;}
+.hero-tags span{margin:0 4px;}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-family:'Montserrat',sans-serif;font-size:0.68rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:var(--tr);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--night);box-shadow:0 6px 24px rgba(201,169,110,0.45);}
+.btn-gold:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 12px 36px rgba(201,169,110,0.55);}
+.btn-glass{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);color:#fff;backdrop-filter:blur(10px);}
+.btn-glass:hover{background:rgba(255,255,255,0.18);border-color:rgba(201,169,110,0.5);transform:translateY(-3px);}
+.btn-link{background:none;border:none;color:rgba(255,255,255,0.7);font-size:0.72rem;padding:0;letter-spacing:1px;text-transform:none;display:flex;align-items:center;gap:6px;}
+.btn-link::after{content:'→';transition:transform 0.2s;}
+.btn-link:hover{color:#fff;}
+.btn-link:hover::after{transform:translateX(4px);}
+
+/* Hero right: doctor photo */
+.hero-right{display:flex;flex-direction:column;align-items:center;gap:24px;}
+.hero-photo-wrap{position:relative;display:inline-block;}
+.hero-photo{
+  width:340px;height:420px;border-radius:50% 50% 40% 40%/60% 60% 40% 40%;
+  background:linear-gradient(135deg,var(--sage),var(--secondary));
+  display:flex;align-items:center;justify-content:center;
+  font-size:8rem;overflow:hidden;position:relative;
+  box-shadow:0 0 60px rgba(168,197,181,0.3),0 0 120px rgba(201,169,110,0.15);
+  border:3px solid rgba(201,169,110,0.3);
+}
+.hero-photo-glow{position:absolute;inset:-20px;border-radius:inherit;background:radial-gradient(circle,rgba(201,169,110,0.2) 0%,transparent 70%);animation:glowPulse 3s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{opacity:0.5}50%{opacity:1}}
+.hero-rating{
+  position:absolute;bottom:-16px;right:-16px;
+  padding:14px 20px;border-radius:12px;
+  background:rgba(244,241,236,0.95);backdrop-filter:blur(10px);
+  border:1px solid var(--gold);
+  font-family:'Montserrat',sans-serif;text-align:center;
+  box-shadow:var(--shadow-md);animation:float3 3s ease-in-out infinite;
+}
+@keyframes float3{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.hero-rating-stars{color:var(--gold);font-size:0.8rem;margin-bottom:2px;}
+.hero-rating-text{font-size:0.58rem;font-weight:700;letter-spacing:1px;color:var(--primary);text-transform:uppercase;}
+
+/* Hero stats */
+.hero-stats{display:flex;gap:32px;margin-top:40px;flex-wrap:wrap;}
+.stat-item{text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--gold-light);line-height:1;}
+.stat-label{font-family:'Montserrat',sans-serif;font-size:0.55rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-top:4px;}
+.stat-div{width:1px;background:rgba(255,255,255,0.1);align-self:stretch;}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,0.4);font-size:0.55rem;letter-spacing:3px;text-transform:uppercase;cursor:pointer;animation:bounce 2s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(255,255,255,0.3),transparent);}
+
+/* ═══════════════════════════════════════
+   QUICK ACCESS BAR
+   ═══════════════════════════════════════ */
+.quick-bar{background:var(--night);padding:40px;}
+.quick-bar-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+.quick-card{
+  padding:28px 24px;border-radius:16px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);cursor:pointer;transition:var(--tr);
+  display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;
+}
+.quick-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(201,169,110,0.05));opacity:0;transition:var(--tr);}
+.quick-card:hover{transform:translateY(-6px);border-color:rgba(201,169,110,0.3);box-shadow:0 20px 50px rgba(0,0,0,0.4);}
+.quick-card:hover::before{opacity:1;}
+.quick-card.urgent{border-color:rgba(192,57,43,0.3);}
+.quick-card.urgent:hover{border-color:rgba(192,57,43,0.6);}
+.quick-icon{font-size:1.8rem;}
+.quick-title{font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;}
+.quick-desc{font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.6;}
+.quick-btn{font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:4px;margin-top:4px;transition:var(--tr);}
+.quick-card.urgent .quick-btn{color:#e74c3c;}
+.quick-card:hover .quick-btn{gap:8px;}
+
+/* ═══════════════════════════════════════
+   SECTIONS — COMMON
+   ═══════════════════════════════════════ */
+section{padding:100px 40px;}
+.section-inner{max-width:1200px;margin:0 auto;}
+.section-tag{display:inline-block;font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;position:relative;padding-left:30px;}
+.section-tag::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:20px;height:2px;background:var(--gold);}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:600;color:var(--primary);line-height:1.2;margin-bottom:20px;}
+.section-title span{color:var(--gold);}
+.section-sub{font-size:0.88rem;color:var(--secondary);max-width:560px;line-height:1.9;}
+
+/* Reveal animations */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.9s ease,transform 0.9s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-50px);transition:opacity 0.9s ease,transform 0.9s ease;}
+.reveal-left.visible{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(50px);transition:opacity 0.9s ease,transform 0.9s ease;}
+.reveal-right.visible{opacity:1;transform:translateX(0);}
+
+/* ═══════════════════════════════════════
+   ABOUT DR. NESTOR
+   ═══════════════════════════════════════ */
+.about{background:var(--ivory);}
+.about-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:80px;align-items:center;}
+.about-photo-area{display:flex;justify-content:center;}
+.about-photo{
+  width:360px;height:440px;
+  border-radius:60% 40% 55% 45%/50% 45% 55% 50%;
+  background:linear-gradient(135deg,var(--sage) 0%,var(--secondary) 60%,var(--primary) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:9rem;
+  position:relative;box-shadow:var(--shadow-lg);
+  border:4px solid rgba(168,197,181,0.4);transition:var(--tr);cursor:pointer;
+}
+.about-photo:hover{border-radius:50%;transform:scale(1.02);}
+.about-cert-badge{
+  position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;padding:10px 20px;border-radius:30px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--night);
+  box-shadow:0 6px 24px rgba(201,169,110,0.4);
+}
+.about-name{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--primary);margin-bottom:8px;}
+.about-role{font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:var(--gold);margin-bottom:24px;}
+.about-text{font-size:0.88rem;line-height:1.9;color:var(--anthracite);margin-bottom:28px;}
+.about-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;}
+.tag{padding:6px 14px;border-radius:30px;font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:rgba(44,62,107,0.07);border:1px solid rgba(44,62,107,0.15);color:var(--primary);transition:var(--tr);cursor:default;}
+.tag:hover{background:var(--primary);color:#fff;}
+.about-certs{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;}
+.cert-item{display:flex;align-items:center;gap:10px;font-size:0.8rem;color:var(--anthracite);}
+.cert-icon{font-size:1rem;flex-shrink:0;}
+.about-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#3a5080);color:#fff;box-shadow:var(--shadow-sm);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(44,62,107,0.35);}
+.btn-outline{background:transparent;border:2px solid var(--gold);color:var(--gold);}
+.btn-outline:hover{background:var(--gold);color:var(--night);transform:translateY(-3px);}
+
+/* ═══════════════════════════════════════
+   BOOKING SECTION
+   ═══════════════════════════════════════ */
+.booking{background:var(--night);}
+.booking .section-title{color:#fff;}
+.booking .section-sub{color:rgba(255,255,255,0.5);}
+.booking-options{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:50px;}
+.booking-card{
+  padding:36px;border-radius:20px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  transition:var(--tr);position:relative;overflow:hidden;
+}
+.booking-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--gold));transform:scaleX(0);transform-origin:left;transition:var(--tr);}
+.booking-card:hover{border-color:rgba(201,169,110,0.3);transform:translateY(-4px);}
+.booking-card:hover::before{transform:scaleX(1);}
+.booking-card-icon{font-size:2.5rem;margin-bottom:16px;display:block;}
+.booking-card-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:20px;}
+.booking-feat{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.booking-feat-item{display:flex;align-items:center;gap:10px;font-size:0.78rem;color:rgba(255,255,255,0.65);}
+.booking-feat-item::before{content:'✅';font-size:0.8rem;flex-shrink:0;}
+.booking-price{font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(255,255,255,0.4);margin-bottom:20px;}
+.booking-price strong{font-size:1.6rem;color:var(--gold-light);font-weight:700;}
+
+/* Booking widget */
+.booking-widget{margin-top:60px;padding:40px;border-radius:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);}
+.booking-steps{display:flex;justify-content:center;gap:0;margin-bottom:40px;overflow-x:auto;}
+.step{display:flex;align-items:center;}
+.step-circle{width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:0.75rem;font-weight:700;color:rgba(255,255,255,0.4);transition:var(--tr);flex-shrink:0;}
+.step.active .step-circle{border-color:var(--gold);color:var(--gold);background:rgba(201,169,110,0.1);}
+.step.done .step-circle{border-color:var(--sage);background:var(--sage);color:var(--night);}
+.step-label{font-family:'Montserrat',sans-serif;font-size:0.55rem;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-top:6px;text-align:center;text-transform:uppercase;display:block;}
+.step-line{width:60px;height:1px;background:rgba(255,255,255,0.1);flex-shrink:0;}
+.step-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.booking-form{display:flex;flex-direction:column;gap:16px;max-width:600px;margin:0 auto;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-family:'Montserrat',sans-serif;font-size:0.58rem;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);font-weight:600;}
+.form-input,.form-select,.form-textarea{
+  padding:13px 16px;border-radius:10px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+  color:#fff;font-family:'Lato',sans-serif;font-size:0.88rem;outline:none;transition:var(--tr);
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(201,169,110,0.5);background:rgba(255,255,255,0.08);box-shadow:0 0 0 3px rgba(201,169,110,0.1);}
+.form-input::placeholder,.form-textarea::placeholder{color:rgba(255,255,255,0.25);}
+.form-select option{background:#1A1A2E;color:#fff;}
+.rgpd-note{font-size:0.7rem;color:rgba(255,255,255,0.35);display:flex;align-items:flex-start;gap:8px;padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);}
+
+/* ═══════════════════════════════════════
+   TESTS SECTION
+   ═══════════════════════════════════════ */
+.tests{background:var(--ivory);}
+.tests-info{font-size:0.75rem;color:var(--secondary);background:rgba(44,62,107,0.05);border:1px solid var(--border);border-left:3px solid var(--secondary);padding:14px 20px;border-radius:8px;margin-bottom:50px;display:flex;align-items:center;gap:10px;}
+.tests-categories{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:40px;}
+.test-cat-btn{padding:8px 18px;border-radius:30px;font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--border);background:transparent;color:var(--anthracite);cursor:pointer;transition:var(--tr);}
+.test-cat-btn.active,.test-cat-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+.tests-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px;}
+.test-card{
+  padding:28px;border-radius:16px;background:#fff;border:1px solid var(--border);
+  transition:var(--tr);cursor:pointer;position:relative;overflow:hidden;
+}
+.test-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--gold));transform:scaleX(0);transform-origin:left;transition:var(--tr);}
+.test-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-md);}
+.test-card:hover::before{transform:scaleX(1);}
+.test-card-cat{font-family:'Montserrat',sans-serif;font-size:0.55rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--secondary);margin-bottom:10px;}
+.test-card-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--primary);margin-bottom:8px;line-height:1.3;}
+.test-card-desc{font-size:0.75rem;color:var(--anthracite);opacity:0.7;margin-bottom:14px;line-height:1.6;}
+.test-card-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.test-meta-item{font-size:0.62rem;color:var(--secondary);display:flex;align-items:center;gap:4px;}
+.test-card-badge{position:absolute;top:16px;right:16px;padding:3px 10px;border-radius:20px;font-size:0.5rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(168,197,181,0.2);color:var(--sage);border:1px solid rgba(168,197,181,0.4);}
+.test-card-badge.premium{background:rgba(201,169,110,0.1);color:var(--gold);border-color:rgba(201,169,110,0.3);}
+.btn-test{width:100%;padding:11px;border-radius:10px;background:var(--primary);color:#fff;font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;transition:var(--tr);}
+.btn-test:hover{background:var(--gold);color:var(--night);}
+
+/* ═══════════════════════════════════════
+   ARTICLES
+   ═══════════════════════════════════════ */
+.articles{background:#fff;}
+.articles-search{position:relative;max-width:600px;margin:0 auto 40px;}
+.articles-search input{width:100%;padding:16px 20px 16px 52px;border-radius:50px;border:2px solid var(--border);font-family:'Lato',sans-serif;font-size:0.88rem;outline:none;transition:var(--tr);background:var(--ivory);}
+.articles-search input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,169,110,0.1);}
+.articles-search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:1.1rem;color:var(--secondary);}
+.article-filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px;justify-content:center;}
+.filter-btn{padding:7px 16px;border-radius:20px;font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--border);background:transparent;color:var(--anthracite);cursor:pointer;transition:var(--tr);}
+.filter-btn.active,.filter-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+.article-hero-card{
+  border-radius:20px;overflow:hidden;margin-bottom:40px;
+  background:linear-gradient(135deg,var(--night),var(--primary));
+  display:grid;grid-template-columns:1fr 1fr;min-height:340px;
+  box-shadow:var(--shadow-lg);transition:var(--tr);cursor:pointer;
+}
+.article-hero-card:hover{transform:translateY(-4px);box-shadow:0 30px 80px rgba(44,62,107,0.2);}
+.article-hero-img{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 50%,var(--sage) 100%);display:flex;align-items:center;justify-content:center;font-size:6rem;position:relative;min-height:280px;}
+.article-hero-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent,rgba(26,26,46,0.5));}
+.article-hero-body{padding:40px;display:flex;flex-direction:column;justify-content:center;gap:14px;}
+.article-cat-tag{display:inline-block;padding:4px 12px;border-radius:20px;font-family:'Montserrat',sans-serif;font-size:0.55rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:rgba(201,169,110,0.15);color:var(--gold-light);border:1px solid rgba(201,169,110,0.3);}
+.article-hero-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#fff;line-height:1.3;}
+.article-hero-meta{font-size:0.68rem;color:rgba(255,255,255,0.45);display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+.articles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;}
+.article-card{border-radius:16px;overflow:hidden;border:1px solid var(--border);background:#fff;transition:var(--tr);cursor:pointer;}
+.article-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md);border-color:rgba(201,169,110,0.3);}
+.article-card-img{height:180px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:3.5rem;}
+.article-card-body{padding:22px;}
+.article-card-cat{font-family:'Montserrat',sans-serif;font-size:0.55rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.article-card-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:8px;line-height:1.4;}
+.article-card-excerpt{font-size:0.75rem;color:var(--secondary);line-height:1.7;margin-bottom:14px;}
+.article-card-meta{font-size:0.62rem;color:rgba(44,62,107,0.4);display:flex;gap:10px;}
+
+/* ═══════════════════════════════════════
+   FORUM PREVIEW
+   ═══════════════════════════════════════ */
+.forum{background:var(--night);}
+.forum .section-title{color:#fff;}
+.forum .section-sub{color:rgba(255,255,255,0.5);}
+.forum-charter{padding:20px 24px;border-radius:12px;background:rgba(168,197,181,0.08);border:1px solid rgba(168,197,181,0.2);margin-bottom:40px;font-size:0.8rem;color:rgba(255,255,255,0.6);line-height:1.7;}
+.forum-categories{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:40px;}
+.forum-cat{padding:18px 20px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);transition:var(--tr);cursor:pointer;}
+.forum-cat:hover{background:rgba(255,255,255,0.06);border-color:rgba(201,169,110,0.2);transform:translateX(4px);}
+.forum-cat-title{font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:700;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.forum-cat-count{font-size:0.6rem;color:rgba(255,255,255,0.3);}
+.forum-preview-posts{display:flex;flex-direction:column;gap:14px;margin-bottom:40px;}
+.forum-post{padding:20px 24px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);transition:var(--tr);cursor:pointer;}
+.forum-post:hover{background:rgba(255,255,255,0.06);border-color:rgba(201,169,110,0.2);}
+.forum-post-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.forum-post-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
+.forum-post-author{font-family:'Montserrat',sans-serif;font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.7);}
+.forum-post-time{font-size:0.58rem;color:rgba(255,255,255,0.3);}
+.forum-post-title{font-size:0.85rem;color:rgba(255,255,255,0.85);line-height:1.5;margin-bottom:10px;}
+.forum-post-actions{display:flex;gap:14px;}
+.forum-react{font-size:0.6rem;color:rgba(255,255,255,0.35);display:flex;align-items:center;gap:4px;cursor:pointer;transition:var(--tr);}
+.forum-react:hover{color:var(--gold);}
+
+/* ═══════════════════════════════════════
+   SUPPORT GROUPS
+   ═══════════════════════════════════════ */
+.groups{background:var(--ivory);}
+.groups-banner{
+  padding:44px;border-radius:20px;margin-bottom:60px;
+  background:linear-gradient(135deg,var(--night),var(--primary));
+  display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;
+  border:1px solid rgba(201,169,110,0.2);
+}
+.groups-banner-text h3{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#fff;margin-bottom:10px;}
+.groups-banner-text p{font-size:0.82rem;color:rgba(255,255,255,0.65);max-width:500px;line-height:1.7;margin-bottom:12px;}
+.groups-banner-badges{display:flex;gap:10px;flex-wrap:wrap;}
+.group-badge{padding:5px 14px;border-radius:20px;font-family:'Montserrat',sans-serif;font-size:0.55rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);}
+.groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
+.group-card{padding:26px;border-radius:14px;border:1px solid var(--border);background:#fff;transition:var(--tr);cursor:pointer;}
+.group-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:rgba(44,62,107,0.2);}
+.group-card-icon{font-size:1.8rem;margin-bottom:12px;display:block;}
+.group-card-title{font-family:'Montserrat',sans-serif;font-size:0.78rem;font-weight:700;color:var(--primary);margin-bottom:6px;letter-spacing:0.5px;}
+.group-card-desc{font-size:0.72rem;color:var(--secondary);line-height:1.6;margin-bottom:14px;}
+.group-card-meta{display:flex;justify-content:space-between;align-items:center;font-size:0.6rem;color:rgba(44,62,107,0.4);}
+.group-status{padding:3px 10px;border-radius:20px;font-family:'Montserrat',sans-serif;font-size:0.52rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;background:rgba(168,197,181,0.15);color:var(--sage);border:1px solid rgba(168,197,181,0.3);}
+
+/* ═══════════════════════════════════════
+   TESTIMONIALS
+   ═══════════════════════════════════════ */
+.testimonials{background:#fff;}
+.testimonials-stats{display:flex;gap:50px;justify-content:center;margin-bottom:60px;flex-wrap:wrap;}
+.ts-stat{text-align:center;}
+.ts-stat-num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:var(--primary);}
+.ts-stat-num sub{font-size:1.2rem;}
+.ts-stat-label{font-family:'Montserrat',sans-serif;font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--secondary);}
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;}
+.test-card-t{
+  padding:30px;border-radius:16px;background:var(--ivory);border:1px solid var(--border);
+  transition:var(--tr);cursor:default;
+}
+.test-card-t:hover{transform:translateY(-5px);box-shadow:var(--shadow-md);}
+.tc-stars{color:var(--gold);font-size:0.85rem;margin-bottom:16px;}
+.tc-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:0.9rem;color:var(--anthracite);line-height:1.8;margin-bottom:20px;}
+.tc-author{font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:1px;color:var(--primary);}
+.tc-detail{font-size:0.62rem;color:var(--secondary);margin-top:4px;}
+
+/* ═══════════════════════════════════════
+   ENGAGEMENT — DAILY FEATURES
+   ═══════════════════════════════════════ */
+.engage{background:var(--night);}
+.engage .section-title{color:#fff;}
+.engage .section-sub{color:rgba(255,255,255,0.5);}
+.engage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;margin-top:50px;}
+.engage-card{padding:28px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);transition:var(--tr);}
+.engage-card:hover{border-color:rgba(201,169,110,0.3);transform:translateY(-4px);background:rgba(255,255,255,0.07);}
+.engage-icon{font-size:2rem;margin-bottom:16px;display:block;}
+.engage-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:8px;}
+.engage-desc{font-size:0.75rem;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:16px;}
+.engage-btn{font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:4px;cursor:pointer;background:none;border:none;transition:var(--tr);}
+.engage-card:hover .engage-btn{gap:8px;}
+
+/* Mood wheel */
+.mood-wheel{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:24px;background:rgba(255,255,255,0.03);border-radius:16px;border:1px solid rgba(255,255,255,0.07);}
+.mood-emoji{font-size:2rem;cursor:pointer;padding:8px;border-radius:50%;transition:var(--tr);width:52px;height:52px;display:flex;align-items:center;justify-content:center;}
+.mood-emoji:hover,.mood-emoji.active{background:rgba(201,169,110,0.2);transform:scale(1.2);}
+
+/* Newsletter */
+.newsletter-box{padding:40px;border-radius:20px;background:linear-gradient(135deg,rgba(44,62,107,0.3),rgba(168,197,181,0.1));border:1px solid rgba(201,169,110,0.2);margin-top:40px;text-align:center;}
+.newsletter-box h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;margin-bottom:8px;}
+.newsletter-box p{font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:24px;}
+.newsletter-form{display:flex;gap:12px;max-width:440px;margin:0 auto;flex-wrap:wrap;justify-content:center;}
+.newsletter-form input{flex:1;min-width:220px;padding:13px 18px;border-radius:50px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-family:'Lato',sans-serif;font-size:0.88rem;outline:none;transition:var(--tr);}
+.newsletter-form input:focus{border-color:rgba(201,169,110,0.5);}
+.newsletter-form input::placeholder{color:rgba(255,255,255,0.3);}
+.newsletter-form .btn-gold{border:none;border-radius:50px;white-space:nowrap;}
+
+/* ═══════════════════════════════════════
+   CHATBOT LUMI
+   ═══════════════════════════════════════ */
+.chatbot-bubble{
+  position:fixed;bottom:28px;right:28px;z-index:5000;
+  width:60px;height:60px;border-radius:50%;cursor:pointer;
+  background:linear-gradient(135deg,var(--primary),var(--gold));
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;
+  box-shadow:0 8px 30px rgba(44,62,107,0.4);
+  animation:lumipulse 3s ease-in-out infinite;transition:var(--tr);
+}
+@keyframes lumipulse{0%,100%{box-shadow:0 8px 30px rgba(44,62,107,0.4)}50%{box-shadow:0 8px 40px rgba(201,169,110,0.5)}}
+.chatbot-bubble:hover{transform:scale(1.1);}
+.chatbot-window{
+  position:fixed;bottom:100px;right:28px;z-index:5000;
+  width:320px;border-radius:20px;overflow:hidden;
+  background:var(--night);border:1px solid rgba(201,169,110,0.2);
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  opacity:0;visibility:hidden;transform:translateY(20px) scale(0.95);
+  transition:var(--tr);transform-origin:bottom right;
+}
+.chatbot-window.open{opacity:1;visibility:visible;transform:translateY(0) scale(1);}
+.chatbot-header{padding:18px 20px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;gap:12px;}
+.chatbot-avatar{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.chatbot-name{font-family:'Montserrat',sans-serif;font-size:0.8rem;font-weight:700;color:#fff;}
+.chatbot-status{font-size:0.6rem;color:rgba(255,255,255,0.5);display:flex;align-items:center;gap:4px;}
+.chatbot-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#2ecc71;display:inline-block;}
+.chatbot-close{margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.1rem;cursor:pointer;}
+.chatbot-messages{padding:16px;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+.chatbot-msg{padding:12px 14px;border-radius:12px;font-size:0.78rem;line-height:1.6;}
+.chatbot-msg.bot{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);border-bottom-left-radius:4px;}
+.chatbot-msg.user{background:rgba(201,169,110,0.15);color:var(--gold-light);text-align:right;border-bottom-right-radius:4px;align-self:flex-end;}
+.chatbot-quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px;}
+.chatbot-quick-btn{padding:5px 10px;border-radius:20px;font-size:0.58rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);cursor:pointer;font-family:'Montserrat',sans-serif;transition:var(--tr);}
+.chatbot-quick-btn:hover{background:rgba(201,169,110,0.1);border-color:rgba(201,169,110,0.3);color:var(--gold-light);}
+.chatbot-input-area{padding:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:8px;}
+.chatbot-input{flex:1;padding:10px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;font-size:0.8rem;outline:none;font-family:'Lato',sans-serif;}
+.chatbot-send{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;cursor:pointer;font-size:0.9rem;transition:var(--tr);}
+.chatbot-send:hover{transform:scale(1.1);}
+
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
+footer{background:var(--night);padding:70px 40px 32px;}
+.footer-inner{max-width:1200px;margin:0 auto;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+.footer-brand-name{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:#fff;margin-bottom:4px;}
+.footer-brand-name span{color:var(--gold);}
+.footer-tagline{font-family:'Playfair Display',serif;font-style:italic;font-size:0.78rem;color:rgba(255,255,255,0.4);margin-bottom:16px;}
+.footer-desc{font-size:0.75rem;color:rgba(255,255,255,0.4);line-height:1.8;margin-bottom:24px;}
+.footer-socials{display:flex;gap:10px;}
+.social-btn{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:0.9rem;cursor:pointer;transition:var(--tr);text-decoration:none;}
+.social-btn:hover{background:rgba(201,169,110,0.15);border-color:rgba(201,169,110,0.3);transform:translateY(-2px);}
+.footer-col-title{font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-links a{color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.75rem;transition:var(--tr);display:flex;align-items:center;gap:6px;}
+.footer-links a::before{content:'';width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.2);flex-shrink:0;transition:var(--tr);}
+.footer-links a:hover{color:var(--gold-light);}
+.footer-links a:hover::before{background:var(--gold);}
+.footer-emergency{padding:20px 24px;border-radius:12px;background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.2);margin-bottom:32px;}
+.footer-emergency-title{font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e74c3c;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.footer-emergency-text{font-size:0.75rem;color:rgba(255,255,255,0.5);line-height:1.7;}
+.footer-emergency-text strong{color:rgba(255,255,255,0.7);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap;gap:16px;}
+.footer-copy{font-size:0.65rem;color:rgba(255,255,255,0.3);}
+.footer-lang-switch{display:flex;gap:10px;}
+.lang-sw-btn{padding:6px 14px;border-radius:20px;font-family:'Montserrat',sans-serif;font-size:0.55rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);cursor:pointer;transition:var(--tr);}
+.lang-sw-btn.active{background:rgba(201,169,110,0.15);border-color:rgba(201,169,110,0.3);color:var(--gold);}
+
+/* ═══════════════════════════════════════
+   NOTIFICATION TOAST
+   ═══════════════════════════════════════ */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--night);border:1px solid var(--gold);border-radius:12px;padding:12px 24px;font-size:0.78rem;font-family:'Montserrat',sans-serif;color:var(--gold-light);z-index:9999;transition:transform 0.35s ease;pointer-events:none;white-space:nowrap;box-shadow:0 12px 40px rgba(0,0,0,0.3);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════ */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;text-align:center;}
+  .hero-right{order:-1;}
+  .hero-btns{justify-content:center;}
+  .hero-stats{justify-content:center;}
+  .about-grid{grid-template-columns:1fr;}
+  .about-photo-area{margin-bottom:20px;}
+  .booking-options{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px;}
+  .quick-bar-inner{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+  .navbar{padding:0 20px;}
+  .nav-links{display:none;}
+  .hamburger{display:flex;}
+  section{padding:70px 20px;}
+  .hero{padding:80px 0 40px;}
+  .hero-inner{padding:0 20px;}
+  .hero-h1{font-size:2.6rem;}
+  .hero-photo{width:260px;height:320px;}
+  .quick-bar{padding:24px 20px;}
+  .quick-bar-inner{grid-template-columns:1fr 1fr;}
+  .article-hero-card{grid-template-columns:1fr;}
+  .article-hero-img{min-height:200px;}
+  .footer-grid{grid-template-columns:1fr;}
+  .footer-inner{padding:0;}
+  .chatbot-window{right:12px;width:calc(100vw - 24px);}
+  .hero-stats{gap:16px;}
+  .stat-div{display:none;}
+  .form-row{grid-template-columns:1fr;}
+  .booking-widget{padding:24px 16px;}
+}
+@media(max-width:480px){
+  .quick-bar-inner{grid-template-columns:1fr;}
+  .testimonials-stats{gap:24px;}
+}
+/* Mobile sticky CTA */
+.mobile-cta-bar{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:900;
+  background:var(--ivory);border-top:1px solid var(--border);padding:12px 16px;
+  box-shadow:0 -4px 20px rgba(44,62,107,0.1);
+}
+@media(max-width:768px){.mobile-cta-bar{display:flex;gap:10px;}}
+.mobile-cta-bar .btn{flex:1;justify-content:center;padding:12px 16px;font-size:0.6rem;}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ═══════════════════════════════
+     SPLASH — LANGUAGE SELECTION
+     ═══════════════════════════════ -->
+<div id="splash">
+  <div class="splash-particles" id="splashParticles"></div>
+  <div class="splash-logo">
+    <span class="splash-brain">🧠</span>
+    <div class="splash-name">Dr. Mike Nestor Sanders Duterval</div>
+    <div class="splash-title">L'Espace Nestor · Пространство Нестора</div>
+  </div>
+  <div class="splash-quote" id="splashQuote">"La paix intérieure commence par une seule décision."</div>
+  <div class="lang-cards">
+    <div class="lang-card fr" onclick="chooseLang('fr')">
+      <span class="lang-flag">🇫🇷</span>
+      <span class="lang-label">Continuer en Français</span>
+      <span class="lang-sub">Cormorant Garamond · Élégance</span>
+    </div>
+    <div class="lang-card ru" onclick="chooseLang('ru')">
+      <span class="lang-flag">🇷🇺</span>
+      <span class="lang-label">Продолжить на Русском</span>
+      <span class="lang-sub">Playfair Display · Изысканность</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     NAVBAR
+     ═══════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">🧠</div>
+    <div class="nav-logo-text">L'Espace <span>Nestor</span></div>
+  </a>
+  <ul class="nav-links">
+    <li class="active"><a href="#accueil">🏠 Accueil</a></li>
+    <li><a href="#about">👨‍⚕️ Dr. Nestor</a></li>
+    <li class="dropdown">
+      <a href="#booking">📅 Rendez-vous ▾</a>
+      <ul class="dropdown-menu">
+        <li><a href="#booking">🖥️ En ligne (Visio)</a></li>
+        <li><a href="#booking">🏥 En clinique</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a href="#tests">🧠 Tests ▾</a>
+      <ul class="dropdown-menu">
+        <li><a href="#tests">🧩 Test de QI</a></li>
+        <li><a href="#tests">💙 Tests émotionnels</a></li>
+        <li><a href="#tests">🎭 Personnalité</a></li>
+        <li><a href="#tests">→ Tous les tests</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a href="#articles">📚 Articles ▾</a>
+      <ul class="dropdown-menu">
+        <li><a href="#articles">🧠 Neurosciences</a></li>
+        <li><a href="#articles">💙 Émotions</a></li>
+        <li><a href="#articles">🎓 Éducation</a></li>
+        <li><a href="#articles">🌍 Société</a></li>
+        <li><a href="#articles">→ Voir tout</a></li>
+      </ul>
+    </li>
+    <li><a href="#forum">💬 Forum</a></li>
+    <li><a href="#groups">🤝 Groupes</a></li>
+    <li><a href="#" onclick="chooseLang('ru')" style="color:var(--secondary)">🇷🇺 Рус</a></li>
+  </ul>
+  <a href="#" class="nav-cta" onclick="openLogin()">🔐 Mon Espace</a>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <a href="#about" onclick="closeMobileMenu()">Dr. Nestor</a>
+  <a href="#booking" onclick="closeMobileMenu()">Rendez-vous</a>
+  <a href="#tests" onclick="closeMobileMenu()">Tests</a>
+  <a href="#articles" onclick="closeMobileMenu()">Articles</a>
+  <a href="#forum" onclick="closeMobileMenu()">Forum</a>
+  <a href="#groups" onclick="closeMobileMenu()">Groupes</a>
+</div>
+
+<!-- ═══════════════════════════════
+     HERO
+     ═══════════════════════════════ -->
+<section class="hero" id="accueil">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-particles" id="heroParticles"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">Cabinet de Psychologie Clinique — Certifié &amp; Reconnu</div>
+      <h1 class="hero-h1">
+        Votre esprit mérite<br>
+        <strong>un espace de paix</strong>
+      </h1>
+      <p class="hero-sub">Dr. Mike Nestor Sanders Duterval vous accompagne vers la compréhension de vous-même et votre épanouissement.</p>
+      <p class="hero-tags">
+        <span>Consultations individuelles</span>·
+        <span>Tests psychologiques certifiés</span>·
+        <span>Articles scientifiques</span>·
+        <span>Communauté bienveillante</span>
+      </p>
+      <div class="hero-btns">
+        <a href="#booking" class="btn btn-gold">📅 Prendre rendez-vous</a>
+        <a href="#tests" class="btn btn-glass">🧠 Test gratuit</a>
+        <button class="btn btn-link" onclick="scrollToId('forum')">💬 Rejoindre la communauté</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num" data-count="2000">0</div>
+          <div class="stat-label">Consultations</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" data-count="98">0</div>
+          <div class="stat-label">% Satisfaction</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" data-count="12">0</div>
+          <div class="stat-label">Pays</div>
+        </div>
+        <div class="stat-div"></div>
+        <div class="stat-item">
+          <div class="stat-num" data-count="847">0</div>
+          <div class="stat-label">Patients</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-photo-wrap">
+        <div class="hero-photo">
+          <div class="hero-photo-glow"></div>
+          🧑‍⚕️
+        </div>
+        <div class="hero-rating">
+          <div class="hero-rating-stars">⭐⭐⭐⭐⭐</div>
+          <div class="hero-rating-text">4.9/5 · 847 patients</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll" onclick="scrollToId('quick')">
+    <div class="scroll-line"></div>
+    <span>Défiler</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     QUICK ACCESS
+     ═══════════════════════════════ -->
+<div class="quick-bar" id="quick">
+  <div class="quick-bar-inner">
+    <div class="quick-card reveal" onclick="scrollToId('booking')">
+      <div class="quick-icon">📅</div>
+      <div class="quick-title">Rendez-vous</div>
+      <div class="quick-desc">En ligne ou en clinique, selon votre confort.</div>
+      <div class="quick-btn">Réserver →</div>
+    </div>
+    <div class="quick-card reveal" onclick="scrollToId('tests')">
+      <div class="quick-icon">🧠</div>
+      <div class="quick-title">Tests Psycho</div>
+      <div class="quick-desc">QI · Émotions · Personnalité · Cliniques</div>
+      <div class="quick-btn">Commencer →</div>
+    </div>
+    <div class="quick-card reveal" onclick="scrollToId('articles')">
+      <div class="quick-icon">📚</div>
+      <div class="quick-title">Articles</div>
+      <div class="quick-desc">Science · Société · Philosophie · Bien-être</div>
+      <div class="quick-btn">Explorer →</div>
+    </div>
+    <div class="quick-card urgent reveal" onclick="showToast('🆘 Urgence : appelez le 3114 (numéro national de prévention du suicide)')">
+      <div class="quick-icon">🆘</div>
+      <div class="quick-title">Aide Urgente</div>
+      <div class="quick-desc">Vous avez besoin d'aide maintenant ?</div>
+      <div class="quick-btn" style="color:#e74c3c">Contacter →</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     ABOUT DR. NESTOR
+     ═══════════════════════════════ -->
+<section class="about" id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-photo-area reveal-left">
+        <div style="position:relative;display:inline-block">
+          <div class="about-photo">🧑‍⚕️</div>
+          <div class="about-cert-badge">Psychologue Clinicien Certifié</div>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div class="section-tag">À propos</div>
+        <div class="about-name">Dr. Mike Nestor<br>Sanders Duterval</div>
+        <div class="about-role">Psychologue Clinicien · Spécialiste en Neurosciences Comportementales</div>
+        <p class="about-text">
+          Le Dr. Nestor Sanders Duterval a consacré sa carrière à l'exploration du lien entre le cerveau, les émotions et le comportement humain. Formé en Europe et en Amérique du Nord, il combine des approches thérapeutiques modernes — TCC, EMDR, psychanalyse intégrative — avec une vision profondément humaniste de la santé mentale.
+        </p>
+        <p class="about-text">Sa pratique est guidée par une conviction fondamentale : chaque individu porte en lui les ressources nécessaires pour évoluer, guérir et s'épanouir.</p>
+        <div class="about-tags">
+          <span class="tag">Anxiété &amp; Dépression</span>
+          <span class="tag">Traumatismes</span>
+          <span class="tag">Addictions</span>
+          <span class="tag">Troubles de la personnalité</span>
+          <span class="tag">Développement personnel</span>
+          <span class="tag">Thérapie de couple</span>
+          <span class="tag">Gestion des émotions</span>
+          <span class="tag">TDAH</span>
+        </div>
+        <div class="about-certs">
+          <div class="cert-item"><span class="cert-icon">🎓</span>Université de Montréal — Doctorat en Psychologie Clinique</div>
+          <div class="cert-item"><span class="cert-icon">🎓</span>APA Member — American Psychological Association</div>
+          <div class="cert-item"><span class="cert-icon">🎓</span>Certifié EMDR Europe</div>
+          <div class="cert-item"><span class="cert-icon">🎓</span>Superviseur clinique agréé</div>
+        </div>
+        <div class="about-btns">
+          <a href="#" class="btn btn-primary" onclick="showToast('📖 Biographie complète — bientôt disponible')">📖 Lire ma biographie</a>
+          <a href="#booking" class="btn btn-outline">📅 Prendre rendez-vous</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     BOOKING
+     ═══════════════════════════════ -->
+<section class="booking" id="booking">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag" style="color:var(--gold)">Planifier</div>
+      <h2 class="section-title" style="color:#fff">📅 Votre <span>Consultation</span></h2>
+      <p class="section-sub">En ligne ou en clinique — Selon vos besoins et votre confort</p>
+    </div>
+    <div class="booking-options">
+      <div class="booking-card reveal">
+        <span class="booking-card-icon">🖥️</span>
+        <div class="booking-card-title">Consultation en Ligne</div>
+        <div class="booking-feat">
+          <div class="booking-feat-item">Depuis chez vous, confortablement</div>
+          <div class="booking-feat-item">Zoom / Google Meet sécurisé</div>
+          <div class="booking-feat-item">Disponible 7j/7 (8h–22h)</div>
+          <div class="booking-feat-item">Paiement en ligne sécurisé</div>
+          <div class="booking-feat-item">Dossier médical confidentiel</div>
+        </div>
+        <div class="booking-price">Durée : 50 min · <strong>À partir de 80€</strong></div>
+        <button class="btn btn-gold" onclick="showToast('📅 Sélection d\'un créneau en ligne — Module en cours d\'intégration')">📅 Réserver en Ligne →</button>
+      </div>
+      <div class="booking-card reveal">
+        <span class="booking-card-icon">🏥</span>
+        <div class="booking-card-title">Consultation en Clinique</div>
+        <div class="booking-feat">
+          <div class="booking-feat-item">Cadre thérapeutique optimal</div>
+          <div class="booking-feat-item">Salle privée &amp; confidentielle</div>
+          <div class="booking-feat-item">Accès facile, parking disponible</div>
+          <div class="booking-feat-item">Accès PMR garanti</div>
+          <div class="booking-feat-item">Suivi dossier papier &amp; numérique</div>
+        </div>
+        <div class="booking-price">Durée : 50 min · <strong>À partir de 90€</strong></div>
+        <button class="btn btn-glass" onclick="showToast('📅 Réservation en clinique — Module en cours d\'intégration')">📅 Réserver en Clinique →</button>
+      </div>
+    </div>
+
+    <div class="booking-widget reveal">
+      <div class="booking-steps">
+        <div class="step-wrap"><div class="step active"><div class="step-circle">1</div></div><span class="step-label">Type</span></div>
+        <div class="step-line"></div>
+        <div class="step-wrap"><div class="step"><div class="step-circle">2</div></div><span class="step-label">Motif</span></div>
+        <div class="step-line"></div>
+        <div class="step-wrap"><div class="step"><div class="step-circle">3</div></div><span class="step-label">Créneaux</span></div>
+        <div class="step-line"></div>
+        <div class="step-wrap"><div class="step"><div class="step-circle">4</div></div><span class="step-label">Infos</span></div>
+        <div class="step-line"></div>
+        <div class="step-wrap"><div class="step"><div class="step-circle">5</div></div><span class="step-label">Confirmation</span></div>
+      </div>
+      <form class="booking-form" onsubmit="handleBooking(event)">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Prénom *</label><input type="text" class="form-input" placeholder="Prénom" required></div>
+          <div class="form-group"><label class="form-label">Nom *</label><input type="text" class="form-input" placeholder="Nom" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Email *</label><input type="email" class="form-input" placeholder="votre@email.com" required></div>
+          <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-input" placeholder="+33 6..."></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Motif de consultation</label>
+          <select class="form-select">
+            <option value="">— Sélectionner —</option>
+            <option>Anxiété &amp; Stress</option>
+            <option>Dépression</option>
+            <option>Traumatisme &amp; PTSD</option>
+            <option>Troubles relationnels</option>
+            <option>Développement personnel</option>
+            <option>Gestion des émotions</option>
+            <option>TDAH / Troubles cognitifs</option>
+            <option>Addictions</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message (optionnel)</label>
+          <textarea class="form-textarea" rows="3" placeholder="Décrivez brièvement ce qui vous amène..."></textarea>
+        </div>
+        <div class="rgpd-note">🔒 Toutes vos informations sont strictement confidentielles et protégées conformément au RGPD. Vos données de santé sont chiffrées et ne seront jamais partagées.</div>
+        <button type="submit" class="btn btn-gold" style="justify-content:center;font-size:0.72rem">📅 Envoyer ma demande de rendez-vous</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     TESTS
+     ═══════════════════════════════ -->
+<section class="tests" id="tests">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">Explorez votre esprit</div>
+      <h2 class="section-title">🧠 Tests <span>Psychologiques</span></h2>
+      <p class="section-sub">Des tests scientifiquement validés pour mieux vous comprendre</p>
+    </div>
+    <div class="tests-info reveal">ℹ️ Nos tests sont basés sur des protocoles cliniques reconnus. Ils ne remplacent pas un diagnostic professionnel.</div>
+    <div class="tests-categories reveal">
+      <button class="test-cat-btn active">Tous</button>
+      <button class="test-cat-btn">🧩 Cognition &amp; QI</button>
+      <button class="test-cat-btn">💙 Émotions</button>
+      <button class="test-cat-btn">🎭 Personnalité</button>
+      <button class="test-cat-btn">👫 Relations</button>
+      <button class="test-cat-btn">🧬 Cliniques</button>
+    </div>
+    <div class="tests-grid">
+      <div class="test-card reveal" onclick="startTest('Test de QI Standard')">
+        <div class="test-card-badge">Gratuit</div>
+        <div class="test-card-cat">🧩 Intelligence &amp; Cognition</div>
+        <div class="test-card-title">Test de QI Standard</div>
+        <div class="test-card-desc">Raisonnement logique, spatial et verbal. Découvrez votre quotient intellectuel.</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 40 questions</span><span class="test-meta-item">⏱️ 25 min</span></div>
+        <button class="btn-test">Commencer Gratuitement →</button>
+      </div>
+      <div class="test-card reveal" onclick="startTest('Intelligence Émotionnelle EQ')">
+        <div class="test-card-badge">Gratuit</div>
+        <div class="test-card-cat">💙 Émotions &amp; Bien-être</div>
+        <div class="test-card-title">Intelligence Émotionnelle — EQ</div>
+        <div class="test-card-desc">Mesurez votre capacité à reconnaître et gérer vos émotions et celles des autres.</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 30 questions</span><span class="test-meta-item">⏱️ 15 min</span></div>
+        <button class="btn-test">Commencer Gratuitement →</button>
+      </div>
+      <div class="test-card reveal" onclick="startTest('MBTI — 16 Personnalités')">
+        <div class="test-card-badge">Gratuit</div>
+        <div class="test-card-cat">🎭 Personnalité &amp; Identité</div>
+        <div class="test-card-title">MBTI — 16 Types de Personnalité</div>
+        <div class="test-card-desc">Découvrez votre profil : INTJ, ENFP… et comprenez comment vous percevez le monde.</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 35 questions</span><span class="test-meta-item">⏱️ 20 min</span></div>
+        <button class="btn-test">Commencer Gratuitement →</button>
+      </div>
+      <div class="test-card reveal" onclick="startTest('PHQ-9 Dépression')">
+        <div class="test-card-cat">💙 Clinique — Dépression</div>
+        <div class="test-card-title">Échelle PHQ-9 — Dépression</div>
+        <div class="test-card-desc">Protocole OMS de dépistage de la dépression. Résultats transmissibles au Dr. Nestor.</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 9 questions</span><span class="test-meta-item">⏱️ 5 min</span></div>
+        <button class="btn-test">Commencer →</button>
+      </div>
+      <div class="test-card reveal" onclick="startTest('GAD-7 Anxiété')">
+        <div class="test-card-cat">💙 Clinique — Anxiété</div>
+        <div class="test-card-title">Test d'Anxiété GAD-7</div>
+        <div class="test-card-desc">Évaluation du trouble anxieux généralisé selon le protocole clinique validé.</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 7 questions</span><span class="test-meta-item">⏱️ 5 min</span></div>
+        <button class="btn-test">Commencer →</button>
+      </div>
+      <div class="test-card reveal" onclick="startTest('Big Five OCEAN')">
+        <div class="test-card-cat">🎭 Personnalité</div>
+        <div class="test-card-title">Big Five — OCEAN</div>
+        <div class="test-card-desc">Les 5 grands traits de personnalité : Ouverture, Conscience, Extraversion, Agréabilité, Névrosisme.</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 50 questions</span><span class="test-meta-item">⏱️ 25 min</span></div>
+        <button class="btn-test">Commencer →</button>
+      </div>
+      <div class="test-card reveal" onclick="startTest('Test de Burnout — Maslach')">
+        <div class="test-card-cat">💙 Bien-être professionnel</div>
+        <div class="test-card-title">Test de Burnout — Maslach</div>
+        <div class="test-card-desc">Évaluez votre niveau d'épuisement professionnel avec l'échelle de Maslach (MBI).</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 22 questions</span><span class="test-meta-item">⏱️ 15 min</span></div>
+        <button class="btn-test">Commencer →</button>
+      </div>
+      <div class="test-card reveal" onclick="startTest('Ennéagramme Premium')">
+        <div class="test-card-badge premium">Premium</div>
+        <div class="test-card-cat">🎭 Personnalité Avancée</div>
+        <div class="test-card-title">Ennéagramme — 9 Types</div>
+        <div class="test-card-desc">Exploration profonde des 9 types de personnalité et de leurs dynamiques internes.</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 120 questions</span><span class="test-meta-item">⏱️ 35 min</span></div>
+        <button class="btn-test" onclick="showToast('🔐 Test Premium — Connexion requise'); event.stopPropagation();">Débloquer →</button>
+      </div>
+      <div class="test-card reveal" onclick="startTest('Test de Résilience')">
+        <div class="test-card-cat">💙 Bien-être</div>
+        <div class="test-card-title">Résilience Psychologique</div>
+        <div class="test-card-desc">Mesurez votre capacité à rebondir face à l'adversité et les épreuves de la vie.</div>
+        <div class="test-card-meta"><span class="test-meta-item">📝 25 questions</span><span class="test-meta-item">⏱️ 20 min</span></div>
+        <button class="btn-test">Commencer →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     ARTICLES
+     ═══════════════════════════════ -->
+<section class="articles" id="articles">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">La Gazette de l'Esprit</div>
+      <h2 class="section-title">📚 Articles & <span>Recherches</span></h2>
+      <p class="section-sub">Science, émotions et société — Écrits pour éclairer votre monde intérieur</p>
+    </div>
+    <div class="articles-search reveal">
+      <span class="articles-search-icon">🔍</span>
+      <input type="text" placeholder="Rechercher un article, un sujet, un symptôme..." onkeyup="filterArticles(this.value)">
+    </div>
+    <div class="article-filters reveal">
+      <button class="filter-btn active">Tous</button>
+      <button class="filter-btn">🧠 Cerveau</button>
+      <button class="filter-btn">💙 Émotions</button>
+      <button class="filter-btn">🎓 Éducation</button>
+      <button class="filter-btn">🌍 Société</button>
+      <button class="filter-btn">🔬 Neurosciences</button>
+      <button class="filter-btn">💭 Philosophie</button>
+      <button class="filter-btn">🧘 Bien-être</button>
+    </div>
+    <div class="article-hero-card reveal" onclick="showToast('📖 Article complet — bientôt disponible')">
+      <div class="article-hero-img">🧠</div>
+      <div class="article-hero-body">
+        <span class="article-cat-tag">Neurosciences</span>
+        <div class="article-hero-title">"Comment votre cerveau crée vos émotions : la révolution de la théorie des émotions construites"</div>
+        <div class="article-hero-meta">
+          <span>Dr. Mike Nestor Sanders Duterval</span>
+          <span>📅 Mai 2026</span>
+          <span>⏱️ 8 min</span>
+          <span>💙 4.2k lectures</span>
+        </div>
+        <div class="btn btn-gold" style="display:inline-flex;margin-top:8px;font-size:0.62rem">Lire l'article →</div>
+      </div>
+    </div>
+    <div class="articles-grid" id="articlesGrid">
+      <div class="article-card reveal" onclick="showToast('📖 Article — bientôt disponible')"><div class="article-card-img">🧪</div><div class="article-card-body"><div class="article-card-cat">Neurosciences</div><div class="article-card-title">Neuroplasticité : votre cerveau peut-il vraiment changer ?</div><div class="article-card-excerpt">Les dernières avancées scientifiques sur la capacité du cerveau adulte à se reconfigurer.</div><div class="article-card-meta"><span>⏱️ 6 min</span><span>💙 2.1k</span></div></div></div>
+      <div class="article-card reveal" onclick="showToast('📖 Article — bientôt disponible')"><div class="article-card-img">💙</div><div class="article-card-body"><div class="article-card-cat">Émotions</div><div class="article-card-title">La colère : ennemie ou alliée de votre santé mentale ?</div><div class="article-card-excerpt">Comprendre la colère pour mieux la canaliser et en faire une force de changement.</div><div class="article-card-meta"><span>⏱️ 5 min</span><span>💙 1.8k</span></div></div></div>
+      <div class="article-card reveal" onclick="showToast('📖 Article — bientôt disponible')"><div class="article-card-img">📱</div><div class="article-card-body"><div class="article-card-cat">Société</div><div class="article-card-title">Les réseaux sociaux et la santé mentale : bilan 2026</div><div class="article-card-excerpt">Une analyse rigoureuse des impacts des plateformes numériques sur notre psychologie.</div><div class="article-card-meta"><span>⏱️ 9 min</span><span>💙 3.4k</span></div></div></div>
+      <div class="article-card reveal" onclick="showToast('📖 Article — bientôt disponible')"><div class="article-card-img">😴</div><div class="article-card-body"><div class="article-card-cat">Bien-être</div><div class="article-card-title">Sommeil et santé mentale : le guide ultime</div><div class="article-card-excerpt">Pourquoi le sommeil est le pilier fondamental de votre équilibre psychologique.</div><div class="article-card-meta"><span>⏱️ 7 min</span><span>💙 2.9k</span></div></div></div>
+      <div class="article-card reveal" onclick="showToast('📖 Article — bientôt disponible')"><div class="article-card-img">🎓</div><div class="article-card-body"><div class="article-card-cat">Éducation</div><div class="article-card-title">L'éducation positive : ce que dit vraiment la recherche</div><div class="article-card-excerpt">Décryptage des preuves scientifiques derrière l'éducation bienveillante et ses limites.</div><div class="article-card-meta"><span>⏱️ 8 min</span><span>💙 1.5k</span></div></div></div>
+      <div class="article-card reveal" onclick="showToast('📖 Article — bientôt disponible')"><div class="article-card-img">🧘</div><div class="article-card-body"><div class="article-card-cat">Bien-être</div><div class="article-card-title">Le protocole anti-stress du Dr. Nestor en 7 étapes</div><div class="article-card-excerpt">Une méthode cliniquement validée pour réduire le stress chronique en moins de 21 jours.</div><div class="article-card-meta"><span>⏱️ 6 min</span><span>💙 4.7k</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FORUM
+     ═══════════════════════════════ -->
+<section class="forum" id="forum">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag" style="color:var(--gold)">L'Agora</div>
+      <h2 class="section-title" style="color:#fff">💬 Notre Espace de <span>Parole</span></h2>
+      <p class="section-sub">Un forum bienveillant pour partager, comprendre et ne pas être seul</p>
+    </div>
+    <div class="forum-charter reveal">🌿 Ici, chaque voix mérite d'être entendue. Bienveillance, respect et empathie sont nos piliers. Tous les messages sont modérés par notre équipe.</div>
+    <div style="display:flex;gap:12px;margin-bottom:36px" class="reveal">
+      <button class="btn btn-gold" onclick="showToast('✏️ Connexion requise pour poster — créez votre compte')">✏️ Partager mon vécu</button>
+      <button class="btn btn-glass">📋 Lire la charte</button>
+    </div>
+    <div class="forum-categories reveal">
+      <div class="forum-cat"><div class="forum-cat-title">💙 Anxiété &amp; Stress<span class="forum-cat-count" style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.3)">847 posts</span></div></div>
+      <div class="forum-cat"><div class="forum-cat-title">🌧️ Dépression<span class="forum-cat-count" style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.3)">612 posts</span></div></div>
+      <div class="forum-cat"><div class="forum-cat-title">⚡ Traumatismes &amp; PTSD<span class="forum-cat-count" style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.3)">398 posts</span></div></div>
+      <div class="forum-cat"><div class="forum-cat-title">💑 Relations &amp; Couple<span class="forum-cat-count" style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.3)">721 posts</span></div></div>
+      <div class="forum-cat"><div class="forum-cat-title">🌿 Développement personnel<span class="forum-cat-count" style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.3)">1.2k posts</span></div></div>
+      <div class="forum-cat"><div class="forum-cat-title">👨‍⚕️ Questions au Dr. Nestor<span class="forum-cat-count" style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.3)">203 posts</span></div></div>
+      <div class="forum-cat"><div class="forum-cat-title">🌟 Témoignages positifs<span class="forum-cat-count" style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.3)">489 posts</span></div></div>
+      <div class="forum-cat"><div class="forum-cat-title">🔥 Burnout &amp; Travail<span class="forum-cat-count" style="margin-left:auto;font-size:0.55rem;color:rgba(255,255,255,0.3)">334 posts</span></div></div>
+    </div>
+    <div class="forum-preview-posts reveal">
+      <div class="forum-post" onclick="showToast('💬 Connexion requise pour lire les discussions')">
+        <div class="forum-post-header">
+          <div class="forum-post-avatar">🌙</div>
+          <div><div class="forum-post-author">Lucie M. (pseudonyme)</div><div class="forum-post-time">Il y a 2 heures</div></div>
+          <div style="margin-left:auto;padding:3px 10px;border-radius:20px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.2);font-size:0.5rem;color:var(--gold);font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:1px">TÉMOIGNAGE</div>
+        </div>
+        <div class="forum-post-title">"Après 8 mois de thérapie, j'ai enfin compris pourquoi je fuyais les relations proches. Merci à cette communauté…"</div>
+        <div class="forum-post-actions"><span class="forum-react">💙 47</span><span class="forum-react">🤗 23</span><span class="forum-react">💬 12 réponses</span></div>
+      </div>
+      <div class="forum-post" onclick="showToast('💬 Connexion requise pour lire les discussions')">
+        <div class="forum-post-header">
+          <div class="forum-post-avatar">🌿</div>
+          <div><div class="forum-post-author">Anonyme</div><div class="forum-post-time">Il y a 5 heures</div></div>
+        </div>
+        <div class="forum-post-title">"Je traverse une période d'anxiété intense au travail. Comment gérez-vous les crises de panique en public ?"</div>
+        <div class="forum-post-actions"><span class="forum-react">💙 31</span><span class="forum-react">❤️ 19</span><span class="forum-react">💬 28 réponses</span></div>
+      </div>
+      <div class="forum-post" onclick="showToast('💬 Connexion requise pour lire les discussions')">
+        <div class="forum-post-header">
+          <div class="forum-post-avatar">⭐</div>
+          <div><div class="forum-post-author">Dr. Mike Nestor</div><div class="forum-post-time">Hier</div></div>
+          <div style="margin-left:auto;padding:3px 10px;border-radius:20px;background:rgba(168,197,181,0.1);border:1px solid rgba(168,197,181,0.2);font-size:0.5rem;color:var(--sage);font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:1px">👨‍⚕️ DR. NESTOR</div>
+        </div>
+        <div class="forum-post-title">"Réponse officielle : sur la question du deuil et du temps nécessaire pour guérir — voici ce que la recherche nous dit…"</div>
+        <div class="forum-post-actions"><span class="forum-react">💙 128</span><span class="forum-react">🤗 74</span><span class="forum-react">💬 45 réponses</span></div>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center">
+      <button class="btn btn-glass" onclick="showToast('💬 Créez votre compte pour rejoindre la communauté')">→ Rejoindre la discussion</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     SUPPORT GROUPS
+     ═══════════════════════════════ -->
+<section class="groups" id="groups">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag">Soutien &amp; Solidarité</div>
+      <h2 class="section-title">🤝 Groupes de <span>Soutien</span></h2>
+    </div>
+    <div class="groups-banner reveal">
+      <div class="groups-banner-text">
+        <h3>Vous luttez contre une dépendance ?</h3>
+        <p>"Vous n'êtes pas seul(e). Des dizaines de personnes comme vous se réunissent chaque semaine dans un espace sécurisé et bienveillant, animé par des professionnels formés."</p>
+        <div class="groups-banner-badges">
+          <span class="group-badge">🔒 100% Anonyme</span>
+          <span class="group-badge">✅ Gratuit</span>
+          <span class="group-badge">🌿 Sans jugement</span>
+          <span class="group-badge">👨‍⚕️ Supervisé</span>
+        </div>
+      </div>
+      <button class="btn btn-gold" onclick="showToast('🤝 Inscription aux groupes de soutien — Connexion requise')">📝 Trouver mon groupe →</button>
+    </div>
+    <div class="groups-grid">
+      <div class="group-card reveal"><span class="group-card-icon">🍷</span><div class="group-card-title">Groupe Alcool &amp; Substances</div><div class="group-card-desc">Soutien par les pairs, séances hebdomadaires confidentielles, animateur formé.</div><div class="group-card-meta"><span>8 participants</span><span class="group-status">Ouvert</span></div></div>
+      <div class="group-card reveal"><span class="group-card-icon">📱</span><div class="group-card-title">Addiction aux Écrans</div><div class="group-card-desc">Réseaux sociaux, gaming disorder, dépendance numérique — reprenez le contrôle.</div><div class="group-card-meta"><span>12 participants</span><span class="group-status">Ouvert</span></div></div>
+      <div class="group-card reveal"><span class="group-card-icon">🌧️</span><div class="group-card-title">Groupe Dépression</div><div class="group-card-desc">Espace bienveillant pour partager, écouter et ne plus se sentir seul face à la dépression.</div><div class="group-card-meta"><span>10 participants</span><span class="group-status">Ouvert</span></div></div>
+      <div class="group-card reveal"><span class="group-card-icon">💔</span><div class="group-card-title">Deuil &amp; Perte</div><div class="group-card-desc">Traversez le deuil entouré de personnes qui comprennent réellement ce que vous vivez.</div><div class="group-card-meta"><span>7 participants</span><span class="group-status">Ouvert</span></div></div>
+      <div class="group-card reveal"><span class="group-card-icon">⚡</span><div class="group-card-title">Survivants de Traumatismes</div><div class="group-card-desc">Un espace sûr pour les personnes en processus de guérison après un trauma.</div><div class="group-card-meta"><span>6 participants</span><span class="group-status">Ouvert</span></div></div>
+      <div class="group-card reveal"><span class="group-card-icon">🌈</span><div class="group-card-title">LGBTQ+ &amp; Santé Mentale</div><div class="group-card-desc">Espace inclusif et bienveillant pour les personnes LGBTQ+ et leurs questionnements.</div><div class="group-card-meta"><span>11 participants</span><span class="group-status">Ouvert</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     TESTIMONIALS
+     ═══════════════════════════════ -->
+<section class="testimonials" id="testimonials">
+  <div class="section-inner">
+    <div class="reveal" style="text-align:center;margin-bottom:20px">
+      <div class="section-tag" style="padding-left:0;margin:0 auto">— Témoignages —</div>
+      <h2 class="section-title">⭐ Ce qu'ils disent de <span>leur parcours</span></h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center">Témoignages anonymisés avec accord écrit des patients</p>
+    </div>
+    <div class="testimonials-stats reveal">
+      <div class="ts-stat"><div class="ts-stat-num" data-count="847">0</div><div class="ts-stat-label">Patients accompagnés</div></div>
+      <div class="ts-stat"><div class="ts-stat-num">4.9<sub>⭐</sub></div><div class="ts-stat-label">Note moyenne</div></div>
+      <div class="ts-stat"><div class="ts-stat-num" data-count="98">0</div><div class="ts-stat-label">% Recommandent</div></div>
+      <div class="ts-stat"><div class="ts-stat-num" data-count="12">0</div><div class="ts-stat-label">Pays de patients</div></div>
+    </div>
+    <div class="testimonials-grid">
+      <div class="test-card-t reveal"><div class="tc-stars">⭐⭐⭐⭐⭐</div><div class="tc-quote">"Après 3 mois de suivi, j'ai enfin compris pourquoi je sabotais mes relations. Ce travail a littéralement changé ma vie et ma façon d'aimer."</div><div class="tc-author">— M.L., 34 ans — Paris</div><div class="tc-detail">Thérapie TCC · 6 mois de suivi</div></div>
+      <div class="test-card-t reveal"><div class="tc-stars">⭐⭐⭐⭐⭐</div><div class="tc-quote">"Je souffrais d'anxiété sévère depuis des années. Le Dr. Nestor m'a donné des outils concrets et une compréhension de mes mécanismes que je n'aurais jamais trouvée seul."</div><div class="tc-author">— K.B., 28 ans — Montréal</div><div class="tc-detail">Anxiété &amp; Gestion du stress · 4 mois</div></div>
+      <div class="test-card-t reveal"><div class="tc-stars">⭐⭐⭐⭐⭐</div><div class="tc-quote">"La thérapie EMDR a transformé ma relation avec mon traumatisme d'enfance. Je n'aurais jamais cru pouvoir me sentir aussi libre un jour."</div><div class="tc-author">— S.R., 41 ans — Bruxelles</div><div class="tc-detail">EMDR &amp; Traumatisme · 8 mois</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     ENGAGEMENT
+     ═══════════════════════════════ -->
+<section class="engage" id="engage">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-tag" style="color:var(--gold)">Engagement quotidien</div>
+      <h2 class="section-title" style="color:#fff">Votre bien-être, <span>chaque jour</span></h2>
+      <p class="section-sub">Des outils pour cultiver votre santé mentale au quotidien</p>
+    </div>
+
+    <!-- Mood check-in -->
+    <div style="margin-top:40px" class="reveal">
+      <div style="font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center">📔 COMMENT VOUS SENTEZ-VOUS AUJOURD'HUI ?</div>
+      <div class="mood-wheel">
+        <div class="mood-emoji" onclick="selectMood(this,'😊')">😊</div>
+        <div class="mood-emoji" onclick="selectMood(this,'😌')">😌</div>
+        <div class="mood-emoji" onclick="selectMood(this,'😐')">😐</div>
+        <div class="mood-emoji" onclick="selectMood(this,'😔')">😔</div>
+        <div class="mood-emoji" onclick="selectMood(this,'😰')">😰</div>
+        <div class="mood-emoji" onclick="selectMood(this,'😢')">😢</div>
+        <div class="mood-emoji" onclick="selectMood(this,'😤')">😤</div>
+        <div class="mood-emoji" onclick="selectMood(this,'😴')">😴</div>
+        <div class="mood-emoji" onclick="selectMood(this,'🌟')">🌟</div>
+        <div class="mood-emoji" onclick="selectMood(this,'💪')">💪</div>
+      </div>
+    </div>
+
+    <div class="engage-grid">
+      <div class="engage-card reveal">
+        <span class="engage-icon">💭</span>
+        <div class="engage-title">Citation du Jour</div>
+        <div class="engage-desc">"La première et la plus grande victoire est de conquérir soi-même." — Platon</div>
+        <button class="engage-btn" onclick="newQuote()">Nouvelle citation →</button>
+      </div>
+      <div class="engage-card reveal">
+        <span class="engage-icon">✨</span>
+        <div class="engage-title">Exercice du Jour</div>
+        <div class="engage-desc">Cohérence cardiaque : 5 minutes de respiration 5-5 pour activer votre système parasympathique.</div>
+        <button class="engage-btn" onclick="showToast('🧘 Exercice du jour — démarrez en 3 respirations profondes')">Commencer →</button>
+      </div>
+      <div class="engage-card reveal">
+        <span class="engage-icon">🏆</span>
+        <div class="engage-title">Vos Badges</div>
+        <div class="engage-desc">Gagnez des badges en explorant le site : tests, articles, forum, check-ins quotidiens.</div>
+        <button class="engage-btn" onclick="showToast('🏆 Connexion requise pour accéder à vos badges')">Voir mes badges →</button>
+      </div>
+      <div class="engage-card reveal">
+        <span class="engage-icon">🎙️</span>
+        <div class="engage-title">Podcast "Dans ta Tête"</div>
+        <div class="engage-desc">Épisodes hebdomadaires du Dr. Nestor sur la psychologie, les émotions et le cerveau.</div>
+        <button class="engage-btn" onclick="showToast('🎙️ Podcast disponible sur Spotify &amp; Apple Podcasts')">Écouter →</button>
+      </div>
+    </div>
+    <div class="newsletter-box reveal">
+      <h3>📧 L'Éveil Hebdomadaire</h3>
+      <p>1 article · 1 exercice · 1 citation · Actualités psy — Chaque semaine dans votre boîte</p>
+      <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+        <input type="email" placeholder="votre@email.com" required>
+        <button type="submit" class="btn btn-gold">S'abonner Gratuitement</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FOOTER
+     ═══════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-emergency reveal">
+      <div class="footer-emergency-title">🆘 URGENCES PSYCHOLOGIQUES</div>
+      <div class="footer-emergency-text">Si vous êtes en danger ou en détresse immédiate : appelez le <strong>15 (SAMU)</strong> ou le <strong>3114 — Numéro national de prévention du suicide</strong> (disponible 24h/24, 7j/7, gratuit). Vous n'êtes pas seul(e).</div>
+    </div>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name">L'Espace <span>Nestor</span></div>
+        <div class="footer-tagline">"Votre havre de paix mental — Comprendre, Guérir, Évoluer"</div>
+        <p class="footer-desc">Cabinet de psychologie clinique du Dr. Mike Nestor Sanders Duterval. Consultations individuelles, tests psychologiques certifiés, communauté bienveillante.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn" title="Instagram">📸</a>
+          <a href="#" class="social-btn" title="LinkedIn">💼</a>
+          <a href="#" class="social-btn" title="YouTube">▶️</a>
+          <a href="#" class="social-btn" title="TikTok">🎵</a>
+          <a href="#" class="social-btn" title="Podcast">🎙️</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Le Cabinet</div>
+        <ul class="footer-links">
+          <li><a href="#about">À propos</a></li>
+          <li><a href="#about">Dr. Nestor</a></li>
+          <li><a href="#booking">Tarifs</a></li>
+          <li><a href="#booking">Réserver</a></li>
+          <li><a href="#" onclick="showToast('📞 Contact — bientôt disponible')">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Ressources</div>
+        <ul class="footer-links">
+          <li><a href="#tests">Tests psycho</a></li>
+          <li><a href="#articles">Articles</a></li>
+          <li><a href="#engage">Podcast</a></li>
+          <li><a href="#engage">Newsletter</a></li>
+          <li><a href="#engage">Ressources gratuites</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Légal</div>
+        <ul class="footer-links">
+          <li><a href="#" onclick="showToast('📄 Page en cours de rédaction')">Mentions légales</a></li>
+          <li><a href="#" onclick="showToast('📄 Page en cours de rédaction')">CGU</a></li>
+          <li><a href="#" onclick="showToast('📄 Page en cours de rédaction')">Vie privée &amp; RGPD</a></li>
+          <li><a href="#" onclick="showToast('📄 Page en cours de rédaction')">Cookies</a></li>
+          <li><a href="#" onclick="showToast('📄 Page en cours de rédaction')">Code déontologique</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Dr. Mike Nestor Sanders Duterval · L'Espace Nestor · Tous droits réservés · 🔒 Site sécurisé SSL</div>
+      <div class="footer-lang-switch">
+        <button class="lang-sw-btn active">🇫🇷 Français</button>
+        <button class="lang-sw-btn" onclick="chooseLang('ru')">🇷🇺 Русский</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Mobile CTA bar -->
+<div class="mobile-cta-bar">
+  <a href="#booking" class="btn btn-gold">📅 Rendez-vous</a>
+  <a href="#tests" class="btn btn-primary">🧠 Test gratuit</a>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Chatbot Lumi -->
+<div class="chatbot-bubble" id="chatBubble" onclick="toggleChat()">🌙</div>
+<div class="chatbot-window" id="chatWindow">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar">🌙</div>
+    <div>
+      <div class="chatbot-name">Lumi — Assistante IA</div>
+      <div class="chatbot-status">En ligne — Répond en quelques secondes</div>
+    </div>
+    <button class="chatbot-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chatbot-messages" id="chatMessages">
+    <div class="chatbot-msg bot">Bonjour 🌙 Je suis Lumi, votre guide sur L'Espace Nestor. Comment puis-je vous aider aujourd'hui ?</div>
+  </div>
+  <div class="chatbot-quick">
+    <div class="chatbot-quick-btn" onclick="sendQuick('Prendre rendez-vous')">📅 Rendez-vous</div>
+    <div class="chatbot-quick-btn" onclick="sendQuick('Tests disponibles')">🧠 Tests</div>
+    <div class="chatbot-quick-btn" onclick="sendQuick('J\'ai besoin d\'aide urgente')">🆘 Urgence</div>
+    <div class="chatbot-quick-btn" onclick="sendQuick('Rejoindre un groupe')">🤝 Groupes</div>
+  </div>
+  <div class="chatbot-input-area">
+    <input class="chatbot-input" id="chatInput" placeholder="Écrivez votre message..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chatbot-send" onclick="sendChat()">→</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════ -->
+<script>
+// ── CURSOR ─────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let cx = 0, cy = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { cx = e.clientX; cy = e.clientY; });
+function animCursor() {
+  rx += (cx - rx) * 0.12;
+  ry += (cy - ry) * 0.12;
+  cursor.style.left = cx + 'px';
+  cursor.style.top = cy + 'px';
+  cursorRing.style.left = rx + 'px';
+  cursorRing.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+document.addEventListener('mousedown', () => { cursor.style.transform = 'translate(-50%,-50%) scale(0.7)'; });
+document.addEventListener('mouseup', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; });
+
+// ── SPLASH ─────────────────────────────────────────
+const splashQuotes = {
+  fr: '"La paix intérieure commence par une seule décision."',
+  ru: '"Внутренний покой начинается с одного решения."'
+};
+// Splash particles
+const sp = document.getElementById('splashParticles');
+for (let i = 0; i < 60; i++) {
+  const p = document.createElement('div');
+  p.className = 'splash-particle';
+  p.style.cssText = `left:${Math.random()*100}%;--drift:${(Math.random()-0.5)*100}px;animation-duration:${4+Math.random()*8}s;animation-delay:${Math.random()*5}s;width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;opacity:${0.3+Math.random()*0.5}`;
+  sp.appendChild(p);
+}
+
+function chooseLang(lang) {
+  const splash = document.getElementById('splash');
+  splash.classList.add('hidden');
+  if (lang === 'ru') {
+    document.documentElement.lang = 'ru';
+    // Minimal Russian adaptation of key UI elements
+    document.querySelector('.nav-logo-text').innerHTML = 'Пространство <span>Нестора</span>';
+    document.querySelector('.hero-h1').innerHTML = 'Ваш разум заслуживает<br><strong>пространства покоя</strong>';
+    document.querySelector('.hero-badge').textContent = 'Клинический кабинет психологии — Сертифицированный';
+    showToast('🇷🇺 Версия на русском языке активирована');
+  }
+  sessionStorage.setItem('lang', lang);
+}
+
+// Auto-skip if lang already chosen
+if (sessionStorage.getItem('lang')) {
+  document.getElementById('splash').classList.add('hidden');
+}
+
+// ── NAVBAR ─────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+  revealOnScroll();
+  animateCounters();
+});
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.add('open');
+});
+function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); }
+
+// Filter buttons
+document.querySelectorAll('.test-cat-btn, .filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    this.closest('.tests-categories, .article-filters')?.querySelectorAll('.test-cat-btn, .filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// ── HERO PARTICLES ─────────────────────────────────
+const hp = document.getElementById('heroParticles');
+for (let i = 0; i < 25; i++) {
+  const p = document.createElement('div');
+  p.className = 'hero-particle';
+  const size = 2 + Math.random() * 5;
+  p.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${size}px;height:${size}px;animation-duration:${5+Math.random()*10}s;animation-delay:${Math.random()*5}s`;
+  hp.appendChild(p);
+}
+
+// ── SCROLL REVEAL ──────────────────────────────────
+function revealOnScroll() {
+  document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight - 80) el.classList.add('visible');
+  });
+}
+setTimeout(revealOnScroll, 200);
+
+// ── COUNTERS ───────────────────────────────────────
+let countersRun = false;
+function animateCounters() {
+  if (countersRun) return;
+  document.querySelectorAll('[data-count]').forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight) {
+      countersRun = true;
+      const target = parseInt(el.dataset.count);
+      const start = Date.now();
+      const dur = 1800;
+      const step = () => {
+        const t = Math.min((Date.now()-start)/dur, 1);
+        const eased = 1-Math.pow(1-t,3);
+        el.textContent = Math.round(eased*target);
+        if (t < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      };
+      step();
+    }
+  });
+}
+
+// ── SCROLL HELPER ──────────────────────────────────
+function scrollToId(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── TOAST ──────────────────────────────────────────
+let _tt;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+// ── BOOKING ────────────────────────────────────────
+function handleBooking(e) {
+  e.preventDefault();
+  showToast('📅 Demande envoyée ! Nous vous contactons dans les 24h.');
+  e.target.reset();
+}
+
+// ── NEWSLETTER ─────────────────────────────────────
+function handleNewsletter(e) {
+  e.preventDefault();
+  showToast('📧 Bienvenue dans L\'Éveil Hebdomadaire ! Confirmez votre email.');
+  e.target.reset();
+}
+
+// ── LOGIN MOCK ─────────────────────────────────────
+function openLogin() { showToast('🔐 Espace personnel — Bientôt disponible'); }
+
+// ── MOOD ───────────────────────────────────────────
+function selectMood(el, emoji) {
+  document.querySelectorAll('.mood-emoji').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  const msgs = { '😊':'Belle énergie ! Profitez de cette journée 🌟', '😌':'Sérénité — continuez à vous ancrer dans le présent.', '😐':'Journée neutre ? C\'est ok. Respirez.', '😔':'Moments difficiles. L\'exercice du jour peut aider.', '😰':'Anxiété détectée — essayez la cohérence cardiaque.', '😢':'Votre peine est valide. Vous n\'êtes pas seul(e).', '😤':'La colère vous parle — écoutez-la avec bienveillance.', '😴':'Fatigue profonde. Le sommeil est médecine.', '🌟':'Vous rayonnez aujourd\'hui !', '💪':'Énergie positive ! Partagez-la dans le forum.' };
+  showToast('💙 ' + (msgs[emoji] || 'Merci de vous être connecté à vous-même.'));
+}
+
+// ── QUOTE ──────────────────────────────────────────
+const quotes = [
+  '"La première et la plus grande victoire est de conquérir soi-même." — Platon',
+  '"Tout ce que nous sommes est le résultat de ce que nous avons pensé." — Bouddha',
+  '"On ne guérit pas une maladie en la niant." — Carl Gustav Jung',
+  '"Le bonheur n\'est pas quelque chose de tout fait. Il provient de vos actions." — Dalaï Lama',
+  '"Connaître les autres, c\'est sagesse. Se connaître soi-même, c\'est éveil." — Lao Tseu',
+  '"Entre stimulus et réponse, il y a un espace. Dans cet espace réside notre pouvoir." — Viktor Frankl',
+];
+let qIdx = 0;
+function newQuote() {
+  qIdx = (qIdx + 1) % quotes.length;
+  document.querySelector('.engage-card:first-child .engage-desc').textContent = quotes[qIdx];
+}
+
+// ── TEST START ─────────────────────────────────────
+function startTest(name) {
+  showToast(`🧠 "${name}" — Module de test en cours d'intégration. Connexion bientôt requise.`);
+}
+
+// ── ARTICLE FILTER ─────────────────────────────────
+function filterArticles(val) {
+  document.querySelectorAll('.article-card').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.style.display = (!val || text.includes(val.toLowerCase())) ? '' : 'none';
+  });
+}
+
+// ── CHATBOT LUMI ───────────────────────────────────
+function toggleChat() {
+  document.getElementById('chatWindow').classList.toggle('open');
+}
+const lumiReplies = {
+  default: ['Je suis là pour vous guider 🌙 Que puis-je faire pour vous ?', 'N\'hésitez pas à explorer nos tests ou à prendre rendez-vous.', 'Chaque question mérite une réponse. Je vous écoute.'],
+  rdv: '📅 Pour prendre rendez-vous, rendez-vous dans la section "Rendez-vous" ou cliquez ici : <a href="#booking" style="color:var(--gold)">Réserver →</a>',
+  test: '🧠 Nous proposons plus de 20 tests psychologiques validés. Découvrez-les dans la section "Tests".',
+  urgence: '🆘 Si vous êtes en danger immédiat, appelez le <strong>15</strong> ou le <strong>3114</strong> (prévention suicide, gratuit 24h/24). Je vous oriente vers l\'aide.',
+  groupe: '🤝 Nos groupes de soutien anonymes sont ouverts à tous. Rendez-vous dans la section "Groupes de soutien".',
+};
+function addMsg(text, role) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chatbot-msg ' + role;
+  div.innerHTML = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function sendQuick(text) {
+  addMsg(text, 'user');
+  setTimeout(() => {
+    if (text.toLowerCase().includes('rendez')) addMsg(lumiReplies.rdv, 'bot');
+    else if (text.toLowerCase().includes('test')) addMsg(lumiReplies.test, 'bot');
+    else if (text.toLowerCase().includes('urgent') || text.toLowerCase().includes('aide')) addMsg(lumiReplies.urgence, 'bot');
+    else if (text.toLowerCase().includes('groupe')) addMsg(lumiReplies.groupe, 'bot');
+    else addMsg(lumiReplies.default[Math.floor(Math.random()*3)], 'bot');
+  }, 700);
+}
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const val = input.value.trim();
+  if (!val) return;
+  addMsg(val, 'user');
+  input.value = '';
+  // Crisis detection
+  const crisis = ['suicid','mourir','en finir','plus envie de vivre','me tuer'];
+  if (crisis.some(w => val.toLowerCase().includes(w))) {
+    setTimeout(() => addMsg('🆘 Je vous entends. Ce que vous ressentez est important. Appelez immédiatement le <strong>3114</strong> (gratuit, 24h/24) — des professionnels sont là pour vous. Vous n\'êtes pas seul(e).', 'bot'), 600);
+    return;
+  }
+  const v = val.toLowerCase();
+  setTimeout(() => {
+    if (v.includes('rendez') || v.includes('consultat')) addMsg(lumiReplies.rdv, 'bot');
+    else if (v.includes('test') || v.includes('qi') || v.includes('anxiety')) addMsg(lumiReplies.test, 'bot');
+    else if (v.includes('groupe') || v.includes('addiction') || v.includes('alcool')) addMsg(lumiReplies.groupe, 'bot');
+    else if (v.includes('urgent') || v.includes('aide') || v.includes('danger')) addMsg(lumiReplies.urgence, 'bot');
+    else addMsg(lumiReplies.default[Math.floor(Math.random()*3)], 'bot');
+  }, 800);
+}
+</script>
+</body>
+</html>
