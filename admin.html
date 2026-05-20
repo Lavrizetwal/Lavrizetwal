@@ -2801,7 +2801,7 @@ window.grantTempAccess = async () => {
       status:       'active'
     });
     if (error) throw error;
-    showMsg('✅ Accès accordé à ' + emailVal + ' jusqu'à ' +
+    showMsg('✅ Accès accordé à ' + emailVal + " jusqu'à " +
       expiresAt.toLocaleString('fr-FR',{hour:'2-digit',minute:'2-digit'}), true);
     toast('✅ Accès temporaire accordé — ' + emailVal, 'success');
     const emailEl = document.getElementById('access-email'); if (emailEl) emailEl.value = '';
@@ -2852,22 +2852,30 @@ function renderAccessCard(acc) {
   const pct      = Math.max(0, Math.min(100, (remainMs / totalMs) * 100));
   const isLow    = pct < 20;
   const perms    = Array.isArray(acc.permissions) ? acc.permissions : JSON.parse(acc.permissions || '[]');
-  return '<div class="access-card" id="acard-' + acc.id + '">' +
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">' +
-    '<div>' +
-    '<div class="access-email">' + escH(acc.email) + '</div>' +
-    '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">Accordé par: ' + escH(acc.granted_by || '—') + '</div>' +
-    (acc.note ? '<div style="font-size:0.62rem;color:rgba(255,215,0,0.6);margin-top:2px;font-style:italic">' + escH(acc.note) + '</div>' : '') +
-    '</div>' +
-    '<button onclick="revokeAccess('' + acc.id + '')" style="padding:4px 10px;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:8px;color:#ff8888;font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;cursor:pointer;flex-shrink:0;transition:var(--tr)">🚫 Révoquer</button>' +
-    '</div>' +
-    '<div class="access-timer' + (isLow ? ' expiring' : '') + '" id="atimer-' + acc.id + '" data-expires="' + acc.expires_at + '">' + formatRemaining(remainMs) + '</div>' +
-    '<div class="access-progress"><div class="access-progress-bar' + (isLow ? ' low' : '') + '" id="apbar-' + acc.id + '" style="width:' + pct + '%"></div></div>' +
-    '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px">' +
-    perms.map(p => { const t = TEMP_ACCESS_TABS.find(x => x.id === p); return '<span class="perm-chip">' + (t ? t.label : p) + '</span>'; }).join('') +
-    '</div>' +
-    '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:8px">Expire: ' +
-    expires.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) + '</div></div>';
+  const revokeBtn = '<button onclick="revokeAccess(\'' + acc.id + '\')" style="padding:4px 10px;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:8px;color:#ff8888;font-family:Montserrat,sans-serif;font-size:0.58rem;font-weight:700;cursor:pointer;flex-shrink:0">\uD83D\uDEAB R\u00e9voquer</button>';
+  const noteHtml  = acc.note ? '<div style="font-size:0.62rem;color:rgba(255,215,0,0.6);margin-top:2px;font-style:italic">' + escH(acc.note) + '</div>' : '';
+  const permsHtml = perms.map(function(p) {
+    const t = TEMP_ACCESS_TABS.find(function(x){ return x.id === p; });
+    return '<span class="perm-chip">' + (t ? t.label : p) + '</span>';
+  }).join('');
+  const timerClass = 'access-timer' + (isLow ? ' expiring' : '');
+  const barClass   = 'access-progress-bar' + (isLow ? ' low' : '');
+  return [
+    '<div class="access-card" id="acard-' + acc.id + '">',
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">',
+    '<div>',
+    '<div class="access-email">' + escH(acc.email) + '</div>',
+    '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">Accord\u00e9 par: ' + escH(acc.granted_by || '\u2014') + '</div>',
+    noteHtml,
+    '</div>',
+    revokeBtn,
+    '</div>',
+    '<div class="' + timerClass + '" id="atimer-' + acc.id + '" data-expires="' + acc.expires_at + '">' + formatRemaining(remainMs) + '</div>',
+    '<div class="access-progress"><div class="' + barClass + '" id="apbar-' + acc.id + '" style="width:' + pct + '%"></div></div>',
+    '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px">' + permsHtml + '</div>',
+    '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:8px">Expire: ' + expires.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) + '</div>',
+    '</div>'
+  ].join('');
 }
 
 function formatRemaining(ms) {
