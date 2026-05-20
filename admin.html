@@ -1124,8 +1124,10 @@ async function onUserChange(user) {
   document.getElementById('nav-email').textContent = user.email;
   await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
   loadStats();
-  // Vérifier si l'utilisateur a des restrictions d'accès temporaires
-  await checkAndApplyTempRestrictions();
+  // Vérifier accès temporaires (défini plus bas — appel différé sûr)
+  if (typeof window.checkAndApplyTempRestrictions === 'function') {
+    await window.checkAndApplyTempRestrictions();
+  }
 }
 
 function show(id)   { document.getElementById(id)?.classList.add('show'); }
@@ -1227,7 +1229,9 @@ window.handleLogin = async () => {
     document.getElementById('nav-email').textContent = data.email;
     await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
     loadStats();
-    await checkAndApplyTempRestrictions();
+    if (typeof window.checkAndApplyTempRestrictions === 'function') {
+      await window.checkAndApplyTempRestrictions();
+    }
 
   } catch(fetchErr) {
     err.textContent = 'Erreur réseau. Vérifiez votre connexion internet.';
@@ -2993,8 +2997,8 @@ window.switchTab = (name) => {
   }
   _origSwitchTab(name);
   // Initialiser l'onglet accès temporaires à la demande
-  if (name === 'access') {
-    setTimeout(() => initAccessTab(), 50);
+  if (name === 'access' && typeof window.initAccessTab === 'function') {
+    setTimeout(() => window.initAccessTab(), 50);
   }
 };
 // Note: la vérification des accès temporaires est déclenchée
