@@ -1124,6 +1124,8 @@ async function onUserChange(user) {
   document.getElementById('nav-email').textContent = user.email;
   await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
   loadStats();
+  // Vérifier si l'utilisateur a des restrictions d'accès temporaires
+  await checkAndApplyTempRestrictions();
 }
 
 function show(id)   { document.getElementById(id)?.classList.add('show'); }
@@ -1225,6 +1227,7 @@ window.handleLogin = async () => {
     document.getElementById('nav-email').textContent = data.email;
     await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
     loadStats();
+    await checkAndApplyTempRestrictions();
 
   } catch(fetchErr) {
     err.textContent = 'Erreur réseau. Vérifiez votre connexion internet.';
@@ -1936,7 +1939,7 @@ function loadStats(){
 
 window.switchTab=(name)=>{
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    const tabs=['products','coming','add','sales','orders','notifications','scan','wash','history','analytics','calculator','settings'];
+    const tabs=['products','coming','add','sales','orders','notifications','scan','wash','history','analytics','calculator','settings','access'];
     b.classList.toggle('active',tabs[i]===name);
   });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -2979,33 +2982,23 @@ window.checkAndApplyTempRestrictions = async () => {
   applyTempAccessRestrictions(access.permissions);
 };
 
-// Patch switchTab pour bloquer accès non autorisés
+// Patch switchTab — bloque accès non autorisés pour users temporaires
+// IMPORTANT: capture APRÈS définition originale, patch sûr pour admins
 const _origSwitchTab = window.switchTab;
 window.switchTab = (name) => {
+  // currentTempPerms === null = admin principal = tout autorisé
   if (currentTempPerms !== null && !currentTempPerms.includes(name)) {
     toast('🔒 Accès non autorisé à cette section.', 'error');
     return;
   }
   _origSwitchTab(name);
-  if (name === 'access') initAccessTab();
+  // Initialiser l'onglet accès temporaires à la demande
+  if (name === 'access') {
+    setTimeout(() => initAccessTab(), 50);
+  }
 };
-
-// Observer l'apparition du panneau app pour déclencher la vérification
-const _appObserver = new MutationObserver((mutations) => {
-  mutations.forEach(m => {
-    if (m.type === 'attributes' && m.attributeName === 'class') {
-      const app = document.getElementById('app');
-      if (app && app.classList.contains('show') && currentUser) {
-        const email = currentUser.email ? currentUser.email.toLowerCase() : '';
-        if (!ADMIN_EMAILS.includes(email)) {
-          checkAndApplyTempRestrictions();
-        }
-      }
-    }
-  });
-});
-const _appEl = document.getElementById('app');
-if (_appEl) _appObserver.observe(_appEl, { attributes: true });
+// Note: la vérification des accès temporaires est déclenchée
+// directement dans onUserChange via checkAndApplyTempRestrictions()
 
 // ── SQL REQUIS (ajouter dans zetwal-setup-complet.sql) ────────
 // CREATE TABLE IF NOT EXISTS temp_access (
