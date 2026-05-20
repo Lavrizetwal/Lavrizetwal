@@ -1116,17 +1116,53 @@ function initAuth() {
 async function onUserChange(user) {
   if (!user) { showAuthWall(); return; }
   const email = user.email?.toLowerCase() || '';
-  if (!ADMIN_EMAILS.includes(email)) {
+
+  // ── Admin principal → accès complet ──
+  if (ADMIN_EMAILS.includes(email)) {
+    currentUser = user;
+    hide('auth-wall'); hide('denied-wall'); showEl('app');
+    document.getElementById('nav-email').textContent = user.email;
+    await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
+    loadStats();
+    return;
+  }
+
+  // ── Pas admin principal → vérifier accès temporaire Supabase ──
+  currentUser = user;
+  let tempAccess = null;
+  try {
+    const { data } = await db.from('temp_access').select('*')
+      .eq('email', email).eq('status','active')
+      .order('created_at',{ascending:false}).limit(1);
+    if (data && data.length) {
+      const acc = data[0];
+      if (new Date(acc.expires_at) > new Date()) {
+        tempAccess = {
+          permissions: Array.isArray(acc.permissions) ? acc.permissions : JSON.parse(acc.permissions || '[]'),
+          expiresAt:   new Date(acc.expires_at),
+          id:          acc.id
+        };
+      } else {
+        // Expirer automatiquement
+        await db.from('temp_access').update({status:'expired'}).eq('id', acc.id);
+      }
+    }
+  } catch(e) { console.warn('temp_access check:', e.message); }
+
+  if (!tempAccess) {
+    // Aucun accès valide → refuser
+    currentUser = null;
     hide('auth-wall'); show('denied-wall'); return;
   }
-  currentUser = user;
+
+  // Accès temporaire valide → afficher l'app avec restrictions
   hide('auth-wall'); hide('denied-wall'); showEl('app');
   document.getElementById('nav-email').textContent = user.email;
   await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
   loadStats();
-  // Vérifier accès temporaires (défini plus bas — appel différé sûr)
-  if (typeof window.checkAndApplyTempRestrictions === 'function') {
-    await window.checkAndApplyTempRestrictions();
+  // Appliquer les restrictions de permissions
+  if (typeof applyTempAccessRestrictions === 'function') {
+    applyTempAccessRestrictions(tempAccess.permissions);
   }
 }
 
@@ -1213,24 +1249,51 @@ window.handleLogin = async () => {
       btn.disabled=false; btn.innerHTML='Connexion'; return;
     }
 
-    // REST OK — vérifier que c'est un admin
+    // REST OK — vérifier admin principal ou accès temporaire
     const userEmail = (data.email || '').toLowerCase();
-    if (!ADMIN_EMAILS.includes(userEmail)) {
-      hide('auth-wall'); show('denied-wall');
-      btn.disabled=false; btn.innerHTML='Connexion'; return;
-    }
 
-    // Accès accordé via REST
-    currentUser = { email: data.email, uid: data.localId };
-    document.getElementById('auth-wall').classList.add('hidden');
-    document.getElementById('auth-wall').style.display = 'none';
-    document.getElementById('denied-wall').classList.remove('show');
-    document.getElementById('app').classList.add('show');
-    document.getElementById('nav-email').textContent = data.email;
-    await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
-    loadStats();
-    if (typeof window.checkAndApplyTempRestrictions === 'function') {
-      await window.checkAndApplyTempRestrictions();
+    if (ADMIN_EMAILS.includes(userEmail)) {
+      // Admin principal → accès complet
+      currentUser = { email: data.email, uid: data.localId };
+      document.getElementById('auth-wall').classList.add('hidden');
+      document.getElementById('auth-wall').style.display = 'none';
+      document.getElementById('denied-wall').classList.remove('show');
+      document.getElementById('app').classList.add('show');
+      document.getElementById('nav-email').textContent = data.email;
+      await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
+      loadStats();
+    } else {
+      // Non-admin → vérifier accès temporaire
+      let tempAccess = null;
+      try {
+        const { data: tdata } = await db.from('temp_access').select('*')
+          .eq('email', userEmail).eq('status','active')
+          .order('created_at',{ascending:false}).limit(1);
+        if (tdata && tdata.length && new Date(tdata[0].expires_at) > new Date()) {
+          const acc = tdata[0];
+          tempAccess = {
+            permissions: Array.isArray(acc.permissions) ? acc.permissions : JSON.parse(acc.permissions || '[]'),
+            expiresAt:   new Date(acc.expires_at)
+          };
+        }
+      } catch(e) { console.warn('temp_access REST check:', e.message); }
+
+      if (!tempAccess) {
+        hide('auth-wall'); show('denied-wall');
+        btn.disabled=false; btn.innerHTML='Connexion'; return;
+      }
+
+      currentUser = { email: data.email, uid: data.localId };
+      document.getElementById('auth-wall').classList.add('hidden');
+      document.getElementById('auth-wall').style.display = 'none';
+      document.getElementById('denied-wall').classList.remove('show');
+      document.getElementById('app').classList.add('show');
+      document.getElementById('nav-email').textContent = data.email;
+      await Promise.all([loadProducts(), loadWashRecords(), loadSales(), loadOrders(), loadNotifications(), loadRates()]);
+      loadStats();
+      if (typeof applyTempAccessRestrictions === 'function') {
+        applyTempAccessRestrictions(tempAccess.permissions);
+      }
     }
 
   } catch(fetchErr) {
