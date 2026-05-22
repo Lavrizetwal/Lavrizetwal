@@ -939,7 +939,7 @@
               <button onclick="selectAllPerms(true)"  style="padding:4px 12px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);border-radius:10px;color:var(--gold);cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700">Tout sélectionner</button>
               <button onclick="selectAllPerms(false)" style="padding:4px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;color:var(--text-muted);cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700">Tout désélectionner</button>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="perm-checkboxes"></div>
+            <div style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px;scrollbar-width:thin;scrollbar-color:var(--gold-deep) transparent" id="perm-checkboxes"></div>
           </div>
           <div class="field" style="margin-top:14px">
             <label>Note (optionnel)</label>
@@ -2705,390 +2705,311 @@ window.updatePricePreview = () => {
 };
 
 
-// ============================================================
-// ACCÈS TEMPORAIRES — SYSTÈME COMPLET (NOUVEAU)
-// ============================================================
 
-const TEMP_ACCESS_TABS = [
-  { id:'products',      label:'📦 Produits' },
-  { id:'coming',        label:'🕐 À Venir' },
-  { id:'add',           label:'➕ Ajouter Produit' },
-  { id:'sales',         label:'💰 Ventes' },
-  { id:'orders',        label:'📋 Commandes' },
-  { id:'notifications', label:'🔔 Notifications' },
-  { id:'scan',          label:'📷 Scanner QR' },
-  { id:'wash',          label:'🧾 Fiche Lavage' },
-  { id:'history',       label:'📋 Historique' },
-  { id:'analytics',     label:'📊 Analytics' },
-  { id:'calculator',    label:'🧮 Calculatrice' },
-  { id:'settings',      label:'⚙️ Paramètres' },
+// ================================================================
+// ACCES TEMPORAIRES v3
+// ================================================================
+
+var _tempDurationMin = 0;
+var _tempPermsActive = null;
+
+var TEMP_TABS = [
+  {id:'products',      label:'Produits'},
+  {id:'coming',        label:'A Venir'},
+  {id:'add',           label:'Ajouter Produit'},
+  {id:'sales',         label:'Ventes'},
+  {id:'orders',        label:'Commandes'},
+  {id:'notifications', label:'Notifications'},
+  {id:'scan',          label:'Scanner QR'},
+  {id:'wash',          label:'Fiche Lavage'},
+  {id:'history',       label:'Historique'},
+  {id:'analytics',     label:'Analytics'},
+  {id:'calculator',    label:'Calculatrice'},
+  {id:'settings',      label:'Parametres'}
 ];
 
-let selectedDurationMin = null;
-let accessCheckInterval = null;
-let currentTempPerms    = null;
-
-window.initAccessTab = async () => {
-  renderPermCheckboxes();
-  await loadAccessList();
-  await renderAccessLog();
+window.initAccessTab = function() {
+  _buildPermList();
+  _loadAccessList();
+  _loadAccessLog();
 };
 
-function renderPermCheckboxes() {
-  const container = document.getElementById('perm-checkboxes');
-  if (!container) return;
-  container.innerHTML = TEMP_ACCESS_TABS.map(t =>
-    '<label class="perm-checkbox" id="perm-label-' + t.id + '" onclick="togglePermLabel(this)">' +
-    '<input type="checkbox" id="perm-' + t.id + '" value="' + t.id + '">' +
-    '<span>' + t.label + '</span></label>'
-  ).join('');
+function _buildPermList() {
+  var box = document.getElementById('perm-checkboxes');
+  if (!box) return;
+  var html = '';
+  for (var i = 0; i < TEMP_TABS.length; i++) {
+    var t = TEMP_TABS[i];
+    html += '<label id="plbl-' + t.id + '" class="perm-checkbox" onclick="window._togglePerm(this)">'
+          + '<input type="checkbox" id="pchk-' + t.id + '" value="' + t.id + '">'
+          + '<span>' + t.label + '</span></label>';
+  }
+  box.innerHTML = html;
 }
 
-window.togglePermLabel = (label) => {
-  const cb = label.querySelector('input[type="checkbox"]');
+window._togglePerm = function(label) {
+  var cb = label.querySelector('input');
   if (!cb) return;
   cb.checked = !cb.checked;
-  label.classList.toggle('checked', cb.checked);
+  if (cb.checked) label.classList.add('checked');
+  else            label.classList.remove('checked');
 };
 
-window.selectDuration = (btn, min) => {
-  document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('selected'));
+window.selectDuration = function(btn, min) {
+  var btns = document.querySelectorAll('.dur-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
   btn.classList.add('selected');
-  selectedDurationMin = min;
-  const exp = new Date(Date.now() + min * 60000);
-  const preview = document.getElementById('access-expiry-preview');
-  if (preview) preview.innerHTML = '⏱ Expiration: <strong style="color:var(--gold)">' +
-    exp.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) + '</strong>';
+  _tempDurationMin = min;
+  var exp  = new Date(Date.now() + min * 60000);
+  var prev = document.getElementById('access-expiry-preview');
+  if (prev) {
+    prev.innerHTML = 'Expiration: <strong style="color:var(--gold)">'
+      + exp.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      + '</strong>';
+  }
 };
 
-window.selectAllPerms = (val) => {
-  TEMP_ACCESS_TABS.forEach(t => {
-    const cb    = document.getElementById('perm-' + t.id);
-    const label = document.getElementById('perm-label-' + t.id);
-    if (cb)    cb.checked = val;
-    if (label) label.classList.toggle('checked', val);
-  });
+window.selectAllPerms = function(val) {
+  for (var i = 0; i < TEMP_TABS.length; i++) {
+    var cb  = document.getElementById('pchk-' + TEMP_TABS[i].id);
+    var lbl = document.getElementById('plbl-' + TEMP_TABS[i].id);
+    if (cb)  cb.checked = val;
+    if (lbl) { if (val) lbl.classList.add('checked'); else lbl.classList.remove('checked'); }
+  }
 };
 
-window.grantTempAccess = async () => {
-  const emailVal = (document.getElementById('access-email')?.value || '').trim().toLowerCase();
-  const noteVal  = (document.getElementById('access-note')?.value  || '').trim();
-  const msgEl    = document.getElementById('access-grant-msg');
-  const showMsg  = (txt, ok) => {
+window.grantTempAccess = async function() {
+  var emailEl = document.getElementById('access-email');
+  var noteEl  = document.getElementById('access-note');
+  var emailVal = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  var noteVal  = noteEl  ? noteEl.value.trim()                : '';
+  var msgEl    = document.getElementById('access-grant-msg');
+
+  function showMsg(txt, ok) {
     if (!msgEl) return;
     msgEl.style.display = 'block';
     msgEl.style.color   = ok ? 'var(--green)' : 'var(--red)';
     msgEl.textContent   = txt;
-    setTimeout(() => { if(msgEl) msgEl.style.display = 'none'; }, 4000);
-  };
-  if (!emailVal || !emailVal.includes('@')) { showMsg('❌ Email invalide.', false); return; }
-  if (ADMIN_EMAILS.includes(emailVal)) { showMsg('❌ Cet email est déjà administrateur principal.', false); return; }
-  if (!selectedDurationMin) { showMsg('❌ Veuillez choisir une durée.', false); return; }
-  const perms = TEMP_ACCESS_TABS
-    .filter(t => document.getElementById('perm-' + t.id) && document.getElementById('perm-' + t.id).checked)
-    .map(t => t.id);
-  if (!perms.length) { showMsg('❌ Sélectionnez au moins une section.', false); return; }
-  const now       = new Date();
-  const expiresAt = new Date(now.getTime() + selectedDurationMin * 60000);
+    setTimeout(function(){ if(msgEl) msgEl.style.display = 'none'; }, 4000);
+  }
+
+  if (!emailVal || emailVal.indexOf('@') < 0) { showMsg('Email invalide.', false); return; }
+  if (ADMIN_EMAILS.indexOf(emailVal) >= 0)     { showMsg('Cet email est deja admin principal.', false); return; }
+  if (!_tempDurationMin)                        { showMsg('Choisissez une duree.', false); return; }
+
+  var perms = [];
+  for (var i = 0; i < TEMP_TABS.length; i++) {
+    var cb = document.getElementById('pchk-' + TEMP_TABS[i].id);
+    if (cb && cb.checked) perms.push(TEMP_TABS[i].id);
+  }
+  if (!perms.length) { showMsg('Selectionnez au moins une section.', false); return; }
+
+  var expiresAt = new Date(Date.now() + _tempDurationMin * 60000);
   try {
-    const { error } = await db.from('temp_access').insert({
+    var res = await db.from('temp_access').insert({
       email:        emailVal,
       granted_by:   currentUser ? currentUser.email : 'admin',
       permissions:  perms,
-      duration_min: selectedDurationMin,
+      duration_min: _tempDurationMin,
       expires_at:   expiresAt.toISOString(),
       note:         noteVal || null,
       status:       'active'
     });
-    if (error) throw error;
-    showMsg('✅ Accès accordé à ' + emailVal + " jusqu'à " +
-      expiresAt.toLocaleString('fr-FR',{hour:'2-digit',minute:'2-digit'}), true);
-    toast('✅ Accès temporaire accordé — ' + emailVal, 'success');
-    const emailEl = document.getElementById('access-email'); if (emailEl) emailEl.value = '';
-    const noteEl  = document.getElementById('access-note');  if (noteEl)  noteEl.value  = '';
-    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('selected'));
-    selectedDurationMin = null;
-    const prevEl = document.getElementById('access-expiry-preview'); if (prevEl) prevEl.innerHTML = '';
+    if (res.error) throw res.error;
+    showMsg('Acces accorde a ' + emailVal, true);
+    toast('Acces temporaire accorde !', 'success');
+    if (emailEl) emailEl.value = '';
+    if (noteEl)  noteEl.value  = '';
+    var btns = document.querySelectorAll('.dur-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    _tempDurationMin = 0;
+    var prev = document.getElementById('access-expiry-preview');
+    if (prev) prev.innerHTML = '';
     selectAllPerms(false);
-    await loadAccessList();
-    await renderAccessLog();
+    _loadAccessList();
+    _loadAccessLog();
   } catch(e) {
-    showMsg('❌ Erreur: ' + e.message, false);
-    toast('Erreur: ' + e.message + ' — Vérifiez que la table temp_access existe (voir SQL fourni).', 'error');
+    showMsg('Erreur: ' + e.message, false);
+    toast('Erreur: ' + e.message, 'error');
   }
 };
 
-window.loadAccessList = async () => {
-  const container = document.getElementById('access-list');
-  const countEl   = document.getElementById('access-active-count');
+window.loadAccessList = function() { _loadAccessList(); };
+
+async function _loadAccessList() {
+  var container = document.getElementById('access-list');
+  var countEl   = document.getElementById('access-active-count');
   if (!container) return;
+  container.innerHTML = '<div style="color:var(--text-muted);font-size:0.75rem;padding:20px;text-align:center">Chargement...</div>';
   try {
-    const { data, error } = await db.from('temp_access').select('*').eq('status','active').order('created_at',{ascending:false});
-    if (error) throw error;
-    const now    = new Date();
-    const active = (data || []).filter(a => new Date(a.expires_at) > now);
-    const expired = (data || []).filter(a => new Date(a.expires_at) <= now);
-    if (expired.length) {
-      await db.from('temp_access').update({status:'expired'}).in('id', expired.map(e => e.id));
+    var res = await db.from('temp_access').select('*').eq('status','active').order('created_at',{ascending:false});
+    if (res.error) throw res.error;
+    var now = new Date(), active = [], toExp = [];
+    var records = res.data || [];
+    for (var i = 0; i < records.length; i++) {
+      if (new Date(records[i].expires_at) > now) active.push(records[i]);
+      else toExp.push(records[i].id);
     }
-    if (countEl) countEl.textContent = active.length + ' accès actif' + (active.length > 1 ? 's' : '');
+    if (toExp.length) await db.from('temp_access').update({status:'expired'}).in('id', toExp);
+    if (countEl) countEl.textContent = active.length + ' acces actif' + (active.length > 1 ? 's' : '');
     if (!active.length) {
-      container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:0.75rem">🔒 Aucun accès temporaire actif.</div>';
+      container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:0.75rem">Aucun acces actif.</div>';
       return;
     }
-    container.innerHTML = active.map(a => renderAccessCard(a)).join('');
-    startAccessTimers();
+    var html = '';
+    for (var i = 0; i < active.length; i++) html += _renderCard(active[i]);
+    container.innerHTML = html;
+    _startTimers();
   } catch(e) {
-    container.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:16px">❌ ' + escH(e.message) +
-      '<br><small style="color:var(--text-muted)">Créez la table temp_access via le SQL dans zetwal-setup-complet.sql</small></div>';
+    container.innerHTML = '<div style="color:var(--red);font-size:0.72rem;padding:16px">Erreur: ' + escH(e.message)
+      + '<br><small>Verifiez que la table temp_access existe.</small></div>';
   }
-};
-
-function renderAccessCard(acc) {
-  const expires  = new Date(acc.expires_at);
-  const now      = new Date();
-  const totalMs  = acc.duration_min * 60000;
-  const remainMs = expires - now;
-  const pct      = Math.max(0, Math.min(100, (remainMs / totalMs) * 100));
-  const isLow    = pct < 20;
-  const perms    = Array.isArray(acc.permissions) ? acc.permissions : JSON.parse(acc.permissions || '[]');
-  const revokeBtn = '<button onclick="revokeAccess(\'' + acc.id + '\')" style="padding:4px 10px;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:8px;color:#ff8888;font-family:Montserrat,sans-serif;font-size:0.58rem;font-weight:700;cursor:pointer;flex-shrink:0">\uD83D\uDEAB R\u00e9voquer</button>';
-  const noteHtml  = acc.note ? '<div style="font-size:0.62rem;color:rgba(255,215,0,0.6);margin-top:2px;font-style:italic">' + escH(acc.note) + '</div>' : '';
-  const permsHtml = perms.map(function(p) {
-    const t = TEMP_ACCESS_TABS.find(function(x){ return x.id === p; });
-    return '<span class="perm-chip">' + (t ? t.label : p) + '</span>';
-  }).join('');
-  const timerClass = 'access-timer' + (isLow ? ' expiring' : '');
-  const barClass   = 'access-progress-bar' + (isLow ? ' low' : '');
-  return [
-    '<div class="access-card" id="acard-' + acc.id + '">',
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">',
-    '<div>',
-    '<div class="access-email">' + escH(acc.email) + '</div>',
-    '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px">Accord\u00e9 par: ' + escH(acc.granted_by || '\u2014') + '</div>',
-    noteHtml,
-    '</div>',
-    revokeBtn,
-    '</div>',
-    '<div class="' + timerClass + '" id="atimer-' + acc.id + '" data-expires="' + acc.expires_at + '">' + formatRemaining(remainMs) + '</div>',
-    '<div class="access-progress"><div class="' + barClass + '" id="apbar-' + acc.id + '" style="width:' + pct + '%"></div></div>',
-    '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px">' + permsHtml + '</div>',
-    '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:8px">Expire: ' + expires.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) + '</div>',
-    '</div>'
-  ].join('');
 }
 
-function formatRemaining(ms) {
-  if (ms <= 0) return 'Expiré';
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  const s = Math.floor((ms % 60000) / 1000);
-  if (h > 0) return h + 'h ' + String(m).padStart(2,'0') + 'm';
-  return m + 'm ' + String(s).padStart(2,'0') + 's';
+function _renderCard(acc) {
+  var expires  = new Date(acc.expires_at);
+  var now      = new Date();
+  var totalMs  = (acc.duration_min || 60) * 60000;
+  var remainMs = expires - now;
+  var pct      = Math.max(0, Math.min(100, (remainMs / totalMs) * 100));
+  var isLow    = pct < 20;
+  var perms    = [];
+  try { perms = Array.isArray(acc.permissions) ? acc.permissions : JSON.parse(acc.permissions || '[]'); } catch(e){}
+  var permsHtml = '';
+  for (var i = 0; i < perms.length; i++) {
+    var lbl = perms[i];
+    for (var j = 0; j < TEMP_TABS.length; j++) { if (TEMP_TABS[j].id === perms[i]) { lbl = TEMP_TABS[j].label; break; } }
+    permsHtml += '<span class="perm-chip">' + escH(lbl) + '</span>';
+  }
+  var expStr   = expires.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  var noteHtml = acc.note ? '<div style="font-size:0.62rem;color:rgba(255,215,0,0.6);margin-top:2px;font-style:italic">' + escH(acc.note) + '</div>' : '';
+  var timerCls = 'access-timer' + (isLow ? ' expiring' : '');
+  var barCls   = 'access-progress-bar' + (isLow ? ' low' : '');
+  var btnStyle = 'padding:4px 10px;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:8px;color:#ff8888;font-family:Montserrat,sans-serif;font-size:0.58rem;font-weight:700;cursor:pointer';
+  // Build button using element creation approach via data attribute
+  var div = document.createElement('div');
+  div.className = 'access-card';
+  div.id = 'acard-' + acc.id;
+  div.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+    + '<div><div class="access-email">' + escH(acc.email) + '</div>'
+    + '<div style="font-size:0.6rem;color:var(--text-muted)">Par: ' + escH(acc.granted_by || '') + '</div>'
+    + noteHtml + '</div>'
+    + '<button data-revoke-id="' + escH(acc.id) + '" style="' + btnStyle + '">Revoquer</button>'
+    + '</div>'
+    + '<div class="' + timerCls + '" id="atimer-' + acc.id + '" data-expires="' + acc.expires_at + '">' + _fmtRemaining(remainMs) + '</div>'
+    + '<div class="access-progress"><div class="' + barCls + '" id="apbar-' + acc.id + '" style="width:' + pct + '%"></div></div>'
+    + '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px">' + permsHtml + '</div>'
+    + '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:8px">Expire: ' + expStr + '</div>';
+  // Attach event listener to avoid any quote issues
+  var rBtn = div.querySelector('[data-revoke-id]');
+  if (rBtn) {
+    rBtn.addEventListener('click', function() { window.revokeAccess(this.getAttribute('data-revoke-id')); });
+  }
+  return div.outerHTML;
 }
 
-function startAccessTimers() {
-  if (accessCheckInterval) clearInterval(accessCheckInterval);
-  accessCheckInterval = setInterval(() => {
-    const now = new Date();
-    document.querySelectorAll('[id^="atimer-"]').forEach(el => {
-      const id      = el.id.replace('atimer-', '');
-      const expires = new Date(el.dataset.expires);
-      const rem     = expires - now;
-      el.textContent = formatRemaining(rem);
+function _fmtRemaining(ms) {
+  if (ms <= 0) return 'Expire';
+  var h = Math.floor(ms / 3600000);
+  var m = Math.floor((ms % 3600000) / 60000);
+  var s = Math.floor((ms % 60000) / 1000);
+  if (h > 0) return h + 'h ' + (m < 10 ? '0' : '') + m + 'm';
+  return m + 'm ' + (s < 10 ? '0' : '') + s + 's';
+}
+
+var _accessTimer = null;
+function _startTimers() {
+  if (_accessTimer) clearInterval(_accessTimer);
+  _accessTimer = setInterval(function() {
+    var now = new Date();
+    var els = document.querySelectorAll('[id^="atimer-"]');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i], id = el.id.replace('atimer-','');
+      var rem = new Date(el.getAttribute('data-expires')) - now;
+      el.textContent = _fmtRemaining(rem);
       if (rem <= 0) {
         el.className = 'access-timer expired-txt';
-        const card = document.getElementById('acard-' + id);
+        var card = document.getElementById('acard-' + id);
         if (card) card.classList.add('expired');
-        const pbar = document.getElementById('apbar-' + id);
+        var pbar = document.getElementById('apbar-' + id);
         if (pbar) { pbar.style.width = '0%'; pbar.classList.add('low'); }
-        db.from('temp_access').update({status:'expired'}).eq('id', id).then(() => {
-          setTimeout(() => loadAccessList(), 2000);
-        });
+        (function(xid){ db.from('temp_access').update({status:'expired'}).eq('id',xid).then(function(){ setTimeout(_loadAccessList,1500); }); })(id);
       } else if (rem < 600000) {
         el.className = 'access-timer expiring';
       }
-    });
+    }
   }, 1000);
 }
 
-window.revokeAccess = async (id) => {
-  if (!confirm('Révoquer cet accès immédiatement ?')) return;
+window.revokeAccess = async function(id) {
+  if (!confirm('Revoquer cet acces ?')) return;
   try {
-    const { error } = await db.from('temp_access').update({status:'revoked'}).eq('id', id);
-    if (error) throw error;
-    toast('✅ Accès révoqué', 'success');
-    await loadAccessList();
-    await renderAccessLog();
+    var res = await db.from('temp_access').update({status:'revoked'}).eq('id', id);
+    if (res.error) throw res.error;
+    toast('Acces revoque', 'success');
+    _loadAccessList();
+    _loadAccessLog();
   } catch(e) { toast('Erreur: ' + e.message, 'error'); }
 };
 
-window.renderAccessLog = async () => {
-  const tbody = document.getElementById('access-log-body');
+async function _loadAccessLog() {
+  var tbody = document.getElementById('access-log-body');
   if (!tbody) return;
   try {
-    const { data, error } = await db.from('temp_access').select('*').order('created_at',{ascending:false}).limit(50);
-    if (error) throw error;
-    if (!data || !data.length) {
+    var res = await db.from('temp_access').select('*').order('created_at',{ascending:false}).limit(50);
+    if (res.error) throw res.error;
+    var data = res.data || [];
+    if (!data.length) {
       tbody.innerHTML = '<tr><td colspan="8" style="color:var(--text-muted);padding:20px;text-align:center">Aucun enregistrement.</td></tr>';
       return;
     }
-    const sStyle = {
-      active:  'background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2)',
-      expired: 'background:rgba(255,255,255,0.04);color:var(--text-muted);border:1px solid rgba(255,255,255,0.08)',
-      revoked: 'background:rgba(255,68,68,0.1);color:var(--red);border:1px solid rgba(255,68,68,0.2)'
-    };
-    const sLabel = {active:'✅ Actif', expired:'⏱ Expiré', revoked:'🚫 Révoqué'};
-    tbody.innerHTML = data.map(a => {
-      const perms = Array.isArray(a.permissions) ? a.permissions : JSON.parse(a.permissions || '[]');
-      const dur   = a.duration_min >= 60 ? (a.duration_min / 60) + 'h' : a.duration_min + 'min';
-      return '<tr>' +
-        '<td style="font-weight:600">' + escH(a.email) + '</td>' +
-        '<td style="font-size:0.68rem;color:var(--text-muted)">' + escH(a.granted_by || '—') + '</td>' +
-        '<td style="color:var(--gold);font-weight:700">' + dur + '</td>' +
-        '<td>' + perms.slice(0,4).map(p => '<span class="perm-chip" style="font-size:0.5rem;padding:1px 7px">' + p + '</span>').join('') +
-        (perms.length > 4 ? '<span class="perm-chip" style="font-size:0.5rem;padding:1px 7px">+' + (perms.length-4) + '</span>' : '') + '</td>' +
-        '<td style="font-size:0.68rem;color:var(--text-muted);font-style:italic">' + escH(a.note || '—') + '</td>' +
-        '<td style="font-size:0.65rem;color:var(--text-muted)">' + (a.created_at ? new Date(a.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—') + '</td>' +
-        '<td style="font-size:0.65rem;color:var(--text-muted)">' + (a.expires_at ? new Date(a.expires_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—') + '</td>' +
-        '<td><span style="' + (sStyle[a.status] || '') + ';border-radius:10px;padding:3px 10px;font-size:0.6rem;font-weight:700">' + (sLabel[a.status] || a.status) + '</span></td>' +
-        '</tr>';
-    }).join('');
+    var rows = '';
+    for (var i = 0; i < data.length; i++) {
+      var a = data[i];
+      var perms = [];
+      try { perms = Array.isArray(a.permissions) ? a.permissions : JSON.parse(a.permissions || '[]'); } catch(e){}
+      var dur = a.duration_min >= 60 ? (a.duration_min/60) + 'h' : a.duration_min + 'min';
+      var ph = '';
+      for (var k = 0; k < Math.min(perms.length,4); k++) ph += '<span class="perm-chip" style="font-size:0.5rem;padding:1px 7px">' + escH(perms[k]) + '</span>';
+      if (perms.length > 4) ph += '<span class="perm-chip" style="font-size:0.5rem;padding:1px 7px">+' + (perms.length-4) + '</span>';
+      var sty = a.status==='active' ? 'background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2)'
+              : a.status==='revoked' ? 'background:rgba(255,68,68,0.1);color:var(--red);border:1px solid rgba(255,68,68,0.2)'
+              : 'background:rgba(255,255,255,0.04);color:var(--text-muted);border:1px solid rgba(255,255,255,0.08)';
+      var slbl = a.status==='active' ? 'Actif' : a.status==='revoked' ? 'Revoque' : 'Expire';
+      var cd = a.created_at ? new Date(a.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+      var ed = a.expires_at ? new Date(a.expires_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+      rows += '<tr>'
+        + '<td style="font-weight:600">' + escH(a.email||'') + '</td>'
+        + '<td style="font-size:0.68rem;color:var(--text-muted)">' + escH(a.granted_by||'') + '</td>'
+        + '<td style="color:var(--gold);font-weight:700">' + dur + '</td>'
+        + '<td>' + ph + '</td>'
+        + '<td style="font-size:0.68rem;color:var(--text-muted);font-style:italic">' + escH(a.note||'') + '</td>'
+        + '<td style="font-size:0.65rem;color:var(--text-muted)">' + cd + '</td>'
+        + '<td style="font-size:0.65rem;color:var(--text-muted)">' + ed + '</td>'
+        + '<td><span style="' + sty + ';border-radius:10px;padding:3px 10px;font-size:0.6rem;font-weight:700">' + slbl + '</span></td>'
+        + '</tr>';
+    }
+    tbody.innerHTML = rows;
   } catch(e) {
-    tbody.innerHTML = '<tr><td colspan="8" style="color:var(--red);font-size:0.72rem;padding:16px">❌ ' + escH(e.message) + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="color:var(--red);font-size:0.72rem;padding:16px">' + escH(e.message) + '</td></tr>';
   }
-};
+}
 
-async function checkTempUserAccess(email) {
-  if (!email) return null;
-  try {
-    const { data, error } = await db.from('temp_access').select('*')
-      .eq('email', email.toLowerCase()).eq('status','active')
-      .order('created_at',{ascending:false}).limit(1);
-    if (error || !data || !data.length) return null;
-    const acc     = data[0];
-    const expires = new Date(acc.expires_at);
-    if (expires <= new Date()) {
-      await db.from('temp_access').update({status:'expired'}).eq('id', acc.id);
-      return null;
+// Patch switchTab
+(function() {
+  var _orig = window.switchTab;
+  if (!_orig) return;
+  window.switchTab = function(name) {
+    if (_tempPermsActive !== null && _tempPermsActive.indexOf(name) < 0) {
+      toast('Acces non autorise', 'error');
+      return;
     }
-    return {
-      permissions: Array.isArray(acc.permissions) ? acc.permissions : JSON.parse(acc.permissions || '[]'),
-      expiresAt:   expires,
-      id:          acc.id
-    };
-  } catch(e) { return null; }
-}
+    _orig(name);
+    if (name === 'access') setTimeout(function(){ window.initAccessTab(); }, 80);
+  };
+})();
 
-function applyTempAccessRestrictions(perms) {
-  currentTempPerms = perms;
-  const allTabs = ['products','coming','add','sales','orders','notifications','scan','wash','history','analytics','calculator','settings','access'];
-  allTabs.forEach(tabId => {
-    const btn = document.querySelector('.tab-btn[onclick*="\'' + tabId + '\'"]');
-    if (!btn) return;
-    if (tabId === 'access') { btn.style.display = 'none'; return; }
-    if (perms.includes(tabId)) {
-      btn.style.display = ''; btn.style.opacity = '1'; btn.style.pointerEvents = ''; btn.title = '';
-    } else {
-      btn.style.opacity = '0.25'; btn.style.pointerEvents = 'none'; btn.title = '🔒 Accès non autorisé';
-    }
-  });
-  showTempAccessBanner(perms);
-  startTempAccessExpiryCheck();
-  const firstAllowed = perms[0];
-  if (firstAllowed) _origSwitchTab(firstAllowed);
-}
-
-function showTempAccessBanner(perms) {
-  const existing = document.getElementById('temp-access-banner');
-  if (existing) existing.remove();
-  const banner = document.createElement('div');
-  banner.id = 'temp-access-banner';
-  banner.style.cssText = 'position:fixed;top:60px;left:0;right:0;z-index:490;background:rgba(255,215,0,0.1);border-bottom:1px solid rgba(255,215,0,0.3);padding:8px 20px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(10px)';
-  banner.innerHTML = '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:0.9rem">⏱</span>' +
-    '<span style="font-size:0.68rem;color:var(--gold);font-weight:700">Accès temporaire actif</span>' +
-    '<span style="font-size:0.62rem;color:var(--text-muted)" id="banner-timer">—</span></div>' +
-    '<div style="font-size:0.6rem;color:var(--text-muted)">' + perms.length + ' section' + (perms.length > 1 ? 's' : '') + ' accessible' + (perms.length > 1 ? 's' : '') + '</div>';
-  document.body.appendChild(banner);
-  const main = document.querySelector('.main');
-  if (main) main.style.paddingTop = '100px';
-}
-
-function startTempAccessExpiryCheck() {
-  if (window._tempExpiryInterval) clearInterval(window._tempExpiryInterval);
-  window._tempExpiryInterval = setInterval(async () => {
-    if (!currentUser) { clearInterval(window._tempExpiryInterval); return; }
-    const email = currentUser.email ? currentUser.email.toLowerCase() : '';
-    if (ADMIN_EMAILS.includes(email)) { clearInterval(window._tempExpiryInterval); return; }
-    const access = await checkTempUserAccess(email);
-    if (!access) {
-      clearInterval(window._tempExpiryInterval);
-      const banner = document.getElementById('temp-access-banner');
-      if (banner) banner.style.background = 'rgba(255,68,68,0.15)';
-      toast('⏱ Votre accès temporaire a expiré. Déconnexion...', 'error');
-      setTimeout(() => handleSignOut(), 3000);
-    } else {
-      const timerEl = document.getElementById('banner-timer');
-      if (timerEl) timerEl.textContent = '— Expire: ' + access.expiresAt.toLocaleString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-    }
-  }, 30000);
-}
-
-window.checkAndApplyTempRestrictions = async () => {
-  if (!currentUser) return;
-  const email = currentUser.email ? currentUser.email.toLowerCase() : '';
-  if (ADMIN_EMAILS.includes(email)) {
-    currentTempPerms = null;
-    const accessBtn = document.getElementById('tab-btn-access');
-    if (accessBtn) accessBtn.style.display = '';
-    const allTabs = ['products','coming','add','sales','orders','notifications','scan','wash','history','analytics','calculator','settings'];
-    allTabs.forEach(tabId => {
-      const btn = document.querySelector('.tab-btn[onclick*="\'' + tabId + '\'"]');
-      if (btn) { btn.style.opacity = ''; btn.style.pointerEvents = ''; btn.title = ''; }
-    });
-    return;
-  }
-  const access = await checkTempUserAccess(email);
-  if (!access) {
-    document.getElementById('app') && document.getElementById('app').classList.remove('show');
-    document.getElementById('denied-wall') && document.getElementById('denied-wall').classList.add('show');
-    return;
-  }
-  applyTempAccessRestrictions(access.permissions);
-};
-
-// Patch switchTab — bloque accès non autorisés pour users temporaires
-// IMPORTANT: capture APRÈS définition originale, patch sûr pour admins
-const _origSwitchTab = window.switchTab;
-window.switchTab = (name) => {
-  // currentTempPerms === null = admin principal = tout autorisé
-  if (currentTempPerms !== null && !currentTempPerms.includes(name)) {
-    toast('🔒 Accès non autorisé à cette section.', 'error');
-    return;
-  }
-  _origSwitchTab(name);
-  // Initialiser l'onglet accès temporaires à la demande
-  if (name === 'access' && typeof window.initAccessTab === 'function') {
-    setTimeout(() => window.initAccessTab(), 50);
-  }
-};
-// Note: la vérification des accès temporaires est déclenchée
-// directement dans onUserChange via checkAndApplyTempRestrictions()
-
-// ── SQL REQUIS (ajouter dans zetwal-setup-complet.sql) ────────
-// CREATE TABLE IF NOT EXISTS temp_access (
-//   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-//   email        TEXT NOT NULL,
-//   granted_by   TEXT NOT NULL,
-//   permissions  JSONB NOT NULL DEFAULT '[]',
-//   duration_min INTEGER NOT NULL,
-//   expires_at   TIMESTAMPTZ NOT NULL,
-//   note         TEXT,
-//   status       TEXT NOT NULL DEFAULT 'active',
-//   created_at   TIMESTAMPTZ DEFAULT NOW()
-// );
-// ALTER TABLE temp_access ENABLE ROW LEVEL SECURITY;
-// CREATE POLICY "temp_access_all" ON temp_access FOR ALL USING (true) WITH CHECK (true);
 </script>
 </body>
 </html>
