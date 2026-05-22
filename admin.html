@@ -2005,6 +2005,11 @@ function loadStats(){
 }
 
 window.switchTab=(name)=>{
+  // Guard: bloquer tabs non autorisés pour utilisateurs temporaires
+  if (typeof _tempPermsActive !== 'undefined' && _tempPermsActive !== null && _tempPermsActive.indexOf(name) < 0) {
+    toast('Acces non autorise a cette section', 'error');
+    return;
+  }
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
     const tabs=['products','coming','add','sales','orders','notifications','scan','wash','history','analytics','calculator','settings','access'];
     b.classList.toggle('active',tabs[i]===name);
@@ -2020,8 +2025,10 @@ window.switchTab=(name)=>{
   if(name==='analytics')     initAnalytics();
   if(name==='calculator')    initCalculator();
   if(name==='settings')      initSettings();
+  if(name==='access')        setTimeout(function(){ if(typeof window.initAccessTab==='function') window.initAccessTab(); }, 80);
   if(name!=='scan'&&qrScanner) stopScanner();
 };
+
 
 // ============================================================
 // PARAMÈTRES — CITASYON + STATUT MAGAZEN
@@ -2996,19 +3003,7 @@ async function _loadAccessLog() {
   }
 }
 
-// Patch switchTab
-(function() {
-  var _orig = window.switchTab;
-  if (!_orig) return;
-  window.switchTab = function(name) {
-    if (_tempPermsActive !== null && _tempPermsActive.indexOf(name) < 0) {
-      toast('Acces non autorise', 'error');
-      return;
-    }
-    _orig(name);
-    if (name === 'access') setTimeout(function(){ window.initAccessTab(); }, 80);
-  };
-})();
+// switchTab patch applied below, after original definition
 
 </script>
 </body>
