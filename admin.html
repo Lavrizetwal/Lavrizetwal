@@ -2657,6 +2657,71 @@ window.updatePricePreview = () => {
 var _tempDurationMin = 0;
 var _tempPermsActive = null;
 
+// ── Appliquer les restrictions de tabs pour un utilisateur temporaire ──
+function applyTempAccessRestrictions(perms) {
+  _tempPermsActive = perms;
+
+  // Cacher l'onglet "Accès Temporaires" pour les users temporaires
+  var accessBtn = document.getElementById('tab-btn-access');
+  if (accessBtn) accessBtn.style.display = 'none';
+
+  // Pour chaque tab: griser si non autorisé, afficher si autorisé
+  var allTabs = ['products','coming','add','sales','orders','notifications',
+                 'scan','wash','history','analytics','calculator','settings'];
+  allTabs.forEach(function(tabId) {
+    var btn = document.querySelector('.tab-btn[onclick*="' + tabId + '"]');
+    if (!btn) return;
+    if (perms && perms.indexOf(tabId) >= 0) {
+      btn.style.opacity       = '';
+      btn.style.pointerEvents = '';
+      btn.title               = '';
+    } else {
+      btn.style.opacity       = '0.2';
+      btn.style.pointerEvents = 'none';
+      btn.title               = 'Accès non autorisé';
+    }
+  });
+
+  // Aller sur le premier tab autorisé
+  var first = perms && perms.length ? perms[0] : null;
+  if (first) {
+    // Appel direct sans passer par le guard (on est en train d'initialiser)
+    document.querySelectorAll('.tab-btn').forEach(function(b, i) {
+      var tabs = ['products','coming','add','sales','orders','notifications',
+                  'scan','wash','history','analytics','calculator','settings','access'];
+      b.classList.toggle('active', tabs[i] === first);
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    var panel = document.getElementById('tab-' + first);
+    if (panel) panel.classList.add('active');
+    // Charger le contenu du tab
+    if (first === 'products')      loadProducts();
+    if (first === 'sales')         { renderSalesTable(allSales); updateSalesKPIs(); loadSales(); }
+    if (first === 'orders')        loadOrders();
+    if (first === 'notifications') loadNotifications();
+    if (first === 'history')       loadWashRecords();
+    if (first === 'analytics')     initAnalytics();
+    if (first === 'calculator')    initCalculator();
+    if (first === 'settings')      initSettings();
+  }
+
+  // Bannière accès temporaire en haut
+  var existing = document.getElementById('temp-access-banner');
+  if (existing) existing.remove();
+  var banner = document.createElement('div');
+  banner.id = 'temp-access-banner';
+  banner.style.cssText = 'position:fixed;top:60px;left:0;right:0;z-index:490;'
+    + 'background:rgba(255,215,0,0.1);border-bottom:1px solid rgba(255,215,0,0.3);'
+    + 'padding:7px 20px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(10px)';
+  banner.innerHTML = '<span>⏱</span>'
+    + '<span style="font-size:0.68rem;color:var(--gold);font-weight:700">Accès temporaire actif</span>'
+    + '<span style="font-size:0.62rem;color:var(--text-muted)">'
+    + (perms ? perms.length : 0) + ' section(s) autorisée(s)</span>';
+  document.body.appendChild(banner);
+  var main = document.querySelector('.main');
+  if (main) main.style.paddingTop = '100px';
+}
+
 var TEMP_TABS = [
   {id:'products',      label:'Produits'},
   {id:'coming',        label:'A Venir'},
