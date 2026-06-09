@@ -1,0 +1,537 @@
+Voici le code HTML/CSS/JS qui reproduit votre tableau de bord d'analyse pour l'épisode 1 de "The Invisible Fight".
+
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>The Invisible Fight · Analyse Épisode 1 | Zétwal Productions</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #06060E;
+      color: #E8E0D0;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      line-height: 1.5;
+    }
+
+    /* typography & utils */
+    .mono {
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      letter-spacing: 0.05em;
+    }
+
+    /* container */
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* header gradient */
+    .header {
+      background: linear-gradient(180deg, #0F0F1A 0%, #06060E 100%);
+      border-bottom: 1px solid #1A1A28;
+      padding: 40px 24px 32px;
+    }
+
+    .header-content {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* badge */
+    .badge-label {
+      font-size: 10px;
+      color: #444;
+      letter-spacing: 0.2em;
+      margin-bottom: 10px;
+      font-family: monospace;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 400;
+      color: #E8D9B0;
+      margin: 0 0 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .subhead {
+      font-size: 13px;
+      color: #555;
+      margin: 0 0 28px;
+      font-style: italic;
+    }
+
+    /* global note card */
+    .global-note-card {
+      background: linear-gradient(135deg, #0F0F1A, #1A1040);
+      border: 1px solid #6366F144;
+      border-radius: 10px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .global-score {
+      text-align: center;
+    }
+
+    .global-num {
+      font-size: 64px;
+      color: #C4B5FD;
+      font-family: monospace;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .global-num small {
+      font-size: 28px;
+      color: #6366F1;
+    }
+
+    .global-label {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+      letter-spacing: 0.1em;
+    }
+
+    .global-desc {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .global-desc p {
+      font-size: 14px;
+      color: #DDD8FF;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .tag-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 10px;
+      padding: 3px 10px;
+      background: #6366F122;
+      color: #C4B5FD;
+      border-radius: 20px;
+      border: 1px solid #6366F133;
+      font-family: monospace;
+    }
+
+    /* section titles */
+    .section-title {
+      font-size: 10px;
+      color: #333;
+      letter-spacing: 0.15em;
+      margin-bottom: 16px;
+      font-family: monospace;
+    }
+
+    /* analysis rows */
+    .analysis-row {
+      background: #0A0A14;
+      border: 1px solid #1A1A28;
+      border-left-width: 3px;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .analysis-row.active-row {
+      background: #0F0F1A;
+      border-color: #1A1A28;
+    }
+
+    .row-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .icon {
+      font-size: 16px;
+    }
+
+    .row-title {
+      font-size: 13px;
+      color: #AAA;
+      flex: 1;
+    }
+
+    .active-row .row-title {
+      color: #E8E0D0;
+    }
+
+    .status-dot {
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    /* note bar container */
+    .note-bar-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 4px;
+      background: #1E1E2E;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .note-value {
+      font-size: 13px;
+      font-family: monospace;
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* detail panel */
+    .row-detail {
+      margin-top: 16px;
+      display: none;
+    }
+
+    .active-row .row-detail {
+      display: block;
+    }
+
+    .resume-text {
+      font-size: 13px;
+      color: #888;
+      font-style: italic;
+      margin: 0 0 14px;
+      line-height: 1.6;
+    }
+
+    .sub-section-title {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+      font-family: monospace;
+    }
+
+    .strength-item, .weakness-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #AAA;
+      line-height: 1.6;
+    }
+
+    .verdict-box {
+      background: #0A0A18;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-top: 14px;
+    }
+
+    /* radar grid */
+    .radar-grid {
+      background: #0A0A14;
+      border: 1px solid #1A1A28;
+      border-radius: 10px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .radar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .radar-info {
+      flex: 1;
+    }
+
+    .radar-title {
+      font-size: 10px;
+      color: #666;
+      margin-bottom: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    .radar-bar-bg {
+      flex: 1;
+      height: 3px;
+      background: #1E1E2E;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .radar-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+    }
+
+    .radar-value {
+      font-size: 11px;
+      font-family: monospace;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    /* conclusion card */
+    .conclusion-card {
+      background: linear-gradient(135deg, #0F0F1A, #0F1A14);
+      border: 1px solid #10B98133;
+      border-radius: 10px;
+      padding: 24px;
+      margin-top: 28px;
+    }
+
+    .next-steps {
+      background: #0F0F1A;
+      border: 1px solid #6366F133;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 10px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    .step-num {
+      color: #6366F1;
+      flex-shrink: 0;
+      font-family: monospace;
+    }
+
+    hr {
+      border-color: #1E1E2E;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 560px) {
+      .container {
+        padding: 0 16px 60px;
+      }
+      .global-note-card {
+        padding: 18px;
+      }
+      .radar-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-content">
+    <div class="badge-label">ZÉTWAL PRODUCTIONS · ANALYSE DE PRODUCTION</div>
+    <h1>"The Invisible Fight" — Épisode 1</h1>
+    <div class="subhead">Analyse complète · Tous les angles · Version définitive</div>
+
+    <div class="global-note-card">
+      <div class="global-score">
+        <div class="global-num">9.1<small>/10</small></div>
+        <div class="global-label">NOTE GLOBALE</div>
+      </div>
+      <div class="global-desc">
+        <p>Un pilote de série exceptionnel. Ambitieux, culturellement fort, émotionnellement construit. Les faiblesses sont techniques, pas narratives — elles se corrigent en production.</p>
+        <div class="tag-group">
+          <span class="tag">Structure ✓</span>
+          <span class="tag">Émotion ✓</span>
+          <span class="tag">Identité ✓</span>
+          <span class="tag">Punchline ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- section analyses interactives -->
+  <div style="margin-top: 28px;">
+    <div class="section-title">TOUS LES ANGLES — CLIQUER POUR L'ANALYSE DÉTAILLÉE</div>
+    <div id="analyses-list"></div>
+  </div>
+
+  <!-- radar dashboard -->
+  <div style="margin-top: 28px;">
+    <div class="section-title">TABLEAU DE BORD DES NOTES</div>
+    <div id="radar-dashboard" class="radar-grid"></div>
+  </div>
+
+  <!-- conclusion & next steps -->
+  <div class="conclusion-card">
+    <div class="mono" style="font-size:11px; color:#10B981; letter-spacing:0.14em; margin-bottom:14px;">CONCLUSION FINALE — SANS FILTRE</div>
+    <p style="font-size:14px; color:#6EE7B7; line-height:1.8; margin-bottom:16px;">Cet épisode 1 est un pilote de série au sens propre du terme — il donne envie de voir l'épisode 2 avec urgence. La structure est solide, l'identité est irremplaçable, la punchline est mémorable, et la petite fille est le personnage le plus précieux du projet.</p>
+    <p style="font-size:14px; color:#6EE7B7; line-height:1.8; margin-bottom:16px;">Les deux seules faiblesses réelles sont la femme de Mike (sous-développée) et la faisabilité technique Higgsfield (exigeante). Ni l'une ni l'autre n'est rédhibitoire — elles sont adressables en production et en écriture.</p>
+    <p style="font-size:14px; color:#A7F3D0; line-height:1.8; font-style:italic;">Ce qui ne peut pas être corrigé si ça n'est pas là — l'âme, l'identité, l'émotion — tout ça est présent. C'est l'essentiel. Le reste est du travail.</p>
+  </div>
+
+  <div class="next-steps">
+    <div class="mono" style="font-size:11px; color:#C4B5FD; letter-spacing:0.14em; margin-bottom:12px;">PROCHAINE ÉTAPE RECOMMANDÉE</div>
+    <div class="step-list">
+      <div class="step-item"><span class="step-num">01.</span><span>Envoyer la bible — figer l'univers, les personnages, les 5 adversaires de la saison</span></div>
+      <div class="step-item"><span class="step-num">02.</span><span>Créer les Soul IDs des 6 personnages principaux avant toute génération</span></div>
+      <div class="step-item"><span class="step-num">03.</span><span>Tester la scène arrière-grand-mère en premier — la plus simple, la plus révélatrice du style visuel</span></div>
+      <div class="step-item"><span class="step-num">04.</span><span>Produire le teaser de la petite fille (30 secondes) pour tester la réaction du public</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- données identiques au composant React ---
+  const analyses = [
+    { id: "structure", titre: "Structure Narrative", note: 9.0, icon: "⚡", couleur: "#6366F1", resume: "Architecture en 5 actes parfaitement calibrée.", points_forts: [ "La chute → voyage intérieur → résurrection → victoire → nouvelle menace — c'est l'arc du héros classique exécuté avec précision.", "Les 5 actes ont chacun une fonction émotionnelle distincte. Pas de redondance. Chaque scène fait avancer quelque chose.", "La transition victoire → annonce du prochain combat est brutale et intelligente — elle refuse au public le confort de la célébration.", "L'épisode 1 pose l'univers sans l'expliquer. On voit le système sans qu'on nous le décrive. C'est de la narration par immersion." ], points_faibles: [ "L'acte II (voyage intérieur) représente 85 secondes sur 6 minutes — soit 24% de l'épisode. Si les générations Higgsfield de ces scènes sont trop lentes visuellement, le rythme peut décrocher.", "La relation Mike/femme n'est pas encore établie. On la voit prier, pleurer — mais on ne sait rien d'elle. Ce sera à corriger dès l'épisode 2." ], verdict: "Une structure solide qui respecte les codes du genre tout en les servant intelligemment. Le cliffhanger final est le bon choix." },
+    { id: "personnages", titre: "Développement des Personnages", note: 8.5, icon: "👤", couleur: "#8B5CF6", resume: "Un casting bien construit avec des rôles clairement définis.", points_forts: [ "Mike est établi en 6 minutes sans monologue explicatif. On sait qui il est par ce qu'il fait, pas par ce qu'on nous dit. C'est de l'écriture mature.", "Son silence comme arme psychologique est cohérent avec sa formation de psychologue. Le personnage est intellectuellement consistant.", "La petite fille est le meilleur personnage de l'épisode. Elle n'a pas une ligne de dialogue et elle porte 40% de l'émotion du récit.", "Le personnage récurrent dans la foule est une décision de série intelligente — il crée une continuité narrative sans effort.", "L'arrière-grand-mère sur sa chaise en bois est immédiatement haïtienne, immédiatement vraie." ], points_faibles: [ "Le Géant est fonctionnel mais pas mémorable. Ses répliques provocatrices sont efficaces mais génériques. Il manque un détail qui le rendrait unique.", "Dessalines est sous-utilisé — 45 secondes pour une figure de cette magnitude. Justifié pour l'épisode 1, mais la dette narrative devra être payée plus tard." ], verdict: "Solide. Mike et la petite fille sont les deux piliers émotionnels. Les personnages secondaires remplissent leur rôle sans briller." },
+    { id: "emotion", titre: "Impact Émotionnel", note: 9.5, icon: "💔", couleur: "#EF4444", resume: "Le point le plus fort de l'épisode. Plusieurs moments potentiellement dévastateurs.", points_forts: [ "LES YEUX QUI S'OUVRENT ENSEMBLE — c'est le moment le plus fort du script. Mike et la petite fille qui se réveillent au même instant. Ce plan peut devenir l'image signature de toute la série.", "Le silence de Mike pendant tout le combat crée une tension émotionnelle qui rend la punchline finale 10x plus puissante. Le public attend. Et quand ça arrive, c'est libérateur.", "La petite fille qui tombe à genoux de soulagement — pas de douleur, juste trop grand pour tenir debout. C'est la définition d'une image mémorable.", "L'annonce du prochain combat qui arrive juste après la victoire — c'est émotionnellement parfait parce que c'est injuste. Et c'est la réalité haïtienne que tu racontes." ], points_faibles: [ "La scène de la femme de Mike pourrait être encore plus déchirante si on avait établi leur relation avant le combat. On pleure avec elle par empathie générique, pas par attachement personnel." ], verdict: "L'épisode est construit pour faire pleurer. Et il va y arriver. Le ratio émotion/durée est exceptionnel pour un premier épisode." },
+    { id: "dialogue", titre: "Dialogues & Punchlines", note: 9.0, icon: "💬", couleur: "#F59E0B", resume: "Des répliques qui font leur travail avec précision.", points_forts: [ "LA PUNCHLINE FINALE est le meilleur dialogue du script. Chaque ligne a un poids distinct — l'identité, la déclaration, la menace, l'action finale. Elle est construite comme un poème de combat.", "\"No being on this EARTH is above me\" — le mot EARTH est un acte d'écriture génial. Dans le contexte interplanétaire de la série, cette limitation consciente ou inconsciente devient prophétique.", "Les provocations du Géant sont bien calibrées — elles attaquent l'identité nationale, la fierté, la psychologie. Elles méritent le silence de Mike.", "L'annonce de l'organisateur est froide et administrative. Ce contraste avec l'émotion de la victoire est parfaitement intentionnel." ], points_faibles: [ "Le dialogue de Dessalines est quasi inexistant. C'est un choix — mais il faudra lui donner une voix dans les épisodes suivants pour établir sa profondeur.", "\"Let the bets be opened\" sonne légèrement formel en anglais. Une alternative plus naturelle pourrait être envisagée pour la version Higgsfield." ], verdict: "La punchline seule élève l'ensemble du script. C'est une réplique qui va être citée, partagée, mémorisée. C'est rare." },
+    { id: "cinematique", titre: "Qualité Cinématographique", note: 9.0, icon: "🎬", couleur: "#10B981", resume: "Un langage visuel ambitieux et cohérent.", points_forts: [ "Le gel du temps avant le coup final est la meilleure idée visuelle de l'épisode. C'est cinématographiquement audacieux et narrativement cohérent — c'est le psychologue qui analyse.", "Le contraste visuel arène/espace blanc est fort. Chaos/paix. Bruit/silence. Chaleur/lumière froide. Chaque transition dit quelque chose.", "Le Géant qui regarde le drapeau avec du sang dans la bouche — c'est une image qui restera. La défaite qui reconnaît ce qui l'a vaincue.", "Mike qui traverse le corps du Géant sans regarder en arrière — ponctuation visuelle parfaite. Économique et définitive.", "Le split screen yeux qui s'ouvrent — quand c'est bien fait en montage, c'est une des plus belles images de la série." ], points_faibles: [ "La scène Dessalines demande un travail visuel exceptionnel pour être à la hauteur. Si la génération Higgsfield est moyenne, elle tire l'épisode vers le bas.", "Les effets d'énergie visible (transfert Dessalines, gel du temps) dépendent entièrement de la qualité des VFX en post-production." ], verdict: "Des ambitions visuelles réelles. Plusieurs plans ont le potentiel de devenir iconiques si l'exécution est au niveau." },
+    { id: "identite", titre: "Identité Culturelle Haïtienne", note: 10.0, icon: "🇭🇹", couleur: "#C9A84B", resume: "Le point de distinction absolu du projet. Irremplaçable.", points_forts: [ "Le drapeau haïtien comme objet narratif central — pas décoration, pas symbole abstrait. Il est physiquement sur le corps de Mike. Il est regardé par le Géant mourant. Il est la dernière chose que Mike regarde avant de partir. C'est du storytelling par l'objet.", "Dessalines utilisé avec respect et intelligence. Pas un costume. Une présence ancestrale réelle qui répond à un besoin réel.", "La chaise en bois de l'arrière-grand-mère est haïtienne dans l'âme — ce détail concret ancre la scène dans une réalité culturelle précise.", "\"Aucun être sur TERRE ne m'est supérieur\" dit par un Haïtien — après tout ce que ce peuple a traversé — c'est une déclaration politique, historique et émotionnelle simultanément.", "La diaspora haïtienne mondiale va s'approprier ce projet. Il dit ce qu'elle ressent depuis des générations." ], points_faibles: [], verdict: "10/10 sans hésitation. C'est là que réside l'âme de la série. Rien dans la production mondiale actuelle ne ressemble à ça." },
+    { id: "univers", titre: "Construction de l'Univers", note: 8.5, icon: "🌌", couleur: "#3B82F6", resume: "Un univers fascinant révélé avec intelligence et parcimonie.", points_forts: [ "Le classement interplanétaire révélé en fin d'épisode est un coup de théâtre narratif. Le public croit regarder un film de combat. Il réalise qu'il regarde une épopée cosmique.", "La structure VIP/organisateur/arène est posée sans être expliquée. On comprend le système par immersion.", "\"48 morts\" dans le palmarès de l'adversaire — deux mots qui changent tout. L'enjeu de la série devient mortel en une seconde.", "Le fait de ne pas encore montrer le Grand Conseil est la bonne décision. L'univers se déploie à la bonne vitesse." ], points_faibles: [ "On ne sait pas encore comment Mike est entré dans cette ligue. Cette question va se poser et devra être répondue.", "L'univers interplanétaire est évoqué mais pas visualisé. Le public de l'épisode 1 peut ne pas encore mesurer l'échelle de ce qui l'attend." ], verdict: "L'univers est posé avec intelligence. La révélation progressive est la bonne stratégie. L'épisode 2 devra commencer à l'étoffer." },
+    { id: "rythme", titre: "Rythme & Montage", note: 8.5, icon: "⏱", couleur: "#EC4899", resume: "Un rythme maîtrisé avec une légère fragilité au centre.", points_forts: [ "L'alternance rapide/lent est bien construite : combat rapide, coupes émotionnelles lentes, chute pesante, voyage intérieur calme, réveil explosif.", "Le silence du combat (Mike ne parle pas) crée un rythme narratif rare — le spectateur attend. Cette tension s'accumule pendant 3 minutes.", "Les 15 secondes du coup final sont la bonne durée. Court. Définitif. Ne s'attarde pas." ], points_faibles: [ "L'acte II (85 secondes pour les deux voyages intérieurs) est le seul moment où le rythme peut décrocher si les générations vidéo ne sont pas à la hauteur.", "La scène 10B (étonnement + Géant à terre) ajoute 15 secondes entre l'action et la punchline. C'est justifié mais le montage devra être précis pour ne pas casser l'élan." ], verdict: "Bon rythme global. La fragilité est concentrée dans l'acte II — c'est là que le montage devra être le plus soigné." },
+    { id: "viral", titre: "Potentiel Viral", note: 9.5, icon: "📱", couleur: "#06B6D4", resume: "Plusieurs moments conçus pour être découpés et partagés.", points_forts: [ "LA PETITE FILLE — ce personnage peut générer des millions de vues seul, extrait et posté indépendamment. C'est le plan le plus shareable du projet.", "LA PUNCHLINE — \"I am a fucking predator / they are all prey\" est une réplique qui va circuler. Elle sera citée sur TikTok, Twitter, Facebook.", "LES YEUX QUI S'OUVRENT ENSEMBLE — c'est le plan qui va faire pleurer les gens sur Instagram à 2h du matin.", "La diaspora haïtienne mondiale est le vecteur de diffusion naturel le plus puissant. WhatsApp seul peut faire exploser les vues.", "\"No being on this EARTH is above me\" — cette phrase va résonner bien au-delà d'Haïti." ], points_faibles: [ "La viralité dépend entièrement de la qualité de l'exécution. Un épisode avec des visuels moyens ne viralisera pas, même avec un excellent script." ], verdict: "Le potentiel est réel et élevé. Conditionné à une exécution technique soignée." },
+    { id: "production", titre: "Faisabilité Production Higgsfield", note: 7.0, icon: "⚙️", couleur: "#64748B", resume: "Ambitieux mais faisable avec la bonne discipline de production.", points_forts: [ "Les scènes de l'espace blanc (grand-mère sur sa chaise) sont parmi les plus simples à générer — décor minimal, lumière douce, peu de mouvement.", "Les coupes émotionnelles (petite fille, femme, foule) sont des plans simples et répétitifs — bonne économie de crédits.", "L'arène Spartacus est un univers bien documenté sur Higgsfield — les prompts existent et fonctionnent." ], points_faibles: [ "Le gel du temps avec le poing à quelques millimètres du visage est techniquement le plan le plus difficile de l'épisode. Il faudra plusieurs tentatives.", "La cohérence de Mike sur 11 scènes avec Soul ID est le plus grand risque technique. Si le visage dérive entre les scènes, l'immersion s'effondre.", "La scène Dessalines (bataille 1803) est coûteuse en crédits et complexe à générer de manière cohérente.", "Les effets d'énergie visible et le split screen devront être faits en post-production, pas sur Higgsfield." ], verdict: "7/10 — pas parce que c'est impossible, mais parce que l'exécution demande une discipline technique que beaucoup sous-estiment. Avec méthode, c'est faisable." },
+    { id: "serie", titre: "Potentiel de Série", note: 9.5, icon: "🎭", couleur: "#7C3AED", resume: "Un pilote qui pose les bases d'une série ambitieuse et expandable.", points_forts: [ "Tous les personnages récurrents sont établis en 6 minutes sans que ça semble forcé. C'est une écriture de showrunner.", "L'escalade narrative est claire : Terre → interplanétaire → ?. Le public comprend instinctivement qu'il y a un horizon bien plus vaste.", "Mike est un personnage qui peut porter des dizaines d'épisodes. Sa psychologie est riche, ses motivations sont claires, son arc est ouvert.", "Le mot EARTH dans la punchline devient une promesse narrative pour toute la saison. Quand viendra le premier combat hors-planète, cette phrase sera rappelée.", "La petite fille comme fil rouge de la série est une décision qui peut créer un attachement du public sur plusieurs saisons." ], points_faibles: [ "Il n'y a pas encore de antagoniste clair pour la saison — juste une menace abstraite. L'épisode 2 doit commencer à dessiner l'arc global." ], verdict: "Ce pilote fait ce qu'un pilote doit faire : donner envie de voir la suite. Avec urgence." }
+  ];
+
+  // Générer les lignes d'analyse (expand/collapse)
+  const container = document.getElementById('analyses-list');
+  function buildRows() {
+    container.innerHTML = '';
+    analyses.forEach((item, idx) => {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'analysis-row';
+      rowDiv.setAttribute('data-idx', idx);
+      
+      // header + noteBar
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'row-header';
+      headerDiv.innerHTML = `
+        <span class="icon">${item.icon}</span>
+        <span class="row-title">${item.titre}</span>
+        <span class="status-dot" style="color: ${item.note >= 9 ? '#10B981' : (item.note >= 8 ? '#F59E0B' : '#EF4444')}">●</span>
+      `;
+      
+      const noteBarDiv = document.createElement('div');
+      noteBarDiv.className = 'note-bar-container';
+      const fillWidth = item.note * 10;
+      noteBarDiv.innerHTML = `
+        <div class="bar-track"><div class="bar-fill" style="width: ${fillWidth}%; background: ${item.couleur};"></div></div>
+        <span class="note-value" style="color: ${item.couleur}">${item.note.toFixed(1)}</span>
+      `;
+      
+      // detail panel
+      const detailDiv = document.createElement('div');
+      detailDiv.className = 'row-detail';
+      
+      let strengthsHtml = `<div class="sub-section-title" style="color: ${item.couleur};">CE QUI FONCTIONNE</div>`;
+      item.points_forts.forEach(p => {
+        strengthsHtml += `<div class="strength-item"><span style="color: ${item.couleur};">→</span><span>${p}</span></div>`;
+      });
+      let weaknessesHtml = '';
+      if (item.points_faibles.length > 0) {
+        weaknessesHtml = `<div class="sub-section-title" style="color: #EF4444; margin-top:14px;">CE QUI PEUT ÊTRE PLUS FORT</div>`;
+        item.points_faibles.forEach(p => {
+          weaknessesHtml += `<div class="weakness-item"><span style="color: #EF4444;">→</span><span>${p}</span></div>`;
+        });
+      }
+      const verdictHtml = `
+        <div class="verdict-box" style="border-left-color: ${item.couleur}33; border-left-width: 1px;">
+          <span style="font-size: 11px; color: ${item.couleur}; font-family: monospace;">VERDICT → </span>
+          <span style="font-size: 12px; color: #C8C0A8; font-style: italic;">${item.verdict}</span>
+        </div>
+      `;
+      
+      detailDiv.innerHTML = `
+        <div class="resume-text">${item.resume}</div>
+        ${strengthsHtml}
+        ${weaknessesHtml}
+        ${verdictHtml}
+      `;
+      
+      rowDiv.appendChild(headerDiv);
+      rowDiv.appendChild(noteBarDiv);
+      rowDiv.appendChild(detailDiv);
+      
+      rowDiv.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = rowDiv.classList.contains('active-row');
+        // fermer toutes
+        document.querySelectorAll('.analysis-row').forEach(r => {
+          r.classList.remove('active-row');
+        });
+        if (!isActive) {
+          rowDiv.classList.add('active-row');
+        }
+      });
+      
+      container.appendChild(rowDiv);
+    });
+  }
+  
+  // Générer le radar des notes
+  function buildRadar() {
+    const radarContainer = document.getElementById('radar-dashboard');
+    radarContainer.innerHTML = '';
+    analyses.forEach(item => {
+      const radarItem = document.createElement('div');
+      radarItem.className = 'radar-item';
+      radarItem.innerHTML = `
+        <span style="font-size:12px;">${item.icon}</span>
+        <div class="radar-info">
+          <div class="radar-title">${item.titre}</div>
+          <div class="radar-bar-bg"><div class="radar-bar" style="width: ${item.note * 10}%; background: ${item.note >= 9.5 ? '#10B981' : (item.note >= 9 ? '#6366F1' : (item.note >= 8.5 ? '#F59E0B' : '#EF4444'))};"></div></div>
+        </div>
+        <span class="radar-value" style="color: ${item.note >= 9 ? '#C4B5FD' : (item.note >= 8 ? '#FCD34D' : '#FCA5A5')};">${item.note}</span>
+      `;
+      radarContainer.appendChild(radarItem);
+    });
+  }
+  
+  buildRows();
+  buildRadar();
+</script>
+</body>
+</html>
+```
