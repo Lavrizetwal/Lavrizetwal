@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Épisode 2 — Analyse Viralité</title>
+    <style>
+        /* ── Reset & base ── */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #06060E;
+            color: #E8E0D0;
+            font-family: Georgia, serif;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* ── scrollbar ── */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2A2A3A;
+            border-radius: 4px;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(180deg, #0F0F1A, #06060E);
+            border-bottom: 1px solid #1A1A28;
+            padding: 32px 24px 24px;
+        }
+        .header-inner {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        .header-badge {
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 0.2em;
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 400;
+            color: #E8D9B0;
+            margin: 0 0 4px;
+        }
+        .header-sub {
+            font-size: 12px;
+            color: #555;
+            margin: 0 0 24px;
+            font-style: italic;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .stats-item .num {
+            font-size: 20px;
+            font-family: monospace;
+        }
+        .stats-item .label {
+            font-size: 10px;
+            color: #444;
+            margin-top: 2px;
+        }
+
+        /* ── Tabs ── */
+        .tabs {
+            border-bottom: 1px solid #1A1A28;
+            background: #0A0A12;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .tabs-inner {
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 12px 18px;
+            font-size: 11px;
+            font-family: monospace;
+            color: #555;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            letter-spacing: 0.06em;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tab-btn.active {
+            color: #C9A84B;
+            border-bottom-color: #C9A84B;
+        }
+        .tab-btn:hover {
+            color: #C9A84B;
+        }
+
+        /* ── Content ── */
+        .content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ── Scene list ── */
+        .scene-list-label {
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 0.14em;
+            margin-bottom: 16px;
+            font-family: monospace;
+        }
+
+        .scene-item {
+            background: #0A0A14;
+            border: 1px solid #1A1A28;
+            border-left: 3px solid #1A1A28;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+        .scene-item.active {
+            border-color: var(--scene-border, #1A1A28);
+        }
+        .scene-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .scene-id {
+            font-size: 10px;
+            color: #555;
+            font-family: monospace;
+            min-width: 22px;
+        }
+        .scene-title {
+            font-size: 12px;
+            color: #C8C0A8;
+            flex: 1;
+        }
+        .scene-duree {
+            font-size: 10px;
+            color: #555;
+            font-family: monospace;
+        }
+        .scene-tag {
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-family: monospace;
+            white-space: nowrap;
+            background: #222;
+            color: #888;
+        }
+        .scene-score {
+            font-size: 13px;
+            font-family: monospace;
+            min-width: 36px;
+            text-align: right;
+        }
+        .scene-bar {
+            margin-top: 6px;
+            height: 2px;
+            background: #1E1E2E;
+            border-radius: 1px;
+            overflow: hidden;
+        }
+        .scene-bar-inner {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        /* ── Scene detail (expanded) ── */
+        .scene-detail {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #1E1E2E;
+        }
+        .scene-pic {
+            background: var(--pic-bg, transparent);
+            border: 1px solid var(--pic-border, #333);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            font-style: italic;
+            color: var(--pic-color, #888);
+        }
+        .detail-label {
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            font-family: monospace;
+            margin-bottom: 6px;
+        }
+        .detail-text {
+            font-size: 12px;
+            color: #888;
+            margin: 0 0 12px;
+            line-height: 1.7;
+        }
+        .detail-share {
+            font-size: 12px;
+            color: #F9A8D4;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .detail-share-label {
+            font-size: 10px;
+            color: #EC4899;
+            letter-spacing: 0.1em;
+            font-family: monospace;
+            margin-bottom: 6px;
+        }
+
+        /* ── Top 5 ── */
+        .top-label {
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 0.14em;
+            margin-bottom: 20px;
+            font-family: monospace;
+        }
+        .top-card {
+            background: #0A0A14;
+            border: 1px solid #333;
+            border-left: 3px solid #888;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .top-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .top-rank {
+            font-size: 40px;
+            font-family: monospace;
+            line-height: 1;
+            opacity: 0.3;
+            font-weight: 700;
+            flex-shrink: 0;
+            color: #888;
+        }
+        .top-info {
+            flex: 1;
+        }
+        .top-title {
+            font-size: 14px;
+            color: #E8E0D0;
+            margin-bottom: 4px;
+        }
+        .top-pic {
+            font-size: 11px;
+            font-style: italic;
+            color: #888;
+        }
+        .top-right {
+            text-align: right;
+        }
+        .top-score {
+            font-size: 22px;
+            font-family: monospace;
+            color: #888;
+        }
+        .top-score-label {
+            font-size: 9px;
+            color: #444;
+        }
+        .top-analyse {
+            font-size: 13px;
+            color: #888;
+            margin: 0 0 10px;
+            line-height: 1.7;
+        }
+        .top-share {
+            background: #0F0F1A;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 8px 12px;
+        }
+        .top-share-label {
+            font-size: 10px;
+            font-family: monospace;
+            color: #888;
+        }
+        .top-share-text {
+            font-size: 12px;
+            color: #AAA;
+        }
+
+        /* ── Verdict ── */
+        .verdict-global {
+            background: linear-gradient(135deg, #1A0808, #06060E);
+            border: 1px solid #EF444455;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .verdict-global-label {
+            font-size: 11px;
+            color: #EF4444;
+            letter-spacing: 0.14em;
+            font-family: monospace;
+            margin-bottom: 12px;
+        }
+        .verdict-global-num {
+            font-size: 72px;
+            color: #EF4444;
+            font-family: monospace;
+            line-height: 1;
+        }
+        .verdict-global-num span {
+            font-size: 32px;
+            color: #EF444488;
+        }
+        .verdict-global-sub {
+            font-size: 13px;
+            color: #888;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .compare-label {
+            font-size: 10px;
+            color: #444;
+            letter-spacing: 0.14em;
+            margin-bottom: 12px;
+            font-family: monospace;
+        }
+        .compare-item {
+            background: #0A0A14;
+            border: 1px solid #1A1A28;
+            border-radius: 7px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+        .compare-cat {
+            font-size: 10px;
+            color: #555;
+            font-family: monospace;
+            margin-bottom: 8px;
+            letter-spacing: 0.08em;
+        }
+        .compare-row {
+            display: flex;
+            gap: 10px;
+        }
+        .compare-ep {
+            flex: 1;
+            background: #0F0F1A;
+            border-radius: 6px;
+            padding: 8px 10px;
+        }
+        .compare-ep .ep-label {
+            font-size: 9px;
+            font-family: monospace;
+            margin-bottom: 4px;
+        }
+        .compare-ep .ep-text {
+            font-size: 11px;
+            color: #888;
+        }
+        .compare-ep.ep1 .ep-label {
+            color: #6366F1;
+        }
+        .compare-ep.ep2 .ep-label {
+            color: #EF4444;
+        }
+        .compare-ep.ep2 .ep-text {
+            color: #AAA;
+        }
+
+        .what-box {
+            background: #0F0F1A;
+            border: 1px solid #10B98133;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+        .what-box .what-label {
+            font-size: 11px;
+            color: #10B981;
+            font-family: monospace;
+            margin-bottom: 14px;
+            letter-spacing: 0.1em;
+        }
+        .what-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #6EE7B7;
+            line-height: 1.6;
+        }
+        .what-item .arrow {
+            color: #10B981;
+            flex-shrink: 0;
+        }
+
+        .verdict-final {
+            background: linear-gradient(135deg, #1A0808, #0F0F1A);
+            border: 1px solid #EF444433;
+            border-radius: 10px;
+            padding: 24px;
+            margin-top: 16px;
+        }
+        .verdict-final .vf-label {
+            font-size: 11px;
+            color: #EF4444;
+            font-family: monospace;
+            margin-bottom: 14px;
+            letter-spacing: 0.1em;
+        }
+        .verdict-final p {
+            font-size: 14px;
+            color: #E8D9B0;
+            line-height: 1.8;
+            margin: 0 0 12px;
+        }
+        .verdict-final p.gray {
+            font-size: 13px;
+            color: #AAA;
+        }
+        .verdict-final p.pink {
+            font-size: 13px;
+            color: #FCA5A5;
+            font-style: italic;
+            margin-bottom: 0;
+        }
+
+        /* ── utilities ── */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ── responsive ── */
+        @media (max-width: 480px) {
+            .header {
+                padding: 24px 16px 20px;
+            }
+            .stats {
+                gap: 14px;
+            }
+            .scene-row {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .scene-title {
+                flex: 1 1 100%;
+                order: 1;
+            }
+            .scene-id {
+                order: 0;
+            }
+            .scene-duree {
+                order: 2;
+            }
+            .scene-tag {
+                order: 3;
+            }
+            .scene-score {
+                order: 4;
+            }
+            .scene-bar {
+                order: 5;
+                flex: 1 1 100%;
+            }
+            .top-header {
+                flex-wrap: wrap;
+            }
+            .top-rank {
+                font-size: 28px;
+            }
+            .top-right {
+                text-align: left;
+                flex: 1 1 100%;
+            }
+            .compare-row {
+                flex-direction: column;
+            }
+            .verdict-global-num {
+                font-size: 48px;
+            }
+            .verdict-global-num span {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-badge">L'HAÏTIEN · ÉPISODE 2 · ANALYSE VIRALITÉ COMPLÈTE</div>
+            <h1>Épisode 2 — Analyse Complète</h1>
+            <p class="header-sub">14 séquences analysées · De l'ouverture TV au décompte final</p>
+            <div class="stats" id="stats"></div>
+        </div>
+    </header>
+
+    <!-- ═══ TABS ═══ -->
+    <nav class="tabs" id="tabs">
+        <div class="tabs-inner">
+            <button class="tab-btn active" data-tab="scenes">Toutes les scènes</button>
+            <button class="tab-btn" data-tab="top">Top 5 viral</button>
+            <button class="tab-btn" data-tab="verdict">Verdict final</button>
+        </div>
+    </nav>
+
+    <!-- ═══ CONTENT ═══ -->
+    <div class="content">
+
+        <!-- ─── PANEL: SCENES ─── -->
+        <div id="panel-scenes" class="panel">
+            <div class="scene-list-label">14 SÉQUENCES · CLIQUER POUR L'ANALYSE</div>
+            <div id="scene-list"></div>
+        </div>
+
+        <!-- ─── PANEL: TOP 5 ─── -->
+        <div id="panel-top" class="panel hidden">
+            <div class="top-label">LES 5 MOMENTS QUI VONT DÉFINIR LA VIRALITÉ DE L'ÉPISODE</div>
+            <div id="top-list"></div>
+        </div>
+
+        <!-- ─── PANEL: VERDICT ─── -->
+        <div id="panel-verdict" class="panel hidden">
+            <div id="verdict-content"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        //  DATA
+        // ═══════════════════════════════════════════════════════════════
+
+        const scenes = [{
+            id: "01",
+            titre: "Ouverture TV — Réginald + Me Hantz",
+            duree: "1min 15",
+            score: 9.2,
+            couleur: "#10B981",
+            tag: "ESSENTIEL",
+            pic: '"Fuis — tu gagneras peut-être quelques jours"',
+            analyse: "Un expert neutre à 98% de précision dit à Mike qu'il va mourir. Pas un ennemi. Un analyste. C'est imparable comme ouverture — le public croit Me Hantz avant même de connaître Valdrak.",
+            partage: "Le clip de Me Hantz va circuler massivement. La réplique 'fuis' sera postée partout comme avertissement.",
+            picScore: 9.5
+        }, {
+            id: "02",
+            titre: "Transition invisible → chez Mike",
+            duree: "5 sec",
+            score: 9.8,
+            couleur: "#10B981",
+            tag: "SIGNATURE",
+            pic: "Le plateau TV devient leur salon sans coupe",
+            analyse: "5 secondes qui élèvent le niveau de production de toute la série. Le public est dans l'émission puis dans leur maison sans rupture. C'est du cinéma.",
+            partage: "Les créateurs et cinéphiles vont noter cette transition. Elle contribue à la réputation de qualité de la série.",
+            picScore: 9.0
+        }, {
+            id: "03",
+            titre: "Schnayderna ferme la TV + 'Tu n'es qu'un égoïste'",
+            duree: "20 sec",
+            score: 9.5,
+            couleur: "#10B981",
+            tag: "VIRAL",
+            pic: '"Tu n\'es qu\'un égoïste"',
+            analyse: "Du point de vue de Schnayderna — elle a raison. Elle ne connaît pas la vérité. Et le public qui la connaît souffre pour Mike qui ne peut pas se défendre. Tension émotionnelle parfaite.",
+            partage: "Les femmes vont partager 'je serai veuve d'un moment à l'autre'. Les hommes 'égoïste'. Moment universel.",
+            picScore: 9.3
+        }, {
+            id: "04",
+            titre: "Dialogue couple — Confiance aveugle",
+            duree: "1min 30",
+            score: 9.4,
+            couleur: "#10B981",
+            tag: "VIRAL",
+            pic: '"Je peux mourir pour toi Mike"',
+            analyse: "Le pic émotionnel de toute la première partie. Elle donne plus que ce qu'il demande. Sa seule condition en échange — pas la vérité. Sa vie. Et lui ne peut promettre que sa volonté.",
+            partage: "'Je peux mourir pour toi' et 'Si tu ne me lâches pas je donnerai tout' vont circuler en citations.",
+            picScore: 9.6
+        }, {
+            id: "05",
+            titre: "Briefing Schnayderna + 'Allons-y'",
+            duree: "1min 20",
+            score: 9.3,
+            couleur: "#10B981",
+            tag: "FORT",
+            pic: '"Allons-y."',
+            analyse: "Schnayderna change de dimension — analyste stratège. 16 000 Newton, 32 KO neurologiques, 7 morts. La stratégie de la grille retourne la force de Valdrak contre lui. Et Mike répond deux mots. 'Allons-y.' Après toute cette complexité — deux mots. C'est le personnage de Mike dans toute son essence.",
+            partage: "La stratégie de la grille va générer des débats 'ça va marcher ?'. 'Allons-y' sera clipé comme moment de caractère.",
+            picScore: 9.1
+        }, {
+            id: "06",
+            titre: "Montage entraînement — Schnayderna qui chronomètre",
+            duree: "45 sec",
+            score: 8.8,
+            couleur: "#6366F1",
+            tag: "FORT",
+            pic: "Schnayderna avec le chronomètre — elle est dans la bataille avec lui",
+            analyse: "Le montage rapide dit en 45 secondes ce que 5 minutes de dialogue ne diraient pas aussi bien. Et Schnayderna qui chronomètre transforme leur couple — elle n'est plus la femme qui attend. Elle prépare le combat avec lui.",
+            partage: "Plan de Schnayderna avec le chrono va être partagé comme symbole de partenariat.",
+            picScore: 8.6
+        }, {
+            id: "07",
+            titre: "J-1 — Annonce MORTEX + Combat #4 et #5",
+            duree: "1min 10",
+            score: 9.7,
+            couleur: "#10B981",
+            tag: "ESSENTIEL",
+            pic: "Valdrak qui tient 3 têtes dans ses bras",
+            analyse: "L'image de Valdrak avec trois têtes est le plan le plus fort de toute cette partie. Ce n'est plus un adversaire — c'est une force de destruction. Et le geste de Mike (main sur le front à 'exécution sur place') est d'autant plus puissant qu'il ne montre jamais sa vulnérabilité.",
+            partage: "L'image des 3 têtes et le geste de Mike vont être les deux plans les plus partagés avant le combat. Le public va faire des montages des deux côtés.",
+            picScore: 9.8
+        }, {
+            id: "08",
+            titre: "Combat Nema l'Innocente vs Dalberg le Psychopathe",
+            duree: "1min 45",
+            score: 10.0,
+            couleur: "#EF4444",
+            tag: "EXPLOSION VIRALE",
+            pic: '"Et ça c\'est pour apprendre à fermer ta grande gueule sal chien"',
+            analyse: "Le moment viral le plus explosif de toute la série jusqu'ici. 'L'Innocente' qui démembre méthodiquement un psychopathe qui rit jusqu'à la fin — et ne s'arrête de rire que quand elle lui retire le pénis. Le renversement total. La foule qui crie NEMA. Le public qui réalise ce qu'est MORTEX vraiment.",
+            partage: "Cette scène va être clippée, partagée, analysée, choquée. 'L'Innocente' comme surnom va devenir iconique dans la culture MORTEX. Les gens qui n'ont pas vu la série vont la regarder à cause de ce clip.",
+            picScore: 10.0
+        }, {
+            id: "09",
+            titre: "Retour salon + 'On ne peut jamais être prêt'",
+            duree: "35 sec",
+            score: 9.5,
+            couleur: "#10B981",
+            tag: "VIRAL",
+            pic: '"Que Dieu et les esprits soient avec moi"',
+            analyse: "Après la violence extrême de Nema — le silence du salon de Mike. La transition dit tout. Et sa réplique est la première fois qu'il invoque quelque chose de plus grand que lui avec ces mots précis. Pas les ancêtres qui viennent — lui qui les appelle.",
+            partage: "'On ne peut jamais être prêt dans ce niveau de violence' va circuler massivement dans les communautés haïtiennes et africaines.",
+            picScore: 9.4
+        }, {
+            id: "10",
+            titre: "Quelques heures restantes — Nuit avant le combat",
+            duree: "25 sec",
+            score: 8.9,
+            couleur: "#6366F1",
+            tag: "FORT",
+            pic: "Mike et Schnayderna dans le silence de la dernière nuit",
+            analyse: "L'espace entre Nema et le combat est précieux. Il laisse respirer le public après la violence. Et il installe la tension de l'attente — la nuit avant un duel à mort. Ce silence pèse plus que n'importe quel dialogue.",
+            partage: "Plan contemplatif — moins viral mais contribue au ton cinématographique général.",
+            picScore: 8.5
+        }, {
+            id: "11",
+            titre: "Jour J — Les costumés + Schnayderna 'Je viens avec toi'",
+            duree: "25 sec",
+            score: 9.6,
+            couleur: "#10B981",
+            tag: "VIRAL",
+            pic: '"Attends — je viens avec toi"',
+            analyse: "Cette décision de Schnayderna de l'accompagner crée directement le plan de l'épisode 3 — Mike qui la regarde avec 'je suis désolé, j'ai échoué' quand la hache descend. Sans cette scène, ce plan n'existe pas. Elle construit l'avenir de la série.",
+            partage: "'Je viens avec toi' va être partagé comme image de couple qui se soutient face à l'impossible.",
+            picScore: 9.4
+        }, {
+            id: "12",
+            titre: "USA — Journalistes + Valdrak vole la couverture",
+            duree: "30 sec",
+            score: 9.0,
+            couleur: "#6366F1",
+            tag: "FORT",
+            pic: "Tout le monde abandonne Mike quand Valdrak arrive",
+            analyse: "Le plan le plus subtil de la fin d'épisode. Mike passe — personne ne le suit. Valdrak arrive — tout le monde court. Ce plan dit sans dialogue que Mike n'est pas encore quelqu'un dans ce monde. Et le public ressent l'injustice de ça.",
+            partage: "Ce moment va résonner pour tous ceux qui ont été ignorés au profit de quelqu'un de plus puissant. Universel.",
+            picScore: 8.9
+        }, {
+            id: "13",
+            titre: "La cage — Face à face — Décompte 10 à 5",
+            duree: "50 sec",
+            score: 9.9,
+            couleur: "#EF4444",
+            tag: "EXPLOSION VIRALE",
+            pic: "Valdrak qui sourit. Mike qui regarde la hache. Schnayderna dans la foule.",
+            analyse: "La convergence finale de tous les fils narratifs de l'épisode. Valdrak regarde Mike — il sourit. Mike ne regarde pas Valdrak — il regarde la hache. Cette différence dit tout sur les deux combattants. L'un voit un adversaire. L'autre voit la règle à maîtriser.",
+            partage: "Le split entre Valdrak qui sourit et Mike qui regarde la hache va être l'image promotionnelle de l'épisode 3. Les gens vont l'analyser.",
+            picScore: 9.7
+        }, {
+            id: "14",
+            titre: "COUPE BRUTALE — ÉCRAN NOIR — Épisode 3",
+            duree: "3 sec",
+            score: 10.0,
+            couleur: "#EF4444",
+            tag: "EXPLOSION VIRALE",
+            pic: "La coupe à 5 dans le décompte",
+            analyse: "L'arrêt à 5 dans le décompte est sadique dans le bon sens du terme. Le public avait 10 secondes pour se préparer. Il n'en a reçu que 5. Et maintenant il faut attendre l'épisode 3.",
+            partage: "Les gens vont poster leur réaction à cette coupure. Les vidéos de réaction à cet instant vont générer des millions de vues supplémentaires.",
+            picScore: 10.0
+        }];
+
+        const palette = {
+            "EXPLOSION VIRALE": "#EF4444",
+            "ESSENTIEL": "#10B981",
+            "VIRAL": "#6366F1",
+            "FORT": "#F59E0B",
+            "SIGNATURE": "#C9A84B",
+        };
+
+        const scoreGlobal = (scenes.reduce((s, sc) => s + sc.score, 0) / scenes.length).toFixed(1);
+
+        const topMoments = [...scenes].sort((a, b) => b.picScore - a.picScore).slice(0, 5);
+
+        // ═══════════════════════════════════════════════════════════════
+        //  STATE
+        // ═══════════════════════════════════════════════════════════════
+
+        let activeScene = null; // index
+        let currentTab = 'scenes';
+
+        // ═══════════════════════════════════════════════════════════════
+        //  DOM REFS
+        // ═══════════════════════════════════════════════════════════════
+
+        const statsEl = document.getElementById('stats');
+        const sceneListEl = document.getElementById('scene-list');
+        const topListEl = document.getElementById('top-list');
+        const verdictEl = document.getElementById('verdict-content');
+        const panels = {
+            scenes: document.getElementById('panel-scenes'),
+            top: document.getElementById('panel-top'),
+            verdict: document.getElementById('panel-verdict'),
+        };
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        // ═══════════════════════════════════════════════════════════════
+        //  RENDER HELPERS
+        // ═══════════════════════════════════════════════════════════════
+
+        function getScoreColor(score) {
+            if (score >= 9.8) return '#EF4444';
+            if (score >= 9.3) return '#10B981';
+            if (score >= 9.0) return '#6366F1';
+            return '#F59E0B';
+        }
+
+        function renderStats() {
+            const items = [
+                { v: `${scoreGlobal}/10`, l: 'Score global', c: '#EF4444' },
+                { v: '3', l: 'Explosions virales', c: '#EF4444' },
+                { v: '5', l: 'Moments VIRAL', c: '#6366F1' },
+                { v: '~8min 20', l: 'Durée totale', c: '#C9A84B' },
+            ];
+            statsEl.innerHTML = items.map(k =>
+                `<div class="stats-item">
+              <div class="num" style="color:${k.c}">${k.v}</div>
+              <div class="label">${k.l}</div>
+            </div>`
+            ).join('');
+        }
+
+        function renderScenes() {
+            let html = '';
+            scenes.forEach((s, i) => {
+                const active = activeScene === i;
+                const tagColor = palette[s.tag] || '#888';
+                const scoreCol = getScoreColor(s.score);
+                const borderCol = active ? s.couleur : '#1A1A28';
+                html += `
+              <div class="scene-item ${active ? 'active' : ''}" data-index="${i}" style="--scene-border:${borderCol}; border-left-color:${borderCol};">
+                <div class="scene-row">
+                  <span class="scene-id">${s.id}</span>
+                  <span class="scene-title">${s.titre}</span>
+                  <span class="scene-duree">${s.duree}</span>
+                  <span class="scene-tag" style="background:${tagColor}22;color:${tagColor}">${s.tag}</span>
+                  <span class="scene-score" style="color:${scoreCol}">${s.score}</span>
+                </div>
+                <div class="scene-bar">
+                  <div class="scene-bar-inner" style="width:${s.score * 10}%;background:${s.couleur}"></div>
+                </div>
+                ${active ? `
+                <div class="scene-detail">
+                  <div class="scene-pic" style="--pic-bg:${s.couleur}11;--pic-border:${s.couleur}33;--pic-color:${s.couleur}">
+                    ✦ ${s.pic}
+                  </div>
+                  <div class="detail-label" style="color:${s.couleur}">ANALYSE</div>
+                  <p class="detail-text">${s.analyse}</p>
+                  <div class="detail-share-label">POTENTIEL DE PARTAGE</div>
+                  <p class="detail-share">${s.partage}</p>
+                </div>
+                ` : ''}
+              </div>
+            `;
+            });
+            sceneListEl.innerHTML = html;
+
+            // click handlers
+            document.querySelectorAll('#scene-list .scene-item').forEach(el => {
+                el.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index, 10);
+                    activeScene = (activeScene === idx) ? null : idx;
+                    renderScenes();
+                });
+            });
+        }
+
+        function renderTop() {
+            let html = '';
+            topMoments.forEach((m, i) => {
+                const col = m.couleur;
+                html += `
+              <div class="top-card" style="border-left-color:${col};border-color:${col}33;">
+                <div class="top-header">
+                  <div class="top-rank" style="color:${col}">#${i + 1}</div>
+                  <div class="top-info">
+                    <div class="top-title">${m.titre}</div>
+                    <div class="top-pic" style="color:${col}">${m.pic}</div>
+                  </div>
+                  <div class="top-right">
+                    <div class="top-score" style="color:${col}">${m.picScore}</div>
+                    <div class="top-score-label">score viral</div>
+                  </div>
+                </div>
+                <p class="top-analyse">${m.analyse}</p>
+                <div class="top-share" style="border-color:${col}22;">
+                  <span class="top-share-label" style="color:${col}">PARTAGE → </span>
+                  <span class="top-share-text">${m.partage}</span>
+                </div>
+              </div>
+            `;
+            });
+            topListEl.innerHTML = html;
+        }
+
+        function renderVerdict() {
+            const comps = [
+                { cat: 'Moment le plus viral', ep1: 'Punchline — "I am a fucking predator"', ep2: 'Nema retire le pénis + "sal chien"' },
+                { cat: 'Image la plus forte', ep1: 'Mike traverse le corps de Kron', ep2: 'Valdrak avec 3 têtes' },
+                { cat: 'Moment émotionnel', ep1: 'Yeux qui s\'ouvrent ensemble', ep2: '"Je peux mourir pour toi Mike"' },
+                { cat: 'Cliffhanger', ep1: 'Annonce duel à mort', ep2: 'Décompte coupé à 5' },
+                { cat: 'Surprise narrative', ep1: 'Dessalines dans l\'arène', ep2: 'Schnayderna devient stratège' },
+            ];
+
+            const whatItems = [
+                "L'EP2 montre MORTEX à travers un autre combat — le public comprend l'échelle sans qu'on le lui explique.",
+                "L'EP2 introduit Schnayderna comme personnage actif — pas juste émotionnel. Elle pense, analyse, stratégise.",
+                "L'EP2 humanise Mike en dehors de l'arène — ses peurs, son couple, sa foi dans 'Dieu et les esprits'.",
+                "L'EP2 crée une attente pure avec le décompte coupé à 5 — l'EP1 livrait sa résolution. L'EP2 la refuse.",
+                "Le surnom 'L'Innocente' pour Nema installe une règle implicite de MORTEX — les apparences ne signifient rien.",
+            ];
+
+            let html = `
+            <!-- global -->
+            <div class="verdict-global">
+              <div class="verdict-global-label">SCORE GLOBAL VIRALITÉ — ÉPISODE 2</div>
+              <div class="verdict-global-num">${scoreGlobal}<span>/10</span></div>
+              <div class="verdict-global-sub">Plus viral que l'épisode 1. Le plus fort de la série jusqu'ici.</div>
+            </div>
+
+            <!-- comparaison -->
+            <div class="compare-label">COMPARAISON EP1 VS EP2</div>
+          `;
+
+            comps.forEach(r => {
+                html += `
+              <div class="compare-item">
+                <div class="compare-cat">${r.cat}</div>
+                <div class="compare-row">
+                  <div class="compare-ep ep1">
+                    <div class="ep-label">EP1</div>
+                    <div class="ep-text">${r.ep1}</div>
+                  </div>
+                  <div class="compare-ep ep2">
+                    <div class="ep-label">EP2</div>
+                    <div class="ep-text">${r.ep2}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+            });
+
+            html += `
+            <!-- what -->
+            <div class="what-box">
+              <div class="what-label">CE QUE L'EP2 FAIT QUE L'EP1 NE FAIT PAS</div>
+          `;
+            whatItems.forEach(p => {
+                html += `
+              <div class="what-item"><span class="arrow">→</span><span>${p}</span></div>
+            `;
+            });
+            html += `</div>`;
+
+            // verdict final
+            html += `
+            <div class="verdict-final">
+              <div class="vf-label">VERDICT SANS FILTRE</div>
+              <p>L'épisode 2 est supérieur à l'épisode 1 sur deux dimensions précises — la profondeur émotionnelle du couple Mike/Schnayderna et la brutalité révélatrice de la scène Nema. Ces deux éléments n'ont pas d'équivalent dans l'EP1.</p>
+              <p class="gray">Ce que l'EP1 avait que l'EP2 n'a pas encore — la punchline et la victoire. Ces moments arrivent dans l'EP3. L'EP2 est le film du milieu — il construit, compresse, retient. Et cette retenue est sa plus grande force.</p>
+              <p class="pink">Le décompte coupé à 5 va générer des réactions en vidéo sur TikTok et YouTube. Ces vidéos de réaction vont amener de nouveaux spectateurs sur l'EP1. C'est le meilleur type de marketing — involontaire et organique.</p>
+            </div>
+          `;
+
+            verdictEl.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  TAB SWITCHING
+        // ═══════════════════════════════════════════════════════════════
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+
+            // buttons
+            tabBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+
+            // panels
+            Object.keys(panels).forEach(key => {
+                panels[key].classList.toggle('hidden', key !== tabId);
+            });
+
+            // re-render verdict if needed (static anyway)
+            if (tabId === 'verdict') renderVerdict();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  INIT
+        // ═══════════════════════════════════════════════════════════════
+
+        renderStats();
+        renderScenes();
+        renderTop();
+        renderVerdict();
+
+        // tab clicks
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                switchTab(this.dataset.tab);
+            });
+        });
+
+        // ensure initial panel is visible
+        switchTab('scenes');
+    </script>
+
+</body>
+</html>
