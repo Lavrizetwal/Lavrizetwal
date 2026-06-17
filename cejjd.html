@@ -1,955 +1,2235 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Complexe Éducatif Jean Jacques Dessalines – Examens 6e AF</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
-    <style>
-        /* ===== RESET & BASE ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f0f4f8;
-            color: #1e2a41;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examens - Complèxe Educatif Jean Jacques Dessalines</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
-        /* ===== COULEURS ===== */
-        :root {
-            --primary: #0b1d3a;
-            --primary-light: #1a3562;
-            --gold: #d4a843;
-            --gold-light: #f0d080;
-            --white: #ffffff;
-            --gray: #eef2f7;
-            --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-        }
+  :root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #0f3460;
+    --gold: #e94560;
+    --light-gold: #f5a623;
+    --success: #00d4aa;
+    --white: #ffffff;
+    --light: #f0f4f8;
+    --gray: #a0aec0;
+    --card-bg: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+  }
 
-        /* ===== HEADER ===== */
-        header {
-            background: var(--primary);
-            color: var(--white);
-            padding: 1.2rem 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        header .brand {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        header .brand h1 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-        header .brand h1 span {
-            color: var(--gold);
-        }
-        header .brand .sub {
-            font-size: 0.75rem;
-            font-weight: 300;
-            opacity: 0.8;
-            display: block;
-            margin-top: -4px;
-        }
-        header .contact {
-            font-size: 0.95rem;
-            background: var(--gold);
-            color: var(--primary);
-            padding: 0.4rem 1.2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            box-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
-        }
-        header .contact i {
-            font-size: 1.2rem;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* ===== MAIN LAYOUT ===== */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-            flex: 1;
-            width: 100%;
-        }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    color: var(--white);
+    overflow-x: hidden;
+  }
 
-        /* ===== OVERLAY / LOGIN ===== */
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(11, 29, 58, 0.85);
-            backdrop-filter: blur(6px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            padding: 1.5rem;
-            transition: opacity 0.4s ease;
-        }
-        .overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .login-card {
-            background: var(--white);
-            border-radius: 28px;
-            padding: 2.8rem 2.8rem 2.8rem;
-            max-width: 480px;
-            width: 100%;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-        .login-card .logo-icon {
-            font-size: 3rem;
-            margin-bottom: 0.2rem;
-        }
-        .login-card h2 {
-            font-size: 1.7rem;
-            color: var(--primary);
-            margin-bottom: 0.2rem;
-        }
-        .login-card p {
-            color: #4a5a72;
-            font-size: 0.95rem;
-            margin-bottom: 1.8rem;
-        }
-        .login-card label {
-            display: block;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--primary);
-            margin-top: 0.8rem;
-            margin-bottom: 0.2rem;
-        }
-        .login-card input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid #dce3ec;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            transition: border 0.2s;
-            background: #f8faff;
-        }
-        .login-card input:focus {
-            border-color: var(--gold);
-            outline: none;
-            background: #fff;
-        }
-        .login-card .btn-login {
-            width: 100%;
-            margin-top: 1.8rem;
-            background: var(--primary);
-            color: var(--white);
-            border: none;
-            padding: 0.9rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.25s, transform 0.15s;
-            font-family: 'Poppins', sans-serif;
-        }
-        .login-card .btn-login:hover {
-            background: var(--primary-light);
-            transform: scale(1.01);
-        }
-        .login-card .btn-google {
-            width: 100%;
-            margin-top: 1rem;
-            background: #fff;
-            color: #1e2a41;
-            border: 2px solid #dce3ec;
-            padding: 0.8rem;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.8rem;
-            transition: border 0.2s, background 0.2s;
-            font-family: 'Poppins', sans-serif;
-        }
-        .login-card .btn-google:hover {
-            border-color: var(--gold);
-            background: #f8faff;
-        }
-        .login-card .btn-google img {
-            width: 22px;
-            height: 22px;
-        }
-        .login-card .google-note {
-            margin-top: 0.6rem;
-            font-size: 0.75rem;
-            color: #7a8a9e;
-        }
+  /* PARTICLES */
+  .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(233,69,96,0.3);
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+  }
 
-        /* ===== DASHBOARD ===== */
-        .dashboard-header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2.2rem;
-        }
-        .dashboard-header h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-        .dashboard-header .user-info {
-            background: var(--white);
-            padding: 0.5rem 1.4rem;
-            border-radius: 50px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-        .dashboard-header .user-info .badge {
-            background: var(--gold);
-            color: var(--primary);
-            font-weight: 700;
-            padding: 0.1rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-        }
+  /* HEADER */
+  .header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 30px 20px 20px;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .school-logo {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--gold), var(--light-gold));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 32px;
+    box-shadow: 0 0 30px rgba(233,69,96,0.5);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 30px rgba(233,69,96,0.5); }
+    50% { box-shadow: 0 0 50px rgba(233,69,96,0.8); }
+  }
+  .school-name {
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--light-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .exam-title {
+    font-size: clamp(12px, 2vw, 16px);
+    color: var(--gray);
+    margin-top: 5px;
+  }
 
-        /* ===== GRILLE MATIÈRES ===== */
-        .grille {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-        .carte {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 1.5rem 1.2rem;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.25s;
-            border-left: 6px solid var(--gold);
-            text-align: center;
-        }
-        .carte:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.10);
-        }
-        .carte .emoji {
-            font-size: 2.4rem;
-            margin-bottom: 0.2rem;
-        }
-        .carte h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .carte .qcount {
-            font-size: 0.8rem;
-            color: #5a6a82;
-            margin-top: 0.2rem;
-        }
+  /* NAVIGATION TABS */
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 15px;
+    position: relative;
+    z-index: 10;
+    flex-wrap: wrap;
+  }
+  .nav-tab {
+    padding: 8px 18px;
+    border-radius: 25px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s;
+    font-family: 'Poppins', sans-serif;
+    display: none;
+  }
+  .nav-tab.active, .nav-tab:hover {
+    background: linear-gradient(135deg, var(--gold), var(--light-gold));
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+  }
+  .nav-tab.visible { display: block; }
 
-        /* ===== EXAMEN VIEW ===== */
-        .examen-view {
-            background: var(--white);
-            border-radius: 28px;
-            padding: 2rem 2rem 2.5rem;
-            box-shadow: var(--shadow);
-            display: none;
-            animation: fadeUp 0.35s ease;
-        }
-        .examen-view.active {
-            display: block;
-        }
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+  /* MAIN CONTAINER */
+  .container {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
 
-        .examen-header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--gray);
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .examen-header h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-        }
-        .examen-header .timer {
-            background: var(--primary);
-            color: var(--white);
-            padding: 0.4rem 1.4rem;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.3rem;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .examen-header .timer.warning {
-            background: #b22234;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
+  /* CARDS */
+  .card {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  }
 
-        .examen-body {
-            font-size: 0.98rem;
-            line-height: 1.7;
-        }
-        .examen-body .question {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eef2f7;
-        }
-        .examen-body .question:last-child {
-            border-bottom: none;
-        }
-        .examen-body .question .q {
-            font-weight: 600;
-            color: var(--primary);
-        }
-        .examen-body .question .options {
-            margin-left: 1.2rem;
-            margin-top: 0.3rem;
-        }
-        .examen-body .question .options label {
-            display: block;
-            margin: 0.2rem 0;
-            cursor: pointer;
-        }
-        .examen-body .question input[type="text"],
-        .examen-body .question input[type="number"] {
-            padding: 0.4rem 0.8rem;
-            border: 2px solid #dce3ec;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-family: 'Poppins', sans-serif;
-            width: 100%;
-            max-width: 300px;
-        }
-        .examen-body .question input[type="text"]:focus,
-        .examen-body .question input[type="number"]:focus {
-            border-color: var(--gold);
-            outline: none;
-        }
+  /* LOGIN */
+  #loginSection { display: block; }
+  .login-icon { font-size: 60px; text-align: center; margin-bottom: 20px; }
+  .login-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, var(--gold), var(--light-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .login-subtitle { text-align: center; color: var(--gray); margin-bottom: 30px; font-size: 14px; }
 
-        .examen-footer {
-            margin-top: 2rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-        .examen-footer button {
-            padding: 0.7rem 2.2rem;
-            border: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            font-family: 'Poppins', sans-serif;
-        }
-        .examen-footer .btn-submit {
-            background: var(--gold);
-            color: var(--primary);
-        }
-        .examen-footer .btn-submit:hover {
-            background: #c49a36;
-            transform: scale(1.02);
-        }
-        .examen-footer .btn-back {
-            background: var(--gray);
-            color: var(--primary);
-        }
-        .examen-footer .btn-back:hover {
-            background: #d8dfe8;
-        }
+  .form-group { margin-bottom: 20px; }
+  .form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--light-gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 15px 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+    outline: none;
+  }
+  .form-input:focus {
+    border-color: var(--gold);
+    background: rgba(233,69,96,0.1);
+    box-shadow: 0 0 20px rgba(233,69,96,0.2);
+  }
+  .form-input::placeholder { color: var(--gray); }
 
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: #fff;
-            padding: 0.8rem 2rem;
-            border-radius: 60px;
-            font-weight: 600;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .toast.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--gold), var(--light-gold));
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(233,69,96,0.4);
+  }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 700px) {
-            header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.8rem;
-                padding: 1rem;
-            }
-            header .brand h1 {
-                font-size: 1.2rem;
-            }
-            header .contact {
-                align-self: flex-start;
-                font-size: 0.85rem;
-                padding: 0.3rem 1rem;
-            }
-            .login-card {
-                padding: 2rem 1.5rem;
-            }
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.6rem;
-            }
-            .examen-view {
-                padding: 1.2rem;
-            }
-            .examen-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.8rem;
-            }
-            .examen-header .timer {
-                font-size: 1.1rem;
-                padding: 0.3rem 1.2rem;
-            }
-            .grille {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        @media (max-width: 450px) {
-            .grille {
-                grid-template-columns: 1fr;
-            }
-        }
+  /* SECTIONS */
+  .section { display: none; }
+  .section.active { display: block; }
 
-        /* ===== SCROLL ===== */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #eef2f7;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #c49a36;
-        }
-    </style>
+  /* MATIERE HEADER */
+  .matiere-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(233,69,96,0.2), rgba(245,166,35,0.2));
+    border-radius: 15px;
+    border: 1px solid rgba(233,69,96,0.3);
+  }
+  .matiere-title { font-size: 22px; font-weight: 700; color: var(--light-gold); }
+  .matiere-subtitle { color: var(--gray); font-size: 13px; margin-top: 5px; }
+  .exam-info { display: flex; gap: 20px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+  .exam-badge {
+    padding: 5px 15px;
+    background: rgba(233,69,96,0.2);
+    border: 1px solid rgba(233,69,96,0.4);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--gold);
+  }
+
+  /* QUESTIONS */
+  .question-block {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .question-block:hover { border-color: rgba(233,69,96,0.4); background: rgba(255,255,255,0.06); }
+  .question-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--gold), var(--light-gold));
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .question-text { font-size: 15px; font-weight: 500; margin-bottom: 15px; line-height: 1.6; }
+  .question-points {
+    position: absolute;
+    top: 15px; right: 20px;
+    background: rgba(245,166,35,0.2);
+    border: 1px solid rgba(245,166,35,0.4);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 12px;
+    color: var(--light-gold);
+    font-weight: 600;
+  }
+
+  /* OPTIONS MCQ */
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 500px) { .options-grid { grid-template-columns: 1fr; } }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+  }
+  .option-label:hover { background: rgba(233,69,96,0.1); border-color: var(--gold); }
+  .option-label input[type="radio"] { display: none; }
+  .option-label input[type="radio"]:checked + .option-indicator {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .option-label:has(input:checked) {
+    background: rgba(233,69,96,0.15);
+    border-color: var(--gold);
+  }
+  .option-indicator {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--gray);
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+
+  /* TEXT AREA */
+  .answer-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    resize: vertical;
+    outline: none;
+    transition: all 0.3s;
+  }
+  .answer-textarea:focus { border-color: var(--gold); background: rgba(233,69,96,0.05); }
+  .answer-textarea::placeholder { color: var(--gray); }
+
+  /* TEXT PASSAGE */
+  .text-passage {
+    background: rgba(255,255,255,0.04);
+    border-left: 4px solid var(--light-gold);
+    border-radius: 0 10px 10px 0;
+    padding: 20px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #e2e8f0;
+    font-style: italic;
+  }
+  .text-passage h4 { color: var(--light-gold); margin-bottom: 10px; font-style: normal; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--success);
+    margin: 25px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,212,170,0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* SUBMIT BTN */
+  .submit-section { text-align: center; margin-top: 30px; }
+  .btn-submit {
+    padding: 16px 50px;
+    background: linear-gradient(135deg, var(--success), #00b894);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,212,170,0.4); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* PROGRESS */
+  .progress-bar {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    height: 6px;
+    margin-bottom: 25px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--light-gold));
+    border-radius: 10px;
+    transition: width 0.5s ease;
+  }
+
+  /* NOTIFICATION */
+  .notification {
+    position: fixed;
+    top: 20px; right: 20px;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 1000;
+    transform: translateX(400px);
+    transition: transform 0.3s;
+    max-width: 300px;
+  }
+  .notification.show { transform: translateX(0); }
+  .notification.success { background: linear-gradient(135deg, var(--success), #00b894); }
+  .notification.error { background: linear-gradient(135deg, var(--gold), #c0392b); }
+
+  /* RESULTS PAGE */
+  #resultsSection { display: none; }
+  .results-header {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(0,184,148,0.1));
+    border-radius: 15px;
+    border: 1px solid rgba(0,212,170,0.3);
+    margin-bottom: 30px;
+  }
+  .results-title { font-size: 28px; font-weight: 800; color: var(--success); }
+
+  /* STUDENT TABLE */
+  .table-container { overflow-x: auto; border-radius: 15px; margin-bottom: 30px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+  }
+  thead { background: linear-gradient(135deg, var(--gold), var(--light-gold)); }
+  th {
+    padding: 15px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: all 0.3s; }
+  tbody tr:hover { background: rgba(255,255,255,0.05); }
+  td { padding: 15px; font-size: 14px; }
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); }
+  .rank-2 { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); }
+  .rank-3 { background: linear-gradient(135deg, #CD7F32, #A0522D); }
+  .rank-other { background: rgba(255,255,255,0.1); }
+  .score-bar { display: flex; align-items: center; gap: 10px; }
+  .score-mini-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+  .score-mini-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--light-gold)); border-radius: 3px; }
+  .moyenne-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .badge-excellent { background: rgba(0,212,170,0.2); color: var(--success); border: 1px solid var(--success); }
+  .badge-bien { background: rgba(0,123,255,0.2); color: #74b9ff; border: 1px solid #74b9ff; }
+  .badge-passable { background: rgba(245,166,35,0.2); color: var(--light-gold); border: 1px solid var(--light-gold); }
+  .badge-insuffisant { background: rgba(233,69,96,0.2); color: var(--gold); border: 1px solid var(--gold); }
+
+  /* STUDENT DETAIL */
+  .student-detail {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+  }
+  .student-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  .student-avatar {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, var(--gold), var(--light-gold));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .student-name-big { font-size: 18px; font-weight: 700; }
+  .student-avg { margin-left: auto; font-size: 24px; font-weight: 900; color: var(--light-gold); }
+
+  /* ANSWER REVIEW */
+  .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 600px) { .answers-grid { grid-template-columns: 1fr; } }
+  .answer-item {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid;
+    font-size: 13px;
+  }
+  .answer-correct { background: rgba(0,212,170,0.1); border-color: rgba(0,212,170,0.3); }
+  .answer-wrong { background: rgba(233,69,96,0.1); border-color: rgba(233,69,96,0.3); }
+  .answer-open { background: rgba(245,166,35,0.05); border-color: rgba(245,166,35,0.2); }
+  .answer-label { font-size: 11px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
+  .answer-correct .answer-label { color: var(--success); }
+  .answer-wrong .answer-label { color: var(--gold); }
+  .answer-open .answer-label { color: var(--light-gold); }
+  .correct-answer { color: var(--success); font-size: 12px; margin-top: 5px; }
+  .student-answer { color: #e2e8f0; }
+  .wrong-answer-text { color: var(--gold); text-decoration: line-through; font-size: 12px; }
+
+  /* MATIERE SCORES */
+  .matiere-scores { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px; }
+  .matiere-score-item {
+    padding: 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .matiere-score-name { font-size: 11px; color: var(--gray); margin-bottom: 5px; }
+  .matiere-score-value { font-size: 18px; font-weight: 700; color: var(--light-gold); }
+
+  /* TOGGLE */
+  .detail-toggle {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    color: var(--gray);
+    font-size: 13px;
+    transition: all 0.3s;
+    margin-top: 10px;
+  }
+  .detail-toggle:hover { background: rgba(255,255,255,0.1); color: white; }
+  .detail-content { display: none; margin-top: 15px; }
+
+  /* LOADER */
+  .loader {
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .spinner {
+    width: 50px; height: 50px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* WELCOME */
+  .welcome-banner {
+    background: linear-gradient(135deg, rgba(233,69,96,0.15), rgba(245,166,35,0.15));
+    border: 1px solid rgba(233,69,96,0.3);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    text-align: center;
+  }
+  .welcome-name { font-size: 20px; font-weight: 700; color: var(--light-gold); }
+  .welcome-sub { color: var(--gray); font-size: 13px; margin-top: 5px; }
+
+  /* MATIERE CARD */
+  .matieres-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+  .matiere-card {
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .matiere-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--light-gold));
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  .matiere-card:hover::before { transform: scaleX(1); }
+  .matiere-card:hover { transform: translateY(-5px); border-color: rgba(233,69,96,0.4); }
+  .matiere-card.completed { border-color: var(--success); }
+  .matiere-card.completed::before { transform: scaleX(1); background: var(--success); }
+  .matiere-icon { font-size: 40px; margin-bottom: 10px; }
+  .matiere-name { font-size: 14px; font-weight: 600; }
+  .matiere-status { font-size: 12px; color: var(--gray); margin-top: 5px; }
+  .matiere-card.completed .matiere-status { color: var(--success); }
+  .check-icon { position: absolute; top: 10px; right: 10px; color: var(--success); font-size: 18px; display: none; }
+  .matiere-card.completed .check-icon { display: block; }
+
+  /* ADMIN */
+  .admin-link {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .admin-link button {
+    padding: 10px 25px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--gray);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+  }
+  .admin-link button:hover { background: rgba(255,255,255,0.1); color: white; }
+
+  /* FILTER */
+  .filter-bar {
+    display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .filter-input {
+    flex: 1; min-width: 200px;
+    padding: 12px 15px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    outline: none;
+  }
+  .filter-input:focus { border-color: var(--gold); }
+  .filter-input::placeholder { color: var(--gray); }
+  .btn-refresh {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--accent), var(--secondary));
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+  }
+  .btn-refresh:hover { background: rgba(255,255,255,0.1); }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+  .stat-card {
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    text-align: center;
+  }
+  .stat-value { font-size: 32px; font-weight: 900; background: linear-gradient(135deg, var(--gold), var(--light-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-label { color: var(--gray); font-size: 12px; margin-top: 5px; }
+
+  /* TOOLTIP */
+  .tooltip { position: relative; }
+  .tooltip-text {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+  }
+  .tooltip:hover .tooltip-text { display: block; }
+
+  /* Responsive */
+  @media(max-width: 768px) {
+    .card { padding: 20px; }
+    .options-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; color: black; }
+    .nav-tabs, .btn-submit, .btn-refresh, .filter-bar { display: none; }
+    .card { box-shadow: none; border: 1px solid #ccc; background: white; color: black; }
+  }
+</style>
 </head>
 <body>
 
-    <!-- ===== OVERLAY LOGIN ===== -->
-    <div class="overlay" id="loginOverlay">
-        <div class="login-card">
-            <div class="logo-icon">📘</div>
-            <h2>Complexe Éducatif <br />Jean Jacques Dessalines</h2>
-            <p>Entrez vos identifiants pour accéder aux examens</p>
-            <label for="loginNom">Nom</label>
-            <input type="text" id="loginNom" placeholder="Votre nom" />
-            <label for="loginPrenom">Prénom</label>
-            <input type="text" id="loginPrenom" placeholder="Votre prénom" />
-            <button class="btn-login" id="btnLogin">Accéder aux examens</button>
-            <button class="btn-google" id="btnGoogle">
-                <span>🔐</span> Se connecter avec Google
-            </button>
-            <div class="google-note">(Connexion Google bientôt disponible)</div>
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Header -->
+<div class="header">
+  <div class="school-logo">🏫</div>
+  <div class="school-name">Complèxe Educatif Jean Jacques Dessalines</div>
+  <div class="exam-title">Bureau du District Scolaire (BDS) • ⁴⁄₅ Évaluation de la Dernière Étape • 6ème Année Fondamentale</div>
+</div>
+
+<!-- Nav Tabs -->
+<div class="nav-tabs">
+  <button class="nav-tab" id="tabDashboard" onclick="showSection('dashboard')">🏠 Accueil</button>
+  <button class="nav-tab" id="tabMath" onclick="showSection('math')">📐 Mathématique</button>
+  <button class="nav-tab" id="tabSciences" onclick="showSection('sciences')">🔬 Sciences Exp.</button>
+  <button class="nav-tab" id="tabSociales" onclick="showSection('sociales')">🌍 Sciences Soc.</button>
+  <button class="nav-tab" id="tabKreyo" onclick="showSection('kreyo')">📝 Kominikasyon Kreyòl</button>
+  <button class="nav-tab" id="tabFrancais" onclick="showSection('francais')">🇫🇷 Communication Fr.</button>
+  <button class="nav-tab" id="tabResults" onclick="loadResults()">📊 Résultats</button>
+</div>
+
+<div class="container">
+  <div class="notification" id="notification"></div>
+
+  <!-- ============================================================ -->
+  <!-- LOGIN SECTION -->
+  <!-- ============================================================ -->
+  <div id="loginSection" class="card">
+    <div class="login-icon">🎓</div>
+    <div class="login-title">Accès aux Examens</div>
+    <div class="login-subtitle">Veuillez entrer vos informations pour accéder aux examens</div>
+    <div class="form-group">
+      <label class="form-label">Nom de famille</label>
+      <input type="text" id="loginNom" class="form-input" placeholder="Entrez votre nom..." autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Prénom</label>
+      <input type="text" id="loginPrenom" class="form-input" placeholder="Entrez votre prénom..." autocomplete="off">
+    </div>
+    <button class="btn-primary" onclick="handleLogin()">
+      Accéder aux Examens →
+    </button>
+    <div class="admin-link">
+      <button onclick="toggleAdminLogin()">🔐 Accès Professeur</button>
+    </div>
+    <div id="adminLoginDiv" style="display:none; margin-top:15px;">
+      <input type="password" id="adminPassword" class="form-input" placeholder="Mot de passe professeur..." style="margin-bottom:10px;">
+      <button class="btn-primary" onclick="handleAdminLogin()">Connexion Professeur</button>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- DASHBOARD SECTION -->
+  <!-- ============================================================ -->
+  <div id="dashboardSection" class="section">
+    <div class="welcome-banner">
+      <div class="welcome-name" id="welcomeName">👋 Bienvenue !</div>
+      <div class="welcome-sub">Sélectionnez une matière pour commencer l'examen</div>
+    </div>
+    <div class="matieres-grid">
+      <div class="matiere-card" id="card-math" onclick="showSection('math')">
+        <div class="check-icon">✅</div>
+        <div class="matiere-icon">📐</div>
+        <div class="matiere-name">Mathématique</div>
+        <div class="matiere-status">Non soumis</div>
+      </div>
+      <div class="matiere-card" id="card-sciences" onclick="showSection('sciences')">
+        <div class="check-icon">✅</div>
+        <div class="matiere-icon">🔬</div>
+        <div class="matiere-name">Sciences Expérimentales</div>
+        <div class="matiere-status">Non soumis</div>
+      </div>
+      <div class="matiere-card" id="card-sociales" onclick="showSection('sociales')">
+        <div class="check-icon">✅</div>
+        <div class="matiere-icon">🌍</div>
+        <div class="matiere-name">Sciences Sociales</div>
+        <div class="matiere-status">Non soumis</div>
+      </div>
+      <div class="matiere-card" id="card-kreyo" onclick="showSection('kreyo')">
+        <div class="check-icon">✅</div>
+        <div class="matiere-icon">📝</div>
+        <div class="matiere-name">Kominikasyon Kreyòl</div>
+        <div class="matiere-status">Non soumis</div>
+      </div>
+      <div class="matiere-card" id="card-francais" onclick="showSection('francais')">
+        <div class="check-icon">✅</div>
+        <div class="matiere-icon">🇫🇷</div>
+        <div class="matiere-name">Communication Française</div>
+        <div class="matiere-status">Non soumis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MATHÉMATIQUE SECTION -->
+  <!-- ============================================================ -->
+  <div id="mathSection" class="section">
+    <div class="card">
+      <div class="matiere-header">
+        <div class="matiere-title">📐 Mathématique</div>
+        <div class="matiere-subtitle">Sixième Année Fondamentale (6ème AF)</div>
+        <div class="exam-info">
+          <span class="exam-badge">Total: 300 points</span>
+          <span class="exam-badge">Coefficient: 1</span>
         </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="mathProgress" style="width:0%"></div></div>
+
+      <div class="section-title">Partie I — Choix Multiples (Questions 1 à 6)</div>
+      <p style="color:var(--gray); font-size:13px; margin-bottom:20px;">Choisis la lettre qui correspond à la bonne réponse pour les questions 1 à 6.</p>
+
+      <!-- Q1 -->
+      <div class="question-block">
+        <div class="question-number">1</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Identifie la valeur décimale correspondant à cette fraction 4/5 :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="math_q1" value="a"><div class="option-indicator"></div>a) 0,008</label>
+          <label class="option-label"><input type="radio" name="math_q1" value="b"><div class="option-indicator"></div>b) 0,0008</label>
+          <label class="option-label"><input type="radio" name="math_q1" value="c"><div class="option-indicator"></div>c) 0,8</label>
+          <label class="option-label"><input type="radio" name="math_q1" value="d"><div class="option-indicator"></div>d) 0,00008</label>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question-block">
+        <div class="question-number">2</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">23cm³ est l'équivalent de :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="math_q2" value="a"><div class="option-indicator"></div>a) 0,023 l</label>
+          <label class="option-label"><input type="radio" name="math_q2" value="b"><div class="option-indicator"></div>b) 0,0023 l</label>
+          <label class="option-label"><input type="radio" name="math_q2" value="c"><div class="option-indicator"></div>c) 0,23 l</label>
+          <label class="option-label"><input type="radio" name="math_q2" value="d"><div class="option-indicator"></div>d) 0,00023 l</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question-block">
+        <div class="question-number">3</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Trouve l'écriture en lettres de ce nombre 4 732 608 :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="math_q3" value="a"><div class="option-indicator"></div>a) quarante-sept millions trois cent vingt-six mille huit</label>
+          <label class="option-label"><input type="radio" name="math_q3" value="b"><div class="option-indicator"></div>b) quatre cent soixante-treize mille deux cent huit</label>
+          <label class="option-label"><input type="radio" name="math_q3" value="c"><div class="option-indicator"></div>c) quatre millions sept cent trente-deux mille six cent huit</label>
+          <label class="option-label"><input type="radio" name="math_q3" value="d"><div class="option-indicator"></div>d) quatre millions sept cent vingt-trois mille six cent huit</label>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question-block">
+        <div class="question-number">4</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Le résultat de cette multiplication 6/12 × 3/4 est :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="math_q4" value="a"><div class="option-indicator"></div>a) 21/48</label>
+          <label class="option-label"><input type="radio" name="math_q4" value="b"><div class="option-indicator"></div>b) 3/8</label>
+          <label class="option-label"><input type="radio" name="math_q4" value="c"><div class="option-indicator"></div>c) 48/18</label>
+          <label class="option-label"><input type="radio" name="math_q4" value="d"><div class="option-indicator"></div>d) 24/36</label>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question-block">
+        <div class="question-number">5</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">8 livres de géographie coûtent 7 200 gourdes. 5 livres coûteront :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="math_q5" value="a"><div class="option-indicator"></div>a) 4500 gourdes</label>
+          <label class="option-label"><input type="radio" name="math_q5" value="b"><div class="option-indicator"></div>b) 900 gourdes</label>
+          <label class="option-label"><input type="radio" name="math_q5" value="c"><div class="option-indicator"></div>c) 450 gourdes</label>
+          <label class="option-label"><input type="radio" name="math_q5" value="d"><div class="option-indicator"></div>d) 9000 gourdes</label>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="question-block">
+        <div class="question-number">6</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Le nombre en chiffres romains qui correspond au chiffre arabe 2050 est :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="math_q6" value="a"><div class="option-indicator"></div>a) MMXL</label>
+          <label class="option-label"><input type="radio" name="math_q6" value="b"><div class="option-indicator"></div>b) MMXXXXXX</label>
+          <label class="option-label"><input type="radio" name="math_q6" value="c"><div class="option-indicator"></div>c) MML</label>
+          <label class="option-label"><input type="radio" name="math_q6" value="d"><div class="option-indicator"></div>d) MMLX</label>
+        </div>
+      </div>
+
+      <div class="section-title">Partie II — Calcul (Questions 7 à 11)</div>
+
+      <!-- Q7 -->
+      <div class="question-block">
+        <div class="question-number">7</div>
+        <div class="question-points">40pts</div>
+        <div class="question-text">Effectue les opérations suivantes :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:10px;">a) 2/7 + 1/4 + 2/5 =</p>
+        <textarea class="answer-textarea" id="math_q7a" placeholder="Votre réponse pour a)..." rows="3"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) 1/2 + 3/4 =</p>
+        <textarea class="answer-textarea" id="math_q7b" placeholder="Votre réponse pour b)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">c) 7458,72 + 4984,8 + 0,453 =</p>
+        <textarea class="answer-textarea" id="math_q7c" placeholder="Votre réponse pour c)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">d) 967 × 35 =</p>
+        <textarea class="answer-textarea" id="math_q7d" placeholder="Votre réponse pour d)..." rows="2"></textarea>
+      </div>
+
+      <!-- Q8 -->
+      <div class="question-block">
+        <div class="question-number">8</div>
+        <div class="question-points">60pts</div>
+        <div class="question-text">Complète :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Pour trouver la valeur décimale d'une fraction, on divise le _______ par le _______.</p>
+        <textarea class="answer-textarea" id="math_q8a" placeholder="Votre réponse..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) Pour diviser un nombre décimal par 100, on déplace la _______ de _______ de _______ vers la _______.</p>
+        <textarea class="answer-textarea" id="math_q8b" placeholder="Votre réponse..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">c) Le taux est égal à _______.</p>
+        <textarea class="answer-textarea" id="math_q8c" placeholder="Votre réponse..." rows="2"></textarea>
+      </div>
+
+      <!-- Q9 -->
+      <div class="question-block">
+        <div class="question-number">9</div>
+        <div class="question-points">30pts</div>
+        <div class="question-text">Un capital placé à un taux de 5% rapporte un intérêt annuel de 9500 gourdes. Quel est ce capital ?</div>
+        <textarea class="answer-textarea" id="math_q9" placeholder="Montrez votre démarche et votre réponse..." rows="4"></textarea>
+      </div>
+
+      <!-- Q10 -->
+      <div class="question-block">
+        <div class="question-number">10</div>
+        <div class="question-points">30pts</div>
+        <div class="question-text">Un cube a 6cm d'arête. Trouve son volume.</div>
+        <textarea class="answer-textarea" id="math_q10" placeholder="Montrez votre démarche et votre réponse..." rows="4"></textarea>
+      </div>
+
+      <!-- Q11 -->
+      <div class="question-block">
+        <div class="question-number">11</div>
+        <div class="question-points">40pts</div>
+        <div class="question-text">Une école envoie 250 élèves aux examens de 9ème année. 215 ont réussi. Quel est le pourcentage d'élèves qui a échoué ?</div>
+        <textarea class="answer-textarea" id="math_q11" placeholder="Montrez votre démarche et votre réponse..." rows="4"></textarea>
+      </div>
+
+      <div class="submit-section">
+        <button class="btn-submit" id="btnSubmitMath" onclick="submitExam('math')">
+          ✅ Soumettre Mathématique
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCIENCES EXPÉRIMENTALES SECTION -->
+  <!-- ============================================================ -->
+  <div id="sciencesSection" class="section">
+    <div class="card">
+      <div class="matiere-header">
+        <div class="matiere-title">🔬 Sciences Expérimentales</div>
+        <div class="matiere-subtitle">Sixième Année Fondamentale (6ème AF)</div>
+        <div class="exam-info">
+          <span class="exam-badge">Total: 250 points</span>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="sciencesProgress" style="width:0%"></div></div>
+
+      <div class="section-title">Partie I — Choix Multiples (Questions 1 à 6)</div>
+      <p style="color:var(--gray); font-size:13px; margin-bottom:20px;"><em>Coche la lettre de la bonne réponse pour les questions 1 à 6.</em></p>
+
+      <!-- Q1 -->
+      <div class="question-block">
+        <div class="question-number">1</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Une de ces plantes n'a ni racine, ni tige, ni feuille. C'est :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="sc_q1" value="a"><div class="option-indicator"></div>a) le manguier</label>
+          <label class="option-label"><input type="radio" name="sc_q1" value="b"><div class="option-indicator"></div>b) le citronnier</label>
+          <label class="option-label"><input type="radio" name="sc_q1" value="c"><div class="option-indicator"></div>c) le champignon</label>
+          <label class="option-label"><input type="radio" name="sc_q1" value="d"><div class="option-indicator"></div>d) le cerisier</label>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question-block">
+        <div class="question-number">2</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Une fille peut se reproduire si elle a :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="sc_q2" value="a"><div class="option-indicator"></div>a) une grande taille</label>
+          <label class="option-label"><input type="radio" name="sc_q2" value="b"><div class="option-indicator"></div>b) de gros seins</label>
+          <label class="option-label"><input type="radio" name="sc_q2" value="c"><div class="option-indicator"></div>c) de longues jambes</label>
+          <label class="option-label"><input type="radio" name="sc_q2" value="d"><div class="option-indicator"></div>d) la maturité</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question-block">
+        <div class="question-number">3</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Un manguier est capable de donner des fruits et de se reproduire :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="sc_q3" value="a"><div class="option-indicator"></div>a) entre 3 et 5 ans</label>
+          <label class="option-label"><input type="radio" name="sc_q3" value="b"><div class="option-indicator"></div>b) entre 1 et 2 ans</label>
+          <label class="option-label"><input type="radio" name="sc_q3" value="c"><div class="option-indicator"></div>c) entre 6 mois et 12 mois</label>
+          <label class="option-label"><input type="radio" name="sc_q3" value="d"><div class="option-indicator"></div>d) entre 4 et 8 mois</label>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question-block">
+        <div class="question-number">4</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Pisciculteur veut dire « éleveur de : »</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="sc_q4" value="a"><div class="option-indicator"></div>a) poules</label>
+          <label class="option-label"><input type="radio" name="sc_q4" value="b"><div class="option-indicator"></div>b) poissons</label>
+          <label class="option-label"><input type="radio" name="sc_q4" value="c"><div class="option-indicator"></div>c) porcs</label>
+          <label class="option-label"><input type="radio" name="sc_q4" value="d"><div class="option-indicator"></div>d) palourdes</label>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question-block">
+        <div class="question-number">5</div>
+        <div class="question-points">15pts</div>
+        <div class="question-text">Les spores sont :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="sc_q5" value="a"><div class="option-indicator"></div>a) le chapeau du champignon</label>
+          <label class="option-label"><input type="radio" name="sc_q5" value="b"><div class="option-indicator"></div>b) la pelure d'un fruit</label>
+          <label class="option-label"><input type="radio" name="sc_q5" value="c"><div class="option-indicator"></div>c) de très petits grains contenus dans des sacs appelés sporanges</label>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="question-block">
+        <div class="question-number">6</div>
+        <div class="question-points">15pts</div>
+        <div class="question-text">Laquelle de ces maladies est sexuellement transmissible ?</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="sc_q6" value="a"><div class="option-indicator"></div>a) le tétanos</label>
+          <label class="option-label"><input type="radio" name="sc_q6" value="b"><div class="option-indicator"></div>b) l'hémophilie</label>
+          <label class="option-label"><input type="radio" name="sc_q6" value="c"><div class="option-indicator"></div>c) la blennorragie</label>
+          <label class="option-label"><input type="radio" name="sc_q6" value="d"><div class="option-indicator"></div>d) l'hypertension</label>
+        </div>
+      </div>
+
+      <div class="section-title">Partie II — Questions Ouvertes (Questions 7 à 10)</div>
+
+      <!-- Q7 -->
+      <div class="question-block">
+        <div class="question-number">7</div>
+        <div class="question-points">30pts</div>
+        <div class="question-text">Complète :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Les plantes sans fleurs se reproduisent par _______.</p>
+        <textarea class="answer-textarea" id="sc_q7a" placeholder="Réponse a)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) L'eau est une source _______.</p>
+        <textarea class="answer-textarea" id="sc_q7b" placeholder="Réponse b)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">c) _______ est un corps dont la force magnétique attire tout ce qui est en fer.</p>
+        <textarea class="answer-textarea" id="sc_q7c" placeholder="Réponse c)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">d) L'absence du nerf auditif entraîne _______.</p>
+        <textarea class="answer-textarea" id="sc_q7d" placeholder="Réponse d)..." rows="2"></textarea>
+      </div>
+
+      <!-- Q8 -->
+      <div class="question-block">
+        <div class="question-number">8</div>
+        <div class="question-points">40pts</div>
+        <div class="question-text">Définis les termes suivants :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Durée du son :</p>
+        <textarea class="answer-textarea" id="sc_q8a" placeholder="Définition..." rows="3"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) La pesanteur :</p>
+        <textarea class="answer-textarea" id="sc_q8b" placeholder="Définition..." rows="3"></textarea>
+      </div>
+
+      <!-- Q9 -->
+      <div class="question-block">
+        <div class="question-number">9</div>
+        <div class="question-points">30pts</div>
+        <div class="question-text">Écris 3 substances dangereuses pour le système nerveux :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a)</p>
+        <textarea class="answer-textarea" id="sc_q9a" placeholder="Substance a)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b)</p>
+        <textarea class="answer-textarea" id="sc_q9b" placeholder="Substance b)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">c)</p>
+        <textarea class="answer-textarea" id="sc_q9c" placeholder="Substance c)..." rows="2"></textarea>
+      </div>
+
+      <!-- Q10 -->
+      <div class="question-block">
+        <div class="question-number">10</div>
+        <div class="question-points">30pts</div>
+        <div class="question-text">Donne deux (2) modes de transmission du V.I.H / SIDA :</div>
+        <textarea class="answer-textarea" id="sc_q10" placeholder="Mode 1 et Mode 2..." rows="4"></textarea>
+      </div>
+
+      <div class="submit-section">
+        <button class="btn-submit" id="btnSubmitSciences" onclick="submitExam('sciences')">
+          ✅ Soumettre Sciences Expérimentales
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCIENCES SOCIALES SECTION -->
+  <!-- ============================================================ -->
+  <div id="socialesSection" class="section">
+    <div class="card">
+      <div class="matiere-header">
+        <div class="matiere-title">🌍 Sciences Sociales</div>
+        <div class="matiere-subtitle">Sixième Année Fondamentale (6ème AF)</div>
+        <div class="exam-info">
+          <span class="exam-badge">Total: 270 points</span>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="socialesProgress" style="width:0%"></div></div>
+
+      <div class="section-title">Partie I — Choix Multiples (Questions 1 à 6)</div>
+      <p style="color:var(--gray); font-size:13px; margin-bottom:20px;"><em>Entoure la lettre qui correspond à la bonne réponse pour les questions 1 à 6.</em></p>
+
+      <!-- Q1 -->
+      <div class="question-block">
+        <div class="question-number">1</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Jeanne cite quelques pays moins avancés, elle commet une erreur. Laquelle ?</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="ss_q1" value="a"><div class="option-indicator"></div>a) Haïti</label>
+          <label class="option-label"><input type="radio" name="ss_q1" value="b"><div class="option-indicator"></div>b) Canada</label>
+          <label class="option-label"><input type="radio" name="ss_q1" value="c"><div class="option-indicator"></div>c) Bengladesh</label>
+          <label class="option-label"><input type="radio" name="ss_q1" value="d"><div class="option-indicator"></div>d) Mozambique</label>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question-block">
+        <div class="question-number">2</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Les pays de l'Union Européenne se trouvent en :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="ss_q2" value="a"><div class="option-indicator"></div>a) Europe</label>
+          <label class="option-label"><input type="radio" name="ss_q2" value="b"><div class="option-indicator"></div>b) Amérique</label>
+          <label class="option-label"><input type="radio" name="ss_q2" value="c"><div class="option-indicator"></div>c) Afrique</label>
+          <label class="option-label"><input type="radio" name="ss_q2" value="d"><div class="option-indicator"></div>d) Asie</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question-block">
+        <div class="question-number">3</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Le successeur de Dumarsais Estimé est :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="ss_q3" value="a"><div class="option-indicator"></div>a) François Duvalier</label>
+          <label class="option-label"><input type="radio" name="ss_q3" value="b"><div class="option-indicator"></div>b) Élie Lescot</label>
+          <label class="option-label"><input type="radio" name="ss_q3" value="c"><div class="option-indicator"></div>c) Paul E. Magloire</label>
+          <label class="option-label"><input type="radio" name="ss_q3" value="d"><div class="option-indicator"></div>d) Sudre Dartiguenave</label>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question-block">
+        <div class="question-number">4</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Identifie l'un des droits fondamentaux de l'homme :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="ss_q4" value="a"><div class="option-indicator"></div>a) le droit d'être malade</label>
+          <label class="option-label"><input type="radio" name="ss_q4" value="b"><div class="option-indicator"></div>b) le droit de ne pas respecter les autres</label>
+          <label class="option-label"><input type="radio" name="ss_q4" value="c"><div class="option-indicator"></div>c) le droit de jeter des immondices dans la rue</label>
+          <label class="option-label"><input type="radio" name="ss_q4" value="d"><div class="option-indicator"></div>d) le droit à la liberté</label>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question-block">
+        <div class="question-number">5</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">L'une de ces causes a provoqué la chute du président Magloire :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="ss_q5" value="a"><div class="option-indicator"></div>a) le chômage</label>
+          <label class="option-label"><input type="radio" name="ss_q5" value="b"><div class="option-indicator"></div>b) la construction de ponts</label>
+          <label class="option-label"><input type="radio" name="ss_q5" value="c"><div class="option-indicator"></div>c) l'ouverture de ports au commerce</label>
+          <label class="option-label"><input type="radio" name="ss_q5" value="d"><div class="option-indicator"></div>d) la création de la SHADA</label>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="question-block">
+        <div class="question-number">6</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Il a pris le pouvoir le 16 août 1946 et l'a quitté le 10 mai 1950. Trouve qui c'est.</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="ss_q6" value="a"><div class="option-indicator"></div>a) Magloire</label>
+          <label class="option-label"><input type="radio" name="ss_q6" value="b"><div class="option-indicator"></div>b) Duvalier</label>
+          <label class="option-label"><input type="radio" name="ss_q6" value="c"><div class="option-indicator"></div>c) Vincent</label>
+          <label class="option-label"><input type="radio" name="ss_q6" value="d"><div class="option-indicator"></div>d) Estimé</label>
+        </div>
+      </div>
+
+      <div class="section-title">Partie II — Questions Ouvertes (Questions 7 à 11)</div>
+
+      <!-- Q7 -->
+      <div class="question-block">
+        <div class="question-number">7</div>
+        <div class="question-points">40pts</div>
+        <div class="question-text">Complète avec l'un des mots suivants : la malnutrition – États-Unis – constitution – l'affectivité.</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) La _______ est la loi mère d'un pays.</p>
+        <textarea class="answer-textarea" id="ss_q7a" placeholder="Réponse a)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) _______ se trouvent en Amérique du Nord.</p>
+        <textarea class="answer-textarea" id="ss_q7b" placeholder="Réponse b)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">c) Une fonction de la famille est _______.</p>
+        <textarea class="answer-textarea" id="ss_q7c" placeholder="Réponse c)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">d) L'une des causes du sous-développement est _______.</p>
+        <textarea class="answer-textarea" id="ss_q7d" placeholder="Réponse d)..." rows="2"></textarea>
+      </div>
+
+      <!-- Q8 -->
+      <div class="question-block">
+        <div class="question-number">8</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Quel moyen de transport doit utiliser une personne qui veut se rendre à l'Île à Vache ?</div>
+        <textarea class="answer-textarea" id="ss_q8" placeholder="Votre réponse..." rows="3"></textarea>
+      </div>
+
+      <!-- Q9 -->
+      <div class="question-block">
+        <div class="question-number">9</div>
+        <div class="question-points">40pts</div>
+        <div class="question-text">Écris deux caractéristiques des grandes puissances :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a)</p>
+        <textarea class="answer-textarea" id="ss_q9a" placeholder="Caractéristique a)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b)</p>
+        <textarea class="answer-textarea" id="ss_q9b" placeholder="Caractéristique b)..." rows="2"></textarea>
+      </div>
+
+      <!-- Q10 -->
+      <div class="question-block">
+        <div class="question-number">10</div>
+        <div class="question-points">10pts</div>
+        <div class="question-text">Comment s'appelle la monnaie de l'Union Européenne ?</div>
+        <textarea class="answer-textarea" id="ss_q10" placeholder="Votre réponse..." rows="2"></textarea>
+      </div>
+
+      <!-- Q11 -->
+      <div class="question-block">
+        <div class="question-number">11</div>
+        <div class="question-points">30pts</div>
+        <div class="question-text">Relie par flèche chaque pays à sa capitale :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:10px;">Reliez : France → Paris | Brésil → Brasilia | Cuba → La Havane</p>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) France —</p>
+        <textarea class="answer-textarea" id="ss_q11a" placeholder="Capitale de la France..." rows="1"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) Brésil —</p>
+        <textarea class="answer-textarea" id="ss_q11b" placeholder="Capitale du Brésil..." rows="1"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">c) Cuba —</p>
+        <textarea class="answer-textarea" id="ss_q11c" placeholder="Capitale de Cuba..." rows="1"></textarea>
+      </div>
+
+      <div class="submit-section">
+        <button class="btn-submit" id="btnSubmitSociales" onclick="submitExam('sociales')">
+          ✅ Soumettre Sciences Sociales
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- KOMINIKASYON KREYÒL SECTION -->
+  <!-- ============================================================ -->
+  <div id="kreyoSection" class="section">
+    <div class="card">
+      <div class="matiere-header">
+        <div class="matiere-title">📝 Kominikasyon Kreyòl</div>
+        <div class="matiere-subtitle">Sixième Année Fondamentale (6ème AF)</div>
+        <div class="exam-info">
+          <span class="exam-badge">Total: 250 points</span>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="kreyoProgress" style="width:0%"></div></div>
+
+      <div class="text-passage">
+        <h4>📖 Tèks: Yon aksidan</h4>
+        <p>Yon maten, mwen ap jwe sou yon balanswa. Tout bagay t ap byen mache. Mwen t ap ale vini poukont mwen sou balanswa a.<br><br>
+        Fabyola vin ap pase, sa entèrese l, li pwoche. Men Fabyola gen plis fòs pase m, se nòmal, li pi gran pase m. Li voye m ak tout fòs li. Mwen tonbe sou mwen ban, mwen travèse, m al frape nan mi lekòl la. Chemiz mwen vin tout koulè. Cheve m sal. Tout timoun yo sezi, yo rete ap gade m bouch louvri. Se sèlman lè David vin ap pase, li ban m men pou m leve kanpe. Li ede m netwaye kò m.<br><br>
+        Se lè m rive lakay mwen, m pran reflèchi sou sa k sot pase a. Mwen rann mwen kont tèt mwen oswa yon lòt pati nan kò m te ka kase. Depi jou sa a, mwen pwomèt tèt mwen m ap fè plis atansyon lè m ap jwe.</p>
+      </div>
+
+      <div class="section-title">Konpreyansyon tèks la (Questions 1 à 5)</div>
+      <p style="color:var(--gray); font-size:13px; margin-bottom:20px;"><em>Antoure lèt ki devan bon repons lan soti nan kesyon 1 rive nan 4.</em></p>
+
+      <!-- Q1 -->
+      <div class="question-block">
+        <div class="question-number">1</div>
+        <div class="question-points">10pwen</div>
+        <div class="question-text">De non moun ki site nan tèks la se :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="kr_q1" value="a"><div class="option-indicator"></div>a) David ak Jinèt</label>
+          <label class="option-label"><input type="radio" name="kr_q1" value="an"><div class="option-indicator"></div>an) David ak Fabyola</label>
+          <label class="option-label"><input type="radio" name="kr_q1" value="b"><div class="option-indicator"></div>b) Fabyola ak Aksidan</label>
+          <label class="option-label"><input type="radio" name="kr_q1" value="ch"><div class="option-indicator"></div>ch) David ak Balanswa</label>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question-block">
+        <div class="question-number">2</div>
+        <div class="question-points">10pwen</div>
+        <div class="question-text">Daprè tèks la, aksidan an te pase :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="kr_q2" value="a"><div class="option-indicator"></div>a) aswè</label>
+          <label class="option-label"><input type="radio" name="kr_q2" value="an"><div class="option-indicator"></div>an) granmmaten</label>
+          <label class="option-label"><input type="radio" name="kr_q2" value="b"><div class="option-indicator"></div>b) aprèmidi</label>
+          <label class="option-label"><input type="radio" name="kr_q2" value="ch"><div class="option-indicator"></div>ch) a dezè</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question-block">
+        <div class="question-number">3</div>
+        <div class="question-points">10pwen</div>
+        <div class="question-text">Aksidan an te fèt :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="kr_q3" value="a"><div class="option-indicator"></div>a) nan lari a</label>
+          <label class="option-label"><input type="radio" name="kr_q3" value="an"><div class="option-indicator"></div>an) nan lekòl la</label>
+          <label class="option-label"><input type="radio" name="kr_q3" value="b"><div class="option-indicator"></div>b) sou plasdàm nan</label>
+          <label class="option-label"><input type="radio" name="kr_q3" value="ch"><div class="option-indicator"></div>ch) bò lanmè a</label>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question-block">
+        <div class="question-number">4</div>
+        <div class="question-points">10pwen</div>
+        <div class="question-text">Lè aksidan an te fèt :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="kr_q4" value="a"><div class="option-indicator"></div>a) tout timoun yo te kouri vin leve David</label>
+          <label class="option-label"><input type="radio" name="kr_q4" value="an"><div class="option-indicator"></div>an) David te al leve timoun ki te frape a</label>
+          <label class="option-label"><input type="radio" name="kr_q4" value="b"><div class="option-indicator"></div>b) Fabyola te mennen timoun nan lopital</label>
+          <label class="option-label"><input type="radio" name="kr_q4" value="ch"><div class="option-indicator"></div>ch) Kèk lòt timoun te mennen l lakay li</label>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question-block">
+        <div class="question-number">5</div>
+        <div class="question-points">10pwen</div>
+        <div class="question-text">Konplete ak mo ki nan tèks la :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Se _______ li pi _______ pase m.</p>
+        <textarea class="answer-textarea" id="kr_q5a" placeholder="Réponse a)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">an) Se sèlman lè _______, li ban m men.</p>
+        <textarea class="answer-textarea" id="kr_q5an" placeholder="Réponse an)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) Depi jou sa a _______, m ap fè plis _______ lè m ap jwe.</p>
+        <textarea class="answer-textarea" id="kr_q5b" placeholder="Réponse b)..." rows="2"></textarea>
+      </div>
+
+      <div class="section-title">Òtograf – Vokabilè – Gramè (Questions 6 à 11)</div>
+
+      <!-- Q6 -->
+      <div class="question-block">
+        <div class="question-number">6</div>
+        <div class="question-points">15pwen</div>
+        <div class="question-text">Pase yon trè anba prepozisyon ki nan fraz sa yo :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Elèv yo ap jwenn nan lakou a.</p>
+        <textarea class="answer-textarea" id="kr_q6a" placeholder="Soulignez la préposition..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">an) Chat la kouche anba tab la.</p>
+        <textarea class="answer-textarea" id="kr_q6an" placeholder="Soulignez la préposition..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) Liv la sou tab la.</p>
+        <textarea class="answer-textarea" id="kr_q6b" placeholder="Soulignez la préposition..." rows="2"></textarea>
+      </div>
+
+      <!-- Q7 -->
+      <div class="question-block">
+        <div class="question-number">7</div>
+        <div class="question-points">15pwen</div>
+        <div class="question-text">Mete fòm predika ki nan fraz sa yo nan parantèz yo :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Mwen achte yon bèl mayo. (  ) | Diri a nan bòl la. (  )</p>
+        <textarea class="answer-textarea" id="kr_q7a" placeholder="Réponse a)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) Tèren foutbòl Manich lan. (  )</p>
+        <textarea class="answer-textarea" id="kr_q7b" placeholder="Réponse b)..." rows="2"></textarea>
+      </div>
+
+      <!-- Q8 -->
+      <div class="question-block">
+        <div class="question-number">8</div>
+        <div class="question-points">20pwen</div>
+        <div class="question-text">Mete fraz sa yo nan diskou dirèk :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Jak di li pa byen ditou jodi a.</p>
+        <textarea class="answer-textarea" id="kr_q8a" placeholder="Discours direct..." rows="3"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">an) Yo pap antre nan kay la.</p>
+        <textarea class="answer-textarea" id="kr_q8an" placeholder="Discours direct..." rows="3"></textarea>
+      </div>
+
+      <!-- Q9 -->
+      <div class="question-block">
+        <div class="question-number">9</div>
+        <div class="question-points">20pwen</div>
+        <div class="question-text">Fè de fraz, youn ak :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) ak konpleman dobjè dirèk :</p>
+        <textarea class="answer-textarea" id="kr_q9a" placeholder="Fraz ak konpleman dobjè dirèk..." rows="3"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">an) ak konpleman sikonstansyèl tan :</p>
+        <textarea class="answer-textarea" id="kr_q9an" placeholder="Fraz ak konpleman sikonstansyèl tan..." rows="3"></textarea>
+      </div>
+
+      <!-- Q10 -->
+      <div class="question-block">
+        <div class="question-number">10</div>
+        <div class="question-points">10pwen</div>
+        <div class="question-text">Souliye fraz ki indike sibòdone koz la :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="kr_q10" value="a"><div class="option-indicator"></div>a) Si w pa vin chache m, m pa prale.</label>
+          <label class="option-label"><input type="radio" name="kr_q10" value="an"><div class="option-indicator"></div>an) Papa m pa ale nan prizon paske li pa koupab.</label>
+          <label class="option-label"><input type="radio" name="kr_q10" value="b"><div class="option-indicator"></div>b) Chak jou mwen wè madanm sa a pase bò lakay la.</label>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="question-block">
+        <div class="question-number">11</div>
+        <div class="question-points">20pwen</div>
+        <div class="question-text">Fè yon trè anba fraz nan sans figire a :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="kr_q11" value="a"><div class="option-indicator"></div>a) Gen yon bèf sou tèt mòn nan.</label>
+          <label class="option-label"><input type="radio" name="kr_q11" value="an"><div class="option-indicator"></div>an) Mariz mare tèt li ak yon bèl mouchwa.</label>
+          <label class="option-label"><input type="radio" name="kr_q11" value="b"><div class="option-indicator"></div>b) Li te al panse malad nan tèt li a nan klinik li.</label>
+        </div>
+      </div>
+
+      <!-- Q12 Production -->
+      <div class="question-block">
+        <div class="question-number">12</div>
+        <div class="question-points">50pwen</div>
+        <div class="question-text">Pwodiksyon ekri — Chwazi youn nan sijè sa yo : (Nan do fèy la)</div>
+        <p style="font-size:13px; color:var(--gold); margin-bottom:10px;"><strong>Sijè 1 :</strong> Lè Ayiti te kalifye pou mondyal la, di kisa ounmenm ak moun lakay ou te fè.<br><strong>Sijè 2 :</strong> Di tout sa ou pral fè pandan vakans k ap vini la.</p>
+        <textarea class="answer-textarea" id="kr_q12" placeholder="Ekri repons ou isit la..." rows="10"></textarea>
+      </div>
+
+      <div class="submit-section">
+        <button class="btn-submit" id="btnSubmitKreyo" onclick="submitExam('kreyo')">
+          ✅ Soumettre Kominikasyon Kreyòl
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- COMMUNICATION FRANÇAISE SECTION -->
+  <!-- ============================================================ -->
+  <div id="francaisSection" class="section">
+    <div class="card">
+      <div class="matiere-header">
+        <div class="matiere-title">🇫🇷 Communication Française</div>
+        <div class="matiere-subtitle">Sixième Année Fondamentale (6ème AF)</div>
+        <div class="exam-info">
+          <span class="exam-badge">Total: 350 points</span>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="francaisProgress" style="width:0%"></div></div>
+
+      <div class="text-passage">
+        <h4>📖 Texte : Le chien</h4>
+        <p>Le chien est un animal de la famille des canides. On reconnaît plus de 300 races de chiens différentes dont la taille varie du simple au double.<br><br>
+        Le chien possède un odorat particulièrement développé jusqu'à 20000 fois plus que celui de l'homme. Cet odorat lui est utile pour la chasse et la recherche de survivants sous les décombres. Il possède également une ouïe très fine lui permettant d'entendre des sons inaudibles par l'homme tels que les ultrasons. Sa vue est par contre moins développée que celle de l'homme mais lui permet néanmoins de distinguer sans problème les petits objets en mouvement telle qu'une balle.<br><br>
+        Avec sa mâchoire, le « rottweiller », comme une race de chiens est capable d'exercer une pression de 150kg au cm². Le chien est sans contexte un des meilleurs amis de l'homme.</p>
+      </div>
+
+      <div class="section-title">Compréhension du texte (Questions 1 à 5)</div>
+      <p style="color:var(--gray); font-size:13px; margin-bottom:20px;"><em>Choisis la lettre qui correspond à la bonne réponse pour les questions 1 à 5.</em></p>
+
+      <!-- Q1 -->
+      <div class="question-block">
+        <div class="question-number">1</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Le « rottweiller » est :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="fr_q1" value="a"><div class="option-indicator"></div>a) le nom d'un chien</label>
+          <label class="option-label"><input type="radio" name="fr_q1" value="b"><div class="option-indicator"></div>b) une race de chiens</label>
+          <label class="option-label"><input type="radio" name="fr_q1" value="c"><div class="option-indicator"></div>c) la famille de chiens</label>
+          <label class="option-label"><input type="radio" name="fr_q1" value="d"><div class="option-indicator"></div>d) le squelette d'un chien</label>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question-block">
+        <div class="question-number">2</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Le texte a :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="fr_q2" value="a"><div class="option-indicator"></div>a) 2 paragraphes</label>
+          <label class="option-label"><input type="radio" name="fr_q2" value="b"><div class="option-indicator"></div>b) 4 paragraphes</label>
+          <label class="option-label"><input type="radio" name="fr_q2" value="c"><div class="option-indicator"></div>c) 3 paragraphes</label>
+          <label class="option-label"><input type="radio" name="fr_q2" value="d"><div class="option-indicator"></div>d) 1 paragraphe</label>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question-block">
+        <div class="question-number">3</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">D'après le texte, le chien a une vue :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="fr_q3" value="a"><div class="option-indicator"></div>a) moins développée que celle de l'homme</label>
+          <label class="option-label"><input type="radio" name="fr_q3" value="b"><div class="option-indicator"></div>b) plus développée que celle de l'homme</label>
+          <label class="option-label"><input type="radio" name="fr_q3" value="c"><div class="option-indicator"></div>c) très très développée</label>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question-block">
+        <div class="question-number">4</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Le chien est :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="fr_q4" value="a"><div class="option-indicator"></div>a) ovipare</label>
+          <label class="option-label"><input type="radio" name="fr_q4" value="b"><div class="option-indicator"></div>b) granivore</label>
+          <label class="option-label"><input type="radio" name="fr_q4" value="c"><div class="option-indicator"></div>c) un mammifère</label>
+          <label class="option-label"><input type="radio" name="fr_q4" value="d"><div class="option-indicator"></div>d) un amphibien</label>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question-block">
+        <div class="question-number">5</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">L'ouïe du chien lui permet de (d') :</div>
+        <div class="options-grid">
+          <label class="option-label"><input type="radio" name="fr_q5" value="a"><div class="option-indicator"></div>a) entendre les sons</label>
+          <label class="option-label"><input type="radio" name="fr_q5" value="b"><div class="option-indicator"></div>b) voir très loin</label>
+          <label class="option-label"><input type="radio" name="fr_q5" value="c"><div class="option-indicator"></div>c) couper des os</label>
+          <label class="option-label"><input type="radio" name="fr_q5" value="d"><div class="option-indicator"></div>d) chasser d'autres animaux</label>
+        </div>
+      </div>
+
+      <div class="section-title">Orthographe – Vocabulaire – Grammaire (Questions 6 à 10)</div>
+
+      <!-- Q6 -->
+      <div class="question-block">
+        <div class="question-number">6</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Souligne la phrase à la forme pronominale :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="fr_q6" value="a"><div class="option-indicator"></div>a) Le chien aboie les passants.</label>
+          <label class="option-label"><input type="radio" name="fr_q6" value="b"><div class="option-indicator"></div>b) Nous nous entendons à merveille.</label>
+          <label class="option-label"><input type="radio" name="fr_q6" value="c"><div class="option-indicator"></div>c) Les parents sont arrivés tôt à la réunion.</label>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="question-block">
+        <div class="question-number">7</div>
+        <div class="question-points">20pts</div>
+        <div class="question-text">Coche la lettre de la phrase qui a le pronom démonstratif :</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label class="option-label"><input type="radio" name="fr_q7" value="a"><div class="option-indicator"></div>a) De tous les fruits, l'orange est celle que ma mère préfère.</label>
+          <label class="option-label"><input type="radio" name="fr_q7" value="b"><div class="option-indicator"></div>b) Nadine adore ses parents.</label>
+          <label class="option-label"><input type="radio" name="fr_q7" value="c"><div class="option-indicator"></div>c) Ma soeur est très intelligente.</label>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="question-block">
+        <div class="question-number">8</div>
+        <div class="question-points">30pts</div>
+        <div class="question-text">Entoure les pronoms possessifs :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Ma jupe est courte, la tienne est plus courte.</p>
+        <textarea class="answer-textarea" id="fr_q8a" placeholder="Identifiez le pronom possessif..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) Ton livre est déchiré, le mien ne l'est pas.</p>
+        <textarea class="answer-textarea" id="fr_q8b" placeholder="Identifiez le pronom possessif..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">c) Tes cheveux sont courts, les leurs sont longs.</p>
+        <textarea class="answer-textarea" id="fr_q8c" placeholder="Identifiez le pronom possessif..." rows="2"></textarea>
+      </div>
+
+      <!-- Q9 -->
+      <div class="question-block">
+        <div class="question-number">9</div>
+        <div class="question-points">60pts</div>
+        <div class="question-text">Mets les verbes entre parenthèses aux temps indiqués :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">a) Si tu (lire, présent) _______ le problème, tu le (comprendre, futur simple) _______ mieux.</p>
+        <textarea class="answer-textarea" id="fr_q9a" placeholder="Réponse a)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">b) Hier, il (pleuvoir, passé composé) _______ toute la journée.</p>
+        <textarea class="answer-textarea" id="fr_q9b" placeholder="Réponse b)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">c) Le chapeau de Carla (tomber, passé simple) _______ dans la rivière.</p>
+        <textarea class="answer-textarea" id="fr_q9c" placeholder="Réponse c)..." rows="2"></textarea>
+        <p style="font-size:13px; color:var(--gray); margin:10px 0;">d) De nombreuses étoiles (briller, présent) _______ dans le ciel.</p>
+        <textarea class="answer-textarea" id="fr_q9d" placeholder="Réponse d)..." rows="2"></textarea>
+      </div>
+
+      <!-- Q10 -->
+      <div class="question-block">
+        <div class="question-number">10</div>
+        <div class="question-points">30pts</div>
+        <div class="question-text">Entoure les mots de la même famille que « voir » :</div>
+        <p style="font-size:13px; color:var(--gray); margin-bottom:8px;">Devoir – prévoir – revoir – savoir – visible</p>
+        <textarea class="answer-textarea" id="fr_q10" placeholder="Mots de la famille de voir..." rows="2"></textarea>
+      </div>
+
+      <!-- Q11 Production -->
+      <div class="question-block">
+        <div class="question-number">11</div>
+        <div class="question-points">40pts</div>
+        <div class="question-text">Production écrite — Sujet au choix (Au verso de la feuille) :</div>
+        <p style="font-size:13px; color:var(--gold); margin-bottom:10px;"><strong>Sujet 1 :</strong> Écris à un ou une de tes amis pour lui dire comment tu as passé l'année scolaire 2025-2026.<br><strong>Sujet 2 :</strong> Tu as participé à une fête dans ton école. Raconte.</p>
+        <textarea class="answer-textarea" id="fr_q11" placeholder="Écrivez votre texte ici..." rows="12"></textarea>
+      </div>
+
+      <div class="submit-section">
+        <button class="btn-submit" id="btnSubmitFrancais" onclick="submitExam('francais')">
+          ✅ Soumettre Communication Française
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- RESULTS SECTION -->
+  <!-- ============================================================ -->
+  <div id="resultsSection" class="section">
+    <div class="results-header">
+      <div class="results-title">📊 Résultats & Classement</div>
+      <div style="color:var(--gray); margin-top:5px;">Bureau du District Scolaire — 6ème Année Fondamentale</div>
     </div>
 
-    <!-- ===== HEADER ===== -->
-    <header>
-        <div class="brand">
-            <div>
-                <h1>📚 J.<span>D.</span></h1>
-                <span class="sub">Complexe Éducatif Jean Jacques Dessalines</span>
-            </div>
-        </div>
-        <div class="contact">
-            <span>📞</span> +509 3391 0384
-        </div>
-    </header>
-
-    <!-- ===== MAIN ===== -->
-    <div class="container" id="mainContainer" style="display:none;">
-
-        <!-- Dashboard -->
-        <div id="dashboard">
-            <div class="dashboard-header">
-                <h2>📋 Évaluations – 6<sup>e</sup> AF</h2>
-                <div class="user-info">
-                    <span>👤</span>
-                    <span id="userDisplay">Élève</span>
-                    <span class="badge">Connecté</span>
-                </div>
-            </div>
-
-            <div class="grille" id="grilleMatieres">
-                <!-- Les cartes sont générées par JS -->
-            </div>
-        </div>
-
-        <!-- Examen View -->
-        <div class="examen-view" id="examenView">
-            <div class="examen-header">
-                <h2 id="examenTitre">Sciences sociales</h2>
-                <div class="timer" id="timerDisplay">⏱️ 60:00</div>
-            </div>
-            <div class="examen-body" id="examenBody">
-                <!-- Contenu injecté par JS -->
-            </div>
-            <div class="examen-footer">
-                <button class="btn-back" id="btnBack">← Retour</button>
-                <button class="btn-submit" id="btnSubmit">📤 Soumettre</button>
-            </div>
-        </div>
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-label">Élèves inscrits</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statAvg">0</div>
+        <div class="stat-label">Moyenne générale</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statPassed">0</div>
+        <div class="stat-label">Élèves admis</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statFailed">0</div>
+        <div class="stat-label">Élèves en échec</div>
+      </div>
     </div>
 
-    <!-- ===== TOAST ===== -->
-    <div class="toast" id="toast"></div>
+    <div class="filter-bar">
+      <input type="text" class="filter-input" id="searchInput" placeholder="🔍 Rechercher un élève..." oninput="filterResults()">
+      <button class="btn-refresh" onclick="loadResults()">🔄 Actualiser</button>
+      <button class="btn-refresh" onclick="window.print()">🖨️ Imprimer</button>
+    </div>
 
-    <script>
-        // ============================================================
-        // 1. DONNÉES DES EXAMENS (contenu exact depuis vos fichiers)
-        // ============================================================
-        const examensData = [{
-            id: 'sciences-sociales',
-            titre: 'Sciences sociales',
-            emoji: '🌍',
-            qcount: '10 questions',
-            questions: [
-                { q: '1- Jeanne cite quelques pays moins avancés, elle comment une erreur. Laquelle ?', type: 'radio',
-                    options: ['a) Haïti', 'b) Canada', 'c) Bangladesh', 'd) Mozambique'] },
-                { q: '2- Les pays de l’Union Européenne se trouvent en :', type: 'radio', options: ['a) Europe',
-                        'b) Amérique', 'c) Afrique', 'd) Asie'
-                    ] },
-                { q: '3- Le successeur de Dumarsais Estimé est :', type: 'radio', options: ['a) François Duvalier',
-                        'b) Élie Lescot', 'c) Paul E. Magloire', 'd) Sudre Dartiguenave'
-                    ] },
-                { q: '4- Identifie l’un des droits fondamentaux de l’homme :', type: 'radio', options: [
-                        'a) le droit d’être malade', 'b) le droit de ne pas respecter les autres',
-                        'c) le droit de jeter des immondices dans la rue', 'd) le droit à la liberté'
-                    ] },
-                { q: '5- L’une de ces causes a provoqué la chute du président Magloire :', type: 'radio',
-                    options: ['a) le chômage', 'b) la construction de ponts', 'c) l’ouverture de ports au commerce',
-                        'd) la création de la SHADA'
-                    ] },
-                { q: '6- Il a pris le pouvoir le 16 août 1946 et l’a quitté le 10 mai 1950. Trouve qui c’est.',
-                    type: 'radio', options: ['a) Magloire', 'b) Duvalier', 'c) Vincent', 'd) Estimé'] },
-                { q: '7- Complète avec l’un des mots suivants : (la malnutrition – États-Unis – constitution – l’affectivité)',
-                    type: 'text', placeholder: 'Réponse ...' },
-                { q: '8- Quel moyen de transport doit utiliser une personne qui veut se rendre à l’Ile à Vache ?',
-                    type: 'text', placeholder: 'Moyen de transport ...' },
-                { q: '9- Écris deux caractéristiques des grandes puissances.', type: 'text', placeholder: 'a) ...' },
-                { q: '10- Comment s’appelle la monnaie de l’Union Européenne ?', type: 'text',
-                placeholder: 'Monnaie ...' },
-            ]
-        }, {
-            id: 'sciences-experimentales',
-            titre: 'Sciences expérimentales',
-            emoji: '🔬',
-            qcount: '10 questions',
-            questions: [
-                { q: '1- Une de ces plantes n’a ni racine, ni tige, ni feuille. C’est :', type: 'radio',
-                    options: ['a) le manguier', 'b) le citronnier', 'c) le champignon', 'd) le cerisier'] },
-                { q: '2- Une fille peut reproduire si elle a :', type: 'radio', options: ['a) une grande taille',
-                        'b) de gros seins', 'c) de longues jambes', 'd) la maturité'
-                    ] },
-                { q: '3- Un manguier est capable de donner des fruits et de se reproduire :', type: 'radio',
-                    options: ['a) entre 3 et 5 ans', 'b) entre 1 et 2 ans', 'c) entre 6 mois et 12 mois',
-                        'd) entre 4 et 8 mois'
-                    ] },
-                { q: '4- Pisciculteur veut dire « éleveur de :', type: 'radio', options: ['a) poules »',
-                        'b) poissons »', 'c) porcs »', 'd) palourdes »'
-                    ] },
-                { q: '5- Les spores sont :', type: 'radio', options: ['a) le chapeau du champignon.',
-                        'b) la pelure d’un fruit.', 'c) de très petits grains contenus dans des sacs appelés sporanges.'
-                    ] },
-                { q: '6- Laquelle de ces maladies est sexuellement transmissible ?', type: 'radio', options: [
-                        'a) le tétanos', 'b) l’hémophilie', 'c) la blennorragie', 'd) l’hypertension'
-                    ] },
-                { q: '7- Complète. a) Les plantes sans fleurs se reproduisent par ______. b) L’eau est une source ______. c) ______ est un corps dont la force magnétique attire tout ce qui est en fer. d) L’absence du nerf auditif entraîne ______.',
-                    type: 'text', placeholder: 'Réponse ...' },
-                { q: '8- Définis les termes suivants. a) Durée du son : b) La pesanteur :', type: 'text',
-                    placeholder: 'Définitions ...' },
-                { q: '9- Écris 3 substances dangereuses pour le système nerveux.', type: 'text',
-                    placeholder: 'a) b) c) ...' },
-                { q: '10- Donne deux (2) modes de transmission du V.I.H // SIDA.', type: 'text',
-                    placeholder: 'a) b) ...' },
-            ]
-        }, {
-            id: 'mathematique',
-            titre: 'Mathématique',
-            emoji: '🧮',
-            qcount: '11 questions',
-            questions: [
-                { q: '1- Identifie la valeur décimale correspondant à cette fraction :', type: 'radio',
-                    options: ['a) 0,008', 'b) 0,0008', 'c) 0,8', 'd) 0,00008'] },
-                { q: '2- 23cm³ est l’équivalent de :', type: 'radio', options: ['a) 0,023 l', 'b) 0,0023 l',
-                        'c) 0,23 l', 'd) 0,0023 l'
-                    ] },
-                { q: '3- Trouve l’écriture en lettres de ce nombre 4 732 608 :', type: 'radio', options: [
-                        'a) quarante-sept millions trois cent vingt-six mille huit',
-                        'b) quatre cent soixante-treize mille deux cent huit',
-                        'c) quatre millions sept cent trente-deux mille six cent huit',
-                        'd) quatre millions sept cent vingt-trois mille six cent huit'
-                    ] },
-                { q: '4- Le résultat de cette multiplication :', type: 'radio', options: ['a) 21/48', 'b) 3/8',
-                        'c) 48/18', 'd) 24/36'
-                    ] },
-                { q: '5- 8 livres de géographie coûtent 7 200 gourdes. 5 livres coûtent :', type: 'radio',
-                    options: ['a) 4500 gourdes', 'b) 900 gourdes', 'c) 450 gourdes', 'd) 9000 gourdes'] },
-                { q: '6- Le nombre en chiffres romains qui correspond au chiffre arabe 2050 est :', type: 'radio',
-                    options: ['a) MMXLI', 'b) MMXXXXX', 'c) MML', 'd) MMLX'] },
-                { q: '7- Effectue les opérations suivantes : a) 2/7 + 1/4 + 2/5 = ? b) 3/4 - 1/4 = ? c) 7458,72 + 4984,8 + 0,453 = ? d) 967 × 35 = ?',
-                    type: 'text', placeholder: 'Résultats ...' },
-                { q: '8- Complète. a) Pour trouver la valeur décimale d’une fraction, on ______ le ______ par le ______. b) Pour diviser un nombre décimal par 100, on ______ la ______ de ______ vers la ______. c) Le taux est égal à ______.',
-                    type: 'text', placeholder: 'Complétez ...' },
-                { q: '9- Problème : Un capital placé à un taux de 5% rapporte un intérêt annuel de 9500 gourdes. Quel est ce capital ?',
-                    type: 'text', placeholder: 'Votre réponse ...' },
-                { q: '10- Problème : Un cube a 6cm d’arête. Trouve son volume.', type: 'text',
-                    placeholder: 'Volume ...' },
-                { q: '11- Problème : Une école envoie 250 élèves aux examens de 9ᵉ année. 215 ont réussi. Quel est le pourcentage d’élèves qui a échoué ?',
-                    type: 'text', placeholder: 'Pourcentage ...' },
-            ]
-        }, {
-            id: 'communication-francaise',
-            titre: 'Communication française',
-            emoji: '📖',
-            qcount: '10 questions',
-            questions: [
-                { q: '1- Le « rottweiler » est :', type: 'radio', options: ['a) le nom d’un chien',
-                        'b) une race de chiens', 'c) la famille de chiens', 'd) le squelette d’un chien'
-                    ] },
-                { q: '2- Le texte a :', type: 'radio', options: ['a) 2 paragraphes', 'b) 4 paragraphes',
-                        'c) 3 paragraphes', 'd) 1 paragraphe'
-                    ] },
-                { q: '3- D’après le texte, le chien a une vue :', type: 'radio', options: [
-                        'a) moins développée que celle de l’homme', 'b) plus développée que celle de l’homme',
-                        'c) très très développée'
-                    ] },
-                { q: '4- Le chien est :', type: 'radio', options: ['a) ovipare', 'b) granivore',
-                        'c) un mammifère', 'd) un amphibien'
-                    ] },
-                { q: '5- L’ouïe du chien lui permet de (d’) :', type: 'radio', options: ['a) entendre des sons',
-                        'b) voir très loin', 'c) couper des os', 'd) chasser d’autres animaux'
-                    ] },
-                { q: '6- Souligne la phrase à la forme pronominale.', type: 'text', placeholder: 'Votre réponse ...' },
-                { q: '7- Coche la lettre de la phrase qui a le pronom démonstratif.', type: 'text',
-                    placeholder: 'Réponse ...' },
-                { q: '8- Entoure les pronoms possessifs.', type: 'text', placeholder: 'Réponse ...' },
-                { q: '9- Mets les verbes entre parenthèses aux temps indiqués.', type: 'text',
-                    placeholder: 'Votre réponse ...' },
-                { q: '10- Entoure les mots de la même famille que « voir ».', type: 'text',
-                    placeholder: 'Mots ...' },
-            ]
-        }, {
-            id: 'kominkasyon-kreylò',
-            titre: 'Kominkasyon kreylò',
-            emoji: '🇭🇹',
-            qcount: '10 questions',
-            questions: [
-                { q: '1- De non moun ki site nan tèks la se :', type: 'radio', options: ['a) David ak Jinèt',
-                        'b) Fabiola ak Aksidan', 'c) David ak Balanswa'
-                    ] },
-                { q: '2- Daprè tèks la, aksidan an te pase :', type: 'radio', options: ['a) aswè',
-                        'b) grammante', 'c) apremidi'
-                    ] },
-                { q: '3- Aksidan an te fèt :', type: 'radio', options: ['a) nan lari a', 'b) sou plasdam nan',
-                        'c) bò lannè a'
-                    ] },
-                { q: '4- Lè aksidan an te fèt :', type: 'radio', options: [
-                        'a) tout timoun yo te kouri vin leve David', 'b) David te al leve timoun ki te frape a',
-                        'c) Fabiola te mennen timoun nan loptal', 'd) Kèk lòt timoun te mennen l lakay li'
-                    ] },
-                { q: '5- Konplete ak mo ki nan tèks la.', type: 'text', placeholder: 'a) ... b) ... c) ...' },
-                { q: '6- Pase yon trè anba prepozisyon ki nan fraz sa yo.', type: 'text',
-                    placeholder: 'Votre réponse ...' },
-                { q: '7- Mete fòm predika ki nan fraz sa yo nan parantèz yo.', type: 'text',
-                    placeholder: 'Réponse ...' },
-                { q: '8- Mete fraz sa yo nan diskou dirèk.', type: 'text', placeholder: 'Votre réponse ...' },
-                { q: '9- Fè de fraz, youn ak : a) konplèman dobè dirèk. b) konplèman sikonstansyèl tan.',
-                    type: 'text', placeholder: 'Vos phrases ...' },
-                { q: '10- Souliye fraz ki endike sibòdone koz la.', type: 'text', placeholder: 'Réponse ...' },
-            ]
-        }];
+    <!-- TABLE -->
+    <div class="table-container">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Élève</th>
+            <th>Math</th>
+            <th>Sc. Exp.</th>
+            <th>Sc. Soc.</th>
+            <th>Kreyòl</th>
+            <th>Français</th>
+            <th>Moyenne /10</th>
+          </tr>
+        </thead>
+        <tbody id="resultsTableBody">
+          <tr><td colspan="8" style="text-align:center; padding:40px; color:var(--gray);">Chargement...</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-        // ============================================================
-        // 2. ÉTAT DE L'APPLICATION
-        // ============================================================
-        let currentUser = null;
-        let currentExamId = null;
-        let timerInterval = null;
-        let timeLeft = 3600; // 60 minutes en secondes
-        let examStarted = false;
+    <!-- STUDENT DETAILS -->
+    <div id="studentDetails"></div>
+  </div>
 
-        // Éléments DOM
-        const loginOverlay = document.getElementById('loginOverlay');
-        const mainContainer = document.getElementById('mainContainer');
-        const loginNom = document.getElementById('loginNom');
-        const loginPrenom = document.getElementById('loginPrenom');
-        const btnLogin = document.getElementById('btnLogin');
-        const btnGoogle = document.getElementById('btnGoogle');
-        const userDisplay = document.getElementById('userDisplay');
-        const grilleMatieres = document.getElementById('grilleMatieres');
-        const examenView = document.getElementById('examenView');
-        const examenTitre = document.getElementById('examenTitre');
-        const examenBody = document.getElementById('examenBody');
-        const timerDisplay = document.getElementById('timerDisplay');
-        const btnBack = document.getElementById('btnBack');
-        const btnSubmit = document.getElementById('btnSubmit');
-        const toast = document.getElementById('toast');
+</div><!-- /container -->
 
-        // ============================================================
-        // 3. FONCTIONS UTILITAIRES
-        // ============================================================
-        function showToast(msg) {
-            toast.textContent = msg;
-            toast.classList.add('show');
-            clearTimeout(toast._hide);
-            toast._hide = setTimeout(() => toast.classList.remove('show'), 4000);
+<script>
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+const SUPABASE_URL = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2kZsCCv5jrAce6XIH8oxew_tTH2uL85';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================================
+// CORRECT ANSWERS (MCQ ONLY)
+// ============================================================
+const CORRECT_ANSWERS = {
+  math: {
+    math_q1: 'c',  // 0,8
+    math_q2: 'a',  // 0,023 l (23cm³ = 23/1000 l = 0,023 l)
+    math_q3: 'c',  // quatre millions sept cent trente-deux mille six cent huit
+    math_q4: 'b',  // 3/8 (6/12 × 3/4 = 1/2 × 3/4 = 3/8)
+    math_q5: 'a',  // 4500 gourdes
+    math_q6: 'd',  // MMLX
+  },
+  sciences: {
+    sc_q1: 'c',  // le champignon
+    sc_q2: 'd',  // la maturité
+    sc_q3: 'a',  // entre 3 et 5 ans
+    sc_q4: 'b',  // poissons
+    sc_q5: 'c',  // de très petits grains contenus dans des sacs appelés sporanges
+    sc_q6: 'c',  // la blennorragie
+  },
+  sociales: {
+    ss_q1: 'b',  // Canada (pays développé, pas moins avancé)
+    ss_q2: 'a',  // Europe
+    ss_q3: 'c',  // Paul E. Magloire
+    ss_q4: 'd',  // le droit à la liberté
+    ss_q5: 'a',  // le chômage
+    ss_q6: 'd',  // Estimé
+  },
+  kreyo: {
+    kr_q1: 'an', // David ak Fabyola
+    kr_q2: 'an', // granmmaten
+    kr_q3: 'an', // nan lekòl la
+    kr_q4: 'an', // David te al leve timoun ki te frape a
+    kr_q10: 'an',// Papa m pa ale nan prizon paske li pa koupab
+    kr_q11: 'a', // Gen yon bèf sou tèt mòn nan (sens figuré)
+  },
+  francais: {
+    fr_q1: 'b',  // une race de chiens
+    fr_q2: 'c',  // 3 paragraphes
+    fr_q3: 'a',  // moins développée que celle de l'homme
+    fr_q4: 'c',  // un mammifère
+    fr_q5: 'a',  // entendre les sons
+    fr_q6: 'b',  // Nous nous entendons à merveille
+    fr_q7: 'a',  // De tous les fruits, l'orange est celle que ma mère préfère
+  }
+};
+
+// Points per MCQ question
+const MCQ_POINTS = {
+  math: { math_q1:20, math_q2:20, math_q3:20, math_q4:20, math_q5:10, math_q6:10 },
+  sciences: { sc_q1:10, sc_q2:10, sc_q3:10, sc_q4:10, sc_q5:15, sc_q6:15 },
+  sociales: { ss_q1:10, ss_q2:10, ss_q3:10, ss_q4:10, ss_q5:10, ss_q6:10 },
+  kreyo: { kr_q1:10, kr_q2:10, kr_q3:10, kr_q4:10, kr_q10:10, kr_q11:20 },
+  francais: { fr_q1:20, fr_q2:20, fr_q3:20, fr_q4:20, fr_q5:20, fr_q6:20, fr_q7:20 }
+};
+
+// Total points per matiere
+const TOTAL_POINTS = { math: 300, sciences: 250, sociales: 270, kreyo: 250, francais: 350 };
+
+// Option labels for display
+const OPTION_LABELS = {
+  math: {
+    math_q1: {a:'0,008', b:'0,0008', c:'0,8', d:'0,00008'},
+    math_q2: {a:'0,023 l', b:'0,0023 l', c:'0,23 l', d:'0,00023 l'},
+    math_q3: {a:'quarante-sept millions...', b:'quatre cent soixante-treize mille...', c:'quatre millions sept cent trente-deux mille six cent huit', d:'quatre millions sept cent vingt-trois mille...'},
+    math_q4: {a:'21/48', b:'3/8', c:'48/18', d:'24/36'},
+    math_q5: {a:'4500 gourdes', b:'900 gourdes', c:'450 gourdes', d:'9000 gourdes'},
+    math_q6: {a:'MMXL', b:'MMXXXXXX', c:'MML', d:'MMLX'},
+  },
+  sciences: {
+    sc_q1: {a:'le manguier', b:'le citronnier', c:'le champignon', d:'le cerisier'},
+    sc_q2: {a:'une grande taille', b:'de gros seins', c:'de longues jambes', d:'la maturité'},
+    sc_q3: {a:'entre 3 et 5 ans', b:'entre 1 et 2 ans', c:'entre 6 mois et 12 mois', d:'entre 4 et 8 mois'},
+    sc_q4: {a:'poules', b:'poissons', c:'porcs', d:'palourdes'},
+    sc_q5: {a:'le chapeau du champignon', b:"la pelure d'un fruit", c:'de très petits grains dans des sacs appelés sporanges'},
+    sc_q6: {a:'le tétanos', b:"l'hémophilie", c:'la blennorragie', d:"l'hypertension"},
+  },
+  sociales: {
+    ss_q1: {a:'Haïti', b:'Canada', c:'Bengladesh', d:'Mozambique'},
+    ss_q2: {a:'Europe', b:'Amérique', c:'Afrique', d:'Asie'},
+    ss_q3: {a:'François Duvalier', b:'Élie Lescot', c:'Paul E. Magloire', d:'Sudre Dartiguenave'},
+    ss_q4: {a:"le droit d'être malade", b:'le droit de ne pas respecter les autres', c:"le droit de jeter des immondices dans la rue", d:"le droit à la liberté"},
+    ss_q5: {a:'le chômage', b:'la construction de ponts', c:"l'ouverture de ports au commerce", d:'la création de la SHADA'},
+    ss_q6: {a:'Magloire', b:'Duvalier', c:'Vincent', d:'Estimé'},
+  },
+  kreyo: {
+    kr_q1: {a:'David ak Jinèt', an:'David ak Fabyola', b:'Fabyola ak Aksidan', ch:'David ak Balanswa'},
+    kr_q2: {a:'aswè', an:'granmmaten', b:'aprèmidi', ch:'a dezè'},
+    kr_q3: {a:'nan lari a', an:'nan lekòl la', b:'sou plasdàm nan', ch:'bò lanmè a'},
+    kr_q4: {a:'tout timoun yo te kouri vin leve David', an:'David te al leve timoun ki te frape a', b:'Fabyola te mennen timoun nan lopital', ch:'Kèk lòt timoun te mennen l lakay li'},
+    kr_q10: {a:'Si w pa vin chache m, m pa prale.', an:'Papa m pa ale nan prizon paske li pa koupab.', b:'Chak jou mwen wè madanm sa a pase bò lakay la.'},
+    kr_q11: {a:'Gen yon bèf sou tèt mòn nan.', an:'Mariz mare tèt li ak yon bèl mouchwa.', b:'Li te al panse malad nan tèt li a nan klinik li.'},
+  },
+  francais: {
+    fr_q1: {a:'le nom d\'un chien', b:'une race de chiens', c:'la famille de chiens', d:'le squelette d\'un chien'},
+    fr_q2: {a:'2 paragraphes', b:'4 paragraphes', c:'3 paragraphes', d:'1 paragraphe'},
+    fr_q3: {a:'moins développée que celle de l\'homme', b:'plus développée que celle de l\'homme', c:'très très développée'},
+    fr_q4: {a:'ovipare', b:'granivore', c:'un mammifère', d:'un amphibien'},
+    fr_q5: {a:'entendre les sons', b:'voir très loin', c:'couper des os', d:'chasser d\'autres animaux'},
+    fr_q6: {a:'Le chien aboie les passants.', b:'Nous nous entendons à merveille.', c:'Les parents sont arrivés tôt à la réunion.'},
+    fr_q7: {a:'De tous les fruits, l\'orange est celle que ma mère préfère.', b:'Nadine adore ses parents.', c:'Ma soeur est très intelligente.'},
+  }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null;
+let currentEleveId = null;
+let submittedMatieres = {};
+let allResults = [];
+const ADMIN_PASSWORD = 'prof2025';
+
+// ============================================================
+// PARTICLES
+// ============================================================
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 15; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 6 + 2;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      animation-duration:${Math.random()*10+10}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    container.appendChild(p);
+  }
+}
+createParticles();
+
+// ============================================================
+// NOTIFICATION
+// ============================================================
+function showNotification(msg, type='success') {
+  const n = document.getElementById('notification');
+  n.textContent = msg;
+  n.className = `notification ${type} show`;
+  setTimeout(() => { n.className = 'notification'; }, 4000);
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function toggleAdminLogin() {
+  const div = document.getElementById('adminLoginDiv');
+  div.style.display = div.style.display === 'none' ? 'block' : 'none';
+}
+
+async function handleLogin() {
+  const nom = document.getElementById('loginNom').value.trim();
+  const prenom = document.getElementById('loginPrenom').value.trim();
+  if (!nom || !prenom) {
+    showNotification('⚠️ Veuillez entrer votre nom et prénom !', 'error');
+    return;
+  }
+  // Check existing
+  try {
+    let { data: existing } = await sb.from('eleves').select('*').ilike('nom', nom).ilike('prenom', prenom).single();
+    if (existing) {
+      currentEleveId = existing.id;
+      currentUser = existing;
+      // Load submitted matieres
+      let { data: scores } = await sb.from('scores').select('matiere').eq('eleve_id', existing.id);
+      if (scores) { scores.forEach(s => { submittedMatieres[s.matiere] = true; }); }
+    } else {
+      // Create new
+      let { data: newEleve, error } = await sb.from('eleves').insert({ nom, prenom }).select().single();
+      if (error) throw error;
+      currentEleveId = newEleve.id;
+      currentUser = newEleve;
+    }
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('welcomeName').textContent = `👋 Bienvenue, ${prenom} ${nom.toUpperCase()} !`;
+    showAllTabs();
+    showSection('dashboard');
+    updateDashboardCards();
+    showNotification(`✅ Bonjour ${prenom} ! Bonne chance pour vos examens !`);
+  } catch(e) {
+    showNotification('❌ Erreur de connexion: ' + e.message, 'error');
+  }
+}
+
+async function handleAdminLogin() {
+  const pwd = document.getElementById('adminPassword').value;
+  if (pwd === ADMIN_PASSWORD) {
+    document.getElementById('loginSection').style.display = 'none';
+    showAllTabs();
+    showSection('dashboard');
+    currentUser = { nom: 'PROF', prenom: 'Admin' };
+    document.getElementById('welcomeName').textContent = '👨‍🏫 Mode Professeur';
+    loadResults();
+    showNotification('✅ Connexion professeur réussie !');
+  } else {
+    showNotification('❌ Mot de passe incorrect !', 'error');
+  }
+}
+
+function showAllTabs() {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.add('visible'));
+}
+
+// ============================================================
+// SECTION NAVIGATION
+// ============================================================
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const sec = document.getElementById(name + 'Section');
+  if (sec) sec.classList.add('active');
+  const tab = document.getElementById('tab' + name.charAt(0).toUpperCase() + name.slice(1));
+  if (tab) tab.classList.add('active');
+  if (name === 'results') { loadResults(); }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function updateDashboardCards() {
+  const matieres = ['math','sciences','sociales','kreyo','francais'];
+  matieres.forEach(m => {
+    const card = document.getElementById('card-' + m);
+    if (card) {
+      if (submittedMatieres[m]) {
+        card.classList.add('completed');
+        card.querySelector('.matiere-status').textContent = '✅ Soumis';
+      } else {
+        card.classList.remove('completed');
+        card.querySelector('.matiere-status').textContent = 'Non soumis';
+      }
+    }
+  });
+}
+
+// ============================================================
+// COLLECT ANSWERS
+// ============================================================
+function collectAnswers(matiere) {
+  const answers = {};
+  // MCQ
+  const mcqKeys = Object.keys(CORRECT_ANSWERS[matiere] || {});
+  mcqKeys.forEach(k => {
+    const radios = document.querySelectorAll(`input[name="${k}"]`);
+    radios.forEach(r => { if (r.checked) answers[k] = r.value; });
+  });
+  // Open answers by matiere
+  if (matiere === 'math') {
+    ['math_q7a','math_q7b','math_q7c','math_q7d','math_q8a','math_q8b','math_q8c','math_q9','math_q10','math_q11'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) answers[id] = el.value;
+    });
+  } else if (matiere === 'sciences') {
+    ['sc_q7a','sc_q7b','sc_q7c','sc_q7d','sc_q8a','sc_q8b','sc_q9a','sc_q9b','sc_q9c','sc_q10'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) answers[id] = el.value;
+    });
+  } else if (matiere === 'sociales') {
+    ['ss_q7a','ss_q7b','ss_q7c','ss_q7d','ss_q8','ss_q9a','ss_q9b','ss_q10','ss_q11a','ss_q11b','ss_q11c'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) answers[id] = el.value;
+    });
+  } else if (matiere === 'kreyo') {
+    ['kr_q5a','kr_q5an','kr_q5b','kr_q6a','kr_q6an','kr_q6b','kr_q7a','kr_q7b','kr_q8a','kr_q8an','kr_q9a','kr_q9an','kr_q12'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) answers[id] = el.value;
+    });
+  } else if (matiere === 'francais') {
+    ['fr_q8a','fr_q8b','fr_q8c','fr_q9a','fr_q9b','fr_q9c','fr_q9d','fr_q10','fr_q11'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) answers[id] = el.value;
+    });
+  }
+  return answers;
+}
+
+// ============================================================
+// CALCULATE MCQ SCORE
+// ============================================================
+function calculateMCQScore(matiere, answers) {
+  let score = 0;
+  const correct = CORRECT_ANSWERS[matiere];
+  const pts = MCQ_POINTS[matiere];
+  Object.keys(correct).forEach(k => {
+    if (answers[k] === correct[k]) {
+      score += pts[k];
+    }
+  });
+  return score;
+}
+
+// ============================================================
+// SUBMIT EXAM
+// ============================================================
+async function submitExam(matiere) {
+  if (!currentEleveId) { showNotification('❌ Vous devez vous connecter !', 'error'); return; }
+  if (submittedMatieres[matiere]) {
+    showNotification('⚠️ Vous avez déjà soumis cet examen !', 'error'); return;
+  }
+
+  const btn = document.getElementById('btnSubmit' + matiere.charAt(0).toUpperCase() + matiere.slice(1));
+  btn.disabled = true; btn.textContent = '⏳ Envoi en cours...';
+
+  try {
+    const answers = collectAnswers(matiere);
+    const mcqScore = calculateMCQScore(matiere, answers);
+
+    // Save each answer
+    const inserts = Object.entries(answers).map(([qid, ans]) => ({
+      eleve_id: currentEleveId,
+      matiere,
+      question_id: qid,
+      reponse: String(ans)
+    }));
+
+    if (inserts.length > 0) {
+      const { error: repError } = await sb.from('reponses_examens').insert(inserts);
+      if (repError) throw repError;
+    }
+
+    // Save score
+    const { error: scoreError } = await sb.from('scores').insert({
+      eleve_id: currentEleveId,
+      matiere,
+      score_obtenu: mcqScore,
+      score_total: TOTAL_POINTS[matiere]
+    });
+    if (scoreError) throw scoreError;
+
+    submittedMatieres[matiere] = true;
+    updateDashboardCards();
+
+    btn.textContent = '✅ Soumis avec succès !';
+    btn.style.background = 'linear-gradient(135deg, var(--success), #00b894)';
+    showNotification(`✅ ${getMatiereLabel(matiere)} soumis avec succès ! Score QCM: ${mcqScore} pts`);
+
+    setTimeout(() => { showSection('dashboard'); }, 2000);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '✅ Soumettre ' + getMatiereLabel(matiere);
+    showNotification('❌ Erreur: ' + e.message, 'error');
+  }
+}
+
+function getMatiereLabel(m) {
+  const labels = { math:'Mathématique', sciences:'Sciences Exp.', sociales:'Sciences Sociales', kreyo:'Kreyòl', francais:'Français' };
+  return labels[m] || m;
+}
+
+// ============================================================
+// LOAD RESULTS
+// ============================================================
+async function loadResults() {
+  showSection('results');
+  document.getElementById('resultsTableBody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;"><div class="loader"><div class="spinner"></div><span style="color:var(--gray)">Chargement...</span></div></td></tr>';
+
+  try {
+    // Get all eleves
+    const { data: eleves, error: eleveErr } = await sb.from('eleves').select('*').order('created_at');
+    if (eleveErr) throw eleveErr;
+
+    // Get all scores
+    const { data: scores, error: scoreErr } = await sb.from('scores').select('*');
+    if (scoreErr) throw scoreErr;
+
+    // Get all answers
+    const { data: reponses, error: repErr } = await sb.from('reponses_examens').select('*');
+    if (repErr) throw repErr;
+
+    // Build student results
+    const matieres = ['math','sciences','sociales','kreyo','francais'];
+    const results = eleves.map(eleve => {
+      const eleveScores = {};
+      matieres.forEach(m => {
+        const s = scores.find(x => x.eleve_id === eleve.id && x.matiere === m);
+        eleveScores[m] = s ? s.score_obtenu : null;
+      });
+      const eleveAnswers = reponses.filter(r => r.eleve_id === eleve.id);
+
+      // Compute weighted average /10
+      let total = 0, maxTotal = 0;
+      matieres.forEach(m => {
+        if (eleveScores[m] !== null) {
+          total += eleveScores[m];
+          maxTotal += TOTAL_POINTS[m];
         }
+      });
+      const moyenne = maxTotal > 0 ? (total / maxTotal * 10).toFixed(2) : 'N/A';
 
-        function formatTime(sec) {
-            const m = String(Math.floor(sec / 60)).padStart(2, '0');
-            const s = String(sec % 60).padStart(2, '0');
-            return `${m}:${s}`;
-        }
+      return { eleve, eleveScores, eleveAnswers, total, maxTotal, moyenne };
+    });
 
-        // ============================================================
-        // 4. LOGIN
-        // ============================================================
-        function handleLogin() {
-            const nom = loginNom.value.trim();
-            const prenom = loginPrenom.value.trim();
-            if (!nom || !prenom) {
-                showToast('⚠️ Veuillez entrer votre nom et prénom.');
-                return;
-            }
-            currentUser = { nom, prenom };
-            userDisplay.textContent = `${prenom} ${nom}`;
-            loginOverlay.classList.add('hidden');
-            mainContainer.style.display = 'block';
-            renderGrille();
-            showToast(`👋 Bienvenue ${prenom} ${nom} !`);
-        }
+    // Sort by moyenne
+    results.sort((a,b) => {
+      if (a.moyenne === 'N/A') return 1;
+      if (b.moyenne === 'N/A') return -1;
+      return parseFloat(b.moyenne) - parseFloat(a.moyenne);
+    });
 
-        btnLogin.addEventListener('click', handleLogin);
-        // Appuyer sur Entrée dans les champs
-        [loginNom, loginPrenom].forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter')
-        handleLogin(); }));
+    allResults = results;
+    renderResults(results);
 
-        // Bouton Google (simulation)
-        btnGoogle.addEventListener('click', () => {
-            showToast('🔐 Connexion Google sera disponible prochainement.');
-        });
+    // Stats
+    const valid = results.filter(r => r.moyenne !== 'N/A');
+    const passed = valid.filter(r => parseFloat(r.moyenne) >= 5);
+    const avgGen = valid.length > 0 ? (valid.reduce((sum,r) => sum + parseFloat(r.moyenne), 0) / valid.length).toFixed(2) : 0;
+    document.getElementById('statTotal').textContent = eleves.length;
+    document.getElementById('statAvg').textContent = avgGen;
+    document.getElementById('statPassed').textContent = passed.length;
+    document.getElementById('statFailed').textContent = valid.length - passed.length;
 
-        // ============================================================
-        // 5. GRILLE DES MATIÈRES
-        // ============================================================
-        function renderGrille() {
-            grilleMatieres.innerHTML = '';
-            examensData.forEach(exam => {
-                const card = document.createElement('div');
-                card.className = 'carte';
-                card.dataset.id = exam.id;
-                card.innerHTML = `
-                    <div class="emoji">${exam.emoji}</div>
-                    <h3>${exam.titre}</h3>
-                    <div class="qcount">${exam.qcount}</div>
-                `;
-                card.addEventListener('click', () => openExamen(exam.id));
-                grilleMatieres.appendChild(card);
-            });
-        }
+  } catch(e) {
+    document.getElementById('resultsTableBody').innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gold)">❌ Erreur: ${e.message}</td></tr>`;
+  }
+}
 
-        // ============================================================
-        // 6. OUVERTURE D'UN EXAMEN
-        // ============================================================
-        function openExamen(examId) {
-            // Si un examen est déjà ouvert, on arrête le timer
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
+function renderResults(results) {
+  const tbody = document.getElementById('resultsTableBody');
+  if (!results.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)">Aucun résultat disponible</td></tr>';
+    return;
+  }
 
-            const exam = examensData.find(e => e.id === examId);
-            if (!exam) return;
+  tbody.innerHTML = results.map((r, i) => {
+    const rank = i + 1;
+    const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+    const moy = r.moyenne;
+    const moyNum = parseFloat(moy);
+    const badgeClass = moyNum >= 8 ? 'badge-excellent' : moyNum >= 6 ? 'badge-bien' : moyNum >= 5 ? 'badge-passable' : 'badge-insuffisant';
 
-            currentExamId = examId;
-            examenTitre.textContent = `${exam.emoji} ${exam.titre}`;
+    const fmtScore = (s, total) => s !== null ? `${s}/${total}` : '—';
 
-            // Réinitialiser le timer
-            timeLeft = 3600;
-            timerDisplay.textContent = `⏱️ 60:00`;
-            timerDisplay.classList.remove('warning');
-            examStarted = false;
+    return `<tr>
+      <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+      <td><strong>${r.eleve.prenom} ${r.eleve.nom.toUpperCase()}</strong></td>
+      <td>${fmtScore(r.eleveScores.math, TOTAL_POINTS.math)}</td>
+      <td>${fmtScore(r.eleveScores.sciences, TOTAL_POINTS.sciences)}</td>
+      <td>${fmtScore(r.eleveScores.sociales, TOTAL_POINTS.sociales)}</td>
+      <td>${fmtScore(r.eleveScores.kreyo, TOTAL_POINTS.kreyo)}</td>
+      <td>${fmtScore(r.eleveScores.francais, TOTAL_POINTS.francais)}</td>
+      <td><span class="moyenne-badge ${badgeClass}">${moy}/10</span></td>
+    </tr>`;
+  }).join('');
 
-            // Construire le corps de l'examen
-            let html = '';
-            exam.questions.forEach((q, idx) => {
-                html += `<div class="question"><div class="q">${q.q}</div>`;
-                if (q.type === 'radio') {
-                    html += `<div class="options">`;
-                    q.options.forEach(opt => {
-                        html += `<label><input type="radio" name="q${idx}" value="${opt}" /> ${opt}</label>`;
-                    });
-                    html += `</div>`;
-                } else if (q.type === 'text') {
-                    html += `<input type="text" placeholder="${q.placeholder || 'Votre réponse...'}" style="max-width:100%;" />`;
-                }
-                html += `</div>`;
-            });
-            examenBody.innerHTML = html;
+  // Render student details
+  renderStudentDetails(results);
+}
 
-            // Afficher la vue examen, cacher le dashboard
-            document.getElementById('dashboard').style.display = 'none';
-            examenView.classList.add('active');
+function renderStudentDetails(results) {
+  const container = document.getElementById('studentDetails');
+  container.innerHTML = results.map((r, i) => {
+    const matieres = ['math','sciences','sociales','kreyo','francais'];
+    const initials = (r.eleve.prenom[0] + r.eleve.nom[0]).toUpperCase();
+    const moy = r.moyenne;
+    const moyNum = parseFloat(moy);
 
-            // Démarrer le timer
-            examStarted = true;
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = `⏱️ ${formatTime(timeLeft)}`;
-                if (timeLeft <= 60) timerDisplay.classList.add('warning');
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                    timerDisplay.textContent = '⏱️ 00:00';
-                    showToast('⏰ Temps écoulé ! L\'examen est automatiquement soumis.');
-                    // On peut ajouter un comportement de soumission auto ici si voulu
-                    // Pour l'instant on bloque la soumission manuelle
-                    btnSubmit.disabled = true;
-                    btnSubmit.textContent = '⏳ Terminé';
-                }
-            }, 1000);
-        }
+    const matiereScoresHTML = matieres.map(m => `
+      <div class="matiere-score-item">
+        <div class="matiere-score-name">${getMatiereLabel(m)}</div>
+        <div class="matiere-score-value">${r.eleveScores[m] !== null ? r.eleveScores[m] + '/' + TOTAL_POINTS[m] : '—'}</div>
+      </div>
+    `).join('');
 
-        // ============================================================
-        // 7. RETOUR AU TABLEAU DE BORD
-        // ============================================================
-        function goBack() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-            examenView.classList.remove('active');
-            document.getElementById('dashboard').style.display = 'block';
-            // Réinitialiser le bouton submit
-            btnSubmit.disabled = false;
-            btnSubmit.textContent = '📤 Soumettre';
-            currentExamId = null;
-            showToast('📋 Retour au tableau de bord');
-        }
+    const answersHTML = buildAnswersReviewHTML(r);
 
-        btnBack.addEventListener('click', goBack);
+    return `
+    <div class="student-detail">
+      <div class="student-detail-header" onclick="toggleDetail('detail-${i}')">
+        <div class="student-avatar">${initials}</div>
+        <div>
+          <div class="student-name-big">${r.eleve.prenom} ${r.eleve.nom.toUpperCase()}</div>
+          <div style="color:var(--gray); font-size:13px;">Rang #${i+1} • ${r.maxTotal > 0 ? r.total + '/' + r.maxTotal + ' pts' : 'Non complété'}</div>
+        </div>
+        <div class="student-avg">${moy}/10</div>
+      </div>
+      <div class="matiere-scores">${matiereScoresHTML}</div>
+      <div class="detail-toggle" onclick="toggleDetail('detail-${i}')">
+        📋 Voir les réponses détaillées ▼
+      </div>
+      <div class="detail-content" id="detail-${i}">
+        ${answersHTML}
+      </div>
+    </div>`;
+  }).join('');
+}
 
-        // ============================================================
-        // 8. SOUMISSION (simulation)
-        // ============================================================
-        btnSubmit.addEventListener('click', () => {
-            if (btnSubmit.disabled) {
-                showToast('⏳ Le temps est écoulé.');
-                return;
-            }
-            // Récupérer les réponses
-            const exam = examensData.find(e => e.id === currentExamId);
-            if (!exam) return;
-            const inputs = examenBody.querySelectorAll('input');
-            let reponses = [];
-            inputs.forEach((inp, idx) => {
-                if (inp.type === 'radio' && inp.checked) {
-                    reponses.push(`Q${idx+1}: ${inp.value}`);
-                } else if (inp.type === 'text' && inp.value.trim()) {
-                    reponses.push(`Q${idx+1}: ${inp.value.trim()}`);
-                }
-            });
-            // Arrêter le timer
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-            showToast(`✅ Examen soumis ! (${reponses.length} réponses enregistrées)`);
-            // Désactiver la soumission
-            btnSubmit.disabled = true;
-            btnSubmit.textContent = '✅ Soumis';
-            // On pourrait enregistrer les réponses dans la console / localStorage
-            console.log('Réponses soumises :', reponses);
-            // Option : afficher un récapitulatif
-            alert(`Examen "${exam.titre}" soumis avec succès.\n\nRéponses fournies :\n${reponses.join('\n') || 'Aucune réponse enregistrée.'}`);
-        });
+function buildAnswersReviewHTML(r) {
+  if (!r.eleveAnswers || r.eleveAnswers.length === 0) {
+    return '<p style="color:var(--gray);text-align:center;padding:20px;">Aucune réponse enregistrée</p>';
+  }
 
-        // ============================================================
-        // 9. DÉMARRAGE (si déjà connecté, on affiche le dashboard)
-        // ============================================================
-        // Par défaut, l'overlay est visible, le main caché.
-        // Si on veut skipper le login pour le test, on décommente :
-        // loginOverlay.classList.add('hidden');
-        // mainContainer.style.display = 'block';
-        // currentUser = { nom: 'Test', prenom: 'Élève' };
-        // userDisplay.textContent = 'Élève Test';
-        // renderGrille();
+  const matieres = ['math','sciences','sociales','kreyo','francais'];
+  let html = '';
 
-        console.log('📚 Complexe Éducatif Jean Jacques Dessalines – Examens 6e AF');
-        console.log('💡 Contact: +509 3391 0384');
-    </script>
+  matieres.forEach(matiere => {
+    const matiereAnswers = r.eleveAnswers.filter(a => a.matiere === matiere);
+    if (!matiereAnswers.length) return;
 
+    const correct = CORRECT_ANSWERS[matiere] || {};
+    const opts = OPTION_LABELS[matiere] || {};
+
+    html += `<h4 style="color:var(--light-gold); margin:15px 0 10px;">${getMatiereLabel(matiere)}</h4>`;
+    html += '<div class="answers-grid">';
+
+    // MCQ answers
+    const mcqKeys = Object.keys(correct);
+    mcqKeys.forEach(k => {
+      const a = matiereAnswers.find(x => x.question_id === k);
+      const studentAns = a ? a.reponse : '—';
+      const correctAns = correct[k];
+      const isCorrect = studentAns === correctAns;
+      const optLabel = opts[k] || {};
+
+      const correctText = optLabel[correctAns] || correctAns;
+      const studentText = optLabel[studentAns] || studentAns;
+
+      html += `<div class="answer-item ${isCorrect ? 'answer-correct' : 'answer-wrong'}">
+        <div class="answer-label">${isCorrect ? '✅ Correct' : '❌ Incorrect'} • ${k.replace(/_/g,' ')}</div>
+        ${!isCorrect ? `<div class="wrong-answer-text">${studentText}</div>` : ''}
+        <div class="student-answer">${isCorrect ? studentText : ''}</div>
+        ${!isCorrect ? `<div class="correct-answer">✓ Bonne réponse: ${correctText}</div>` : ''}
+      </div>`;
+    });
+
+    // Open answers
+    const openAnswers = matiereAnswers.filter(a => !mcqKeys.includes(a.question_id));
+    openAnswers.forEach(a => {
+      html += `<div class="answer-item answer-open">
+        <div class="answer-label">📝 ${a.question_id.replace(/_/g,' ')}</div>
+        <div class="student-answer">${a.reponse || '<em style="color:var(--gray)">Sans réponse</em>'}</div>
+        <div class="correct-answer" style="margin-top:5px;">⚠️ À corriger manuellement</div>
+      </div>`;
+    });
+
+    html += '</div>';
+  });
+
+  return html;
+}
+
+function toggleDetail(id) {
+  const el = document.getElementById(id);
+  el.style.display = el.style.display === 'none' || el.style.display === '' ? 'block' : 'none';
+}
+
+// ============================================================
+// FILTER
+// ============================================================
+function filterResults() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allResults.filter(r =>
+    r.eleve.nom.toLowerCase().includes(query) ||
+    r.eleve.prenom.toLowerCase().includes(query)
+  );
+  renderResults(filtered);
+}
+
+// ============================================================
+// LOGIN ENTER KEY
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.getElementById('loginSection').style.display !== 'none') {
+    handleLogin();
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = () => {
+  document.getElementById('loginSection').style.display = 'block';
+};
+</script>
 </body>
 </html>
