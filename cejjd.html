@@ -1,1448 +1,817 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Examens - Complèxe Educatif Jean Jacques Dessalines</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CEJJD – Examens 6e AF</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-:root {
-  --primary:#1a1a2e; --secondary:#16213e; --accent:#0f3460;
-  --gold:#e94560; --light-gold:#f5a623; --success:#00d4aa;
-  --white:#fff; --gray:#a0aec0; --border:rgba(255,255,255,0.1);
-  --card:rgba(255,255,255,0.06);
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;color:#fff;overflow-x:hidden;}
-/* PARTICLES */
-.particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
-.particle{position:absolute;border-radius:50%;background:rgba(233,69,96,0.25);animation:floatUp linear infinite;}
-@keyframes floatUp{0%{transform:translateY(100vh) rotate(0deg);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-100px) rotate(720deg);opacity:0;}}
-/* HEADER */
-.header{position:relative;z-index:10;text-align:center;padding:28px 20px 18px;background:rgba(0,0,0,0.35);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
-.school-logo{width:75px;height:75px;background:linear-gradient(135deg,var(--gold),var(--light-gold));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:30px;box-shadow:0 0 30px rgba(233,69,96,0.5);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 30px rgba(233,69,96,0.5);}50%{box-shadow:0 0 55px rgba(233,69,96,0.85);}}
-.school-name{font-size:clamp(13px,2.5vw,21px);font-weight:800;background:linear-gradient(135deg,var(--gold),var(--light-gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;letter-spacing:2px;}
-.exam-title{font-size:12px;color:var(--gray);margin-top:5px;}
-/* NAV */
-.nav-tabs{display:flex;justify-content:center;gap:5px;padding:12px 15px;position:relative;z-index:10;flex-wrap:wrap;}
-.nav-tab{padding:7px 14px;border-radius:25px;border:1px solid var(--border);background:var(--card);color:var(--gray);cursor:pointer;font-size:12px;font-weight:500;transition:all 0.3s;font-family:'Poppins',sans-serif;display:none;}
-.nav-tab.visible{display:block;}
-.nav-tab.active,.nav-tab:hover{background:linear-gradient(135deg,var(--gold),var(--light-gold));color:#fff;border-color:transparent;transform:translateY(-2px);}
-/* CONTAINER */
-.container{position:relative;z-index:10;max-width:960px;margin:0 auto;padding:18px;}
-/* NOTIFICATION */
-.notif{position:fixed;top:20px;right:20px;padding:13px 22px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;transform:translateX(420px);transition:transform 0.35s;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.4);}
-.notif.show{transform:translateX(0);}
-.notif.ok{background:linear-gradient(135deg,#00d4aa,#00b894);}
-.notif.err{background:linear-gradient(135deg,#e94560,#c0392b);}
-.notif.warn{background:linear-gradient(135deg,#f5a623,#e67e22);}
-/* CARD */
-.card{background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:20px;padding:35px;margin-bottom:18px;box-shadow:0 20px 45px rgba(0,0,0,0.3);}
-/* SECTIONS */
-.section{display:none;}.section.active{display:block;}
-/* LOGIN */
-.login-icon{font-size:58px;text-align:center;margin-bottom:18px;}
-.login-title{text-align:center;font-size:24px;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,var(--gold),var(--light-gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.login-sub{text-align:center;color:var(--gray);margin-bottom:28px;font-size:13px;}
-.form-group{margin-bottom:18px;}
-.form-label{display:block;margin-bottom:7px;font-size:11px;font-weight:600;color:var(--light-gold);text-transform:uppercase;letter-spacing:1px;}
-.form-input{width:100%;padding:13px 17px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;color:#fff;font-size:15px;font-family:'Poppins',sans-serif;transition:all 0.3s;outline:none;}
-.form-input:focus{border-color:var(--gold);background:rgba(233,69,96,0.09);box-shadow:0 0 18px rgba(233,69,96,0.2);}
-.form-input::placeholder{color:var(--gray);}
-.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--light-gold));border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;transition:all 0.3s;text-transform:uppercase;letter-spacing:2px;}
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(233,69,96,0.4);}
-.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
-.admin-link{text-align:center;margin-top:16px;}
-.admin-link button{padding:8px 20px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;color:var(--gray);font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.3s;}
-.admin-link button:hover{background:rgba(255,255,255,0.1);color:#fff;}
-/* DASHBOARD */
-.welcome-banner{background:linear-gradient(135deg,rgba(233,69,96,0.13),rgba(245,166,35,0.13));border:1px solid rgba(233,69,96,0.3);border-radius:15px;padding:18px;margin-bottom:20px;text-align:center;}
-.welcome-name{font-size:18px;font-weight:700;color:var(--light-gold);}
-.welcome-sub{color:var(--gray);font-size:13px;margin-top:4px;}
-.matieres-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:13px;margin-bottom:20px;}
-.matiere-card{padding:18px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:15px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
-.matiere-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--gold),var(--light-gold));transform:scaleX(0);transition:transform 0.3s;}
-.matiere-card:hover::before{transform:scaleX(1);}
-.matiere-card:hover{transform:translateY(-4px);border-color:rgba(233,69,96,0.4);}
-.matiere-card.completed{border-color:var(--success);}
-.matiere-card.completed::before{transform:scaleX(1);background:var(--success);}
-.matiere-icon{font-size:34px;margin-bottom:8px;}
-.matiere-name{font-size:12px;font-weight:600;}
-.matiere-status{font-size:11px;color:var(--gray);margin-top:4px;}
-.matiere-card.completed .matiere-status{color:var(--success);}
-.check-icon{position:absolute;top:8px;right:10px;color:var(--success);font-size:15px;display:none;}
-.matiere-card.completed .check-icon{display:block;}
-/* EXAM QUESTIONS */
-.matiere-header{text-align:center;margin-bottom:22px;padding:16px;background:linear-gradient(135deg,rgba(233,69,96,0.18),rgba(245,166,35,0.18));border-radius:14px;border:1px solid rgba(233,69,96,0.3);}
-.matiere-title{font-size:19px;font-weight:700;color:var(--light-gold);}
-.matiere-sub{color:var(--gray);font-size:12px;margin-top:4px;}
-.exam-badges{display:flex;gap:10px;justify-content:center;margin-top:9px;flex-wrap:wrap;}
-.exam-badge{padding:3px 11px;background:rgba(233,69,96,0.18);border:1px solid rgba(233,69,96,0.4);border-radius:20px;font-size:11px;color:var(--gold);}
-.progress-bar{background:rgba(255,255,255,0.09);border-radius:10px;height:5px;margin-bottom:20px;overflow:hidden;}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--light-gold));border-radius:10px;transition:width 0.5s;}
-.sec-title{font-size:13px;font-weight:700;color:var(--success);margin:20px 0 13px;padding-bottom:6px;border-bottom:1px solid rgba(0,212,170,0.3);text-transform:uppercase;letter-spacing:1px;}
-.q-block{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:13px;padding:20px;margin-bottom:15px;transition:all 0.3s;position:relative;}
-.q-block:hover{border-color:rgba(233,69,96,0.35);background:rgba(255,255,255,0.06);}
-.q-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:linear-gradient(135deg,var(--gold),var(--light-gold));border-radius:50%;font-size:12px;font-weight:700;margin-bottom:9px;}
-.q-pts{position:absolute;top:12px;right:15px;background:rgba(245,166,35,0.18);border:1px solid rgba(245,166,35,0.4);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--light-gold);font-weight:600;}
-.q-text{font-size:13px;font-weight:500;margin-bottom:13px;line-height:1.6;}
-.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-@media(max-width:480px){.opts-grid{grid-template-columns:1fr;}}
-.opt-label{display:flex;align-items:center;gap:9px;padding:10px 13px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all 0.3s;font-size:13px;}
-.opt-label:hover{background:rgba(233,69,96,0.09);border-color:var(--gold);}
-.opt-label input[type=radio]{display:none;}
-.opt-dot{width:17px;height:17px;border-radius:50%;border:2px solid var(--gray);transition:all 0.3s;flex-shrink:0;}
-.opt-label:has(input:checked){background:rgba(233,69,96,0.14);border-color:var(--gold);}
-.opt-label:has(input:checked) .opt-dot{background:var(--gold);border-color:var(--gold);}
-.answer-ta{width:100%;min-height:85px;padding:13px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:13px;font-family:'Poppins',sans-serif;resize:vertical;outline:none;transition:all 0.3s;}
-.answer-ta:focus{border-color:var(--gold);background:rgba(233,69,96,0.05);}
-.answer-ta::placeholder{color:var(--gray);}
-.text-passage{background:rgba(255,255,255,0.04);border-left:4px solid var(--light-gold);border-radius:0 10px 10px 0;padding:16px;margin-bottom:20px;font-size:13px;line-height:1.8;color:#e2e8f0;font-style:italic;}
-.text-passage h4{color:var(--light-gold);margin-bottom:10px;font-style:normal;}
-.sub-q{font-size:12px;color:var(--gray);margin:8px 0 5px;}
-.btn-submit{padding:13px 42px;background:linear-gradient(135deg,var(--success),#00b894);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;transition:all 0.3s;text-transform:uppercase;letter-spacing:2px;}
-.btn-submit:hover{transform:translateY(-3px);box-shadow:0 13px 28px rgba(0,212,170,0.4);}
-.btn-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
-.submit-wrap{text-align:center;margin-top:26px;}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:#0f0f1a;color:#e2e8f0;min-height:100vh}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif}
 
-/* ============ PROF RESULTS ============ */
-.prof-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap;}
-.prof-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:linear-gradient(135deg,rgba(233,69,96,0.28),rgba(245,166,35,0.28));border:1px solid rgba(233,69,96,0.5);border-radius:25px;font-size:12px;font-weight:600;}
-.btn-sm{padding:9px 16px;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:10px;color:#fff;cursor:pointer;font-family:'Poppins',sans-serif;font-size:12px;transition:all 0.3s;white-space:nowrap;}
-.btn-sm:hover{background:rgba(255,255,255,0.14);}
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:20px;}
-.stat-card{padding:16px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:13px;text-align:center;}
-.stat-val{font-size:26px;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--light-gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.stat-lbl{color:var(--gray);font-size:11px;margin-top:3px;}
-.filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-.filter-input{flex:1;min-width:180px;padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;color:#fff;font-family:'Poppins',sans-serif;font-size:13px;outline:none;}
-.filter-input:focus{border-color:var(--gold);}
-.filter-input::placeholder{color:var(--gray);}
-/* TABLE */
-.tbl-wrap{overflow-x:auto;border-radius:13px;border:1px solid var(--border);margin-bottom:22px;}
-table{width:100%;border-collapse:collapse;min-width:720px;}
-thead{background:linear-gradient(135deg,var(--gold),var(--light-gold));}
-th{padding:13px 11px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
-tbody tr{border-bottom:1px solid var(--border);transition:all 0.25s;cursor:pointer;}
-tbody tr:hover{background:rgba(233,69,96,0.07);}
-tbody tr.sel{background:rgba(233,69,96,0.14);border-color:rgba(233,69,96,0.4);}
-td{padding:12px 11px;font-size:12px;}
-.rank-b{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-weight:700;font-size:11px;}
-.r1{background:linear-gradient(135deg,#FFD700,#FFA500);color:#000;}
-.r2{background:linear-gradient(135deg,#C0C0C0,#A8A8A8);color:#000;}
-.r3{background:linear-gradient(135deg,#CD7F32,#A0522D);color:#fff;}
-.rN{background:rgba(255,255,255,0.1);}
-.moy-b{padding:3px 9px;border-radius:20px;font-weight:700;font-size:11px;}
-.b-ex{background:rgba(0,212,170,0.18);color:var(--success);border:1px solid var(--success);}
-.b-bi{background:rgba(116,185,255,0.18);color:#74b9ff;border:1px solid #74b9ff;}
-.b-pa{background:rgba(245,166,35,0.18);color:var(--light-gold);border:1px solid var(--light-gold);}
-.b-in{background:rgba(233,69,96,0.18);color:var(--gold);border:1px solid var(--gold);}
-/* STUDENT PANEL */
-.stu-panel{background:rgba(255,255,255,0.05);border:2px solid rgba(233,69,96,0.4);border-radius:20px;padding:25px;margin-top:18px;animation:fadeIn 0.3s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.stu-panel-hdr{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
-.stu-avatar{width:52px;height:52px;background:linear-gradient(135deg,var(--gold),var(--light-gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;}
-.stu-panel-name{font-size:18px;font-weight:700;}
-.stu-panel-info{color:var(--gray);font-size:12px;margin-top:3px;}
-.stu-avg-big{margin-left:auto;text-align:center;}
-.stu-avg-num{font-size:34px;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--light-gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.stu-avg-lbl{color:var(--gray);font-size:10px;}
-/* MATIERE TABS */
-.mat-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
-.mat-tab{padding:7px 14px;border-radius:25px;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--gray);cursor:pointer;font-size:12px;font-family:'Poppins',sans-serif;transition:all 0.3s;}
-.mat-tab:hover{border-color:var(--gold);color:#fff;}
-.mat-tab.active{background:linear-gradient(135deg,var(--gold),var(--light-gold));color:#fff;border-color:transparent;}
-.mat-content{display:none;}.mat-content.active{display:block;}
-/* SCORE HEADER */
-.mat-score-hdr{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);border-radius:11px;padding:13px 16px;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
-.mat-score-val{font-size:21px;font-weight:800;color:var(--light-gold);}
-.mat-score-lbl{color:var(--gray);font-size:12px;}
-/* REVIEW CARDS */
-.rev-sec-title{font-size:12px;font-weight:700;color:var(--success);margin:16px 0 11px;padding-bottom:5px;border-bottom:1px solid rgba(0,212,170,0.3);text-transform:uppercase;letter-spacing:1px;}
-.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-@media(max-width:600px){.rev-grid{grid-template-columns:1fr;}}
-.rev-card{border-radius:11px;padding:13px;border:1px solid;font-size:12px;line-height:1.5;}
-.rev-ok{background:rgba(0,212,170,0.07);border-color:rgba(0,212,170,0.32);}
-.rev-wrong{background:rgba(233,69,96,0.07);border-color:rgba(233,69,96,0.32);}
-.rev-open{background:rgba(245,166,35,0.05);border-color:rgba(245,166,35,0.28);}
-.rev-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-.rev-ok .rev-lbl{color:var(--success);}
-.rev-wrong .rev-lbl{color:var(--gold);}
-.rev-open .rev-lbl{color:var(--light-gold);}
-.rev-q{color:#8a9bb0;font-size:11px;margin-bottom:5px;}
-.rev-stu{color:#e2e8f0;font-weight:500;}
-.rev-stu-wrong{color:var(--gold);text-decoration:line-through;font-size:11px;}
-.rev-correct{color:var(--success);font-size:11px;margin-top:5px;padding-top:5px;border-top:1px solid rgba(0,212,170,0.2);}
-.open-box{background:rgba(255,255,255,0.04);border-radius:8px;padding:9px;color:#e2e8f0;font-size:12px;margin-top:5px;min-height:36px;white-space:pre-wrap;word-break:break-word;}
-.expected-box{background:rgba(0,212,170,0.06);border-radius:8px;padding:9px;color:var(--success);font-size:11px;margin-top:7px;border:1px dashed rgba(0,212,170,0.28);}
-.expected-lbl{font-size:9px;font-weight:700;color:var(--success);margin-bottom:3px;text-transform:uppercase;}
-.close-btn{padding:7px 18px;background:rgba(233,69,96,0.18);border:1px solid rgba(233,69,96,0.4);border-radius:9px;color:var(--gold);cursor:pointer;font-family:'Poppins',sans-serif;font-size:12px;transition:all 0.3s;display:block;margin-left:auto;margin-bottom:14px;}
-.close-btn:hover{background:rgba(233,69,96,0.35);}
-/* LOADER */
-.loader{display:flex;align-items:center;justify-content:center;padding:48px;flex-direction:column;gap:14px;}
-.spinner{width:42px;height:42px;border:3px solid rgba(255,255,255,0.09);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.no-data{text-align:center;padding:38px;color:var(--gray);}
-.no-data-icon{font-size:46px;margin-bottom:12px;}
-/* SCORE MINI BARS */
-.score-cell{display:flex;flex-direction:column;gap:2px;}
-.score-cell-val{font-size:12px;}
-.score-mini-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;width:60px;}
-.score-mini-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold),var(--light-gold));}
-@media print{
-  body{background:#fff!important;color:#000!important;}
-  .nav-tabs,.filter-bar,.prof-header .btn-sm,.close-btn,.admin-link{display:none!important;}
-  .card{box-shadow:none!important;background:#fff!important;color:#000!important;border:1px solid #ccc!important;}
-  .stu-panel{background:#fff!important;border:1px solid #ccc!important;}
-}
+  /* ── Shared Utilities ── */
+  .hidden{display:none!important}
+  .page{min-height:100vh;padding:2rem 1rem}
+  .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:1rem;padding:1.5rem}
+  .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.4rem;border-radius:.6rem;font-weight:600;cursor:pointer;border:none;font-size:.9rem;transition:all .15s}
+  .btn-primary{background:linear-gradient(135deg,#f59e0b,#ea580c);color:#000}
+  .btn-primary:hover{opacity:.85}
+  .btn-ghost{background:rgba(255,255,255,.07);color:#94a3b8}
+  .btn-ghost:hover{background:rgba(255,255,255,.12);color:#e2e8f0}
+  .btn-green{background:#22c55e;color:#000}
+  .btn-green:hover{background:#16a34a}
+  .btn-amber{background:#f59e0b;color:#000}
+  .btn-amber:hover{background:#d97706}
+  .btn-sm{padding:.4rem .9rem;font-size:.8rem}
+  .badge{display:inline-block;padding:.2rem .6rem;border-radius:9999px;font-size:.75rem;font-weight:600}
+  .badge-green{background:rgba(34,197,94,.15);color:#4ade80}
+  .badge-red{background:rgba(239,68,68,.15);color:#f87171}
+  .badge-amber{background:rgba(245,158,11,.15);color:#fbbf24}
+  input,textarea{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:.5rem;padding:.6rem .9rem;color:#e2e8f0;font-size:.9rem;font-family:inherit;outline:none;transition:border .15s}
+  input:focus,textarea:focus{border-color:rgba(245,158,11,.5)}
+  textarea{resize:vertical;min-height:80px}
+  label{display:block;font-size:.85rem;color:#94a3b8;margin-bottom:.35rem}
+  .error-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:.5rem;padding:.6rem 1rem;color:#fca5a5;font-size:.85rem;margin-top:.5rem}
+  .spinner{width:2rem;height:2rem;border:3px solid rgba(255,255,255,.15);border-top-color:#f59e0b;border-radius:50%;animation:spin .7s linear infinite;margin:2rem auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .center{display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+  /* ── Login Page ── */
+  #page-login{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#2d1457 100%)}
+  .login-wrap{max-width:420px;margin:0 auto;width:100%;padding-top:3rem}
+  .logo-icon{width:5rem;height:5rem;background:rgba(255,255,255,.1);border-radius:1.2rem;display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 1rem}
+  .school-title{font-size:1.6rem;font-weight:700;color:#fff;text-align:center;line-height:1.3}
+  .school-sub{color:rgba(147,197,253,.7);text-align:center;font-size:.85rem;margin-top:.4rem}
+  .school-sub2{color:rgba(147,197,253,.4);text-align:center;font-size:.75rem;margin-top:.2rem}
+
+  /* ── Exam List ── */
+  #page-exams{background:linear-gradient(135deg,#0f172a,#1e1b4b,#2d1457)}
+  .exam-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border-radius:.8rem;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);cursor:pointer;transition:all .15s;margin-bottom:.7rem;text-align:left;width:100%}
+  .exam-item:hover:not(.done){background:rgba(255,255,255,.08);border-color:rgba(245,158,11,.25)}
+  .exam-item.done{cursor:default;border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.05)}
+  .exam-icon{font-size:2rem;flex-shrink:0}
+  .exam-name{font-weight:600;color:#e2e8f0;font-size:1rem}
+  .exam-pts{color:rgba(147,197,253,.5);font-size:.8rem}
+
+  /* ── Exam Questions ── */
+  #page-exam-view{background:linear-gradient(135deg,#0f172a,#1e1b4b,#2d1457)}
+  .q-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:.8rem;padding:1rem 1.2rem;margin-bottom:.8rem}
+  .q-num{display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.4rem;background:rgba(245,158,11,.15);color:#fbbf24;font-size:.75rem;font-weight:700;flex-shrink:0}
+  .q-text{color:#e2e8f0;font-size:.9rem;flex:1}
+  .q-pts{color:rgba(245,158,11,.7);font-size:.75rem;flex-shrink:0}
+  .q-head{display:flex;align-items:flex-start;gap:.7rem;margin-bottom:.8rem}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-left:2.3rem}
+  @media(max-width:500px){.opts{grid-template-columns:1fr}}
+  .opt-btn{text-align:left;padding:.55rem .8rem;border-radius:.5rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#cbd5e1;cursor:pointer;font-size:.85rem;transition:all .15s}
+  .opt-btn:hover{background:rgba(255,255,255,.09)}
+  .opt-btn.selected{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.5);color:#fde68a}
+  .open-input{margin-left:2.3rem}
+  .sticky-bar{position:sticky;bottom:1rem;background:rgba(15,15,26,.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:.9rem;padding:.8rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:1rem}
+
+  /* ── Professor ── */
+  #page-prof{background:linear-gradient(135deg,#0a0a12,#111827)}
+  #page-prof-login{background:linear-gradient(135deg,#0a0a12,#111827)}
+  .tab-bar{display:flex;gap:.5rem;margin-bottom:1.2rem}
+  .tab{padding:.5rem 1rem;border-radius:.5rem;cursor:pointer;font-size:.85rem;font-weight:600;border:none;transition:all .15s}
+  .tab.active{background:#f59e0b;color:#000}
+  .tab:not(.active){background:rgba(255,255,255,.07);color:#94a3b8}
+  .tab:not(.active):hover{background:rgba(255,255,255,.12)}
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th{color:#64748b;font-weight:500;text-align:left;padding:.6rem .8rem;border-bottom:1px solid rgba(255,255,255,.07)}
+  td{padding:.6rem .8rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+  tr:hover td{background:rgba(255,255,255,.03)}
+  .score-good{color:#4ade80;font-weight:700}
+  .score-med{color:#fbbf24;font-weight:700}
+  .score-bad{color:#f87171;font-weight:700}
+  .medal{font-size:1.1rem}
+  .detail-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:.8rem;overflow:hidden;margin-bottom:.7rem}
+  .detail-head{display:flex;align-items:center;gap:.8rem;padding:.9rem 1rem;cursor:pointer;user-select:none}
+  .detail-head:hover{background:rgba(255,255,255,.04)}
+  .detail-body{padding:0 1rem 1rem;display:none}
+  .detail-body.open{display:block}
+  .ans-row{background:rgba(255,255,255,.03);border-radius:.5rem;padding:.7rem;margin-bottom:.5rem}
+  .ans-label{font-size:.75rem;color:#64748b;margin-bottom:.15rem}
+  .ans-val{font-size:.85rem}
+  .correct-ans{color:#4ade80}
+  .wrong-ans{color:#f87171}
+  .open-ans{color:#93c5fd}
+  .correct-ref{color:#4ade80;font-weight:600}
+  .score-input-wrap{display:flex;align-items:center;gap:.5rem}
+  .score-input-wrap input{width:4.5rem;text-align:center}
+  .chevron{transition:transform .2s;display:inline-block;margin-left:auto;font-size:.8rem;color:#64748b}
+  .chevron.open{transform:rotate(180deg)}
+  .overflow-x{overflow-x:auto}
 </style>
 </head>
 <body>
 
-<div class="particles" id="particles"></div>
+<!-- ══════════════════════════════════════════
+     PAGE 1 : IDENTIFICATION DE L'ÉLÈVE
+══════════════════════════════════════════ -->
+<div id="page-login" class="page center">
+  <div class="login-wrap">
+    <div class="logo-icon">🎓</div>
+    <h1 class="school-title">Complexe Éducatif<br>Jean Jacques Dessalines</h1>
+    <p class="school-sub">Bureau du District Scolaire (BDS) — Évaluation de la Dernière Étape</p>
+    <p class="school-sub2">Sixième Année Fondamentale (6<sup>e</sup> AF)</p>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="school-logo">🏫</div>
-  <div class="school-name">Complèxe Educatif Jean Jacques Dessalines</div>
-  <div class="exam-title">Bureau du District Scolaire (BDS) &bull; ⁴⁄₅₄ Évaluation de la Dernière Étape &bull; Sixième Année Fondamentale (6ème AF)</div>
-</div>
-
-<!-- NAV TABS -->
-<div class="nav-tabs">
-  <button class="nav-tab" id="tabDashboard" onclick="goSection('dashboard')">🏠 Accueil</button>
-  <button class="nav-tab" id="tabMath"      onclick="goSection('math')">📐 Maths</button>
-  <button class="nav-tab" id="tabSciences"  onclick="goSection('sciences')">🔬 Sc.Exp</button>
-  <button class="nav-tab" id="tabSociales"  onclick="goSection('sociales')">🌍 Sc.Soc</button>
-  <button class="nav-tab" id="tabKreyo"     onclick="goSection('kreyo')">📝 Kreyòl</button>
-  <button class="nav-tab" id="tabFrancais"  onclick="goSection('francais')">🇫🇷 Français</button>
-  <button class="nav-tab" id="tabResults"   onclick="goSection('results')" style="display:none;">📊 Résultats</button>
-</div>
-
-<div class="container">
-<div class="notif" id="notif"></div>
-
-<!-- ==================== LOGIN ==================== -->
-<div id="loginSection" class="card">
-  <div class="login-icon">🎓</div>
-  <div class="login-title">Accès aux Examens</div>
-  <div class="login-sub">Entrez vos informations pour commencer</div>
-  <div class="form-group">
-    <label class="form-label">Nom de famille</label>
-    <input type="text" id="fNom" class="form-input" placeholder="Votre nom..." autocomplete="off">
-  </div>
-  <div class="form-group">
-    <label class="form-label">Prénom</label>
-    <input type="text" id="fPrenom" class="form-input" placeholder="Votre prénom..." autocomplete="off">
-  </div>
-  <button class="btn-primary" id="btnLogin" onclick="handleLogin()">Accéder aux Examens →</button>
-  <div class="admin-link">
-    <button onclick="toggleAdmin()">🔐 Espace Professeur</button>
-  </div>
-  <div id="adminBox" style="display:none;margin-top:14px;">
-    <input type="password" id="fAdminPwd" class="form-input" placeholder="Mot de passe professeur..." style="margin-bottom:10px;">
-    <button class="btn-primary" onclick="handleAdminLogin()">Connexion Professeur</button>
-  </div>
-</div>
-
-<!-- ==================== DASHBOARD ==================== -->
-<div id="dashboardSection" class="section">
-  <div class="welcome-banner">
-    <div class="welcome-name" id="wName">👋 Bienvenue !</div>
-    <div class="welcome-sub" id="wSub">Sélectionnez une matière pour commencer</div>
-  </div>
-  <div class="matieres-grid">
-    <div class="matiere-card" id="card-math"     onclick="goSection('math')">
-      <div class="check-icon">✅</div><div class="matiere-icon">📐</div>
-      <div class="matiere-name">Mathématique</div><div class="matiere-status">Non soumis</div>
+    <div class="card" style="margin-top:1.5rem">
+      <h3 style="color:#fff;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">📖 Identification de l'élève</h3>
+      <div style="margin-bottom:.9rem">
+        <label>Nom de famille</label>
+        <input id="inp-nom" type="text" placeholder="Entrez votre nom"/>
+      </div>
+      <div style="margin-bottom:1rem">
+        <label>Prénom</label>
+        <input id="inp-prenom" type="text" placeholder="Entrez votre prénom" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div id="login-error" class="error-box hidden"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.3rem;height:2.6rem" onclick="doLogin()">
+        Accéder aux examens →
+      </button>
     </div>
-    <div class="matiere-card" id="card-sciences" onclick="goSection('sciences')">
-      <div class="check-icon">✅</div><div class="matiere-icon">🔬</div>
-      <div class="matiere-name">Sciences Expérimentales</div><div class="matiere-status">Non soumis</div>
-    </div>
-    <div class="matiere-card" id="card-sociales" onclick="goSection('sociales')">
-      <div class="check-icon">✅</div><div class="matiere-icon">🌍</div>
-      <div class="matiere-name">Sciences Sociales</div><div class="matiere-status">Non soumis</div>
-    </div>
-    <div class="matiere-card" id="card-kreyo"    onclick="goSection('kreyo')">
-      <div class="check-icon">✅</div><div class="matiere-icon">📝</div>
-      <div class="matiere-name">Kominikasyon Kreyòl</div><div class="matiere-status">Non soumis</div>
-    </div>
-    <div class="matiere-card" id="card-francais" onclick="goSection('francais')">
-      <div class="check-icon">✅</div><div class="matiere-icon">🇫🇷</div>
-      <div class="matiere-name">Communication Française</div><div class="matiere-status">Non soumis</div>
+
+    <div style="text-align:center;margin-top:1.2rem">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('page-prof-login')">🔒 Espace Professeur</button>
     </div>
   </div>
 </div>
 
-<!-- ==================== MATHÉMATIQUE ==================== -->
-<div id="mathSection" class="section">
-<div class="card">
-  <div class="matiere-header">
-    <div class="matiere-title">📐 Mathématique</div>
-    <div class="matiere-sub">Sixième Année Fondamentale (6ème AF)</div>
-    <div class="exam-badges"><span class="exam-badge">MCQ: 100 pts</span><span class="exam-badge">Calcul: 200 pts</span><span class="exam-badge">Total: 300 pts</span></div>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
-
-  <div class="sec-title">Partie I — Choix Multiples (Q1 à Q6)</div>
-  <p style="color:var(--gray);font-size:12px;margin-bottom:16px;font-style:italic;">Choisis la lettre qui correspond à la bonne réponse.</p>
-
-  <div class="q-block">
-    <div class="q-num">1</div><div class="q-pts">20pts</div>
-    <div class="q-text">Identifie la valeur décimale correspondant à la fraction 4/5 :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="math_q1" value="a"><div class="opt-dot"></div>a) 0,008</label>
-      <label class="opt-label"><input type="radio" name="math_q1" value="b"><div class="opt-dot"></div>b) 0,0008</label>
-      <label class="opt-label"><input type="radio" name="math_q1" value="c"><div class="opt-dot"></div>c) 0,8</label>
-      <label class="opt-label"><input type="radio" name="math_q1" value="d"><div class="opt-dot"></div>d) 0,00008</label>
+<!-- ══════════════════════════════════════════
+     PAGE 2 : LISTE DES EXAMENS
+══════════════════════════════════════════ -->
+<div id="page-exams" class="page hidden">
+  <div style="max-width:600px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+      <div>
+        <h2 style="color:#fff" id="exams-welcome"></h2>
+        <p style="color:rgba(147,197,253,.5);font-size:.85rem">Choisissez un examen</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">⬅ Quitter</button>
     </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">2</div><div class="q-pts">20pts</div>
-    <div class="q-text">23 cm³ est l'équivalent de :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="math_q2" value="a"><div class="opt-dot"></div>a) 0,023 l</label>
-      <label class="opt-label"><input type="radio" name="math_q2" value="b"><div class="opt-dot"></div>b) 0,0023 l</label>
-      <label class="opt-label"><input type="radio" name="math_q2" value="c"><div class="opt-dot"></div>c) 0,23 l</label>
-      <label class="opt-label"><input type="radio" name="math_q2" value="d"><div class="opt-dot"></div>d) 0,00023 l</label>
+    <div id="exams-list"></div>
+    <div id="exams-done-msg" class="card hidden" style="text-align:center;margin-top:1.5rem;border-color:rgba(34,197,94,.3)">
+      <div style="font-size:2rem">✅</div>
+      <h3 style="color:#4ade80;margin-top:.5rem">Tous les examens complétés !</h3>
+      <p style="color:rgba(74,222,128,.5);font-size:.85rem;margin-top:.3rem">Vos réponses ont été enregistrées. Bonne chance !</p>
     </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">3</div><div class="q-pts">20pts</div>
-    <div class="q-text">Trouve l'écriture en lettres du nombre 4 732 608 :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="math_q3" value="a"><div class="opt-dot"></div>a) quarante-sept millions trois cent vingt-six mille huit</label>
-      <label class="opt-label"><input type="radio" name="math_q3" value="b"><div class="opt-dot"></div>b) quatre cent soixante-treize mille deux cent huit</label>
-      <label class="opt-label"><input type="radio" name="math_q3" value="c"><div class="opt-dot"></div>c) quatre millions sept cent trente-deux mille six cent huit</label>
-      <label class="opt-label"><input type="radio" name="math_q3" value="d"><div class="opt-dot"></div>d) quatre millions sept cent vingt-trois mille six cent huit</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">4</div><div class="q-pts">20pts</div>
-    <div class="q-text">Le résultat de 6/12 × 3/4 est :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="math_q4" value="a"><div class="opt-dot"></div>a) 21/48</label>
-      <label class="opt-label"><input type="radio" name="math_q4" value="b"><div class="opt-dot"></div>b) 3/8</label>
-      <label class="opt-label"><input type="radio" name="math_q4" value="c"><div class="opt-dot"></div>c) 48/18</label>
-      <label class="opt-label"><input type="radio" name="math_q4" value="d"><div class="opt-dot"></div>d) 24/36</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">5</div><div class="q-pts">10pts</div>
-    <div class="q-text">8 livres de géographie coûtent 7 200 gourdes. 5 livres coûteront :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="math_q5" value="a"><div class="opt-dot"></div>a) 4 500 gourdes</label>
-      <label class="opt-label"><input type="radio" name="math_q5" value="b"><div class="opt-dot"></div>b) 900 gourdes</label>
-      <label class="opt-label"><input type="radio" name="math_q5" value="c"><div class="opt-dot"></div>c) 450 gourdes</label>
-      <label class="opt-label"><input type="radio" name="math_q5" value="d"><div class="opt-dot"></div>d) 9 000 gourdes</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">6</div><div class="q-pts">10pts</div>
-    <div class="q-text">Le nombre romain correspondant à 2050 est :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="math_q6" value="a"><div class="opt-dot"></div>a) MMXL</label>
-      <label class="opt-label"><input type="radio" name="math_q6" value="b"><div class="opt-dot"></div>b) MMXXXXXX</label>
-      <label class="opt-label"><input type="radio" name="math_q6" value="c"><div class="opt-dot"></div>c) MML</label>
-      <label class="opt-label"><input type="radio" name="math_q6" value="d"><div class="opt-dot"></div>d) MMLX</label>
-    </div>
-  </div>
-
-  <div class="sec-title">Partie II — Opérations & Problèmes</div>
-  <div class="q-block">
-    <div class="q-num">7</div><div class="q-pts">40pts</div>
-    <div class="q-text">Effectue les opérations suivantes :</div>
-    <div class="sub-q">a) 2/7 + 1/4 + 2/5 =</div>
-    <textarea class="answer-ta" id="math_q7a" placeholder="Réponse a)..."></textarea>
-    <div class="sub-q">b) 1/2 + 3/4 =</div>
-    <textarea class="answer-ta" id="math_q7b" rows="2" placeholder="Réponse b)..."></textarea>
-    <div class="sub-q">c) 7 458,72 + 4 984,8 + 0,453 =</div>
-    <textarea class="answer-ta" id="math_q7c" rows="2" placeholder="Réponse c)..."></textarea>
-    <div class="sub-q">d) 967 × 35 =</div>
-    <textarea class="answer-ta" id="math_q7d" rows="2" placeholder="Réponse d)..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">8</div><div class="q-pts">60pts</div>
-    <div class="q-text">Complète :</div>
-    <div class="sub-q">a) Pour trouver la valeur décimale d'une fraction, on divise le _____ par le _____.</div>
-    <textarea class="answer-ta" id="math_q8a" rows="2" placeholder="Réponse a)..."></textarea>
-    <div class="sub-q">b) Pour diviser un nombre décimal par 100, on déplace la virgule de _____ de _____ vers la _____.</div>
-    <textarea class="answer-ta" id="math_q8b" rows="2" placeholder="Réponse b)..."></textarea>
-    <div class="sub-q">c) Le taux est égal à _____.</div>
-    <textarea class="answer-ta" id="math_q8c" rows="2" placeholder="Réponse c)..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">9</div><div class="q-pts">30pts</div>
-    <div class="q-text">Un capital placé à un taux de 5% rapporte un intérêt annuel de 9 500 gourdes. Quel est ce capital ?</div>
-    <textarea class="answer-ta" id="math_q9" rows="4" placeholder="Démarche et réponse..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">10</div><div class="q-pts">30pts</div>
-    <div class="q-text">Un cube a 6 cm d'arête. Trouve son volume.</div>
-    <textarea class="answer-ta" id="math_q10" rows="4" placeholder="Démarche et réponse..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">11</div><div class="q-pts">40pts</div>
-    <div class="q-text">Une école envoie 250 élèves aux examens de 9ème année. 215 ont réussi. Quel est le pourcentage d'élèves qui a échoué ?</div>
-    <textarea class="answer-ta" id="math_q11" rows="4" placeholder="Démarche et réponse..."></textarea>
-  </div>
-  <div class="submit-wrap">
-    <button class="btn-submit" id="btnSMath" onclick="submitExam('math')">✅ Soumettre Mathématique</button>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════
+     PAGE 3 : EXAMEN (questions)
+══════════════════════════════════════════ -->
+<div id="page-exam-view" class="page hidden">
+  <div style="max-width:720px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('page-exams')">← Retour</button>
+      <div>
+        <h2 id="exam-title" style="color:#fff"></h2>
+        <p id="exam-total-pts" style="color:rgba(245,158,11,.6);font-size:.8rem"></p>
+      </div>
+    </div>
+    <div id="questions-container"></div>
+    <div class="sticky-bar">
+      <p id="exam-progress" style="color:rgba(147,197,253,.6);font-size:.85rem"></p>
+      <div id="submit-area">
+        <button class="btn btn-primary" onclick="askConfirm()">📤 Soumettre</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ==================== SCIENCES EXPÉRIMENTALES ==================== -->
-<div id="sciencesSection" class="section">
-<div class="card">
-  <div class="matiere-header">
-    <div class="matiere-title">🔬 Sciences Expérimentales</div>
-    <div class="matiere-sub">Sixième Année Fondamentale (6ème AF)</div>
-    <div class="exam-badges"><span class="exam-badge">MCQ: 70 pts</span><span class="exam-badge">Ouvert: 130 pts</span><span class="exam-badge">Total: 200 pts</span></div>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
-  <div class="sec-title">Partie I — Choix Multiples (Q1 à Q6)</div>
-  <p style="color:var(--gray);font-size:12px;margin-bottom:16px;font-style:italic;">Coche la lettre de la bonne réponse.</p>
-
-  <div class="q-block">
-    <div class="q-num">1</div><div class="q-pts">10pts</div>
-    <div class="q-text">Une de ces plantes n'a ni racine, ni tige, ni feuille. C'est :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="sc_q1" value="a"><div class="opt-dot"></div>a) le manguier</label>
-      <label class="opt-label"><input type="radio" name="sc_q1" value="b"><div class="opt-dot"></div>b) le citronnier</label>
-      <label class="opt-label"><input type="radio" name="sc_q1" value="c"><div class="opt-dot"></div>c) le champignon</label>
-      <label class="opt-label"><input type="radio" name="sc_q1" value="d"><div class="opt-dot"></div>d) le cerisier</label>
+<!-- ══════════════════════════════════════════
+     PAGE 4 : LOGIN PROFESSEUR
+══════════════════════════════════════════ -->
+<div id="page-prof-login" class="page center hidden">
+  <div style="max-width:380px;width:100%">
+    <button class="btn btn-ghost btn-sm" onclick="showPage('page-login')" style="margin-bottom:1.5rem">← Retour</button>
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:3rem">🛡️</div>
+      <h2 style="color:#fff;margin-top:.5rem">Espace Professeur</h2>
+      <p style="color:#64748b;font-size:.85rem">Entrez le code d'accès</p>
     </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">2</div><div class="q-pts">10pts</div>
-    <div class="q-text">Une fille peut se reproduire si elle a :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="sc_q2" value="a"><div class="opt-dot"></div>a) une grande taille</label>
-      <label class="opt-label"><input type="radio" name="sc_q2" value="b"><div class="opt-dot"></div>b) de gros seins</label>
-      <label class="opt-label"><input type="radio" name="sc_q2" value="c"><div class="opt-dot"></div>c) de longues jambes</label>
-      <label class="opt-label"><input type="radio" name="sc_q2" value="d"><div class="opt-dot"></div>d) la maturité</label>
+    <div class="card">
+      <label>Code d'accès</label>
+      <input id="prof-code" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doProf()"/>
+      <div id="prof-error" class="error-box hidden" style="margin-top:.5rem"></div>
+      <button class="btn btn-amber" style="width:100%;justify-content:center;margin-top:1rem;height:2.6rem" onclick="doProf()">
+        Accéder
+      </button>
     </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">3</div><div class="q-pts">10pts</div>
-    <div class="q-text">Un manguier est capable de donner des fruits et de se reproduire :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="sc_q3" value="a"><div class="opt-dot"></div>a) entre 3 et 5 ans</label>
-      <label class="opt-label"><input type="radio" name="sc_q3" value="b"><div class="opt-dot"></div>b) entre 1 et 2 ans</label>
-      <label class="opt-label"><input type="radio" name="sc_q3" value="c"><div class="opt-dot"></div>c) entre 6 mois et 12 mois</label>
-      <label class="opt-label"><input type="radio" name="sc_q3" value="d"><div class="opt-dot"></div>d) entre 4 et 8 mois</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">4</div><div class="q-pts">10pts</div>
-    <div class="q-text">Pisciculteur veut dire « éleveur de : »</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="sc_q4" value="a"><div class="opt-dot"></div>a) poules</label>
-      <label class="opt-label"><input type="radio" name="sc_q4" value="b"><div class="opt-dot"></div>b) poissons</label>
-      <label class="opt-label"><input type="radio" name="sc_q4" value="c"><div class="opt-dot"></div>c) porcs</label>
-      <label class="opt-label"><input type="radio" name="sc_q4" value="d"><div class="opt-dot"></div>d) palourdes</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">5</div><div class="q-pts">15pts</div>
-    <div class="q-text">Les spores sont :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="sc_q5" value="a"><div class="opt-dot"></div>a) le chapeau du champignon</label>
-      <label class="opt-label"><input type="radio" name="sc_q5" value="b"><div class="opt-dot"></div>b) la pelure d'un fruit</label>
-      <label class="opt-label"><input type="radio" name="sc_q5" value="c"><div class="opt-dot"></div>c) de très petits grains contenus dans des sacs appelés sporanges</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">6</div><div class="q-pts">15pts</div>
-    <div class="q-text">Laquelle de ces maladies est sexuellement transmissible ?</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="sc_q6" value="a"><div class="opt-dot"></div>a) le tétanos</label>
-      <label class="opt-label"><input type="radio" name="sc_q6" value="b"><div class="opt-dot"></div>b) l'hémophilie</label>
-      <label class="opt-label"><input type="radio" name="sc_q6" value="c"><div class="opt-dot"></div>c) la blennorragie</label>
-      <label class="opt-label"><input type="radio" name="sc_q6" value="d"><div class="opt-dot"></div>d) l'hypertension</label>
-    </div>
-  </div>
-
-  <div class="sec-title">Partie II — Questions Ouvertes</div>
-  <div class="q-block">
-    <div class="q-num">7</div><div class="q-pts">30pts</div>
-    <div class="q-text">Complète :</div>
-    <div class="sub-q">a) Les plantes sans fleurs se reproduisent par _______.</div>
-    <textarea class="answer-ta" id="sc_q7a" rows="2" placeholder="Réponse a)..."></textarea>
-    <div class="sub-q">b) L'eau est une source _______.</div>
-    <textarea class="answer-ta" id="sc_q7b" rows="2" placeholder="Réponse b)..."></textarea>
-    <div class="sub-q">c) _______ est un corps dont la force magnétique attire tout ce qui est en fer.</div>
-    <textarea class="answer-ta" id="sc_q7c" rows="2" placeholder="Réponse c)..."></textarea>
-    <div class="sub-q">d) L'absence du nerf auditif entraîne _______.</div>
-    <textarea class="answer-ta" id="sc_q7d" rows="2" placeholder="Réponse d)..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">8</div><div class="q-pts">40pts</div>
-    <div class="q-text">Définis les termes suivants :</div>
-    <div class="sub-q">a) Durée du son :</div>
-    <textarea class="answer-ta" id="sc_q8a" rows="3" placeholder="Définition..."></textarea>
-    <div class="sub-q">b) La pesanteur :</div>
-    <textarea class="answer-ta" id="sc_q8b" rows="3" placeholder="Définition..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">9</div><div class="q-pts">30pts</div>
-    <div class="q-text">Écris 3 substances dangereuses pour le système nerveux :</div>
-    <textarea class="answer-ta" id="sc_q9" rows="3" placeholder="a) ... b) ... c) ..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">10</div><div class="q-pts">30pts</div>
-    <div class="q-text">Donne deux (2) modes de transmission du V.I.H / SIDA :</div>
-    <textarea class="answer-ta" id="sc_q10" rows="3" placeholder="Mode 1: ... Mode 2: ..."></textarea>
-  </div>
-  <div class="submit-wrap">
-    <button class="btn-submit" id="btnSSciences" onclick="submitExam('sciences')">✅ Soumettre Sciences Expérimentales</button>
   </div>
 </div>
-</div>
 
-<!-- ==================== SCIENCES SOCIALES ==================== -->
-<div id="socialesSection" class="section">
-<div class="card">
-  <div class="matiere-header">
-    <div class="matiere-title">🌍 Sciences Sociales</div>
-    <div class="matiere-sub">Sixième Année Fondamentale (6ème AF)</div>
-    <div class="exam-badges"><span class="exam-badge">MCQ: 60 pts</span><span class="exam-badge">Ouvert: 150 pts</span><span class="exam-badge">Total: 210 pts</span></div>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
-  <div class="sec-title">Partie I — Choix Multiples (Q1 à Q6)</div>
-  <p style="color:var(--gray);font-size:12px;margin-bottom:16px;font-style:italic;">Entoure la lettre qui correspond à la bonne réponse.</p>
+<!-- ══════════════════════════════════════════
+     PAGE 5 : ESPACE PROFESSEUR
+══════════════════════════════════════════ -->
+<div id="page-prof" class="page hidden">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.8rem">
+      <div style="display:flex;align-items:center;gap:.8rem">
+        <span style="font-size:1.8rem">🛡️</span>
+        <div>
+          <h2 style="color:#fff">Espace Professeur</h2>
+          <p style="color:#64748b;font-size:.8rem">Complexe Éducatif Jean Jacques Dessalines</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <span id="prof-stats" style="color:#64748b;font-size:.82rem"></span>
+        <button class="btn btn-ghost btn-sm" onclick="profLogout()">Quitter</button>
+      </div>
+    </div>
 
-  <div class="q-block">
-    <div class="q-num">1</div><div class="q-pts">10pts</div>
-    <div class="q-text">Jeanne cite quelques pays moins avancés, elle commet une erreur. Laquelle ?</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="ss_q1" value="a"><div class="opt-dot"></div>a) Haïti</label>
-      <label class="opt-label"><input type="radio" name="ss_q1" value="b"><div class="opt-dot"></div>b) Canada</label>
-      <label class="opt-label"><input type="radio" name="ss_q1" value="c"><div class="opt-dot"></div>c) Bengladesh</label>
-      <label class="opt-label"><input type="radio" name="ss_q1" value="d"><div class="opt-dot"></div>d) Mozambique</label>
+    <div class="tab-bar">
+      <button class="tab active" id="tab-rank" onclick="switchTab('rank')">🏆 Classement</button>
+      <button class="tab" id="tab-detail" onclick="switchTab('detail')" id="tab-detail" style="display:none">📋 Détail élève</button>
     </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">2</div><div class="q-pts">10pts</div>
-    <div class="q-text">Les pays de l'Union Européenne se trouvent en :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="ss_q2" value="a"><div class="opt-dot"></div>a) Europe</label>
-      <label class="opt-label"><input type="radio" name="ss_q2" value="b"><div class="opt-dot"></div>b) Amérique</label>
-      <label class="opt-label"><input type="radio" name="ss_q2" value="c"><div class="opt-dot"></div>c) Afrique</label>
-      <label class="opt-label"><input type="radio" name="ss_q2" value="d"><div class="opt-dot"></div>d) Asie</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">3</div><div class="q-pts">10pts</div>
-    <div class="q-text">Le successeur de Dumarsais Estimé est :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="ss_q3" value="a"><div class="opt-dot"></div>a) François Duvalier</label>
-      <label class="opt-label"><input type="radio" name="ss_q3" value="b"><div class="opt-dot"></div>b) Élie Lescot</label>
-      <label class="opt-label"><input type="radio" name="ss_q3" value="c"><div class="opt-dot"></div>c) Paul E. Magloire</label>
-      <label class="opt-label"><input type="radio" name="ss_q3" value="d"><div class="opt-dot"></div>d) Sudre Dartiguenave</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">4</div><div class="q-pts">10pts</div>
-    <div class="q-text">Identifie l'un des droits fondamentaux de l'homme :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="ss_q4" value="a"><div class="opt-dot"></div>a) le droit d'être malade</label>
-      <label class="opt-label"><input type="radio" name="ss_q4" value="b"><div class="opt-dot"></div>b) le droit de ne pas respecter les autres</label>
-      <label class="opt-label"><input type="radio" name="ss_q4" value="c"><div class="opt-dot"></div>c) le droit de jeter des immondices dans la rue</label>
-      <label class="opt-label"><input type="radio" name="ss_q4" value="d"><div class="opt-dot"></div>d) le droit à la liberté</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">5</div><div class="q-pts">10pts</div>
-    <div class="q-text">L'une de ces causes a provoqué la chute du président Magloire :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="ss_q5" value="a"><div class="opt-dot"></div>a) le chômage</label>
-      <label class="opt-label"><input type="radio" name="ss_q5" value="b"><div class="opt-dot"></div>b) la construction de ponts</label>
-      <label class="opt-label"><input type="radio" name="ss_q5" value="c"><div class="opt-dot"></div>c) l'ouverture de ports au commerce</label>
-      <label class="opt-label"><input type="radio" name="ss_q5" value="d"><div class="opt-dot"></div>d) la création de la SHADA</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">6</div><div class="q-pts">10pts</div>
-    <div class="q-text">Il a pris le pouvoir le 16 août 1946 et l'a quitté le 10 mai 1950. Qui est-ce ?</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="ss_q6" value="a"><div class="opt-dot"></div>a) Magloire</label>
-      <label class="opt-label"><input type="radio" name="ss_q6" value="b"><div class="opt-dot"></div>b) Duvalier</label>
-      <label class="opt-label"><input type="radio" name="ss_q6" value="c"><div class="opt-dot"></div>c) Vincent</label>
-      <label class="opt-label"><input type="radio" name="ss_q6" value="d"><div class="opt-dot"></div>d) Estimé</label>
-    </div>
-  </div>
 
-  <div class="sec-title">Partie II — Questions Ouvertes</div>
-  <div class="q-block">
-    <div class="q-num">7</div><div class="q-pts">40pts</div>
-    <div class="q-text">Complète avec : <em>la malnutrition – États-Unis – constitution – l'affectivité</em></div>
-    <div class="sub-q">a) La _____ est la loi mère d'un pays.</div>
-    <textarea class="answer-ta" id="ss_q7a" rows="2" placeholder="Réponse a)..."></textarea>
-    <div class="sub-q">b) _____ se trouvent en Amérique du Nord.</div>
-    <textarea class="answer-ta" id="ss_q7b" rows="2" placeholder="Réponse b)..."></textarea>
-    <div class="sub-q">c) Une fonction de la famille est _____.</div>
-    <textarea class="answer-ta" id="ss_q7c" rows="2" placeholder="Réponse c)..."></textarea>
-    <div class="sub-q">d) L'une des causes du sous-développement est _____.</div>
-    <textarea class="answer-ta" id="ss_q7d" rows="2" placeholder="Réponse d)..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">8</div><div class="q-pts">20pts</div>
-    <div class="q-text">Quel moyen de transport doit utiliser une personne qui veut se rendre à l'Île à Vache ?</div>
-    <textarea class="answer-ta" id="ss_q8" rows="3" placeholder="Votre réponse..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">9</div><div class="q-pts">40pts</div>
-    <div class="q-text">Écris deux caractéristiques des grandes puissances :</div>
-    <textarea class="answer-ta" id="ss_q9" rows="3" placeholder="a) ... b) ..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">10</div><div class="q-pts">10pts</div>
-    <div class="q-text">Comment s'appelle la monnaie de l'Union Européenne ?</div>
-    <textarea class="answer-ta" id="ss_q10" rows="2" placeholder="Votre réponse..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">11</div><div class="q-pts">30pts</div>
-    <div class="q-text">Relie chaque pays à sa capitale :</div>
-    <div class="sub-q">a) France →</div>
-    <textarea class="answer-ta" id="ss_q11a" rows="1" placeholder="Capitale..."></textarea>
-    <div class="sub-q">b) Brésil →</div>
-    <textarea class="answer-ta" id="ss_q11b" rows="1" placeholder="Capitale..."></textarea>
-    <div class="sub-q">c) Cuba →</div>
-    <textarea class="answer-ta" id="ss_q11c" rows="1" placeholder="Capitale..."></textarea>
-  </div>
-  <div class="submit-wrap">
-    <button class="btn-submit" id="btnSSociales" onclick="submitExam('sociales')">✅ Soumettre Sciences Sociales</button>
+    <div id="prof-loading" class="spinner"></div>
+
+    <div id="tab-rank-content" class="hidden">
+      <div class="card overflow-x">
+        <table id="rank-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Élève</th>
+              <th title="Mathématiques">📐</th>
+              <th title="Sciences Expérimentales">🔬</th>
+              <th title="Sciences Sociales">🌍</th>
+              <th title="Kreyòl">📝</th>
+              <th title="Français">📖</th>
+              <th>Total</th>
+              <th style="color:#f59e0b">Moy/10</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rank-body"></tbody>
+        </table>
+        <p id="rank-empty" class="hidden" style="text-align:center;color:#64748b;padding:2rem">Aucun résultat enregistré.</p>
+      </div>
+    </div>
+
+    <div id="tab-detail-content" class="hidden">
+      <button class="btn btn-ghost btn-sm" style="margin-bottom:1rem" onclick="switchTab('rank')">← Retour au classement</button>
+      <div id="detail-header" class="card" style="margin-bottom:1rem"></div>
+      <div id="detail-subjects"></div>
+    </div>
   </div>
 </div>
-</div>
-
-<!-- ==================== KREYÒL ==================== -->
-<div id="kreyoSection" class="section">
-<div class="card">
-  <div class="matiere-header">
-    <div class="matiere-title">📝 Kominikasyon Kreyòl</div>
-    <div class="matiere-sub">Sixième Année Fondamentale (6ème AF)</div>
-    <div class="exam-badges"><span class="exam-badge">MCQ: 60 pwen</span><span class="exam-badge">Ouvert: 150 pwen</span><span class="exam-badge">Total: 210 pwen</span></div>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
-  <div class="text-passage">
-    <h4>📖 Tèks : Yon aksidan</h4>
-    <p>Yon maten, mwen ap jwe sou yon balanswa. Tout bagay t ap byen mache. Mwen t ap ale vini poukont mwen sou balanswa a.<br><br>
-    Fabyola vin ap pase, sa entèrese l, li pwoche. Men Fabyola gen plis fòs pase m, se nòmal, li pi gran pase m. Li voye m ak tout fòs li. Mwen tonbe sou mwen ban, mwen travèse, m al frape nan mi lekòl la. Chemiz mwen vin tout koulè. Cheve m sal. Tout timoun yo sezi, yo rete ap gade m bouch louvri. Se sèlman lè David vin ap pase, li ban m men pou m leve kanpe. Li ede m netwaye kò m.<br><br>
-    Se lè m rive lakay mwen, m pran reflèchi sou sa k sot pase a. Mwen rann mwen kont tèt mwen oswa yon lòt pati nan kò m te ka kase. Depi jou sa a, mwen pwomèt tèt mwen m ap fè plis atansyon lè m ap jwe.</p>
-  </div>
-  <div class="sec-title">Konpreyansyon tèks la (Q1-4)</div>
-  <p style="color:var(--gray);font-size:12px;margin-bottom:16px;font-style:italic;">Antoure lèt ki devan bon repons lan.</p>
-
-  <div class="q-block">
-    <div class="q-num">1</div><div class="q-pts">10pwen</div>
-    <div class="q-text">De non moun ki site nan tèks la se :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="kr_q1" value="a"><div class="opt-dot"></div>a) David ak Jinèt</label>
-      <label class="opt-label"><input type="radio" name="kr_q1" value="an"><div class="opt-dot"></div>an) David ak Fabyola</label>
-      <label class="opt-label"><input type="radio" name="kr_q1" value="b"><div class="opt-dot"></div>b) Fabyola ak Aksidan</label>
-      <label class="opt-label"><input type="radio" name="kr_q1" value="ch"><div class="opt-dot"></div>ch) David ak Balanswa</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">2</div><div class="q-pts">10pwen</div>
-    <div class="q-text">Daprè tèks la, aksidan an te pase :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="kr_q2" value="a"><div class="opt-dot"></div>a) aswè</label>
-      <label class="opt-label"><input type="radio" name="kr_q2" value="an"><div class="opt-dot"></div>an) granmmaten</label>
-      <label class="opt-label"><input type="radio" name="kr_q2" value="b"><div class="opt-dot"></div>b) aprèmidi</label>
-      <label class="opt-label"><input type="radio" name="kr_q2" value="ch"><div class="opt-dot"></div>ch) a dezè</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">3</div><div class="q-pts">10pwen</div>
-    <div class="q-text">Aksidan an te fèt :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="kr_q3" value="a"><div class="opt-dot"></div>a) nan lari a</label>
-      <label class="opt-label"><input type="radio" name="kr_q3" value="an"><div class="opt-dot"></div>an) nan lekòl la</label>
-      <label class="opt-label"><input type="radio" name="kr_q3" value="b"><div class="opt-dot"></div>b) sou plasdàm nan</label>
-      <label class="opt-label"><input type="radio" name="kr_q3" value="ch"><div class="opt-dot"></div>ch) bò lanmè a</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">4</div><div class="q-pts">10pwen</div>
-    <div class="q-text">Lè aksidan an te fèt :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="kr_q4" value="a"><div class="opt-dot"></div>a) tout timoun yo te kouri vin leve David</label>
-      <label class="opt-label"><input type="radio" name="kr_q4" value="an"><div class="opt-dot"></div>an) David te al leve timoun ki te frape a</label>
-      <label class="opt-label"><input type="radio" name="kr_q4" value="b"><div class="opt-dot"></div>b) Fabyola te mennen timoun nan lopital</label>
-      <label class="opt-label"><input type="radio" name="kr_q4" value="ch"><div class="opt-dot"></div>ch) Kèk lòt timoun te mennen l lakay li</label>
-    </div>
-  </div>
-
-  <div class="sec-title">Konpreyansyon — Konpletaj (Q5)</div>
-  <div class="q-block">
-    <div class="q-num">5</div><div class="q-pts">10pwen</div>
-    <div class="q-text">Konplete ak mo ki nan tèks la :</div>
-    <div class="sub-q">a) Se _____ li pi _____ pase m.</div>
-    <textarea class="answer-ta" id="kr_q5a" rows="2" placeholder="Réponse a)..."></textarea>
-    <div class="sub-q">an) Se sèlman lè _____, li ban m men.</div>
-    <textarea class="answer-ta" id="kr_q5an" rows="2" placeholder="Réponse an)..."></textarea>
-    <div class="sub-q">b) Depi jou sa a _____, m ap fè plis _____ lè m ap jwe.</div>
-    <textarea class="answer-ta" id="kr_q5b" rows="2" placeholder="Réponse b)..."></textarea>
-  </div>
-
-  <div class="sec-title">Òtograf – Vokabilè – Gramè (Q6-11)</div>
-  <div class="q-block">
-    <div class="q-num">6</div><div class="q-pts">15pwen</div>
-    <div class="q-text">Pase yon trè anba prepozisyon ki nan fraz sa yo :</div>
-    <div class="sub-q">a) Elèv yo ap jwenn nan lakou a.</div>
-    <textarea class="answer-ta" id="kr_q6a" rows="2" placeholder="Identifie la préposition..."></textarea>
-    <div class="sub-q">an) Chat la kouche anba tab la.</div>
-    <textarea class="answer-ta" id="kr_q6an" rows="2" placeholder="Identifie la préposition..."></textarea>
-    <div class="sub-q">b) Liv la sou tab la.</div>
-    <textarea class="answer-ta" id="kr_q6b" rows="2" placeholder="Identifie la préposition..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">7</div><div class="q-pts">15pwen</div>
-    <div class="q-text">Mete fòm predika ki nan fraz sa yo nan parantèz yo :</div>
-    <div class="sub-q">a) Mwen achte yon bèl mayo. ( ) | Diri a nan bòl la. ( )</div>
-    <textarea class="answer-ta" id="kr_q7a" rows="2" placeholder="Réponse a)..."></textarea>
-    <div class="sub-q">b) Tèren foutbòl Manich lan. ( )</div>
-    <textarea class="answer-ta" id="kr_q7b" rows="2" placeholder="Réponse b)..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">8</div><div class="q-pts">20pwen</div>
-    <div class="q-text">Mete fraz sa yo nan diskou dirèk :</div>
-    <div class="sub-q">a) Jak di li pa byen ditou jodi a.</div>
-    <textarea class="answer-ta" id="kr_q8a" rows="3" placeholder="Diskou dirèk..."></textarea>
-    <div class="sub-q">an) Yo pap antre nan kay la.</div>
-    <textarea class="answer-ta" id="kr_q8an" rows="3" placeholder="Diskou dirèk..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">9</div><div class="q-pts">20pwen</div>
-    <div class="q-text">Fè de fraz — youn ak konpleman dobjè dirèk, lòt ak konpleman sikonstansyèl tan :</div>
-    <div class="sub-q">a) Fraz ak konpleman dobjè dirèk :</div>
-    <textarea class="answer-ta" id="kr_q9a" rows="3" placeholder="Fraz 1..."></textarea>
-    <div class="sub-q">an) Fraz ak konpleman sikonstansyèl tan :</div>
-    <textarea class="answer-ta" id="kr_q9an" rows="3" placeholder="Fraz 2..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">10</div><div class="q-pts">10pwen</div>
-    <div class="q-text">Souliye fraz ki indike sibòdone koz la :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="kr_q10" value="a"><div class="opt-dot"></div>a) Si w pa vin chache m, m pa prale.</label>
-      <label class="opt-label"><input type="radio" name="kr_q10" value="an"><div class="opt-dot"></div>an) Papa m pa ale nan prizon paske li pa koupab.</label>
-      <label class="opt-label"><input type="radio" name="kr_q10" value="b"><div class="opt-dot"></div>b) Chak jou mwen wè madanm sa a pase bò lakay la.</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">11</div><div class="q-pts">20pwen</div>
-    <div class="q-text">Fè yon trè anba fraz nan sans figire a :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="kr_q11" value="a"><div class="opt-dot"></div>a) Gen yon bèf sou tèt mòn nan.</label>
-      <label class="opt-label"><input type="radio" name="kr_q11" value="an"><div class="opt-dot"></div>an) Mariz mare tèt li ak yon bèl mouchwa.</label>
-      <label class="opt-label"><input type="radio" name="kr_q11" value="b"><div class="opt-dot"></div>b) Li te al panse malad nan tèt li a nan klinik li.</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">12</div><div class="q-pts">50pwen</div>
-    <div class="q-text">Pwodiksyon ekri — Chwazi youn nan sijè sa yo :</div>
-    <p style="font-size:12px;color:var(--gold);margin-bottom:10px;"><strong>Sijè 1 :</strong> Lè Ayiti te kalifye pou mondyal la, di kisa ounmenm ak moun lakay ou te fè.<br><strong>Sijè 2 :</strong> Di tout sa ou pral fè pandan vakans k ap vini la.</p>
-    <textarea class="answer-ta" id="kr_q12" rows="10" placeholder="Ekri repons ou isit la..."></textarea>
-  </div>
-  <div class="submit-wrap">
-    <button class="btn-submit" id="btnSKreyo" onclick="submitExam('kreyo')">✅ Soumettre Kominikasyon Kreyòl</button>
-  </div>
-</div>
-</div>
-
-<!-- ==================== FRANÇAIS ==================== -->
-<div id="francaisSection" class="section">
-<div class="card">
-  <div class="matiere-header">
-    <div class="matiere-title">🇫🇷 Communication Française</div>
-    <div class="matiere-sub">Sixième Année Fondamentale (6ème AF)</div>
-    <div class="exam-badges"><span class="exam-badge">MCQ: 140 pts</span><span class="exam-badge">Ouvert: 160 pts</span><span class="exam-badge">Total: 300 pts</span></div>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
-  <div class="text-passage">
-    <h4>📖 Texte : Le chien</h4>
-    <p>Le chien est un animal de la famille des canides. On reconnaît plus de 300 races de chiens différentes dont la taille varie du simple au double.<br><br>
-    Le chien possède un odorat particulièrement développé jusqu'à 20000 fois plus que celui de l'homme. Cet odorat lui est utile pour la chasse et la recherche de survivants sous les décombres. Il possède également une ouïe très fine lui permettant d'entendre des sons inaudibles par l'homme tels que les ultrasons. Sa vue est par contre moins développée que celle de l'homme mais lui permet néanmoins de distinguer sans problème les petits objets en mouvement telle qu'une balle.<br><br>
-    Avec sa mâchoire, le « rottweiller », comme une race de chiens est capable d'exercer une pression de 150 kg au cm². Le chien est sans contexte un des meilleurs amis de l'homme.</p>
-  </div>
-  <div class="sec-title">Compréhension du texte (Q1-5)</div>
-  <p style="color:var(--gray);font-size:12px;margin-bottom:16px;font-style:italic;">Choisis la lettre qui correspond à la bonne réponse.</p>
-
-  <div class="q-block">
-    <div class="q-num">1</div><div class="q-pts">20pts</div>
-    <div class="q-text">Le « rottweiller » est :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="fr_q1" value="a"><div class="opt-dot"></div>a) le nom d'un chien</label>
-      <label class="opt-label"><input type="radio" name="fr_q1" value="b"><div class="opt-dot"></div>b) une race de chiens</label>
-      <label class="opt-label"><input type="radio" name="fr_q1" value="c"><div class="opt-dot"></div>c) la famille de chiens</label>
-      <label class="opt-label"><input type="radio" name="fr_q1" value="d"><div class="opt-dot"></div>d) le squelette d'un chien</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">2</div><div class="q-pts">20pts</div>
-    <div class="q-text">Le texte a :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="fr_q2" value="a"><div class="opt-dot"></div>a) 2 paragraphes</label>
-      <label class="opt-label"><input type="radio" name="fr_q2" value="b"><div class="opt-dot"></div>b) 4 paragraphes</label>
-      <label class="opt-label"><input type="radio" name="fr_q2" value="c"><div class="opt-dot"></div>c) 3 paragraphes</label>
-      <label class="opt-label"><input type="radio" name="fr_q2" value="d"><div class="opt-dot"></div>d) 1 paragraphe</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">3</div><div class="q-pts">20pts</div>
-    <div class="q-text">D'après le texte, le chien a une vue :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="fr_q3" value="a"><div class="opt-dot"></div>a) moins développée que celle de l'homme</label>
-      <label class="opt-label"><input type="radio" name="fr_q3" value="b"><div class="opt-dot"></div>b) plus développée que celle de l'homme</label>
-      <label class="opt-label"><input type="radio" name="fr_q3" value="c"><div class="opt-dot"></div>c) très très développée</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">4</div><div class="q-pts">20pts</div>
-    <div class="q-text">Le chien est :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="fr_q4" value="a"><div class="opt-dot"></div>a) ovipare</label>
-      <label class="opt-label"><input type="radio" name="fr_q4" value="b"><div class="opt-dot"></div>b) granivore</label>
-      <label class="opt-label"><input type="radio" name="fr_q4" value="c"><div class="opt-dot"></div>c) un mammifère</label>
-      <label class="opt-label"><input type="radio" name="fr_q4" value="d"><div class="opt-dot"></div>d) un amphibien</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">5</div><div class="q-pts">20pts</div>
-    <div class="q-text">L'ouïe du chien lui permet de (d') :</div>
-    <div class="opts-grid">
-      <label class="opt-label"><input type="radio" name="fr_q5" value="a"><div class="opt-dot"></div>a) entendre les sons</label>
-      <label class="opt-label"><input type="radio" name="fr_q5" value="b"><div class="opt-dot"></div>b) voir très loin</label>
-      <label class="opt-label"><input type="radio" name="fr_q5" value="c"><div class="opt-dot"></div>c) couper des os</label>
-      <label class="opt-label"><input type="radio" name="fr_q5" value="d"><div class="opt-dot"></div>d) chasser d'autres animaux</label>
-    </div>
-  </div>
-  <div class="sec-title">Orthographe – Vocabulaire – Grammaire (Q6-10)</div>
-  <div class="q-block">
-    <div class="q-num">6</div><div class="q-pts">20pts</div>
-    <div class="q-text">Souligne la phrase à la forme pronominale :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="fr_q6" value="a"><div class="opt-dot"></div>a) Le chien aboie les passants.</label>
-      <label class="opt-label"><input type="radio" name="fr_q6" value="b"><div class="opt-dot"></div>b) Nous nous entendons à merveille.</label>
-      <label class="opt-label"><input type="radio" name="fr_q6" value="c"><div class="opt-dot"></div>c) Les parents sont arrivés tôt à la réunion.</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">7</div><div class="q-pts">20pts</div>
-    <div class="q-text">Coche la phrase qui a le pronom démonstratif :</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label class="opt-label"><input type="radio" name="fr_q7" value="a"><div class="opt-dot"></div>a) De tous les fruits, l'orange est celle que ma mère préfère.</label>
-      <label class="opt-label"><input type="radio" name="fr_q7" value="b"><div class="opt-dot"></div>b) Nadine adore ses parents.</label>
-      <label class="opt-label"><input type="radio" name="fr_q7" value="c"><div class="opt-dot"></div>c) Ma soeur est très intelligente.</label>
-    </div>
-  </div>
-  <div class="q-block">
-    <div class="q-num">8</div><div class="q-pts">30pts</div>
-    <div class="q-text">Entoure les pronoms possessifs :</div>
-    <div class="sub-q">a) Ma jupe est courte, la tienne est plus courte.</div>
-    <textarea class="answer-ta" id="fr_q8a" rows="2" placeholder="Pronom possessif : ..."></textarea>
-    <div class="sub-q">b) Ton livre est déchiré, le mien ne l'est pas.</div>
-    <textarea class="answer-ta" id="fr_q8b" rows="2" placeholder="Pronom possessif : ..."></textarea>
-    <div class="sub-q">c) Tes cheveux sont courts, les leurs sont longs.</div>
-    <textarea class="answer-ta" id="fr_q8c" rows="2" placeholder="Pronom possessif : ..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">9</div><div class="q-pts">60pts</div>
-    <div class="q-text">Mets les verbes entre parenthèses aux temps indiqués :</div>
-    <div class="sub-q">a) Si tu (lire, présent) _____ le problème, tu le (comprendre, futur simple) _____ mieux.</div>
-    <textarea class="answer-ta" id="fr_q9a" rows="2" placeholder="lis / comprendras"></textarea>
-    <div class="sub-q">b) Hier, il (pleuvoir, passé composé) _____ toute la journée.</div>
-    <textarea class="answer-ta" id="fr_q9b" rows="2" placeholder="a plu"></textarea>
-    <div class="sub-q">c) Le chapeau de Carla (tomber, passé simple) _____ dans la rivière.</div>
-    <textarea class="answer-ta" id="fr_q9c" rows="2" placeholder="tomba"></textarea>
-    <div class="sub-q">d) De nombreuses étoiles (briller, présent) _____ dans le ciel.</div>
-    <textarea class="answer-ta" id="fr_q9d" rows="2" placeholder="brillent"></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">10</div><div class="q-pts">30pts</div>
-    <div class="q-text">Entoure les mots de la même famille que « voir » parmi : Devoir – prévoir – revoir – savoir – visible</div>
-    <textarea class="answer-ta" id="fr_q10" rows="2" placeholder="Mots de la famille de voir : ..."></textarea>
-  </div>
-  <div class="q-block">
-    <div class="q-num">11</div><div class="q-pts">40pts</div>
-    <div class="q-text">Production écrite — Sujet au choix :</div>
-    <p style="font-size:12px;color:var(--gold);margin-bottom:10px;"><strong>Sujet 1 :</strong> Écris à un(e) ami(e) pour lui dire comment tu as passé l'année scolaire 2025-2026.<br><strong>Sujet 2 :</strong> Tu as participé à une fête dans ton école. Raconte.</p>
-    <textarea class="answer-ta" id="fr_q11" rows="12" placeholder="Votre texte ici..."></textarea>
-  </div>
-  <div class="submit-wrap">
-    <button class="btn-submit" id="btnSFrancais" onclick="submitExam('francais')">✅ Soumettre Communication Française</button>
-  </div>
-</div>
-</div>
-
-<!-- ==================== RESULTS (PROF ONLY) ==================== -->
-<div id="resultsSection" class="section">
-<div class="card">
-  <div class="prof-header">
-    <span class="prof-badge">👨‍🏫 Espace Professeur — Résultats & Corrections</span>
-    <button class="btn-sm" onclick="loadResults()">🔄 Actualiser</button>
-    <button class="btn-sm" onclick="exportCSV()">📥 CSV</button>
-    <button class="btn-sm" onclick="window.print()">🖨️ Imprimer</button>
-  </div>
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-val" id="sTotal">—</div><div class="stat-lbl">Élèves inscrits</div></div>
-    <div class="stat-card"><div class="stat-val" id="sAvg">—</div><div class="stat-lbl">Moyenne générale</div></div>
-    <div class="stat-card"><div class="stat-val" id="sPassed">—</div><div class="stat-lbl">Admis ≥ 5/10</div></div>
-    <div class="stat-card"><div class="stat-val" id="sFailed">—</div><div class="stat-lbl">En échec</div></div>
-  </div>
-  <div class="filter-bar">
-    <input type="text" class="filter-input" id="searchEl" placeholder="🔍 Rechercher un élève..." oninput="filterTable()">
-  </div>
-  <div id="rLoader" class="loader"><div class="spinner"></div><span style="color:var(--gray)">Chargement...</span></div>
-  <div class="tbl-wrap" id="tblWrap" style="display:none;">
-    <table>
-      <thead><tr>
-        <th>#</th><th>Élève</th><th>Maths</th><th>Sc.Exp</th><th>Sc.Soc</th><th>Kreyòl</th><th>Français</th><th>Moy/10</th><th>Action</th>
-      </tr></thead>
-      <tbody id="tBody"></tbody>
-    </table>
-  </div>
-  <div id="stuPanel" style="display:none;"></div>
-</div>
-</div>
-
-</div><!-- /container -->
 
 <script>
-// ================================================================
-// SUPABASE — REST API directe (évite les problèmes de clé JWT)
-// ================================================================
-const SB_URL  = 'https://mzwibzvdcwapqrtbhxox.supabase.co';
-// Clé anon récupérée depuis Settings > API > anon public
-const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2liemZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2MzY5NTQsImV4cCI6MjA2NDIxMjk1NH0.R0KMsOaFzAYuEWXBMZMMXyPXmDF_WkmKqTCz6XlxAbs';
+// ══════════════════════════════════
+// SUPABASE CLIENT
+// ══════════════════════════════════
+const { createClient } = supabase;
+const sb = createClient(
+  'https://mzwibzvdcwapqrtbhxox.supabase.co',
+  'sb_publishable_2kZsCCv5jrAce6XIH8oxew_tTH2uL85'
+);
 
-const H = () => ({ 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' });
+// ══════════════════════════════════
+// EXAM DATA
+// ══════════════════════════════════
+const SUBJECTS = [
+  { id:'mathematiques',    name:'Mathématiques',           icon:'📐', total:300 },
+  { id:'sciences_exp',     name:'Sciences Expérimentales', icon:'🔬', total:200 },
+  { id:'sciences_soc',     name:'Sciences Sociales',       icon:'🌍', total:200 },
+  { id:'kreyol',           name:'Kominikasyon Kreyòl',     icon:'📝', total:200 },
+  { id:'francais',         name:'Communication Française', icon:'📖', total:300 },
+];
 
-async function dbGet(table, where = {}) {
-  let url = `${SB_URL}/rest/v1/${table}?select=*&order=created_at.asc`;
-  Object.entries(where).forEach(([k, v]) => url += `&${k}=eq.${encodeURIComponent(v)}`);
-  const r = await fetch(url, { headers: H() });
-  if (!r.ok) { const t = await r.text(); throw new Error(t); }
-  return r.json();
-}
-
-async function dbPost(table, data) {
-  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
-    method: 'POST', headers: H(), body: JSON.stringify(data)
-  });
-  if (!r.ok) { const t = await r.text(); throw new Error(t); }
-  const txt = await r.text();
-  return txt ? JSON.parse(txt) : [];
-}
-
-// ================================================================
-// DATA DEFINITIONS
-// ================================================================
-const CORRECT = {
-  math:     { math_q1:'c', math_q2:'a', math_q3:'c', math_q4:'b', math_q5:'a', math_q6:'d' },
-  sciences: { sc_q1:'c',  sc_q2:'d',  sc_q3:'a',  sc_q4:'b',  sc_q5:'c',  sc_q6:'c'  },
-  sociales: { ss_q1:'b',  ss_q2:'a',  ss_q3:'c',  ss_q4:'d',  ss_q5:'a',  ss_q6:'d'  },
-  kreyo:    { kr_q1:'an', kr_q2:'an', kr_q3:'an', kr_q4:'an', kr_q10:'an',kr_q11:'a' },
-  francais: { fr_q1:'b',  fr_q2:'c',  fr_q3:'a',  fr_q4:'c',  fr_q5:'a',  fr_q6:'b',  fr_q7:'a' }
-};
-
-const MCQ_PTS = {
-  math:     { math_q1:20, math_q2:20, math_q3:20, math_q4:20, math_q5:10, math_q6:10 },
-  sciences: { sc_q1:10,  sc_q2:10,  sc_q3:10,  sc_q4:10,  sc_q5:15,  sc_q6:15  },
-  sociales: { ss_q1:10,  ss_q2:10,  ss_q3:10,  ss_q4:10,  ss_q5:10,  ss_q6:10  },
-  kreyo:    { kr_q1:10,  kr_q2:10,  kr_q3:10,  kr_q4:10,  kr_q10:10, kr_q11:20 },
-  francais: { fr_q1:20,  fr_q2:20,  fr_q3:20,  fr_q4:20,  fr_q5:20,  fr_q6:20,  fr_q7:20 }
-};
-
-const TOTAL_PTS = { math:300, sciences:200, sociales:210, kreyo:210, francais:300 };
-
-const OPT_LABELS = {
-  math: {
-    math_q1:{a:'0,008',b:'0,0008',c:'0,8',d:'0,00008'},
-    math_q2:{a:'0,023 l',b:'0,0023 l',c:'0,23 l',d:'0,00023 l'},
-    math_q3:{a:'quarante-sept millions trois cent vingt-six mille huit',b:'quatre cent soixante-treize mille deux cent huit',c:'quatre millions sept cent trente-deux mille six cent huit',d:'quatre millions sept cent vingt-trois mille six cent huit'},
-    math_q4:{a:'21/48',b:'3/8',c:'48/18',d:'24/36'},
-    math_q5:{a:'4 500 gourdes',b:'900 gourdes',c:'450 gourdes',d:'9 000 gourdes'},
-    math_q6:{a:'MMXL',b:'MMXXXXXX',c:'MML',d:'MMLX'},
+const EXAMS = {
+  mathematiques: {
+    title:'Mathématiques', total:300,
+    questions:[
+      {id:'m1',text:"Identifie la valeur décimale correspondant à cette fraction 4/5 :",type:'qcm',pts:20,opts:["0,008","0,0008","0,8","0,00008"],labels:['a','b','c','d'],ans:'c'},
+      {id:'m2',text:"23cm³ est l'équivalent de :",type:'qcm',pts:20,opts:["0,023 l","0,0023 l","0,23 l","0,00023 l"],labels:['a','b','c','d'],ans:'b'},
+      {id:'m3',text:"Trouve l'écriture en lettres du nombre 4 732 608 :",type:'qcm',pts:20,opts:["quarante-sept millions trois cent vingt-six mille huit","quatre cent soixante-treize mille deux cent huit","quatre millions sept cent trente-deux mille six cent huit","quatre millions sept cent vingt-trois mille six cent huit"],labels:['a','b','c','d'],ans:'c'},
+      {id:'m4',text:"Le résultat de 6/12 × 3/4 est :",type:'qcm',pts:20,opts:["21/48","3/8","48/18","24/36"],labels:['a','b','c','d'],ans:'b'},
+      {id:'m5',text:"8 livres coûtent 7 200 gourdes. 5 livres coûteront :",type:'qcm',pts:10,opts:["4500 gourdes","900 gourdes","450 gourdes","9000 gourdes"],labels:['a','b','c','d'],ans:'a'},
+      {id:'m6',text:"Le nombre romain correspondant à 2050 est :",type:'qcm',pts:10,opts:["MMXL","MMXXXXX","MML","MMLX"],labels:['a','b','c','d'],ans:'d'},
+      {id:'m7a',text:"Effectue : 2/7 + 1/4 + 2/5 =",type:'open',pts:10,ans:"103/140"},
+      {id:'m7b',text:"Effectue : ... + 3/4 = (compléter selon l'examen)",type:'open',pts:10,ans:"Voir examen"},
+      {id:'m7c',text:"Effectue : 7458,72 + 4984,8 + 0,453 =",type:'open',pts:10,ans:"12 443,973"},
+      {id:'m7d',text:"Effectue : 967 × 35 =",type:'open',pts:10,ans:"33 845"},
+      {id:'m8a',text:"Complète : Pour trouver la valeur décimale d'une fraction, on _____ le _____ par le _____",type:'open',pts:20,ans:"divise le numérateur par le dénominateur"},
+      {id:'m8b',text:"Complète : Pour diviser un nombre décimal par 100, on _____ la virgule de _____ rangs vers la _____",type:'open',pts:20,ans:"déplace la virgule de deux rangs vers la gauche"},
+      {id:'m8c',text:"Complète : Le taux est égal à _____",type:'open',pts:20,ans:"I / (C × T)"},
+      {id:'m9',text:"Un capital à 5% rapporte 9500 gourdes d'intérêt annuel. Quel est ce capital ?",type:'open',pts:30,ans:"190 000 gourdes"},
+      {id:'m10',text:"Un cube a 6 cm d'arête. Trouve son volume.",type:'open',pts:30,ans:"216 cm³"},
+      {id:'m11',text:"250 élèves aux examens, 215 ont réussi. Quel est le % d'échec ?",type:'open',pts:40,ans:"14%"},
+    ]
   },
-  sciences:{
-    sc_q1:{a:'le manguier',b:'le citronnier',c:'le champignon',d:'le cerisier'},
-    sc_q2:{a:'une grande taille',b:'de gros seins',c:'de longues jambes',d:'la maturité'},
-    sc_q3:{a:'entre 3 et 5 ans',b:'entre 1 et 2 ans',c:'entre 6 mois et 12 mois',d:'entre 4 et 8 mois'},
-    sc_q4:{a:'poules',b:'poissons',c:'porcs',d:'palourdes'},
-    sc_q5:{a:'le chapeau du champignon',b:"la pelure d'un fruit",c:'de très petits grains dans des sacs appelés sporanges'},
-    sc_q6:{a:'le tétanos',b:"l'hémophilie",c:'la blennorragie',d:"l'hypertension"},
+  sciences_exp: {
+    title:'Sciences Expérimentales', total:200,
+    questions:[
+      {id:'se1',text:"Une plante sans racine, ni tige, ni feuille. C'est :",type:'qcm',pts:10,opts:["le manguier","le citronnier","le champignon","le cerisier"],labels:['a','b','c','d'],ans:'c'},
+      {id:'se2',text:"Une fille peut se reproduire si elle a :",type:'qcm',pts:10,opts:["une grande taille","de gros seins","de longues jambes","la maturité"],labels:['a','b','c','d'],ans:'d'},
+      {id:'se3',text:"Un manguier donne des fruits et se reproduit :",type:'qcm',pts:10,opts:["entre 3 et 5 ans","entre 1 et 2 ans","entre 6 mois et 12 mois","entre 4 et 8 mois"],labels:['a','b','c','d'],ans:'a'},
+      {id:'se4',text:"Pisciculteur veut dire éleveur de :",type:'qcm',pts:10,opts:["poules","poissons","porcs","palourdes"],labels:['a','b','c','d'],ans:'b'},
+      {id:'se5',text:"Les spores sont :",type:'qcm',pts:15,opts:["le chapeau du champignon","la pelure d'un fruit","de très petits grains dans des sacs (sporanges)"],labels:['a','b','c'],ans:'c'},
+      {id:'se6',text:"Laquelle est une maladie sexuellement transmissible ?",type:'qcm',pts:15,opts:["le tétanos","l'hémophilie","la blennorragie","l'hypertension"],labels:['a','b','c','d'],ans:'c'},
+      {id:'se7a',text:"Complète : Les plantes sans fleurs se reproduisent par _____",type:'open',pts:7,ans:"les spores"},
+      {id:'se7b',text:"Complète : L'eau est une source _____",type:'open',pts:7,ans:"d'énergie"},
+      {id:'se7c',text:"Complète : _____ est un corps dont la force magnétique attire tout ce qui est en fer.",type:'open',pts:8,ans:"L'aimant"},
+      {id:'se7d',text:"Complète : L'absence du nerf auditif entraîne _____",type:'open',pts:8,ans:"la surdité"},
+      {id:'se8a',text:"Définis : Durée du son",type:'open',pts:20,ans:"Temps pendant lequel un son est perçu"},
+      {id:'se8b',text:"Définis : La pesanteur",type:'open',pts:20,ans:"Force qui attire les corps vers le centre de la Terre"},
+      {id:'se9',text:"Écris 3 substances dangereuses pour le système nerveux :",type:'open',pts:30,ans:"L'alcool, la drogue, le tabac"},
+      {id:'se10',text:"Donne 2 modes de transmission du VIH/SIDA :",type:'open',pts:30,ans:"Rapports sexuels non protégés ; transfusion sanguine contaminée"},
+    ]
   },
-  sociales:{
-    ss_q1:{a:'Haïti',b:'Canada',c:'Bengladesh',d:'Mozambique'},
-    ss_q2:{a:'Europe',b:'Amérique',c:'Afrique',d:'Asie'},
-    ss_q3:{a:'François Duvalier',b:'Élie Lescot',c:'Paul E. Magloire',d:'Sudre Dartiguenave'},
-    ss_q4:{a:"le droit d'être malade",b:'le droit de ne pas respecter les autres',c:"le droit de jeter des immondices",d:"le droit à la liberté"},
-    ss_q5:{a:'le chômage',b:'la construction de ponts',c:"l'ouverture de ports",d:'la création de la SHADA'},
-    ss_q6:{a:'Magloire',b:'Duvalier',c:'Vincent',d:'Estimé'},
+  sciences_soc: {
+    title:'Sciences Sociales', total:200,
+    questions:[
+      {id:'ss1',text:"Jeanne cite des pays moins avancés et commet une erreur. Laquelle ?",type:'qcm',pts:10,opts:["Haïti","Canada","Bengladesh","Mozambique"],labels:['a','b','c','d'],ans:'b'},
+      {id:'ss2',text:"Les pays de l'Union Européenne se trouvent en :",type:'qcm',pts:10,opts:["Europe","Amérique","Afrique","Asie"],labels:['a','b','c','d'],ans:'a'},
+      {id:'ss3',text:"Le successeur de Dumarsais Estimé est :",type:'qcm',pts:10,opts:["François Duvalier","Élie Lescot","Paul E. Magloire","Sudre Dartiguenave"],labels:['a','b','c','d'],ans:'c'},
+      {id:'ss4',text:"Identifie un droit fondamental de l'homme :",type:'qcm',pts:10,opts:["le droit d'être malade","le droit de ne pas respecter les autres","le droit de jeter des immondices","le droit à la liberté"],labels:['a','b','c','d'],ans:'d'},
+      {id:'ss5',text:"Cause de la chute du président Magloire :",type:'qcm',pts:10,opts:["le chômage","la construction de ponts","l'ouverture de ports","la création de la SHADA"],labels:['a','b','c','d'],ans:'a'},
+      {id:'ss6',text:"Pouvoir 16 août 1946 → 10 mai 1950. Qui est-ce ?",type:'qcm',pts:10,opts:["Magloire","Duvalier","Vincent","Estimé"],labels:['a','b','c','d'],ans:'d'},
+      {id:'ss7a',text:"Complète : La _____ est la loi mère d'un pays.",type:'open',pts:10,ans:"constitution"},
+      {id:'ss7b',text:"Complète : Les _____ se trouvent en Amérique du Nord.",type:'open',pts:10,ans:"États-Unis"},
+      {id:'ss7c',text:"Complète : Une fonction de la famille est _____",type:'open',pts:10,ans:"l'affectivité"},
+      {id:'ss7d',text:"Complète : Une cause du sous-développement est _____",type:'open',pts:10,ans:"la malnutrition"},
+      {id:'ss8',text:"Quel transport pour se rendre à l'Île à Vache ?",type:'open',pts:20,ans:"Le bateau"},
+      {id:'ss9',text:"Écris deux caractéristiques des grandes puissances :",type:'open',pts:40,ans:"Économie forte/industrialisée ; armée puissante"},
+      {id:'ss10',text:"Comment s'appelle la monnaie de l'Union Européenne ?",type:'open',pts:10,ans:"L'Euro"},
+      {id:'ss11',text:"Relie : France→? Brésil→? Cuba→? (1-La Havane, 2-Paris, 3-Brasilia)",type:'open',pts:30,ans:"France→Paris, Brésil→Brasilia, Cuba→La Havane"},
+    ]
   },
-  kreyo:{
-    kr_q1:{a:'David ak Jinèt',an:'David ak Fabyola',b:'Fabyola ak Aksidan',ch:'David ak Balanswa'},
-    kr_q2:{a:'aswè',an:'granmmaten',b:'aprèmidi',ch:'a dezè'},
-    kr_q3:{a:'nan lari a',an:'nan lekòl la',b:'sou plasdàm nan',ch:'bò lanmè a'},
-    kr_q4:{a:'tout timoun yo te kouri vin leve David',an:'David te al leve timoun ki te frape a',b:'Fabyola te mennen timoun nan lopital',ch:'Kèk lòt timoun te mennen l lakay li'},
-    kr_q10:{a:'Si w pa vin chache m, m pa prale.',an:'Papa m pa ale nan prizon paske li pa koupab.',b:'Chak jou mwen wè madanm sa a pase bò lakay la.'},
-    kr_q11:{a:'Gen yon bèf sou tèt mòn nan.',an:'Mariz mare tèt li ak yon bèl mouchwa.',b:'Li te al panse malad nan tèt li a nan klinik li.'},
+  kreyol: {
+    title:'Kominikasyon Kreyòl', total:200,
+    questions:[
+      {id:'k1',text:"De non moun ki site nan tèks la se :",type:'qcm',pts:10,opts:["David ak Jinèt","David ak Fabyola","Fabyola ak Aksidan","David ak Balanswa"],labels:['a','an','b','ch'],ans:'an'},
+      {id:'k2',text:"Daprè tèks la, aksidan an te pase :",type:'qcm',pts:10,opts:["aswè","granmmaten","aprèmidi","a dezè"],labels:['a','an','b','ch'],ans:'an'},
+      {id:'k3',text:"Aksidan an te fèt :",type:'qcm',pts:10,opts:["nan lari a","nan lekòl la","sou plasdàm nan","bò lanmè a"],labels:['a','an','b','ch'],ans:'a'},
+      {id:'k4',text:"Lè aksidan an te fèt :",type:'qcm',pts:10,opts:["tout timoun yo te kouri vin leve David","David te al leve timoun ki te frape a","Fabyola te mennen timoun nan lopital","Kèk lòt timoun te mennen l lakay li"],labels:['a','an','b','ch'],ans:'an'},
+      {id:'k5a',text:"Konplete : Se _____ li pi _____ pase m.",type:'open',pts:5,ans:"nòmal, gran"},
+      {id:'k5b',text:"Konplete : Se sèlman lè _____, li ban m men _____",type:'open',pts:5,ans:"David vin ap pase, kanpe"},
+      {id:'k6a',text:"Prepozisyon nan : Elèv yo ap jwe nan lakou a.",type:'open',pts:5,ans:"nan"},
+      {id:'k6b',text:"Prepozisyon nan : Chat la kouche anba tab la.",type:'open',pts:5,ans:"anba"},
+      {id:'k6c',text:"Prepozisyon nan : Liv la sou tab la.",type:'open',pts:5,ans:"sou"},
+      {id:'k7a',text:"Fòm predika : Mwen achte yon bèl mayo. ( )",type:'open',pts:5,ans:"achte"},
+      {id:'k7b',text:"Fòm predika : Diri a nan bòl la. ( )",type:'open',pts:5,ans:"nan"},
+      {id:'k7c',text:"Fòm predika : Tèren foutbòl Manich lan. ( )",type:'open',pts:5,ans:"(fraz nominale – pa gen predika)"},
+      {id:'k8',text:"Diskou dirèk : Jak di li pa byen ditou jodi a.",type:'open',pts:10,ans:'Jak di : « M pa byen ditou jodi a. »'},
+      {id:'k8b',text:"Diskou dirèk : Yo pap antre nan kay la.",type:'open',pts:10,ans:'Yo di : « Nou pap antre nan kay la. »'},
+      {id:'k9a',text:"Fè yon fraz ak konpleman dobjè dirèk :",type:'open',pts:10,ans:"(Repons lib)"},
+      {id:'k9b',text:"Fè yon fraz ak konpleman sikonstansyèl tan :",type:'open',pts:10,ans:"(Repons lib)"},
+      {id:'k10',text:"Souliye fraz sibòdone koz : a) Si w pa vin chache m, m pa prale. an) Papa m pa ale nan prizon paske li pa koupab.",type:'open',pts:10,ans:"an) Papa m pa ale nan prizon paske li pa koupab."},
+      {id:'k11',text:"Fraz nan sans figuré : Gen yon bèf sou tèt mòn nan. / Li te al panse malad nan tèt li a.",type:'open',pts:20,ans:"Mariz mare tèt li ak yon bèl mouchwa."},
+      {id:'k12',text:"Pwodiksyon ekri (Sijè 1 : Lè Ayiti te kalifye pou mondyal — ou (Sijè 2 : Di sa ou pral fè pandan vakans)",type:'open',pts:50,ans:"(Evalyasyon pa pwofesè a)"},
+    ]
   },
-  francais:{
-    fr_q1:{a:"le nom d'un chien",b:'une race de chiens',c:'la famille de chiens',d:"le squelette d'un chien"},
-    fr_q2:{a:'2 paragraphes',b:'4 paragraphes',c:'3 paragraphes',d:'1 paragraphe'},
-    fr_q3:{a:"moins développée que celle de l'homme",b:"plus développée que celle de l'homme",c:'très très développée'},
-    fr_q4:{a:'ovipare',b:'granivore',c:'un mammifère',d:'un amphibien'},
-    fr_q5:{a:'entendre les sons',b:'voir très loin',c:'couper des os',d:"chasser d'autres animaux"},
-    fr_q6:{a:'Le chien aboie les passants.',b:'Nous nous entendons à merveille.',c:'Les parents sont arrivés tôt à la réunion.'},
-    fr_q7:{a:"De tous les fruits, l'orange est celle que ma mère préfère.",b:'Nadine adore ses parents.',c:'Ma soeur est très intelligente.'},
+  francais: {
+    title:'Communication Française', total:300,
+    questions:[
+      {id:'f1',text:"Le « rottweiller » est :",type:'qcm',pts:20,opts:["le nom d'un chien","une race de chiens","la famille de chiens","le squelette d'un chien"],labels:['a','b','c','d'],ans:'b'},
+      {id:'f2',text:"Le texte a :",type:'qcm',pts:20,opts:["2 paragraphes","4 paragraphes","3 paragraphes","1 paragraphe"],labels:['a','b','c','d'],ans:'c'},
+      {id:'f3',text:"D'après le texte, le chien a une vue :",type:'qcm',pts:20,opts:["moins développée que celle de l'homme","plus développée que celle de l'homme","très très développée"],labels:['a','b','c'],ans:'a'},
+      {id:'f4',text:"Le chien est :",type:'qcm',pts:20,opts:["ovipare","granivore","un mammifère","un amphibien"],labels:['a','b','c','d'],ans:'c'},
+      {id:'f5',text:"L'ouïe du chien lui permet de :",type:'qcm',pts:20,opts:["entendre des sons","voir très loin","couper des os","chasser d'autres animaux"],labels:['a','b','c','d'],ans:'a'},
+      {id:'f6',text:"Souligne la phrase pronominale : a) Le chien aboie les passants. b) Nous nous entendons à merveille. c) Les parents sont arrivés tôt.",type:'open',pts:20,ans:"b) Nous nous entendons à merveille."},
+      {id:'f7',text:"Pronom démonstratif : a) De tous les fruits, l'orange est celle que ma mère préfère. b) Nadine adore ses parents. c) Ma sœur est très intelligente.",type:'open',pts:20,ans:"a) De tous les fruits, l'orange est celle que ma mère préfère."},
+      {id:'f8',text:"Entoure les pronoms possessifs : a) Ma jupe est courte, la tienne est plus courte. b) Ton livre est déchiré, le mien ne l'est pas. c) Tes cheveux sont courts, les leurs sont longs.",type:'open',pts:30,ans:"la tienne, le mien, les leurs"},
+      {id:'f9a',text:"Si tu (lire, présent) _____ le problème, tu le (comprendre, futur) _____ mieux.",type:'open',pts:15,ans:"lis … comprendras"},
+      {id:'f9b',text:"Hier, il (pleuvoir, passé composé) _____ toute la journée.",type:'open',pts:15,ans:"a plu"},
+      {id:'f9c',text:"Le chapeau de Carla (tomber, passé simple) _____ dans la rivière.",type:'open',pts:15,ans:"tomba"},
+      {id:'f9d',text:"De nombreuses étoiles (briller, présent) _____ dans le ciel.",type:'open',pts:15,ans:"brillent"},
+      {id:'f10',text:"Mots de la même famille que « voir » : Devoir – prévoir – revoir – savoir – visible.",type:'open',pts:30,ans:"prévoir, revoir, visible"},
+      {id:'f11',text:"Production écrite (Sujet 1 : Lettre à un ami sur l'année scolaire 2025-2026 — ou Sujet 2 : Fête à l'école)",type:'open',pts:40,ans:"(Évaluation par le professeur)"},
+    ]
   }
 };
 
-const EXPECTED = {
-  math:{
-    math_q7a:'131/140 ≈ 0,936  (2/7 + 1/4 + 2/5 = 40/140 + 35/140 + 56/140 = 131/140)',
-    math_q7b:'5/4 = 1 1/4  (1/2 + 3/4 = 2/4 + 3/4 = 5/4)',
-    math_q7c:'12 443,973',
-    math_q7d:'33 845',
-    math_q8a:'numérateur par le dénominateur',
-    math_q8b:'2 rangs / décimaux vers la gauche',
-    math_q8c:'Intérêt ÷ Capital × 100  (ou I/C)',
-    math_q9:'Capital = I ÷ t = 9 500 ÷ 0,05 = 190 000 gourdes',
-    math_q10:'V = a³ = 6³ = 216 cm³',
-    math_q11:'Échec = 250−215 = 35 élèves → 35÷250×100 = 14%',
-  },
-  sciences:{
-    sc_q7a:'Les spores',
-    sc_q7b:"d'énergie (de vie, d'hydratation...)",
-    sc_q7c:"L'aimant (le magnétite)",
-    sc_q7d:'la surdité (perte de l\'ouïe)',
-    sc_q8a:"La durée du son est le temps pendant lequel un son reste perceptible.",
-    sc_q8b:"La pesanteur est la force d'attraction qu'exerce la Terre sur les corps.",
-    sc_q9:"Ex : l'alcool, la drogue/narcotiques, le tabac, les solvants, le mercure...",
-    sc_q10:"1) Rapports sexuels non protégés  2) Transfusion de sang contaminé / de la mère à l'enfant (transmission verticale)",
-  },
-  sociales:{
-    ss_q7a:'constitution',
-    ss_q7b:'Les États-Unis',
-    ss_q7c:"l'affectivité",
-    ss_q7d:'la malnutrition',
-    ss_q8:'Bateau / voie maritime',
-    ss_q9:'1) Grande puissance militaire et économique  2) Technologie avancée / PIB élevé',
-    ss_q10:"L'euro (€)",
-    ss_q11a:'Paris',ss_q11b:'Brasilia',ss_q11c:'La Havane',
-  },
-  kreyo:{
-    kr_q5a:'Fabyola / gran (pi gran)',
-    kr_q5an:'David vin ap pase',
-    kr_q5b:'mwen pwomèt tèt mwen / atansyon',
-    kr_q6a:'nan',kr_q6an:'anba',kr_q6b:'sou',
-    kr_q7a:'achte (vèb) / nan bòl la (predika nominal)',
-    kr_q7b:'predika nominal',
-    kr_q8a:'Jak di : « Li pa byen ditou jodi a. »',
-    kr_q8an:'Yo di : « Nou pap antre nan kay la. »',
-    kr_q9a:'Fraz libre ak konpleman dobjè dirèk',
-    kr_q9an:'Fraz libre ak konpleman sikonstansyèl tan',
-    kr_q12:'Production libre — évaluer : cohérence, orthographe créole, contenu (50 pwen)',
-  },
-  francais:{
-    fr_q8a:'la tienne',fr_q8b:'le mien',fr_q8c:'les leurs',
-    fr_q9a:'lis / comprendras',fr_q9b:'a plu',fr_q9c:'tomba',fr_q9d:'brillent',
-    fr_q10:'prévoir, revoir, visible',
-    fr_q11:'Production libre — évaluer : cohérence, grammaire, vocabulaire, structure (40pts)',
-  }
-};
-
-const OPEN_IDS = {
-  math:    ['math_q7a','math_q7b','math_q7c','math_q7d','math_q8a','math_q8b','math_q8c','math_q9','math_q10','math_q11'],
-  sciences:['sc_q7a','sc_q7b','sc_q7c','sc_q7d','sc_q8a','sc_q8b','sc_q9','sc_q10'],
-  sociales:['ss_q7a','ss_q7b','ss_q7c','ss_q7d','ss_q8','ss_q9','ss_q10','ss_q11a','ss_q11b','ss_q11c'],
-  kreyo:   ['kr_q5a','kr_q5an','kr_q5b','kr_q6a','kr_q6an','kr_q6b','kr_q7a','kr_q7b','kr_q8a','kr_q8an','kr_q9a','kr_q9an','kr_q12'],
-  francais:['fr_q8a','fr_q8b','fr_q8c','fr_q9a','fr_q9b','fr_q9c','fr_q9d','fr_q10','fr_q11']
-};
-
-const MAT_LABEL = { math:'📐 Maths', sciences:'🔬 Sc.Exp', sociales:'🌍 Sc.Soc', kreyo:'📝 Kreyòl', francais:'🇫🇷 Français' };
-
-// ================================================================
+// ══════════════════════════════════
 // STATE
-// ================================================================
-let IS_PROF = false, CUR_USER = null, CUR_ID = null, SUBMITTED = {}, ALL_RES = [];
+// ══════════════════════════════════
+let currentStudent = null; // {nom, prenom}
+let currentExamId  = null;
+let examAnswers    = {};    // {qId: value}
+let profData       = { responses:[], students:{} }; // loaded for professor
+let currentDetailStudent = null;
 
-// ================================================================
-// PARTICLES
-// ================================================================
-(()=>{ const c=document.getElementById('particles'); for(let i=0;i<12;i++){ const p=document.createElement('div'); p.className='particle'; const s=Math.random()*5+2; p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*10+12}s;animation-delay:${Math.random()*8}s;`; c.appendChild(p); } })();
-
-// ================================================================
-// NOTIFICATION
-// ================================================================
-function notif(msg, type='ok'){
-  const n=document.getElementById('notif');
-  n.textContent=msg; n.className=`notif ${type} show`;
-  setTimeout(()=>n.className='notif',4500);
-}
-
-// ================================================================
-// TOGGLE ADMIN BOX
-// ================================================================
-function toggleAdmin(){ const d=document.getElementById('adminBox'); d.style.display=d.style.display==='none'?'block':'none'; }
-
-// ================================================================
-// LOGIN — ÉLÈVE
-// ================================================================
-async function handleLogin(){
-  const nom=document.getElementById('fNom').value.trim();
-  const pre=document.getElementById('fPrenom').value.trim();
-  if(!nom||!pre){ notif('⚠️ Entrez votre nom et prénom !','warn'); return; }
-  const btn=document.getElementById('btnLogin');
-  btn.disabled=true; btn.textContent='⏳ Connexion...';
-  try{
-    // Search existing (case-insensitive via ilike)
-    let url=`${SB_URL}/rest/v1/eleves?select=*&nom=ilike.${encodeURIComponent(nom)}&prenom=ilike.${encodeURIComponent(pre)}`;
-    let r=await fetch(url,{headers:H()});
-    let data=await r.json();
-    let eleve;
-    if(data && data.length>0){
-      eleve=data[0];
-      // load submitted
-      const sc=await dbGet('scores',{eleve_id:eleve.id});
-      sc.forEach(s=>{ SUBMITTED[s.matiere]=true; });
-      notif(`✅ Bon retour, ${pre} !`);
-    } else {
-      const ins=await dbPost('eleves',{nom:nom.toUpperCase(),prenom:pre});
-      eleve=Array.isArray(ins)?ins[0]:ins;
-      notif(`✅ Bienvenue, ${pre} ! Bonne chance !`);
-    }
-    CUR_ID=eleve.id; CUR_USER=eleve; IS_PROF=false;
-    document.getElementById('loginSection').style.display='none';
-    document.getElementById('wName').textContent=`👋 ${pre} ${nom.toUpperCase()}`;
-    document.getElementById('wSub').textContent='Sélectionnez une matière pour commencer votre examen';
-    showStudentTabs(); goSection('dashboard'); updateCards();
-  } catch(e){ notif('❌ Erreur : '+e.message,'err'); console.error(e); }
-  finally{ btn.disabled=false; btn.textContent='Accéder aux Examens →'; }
-}
-
-// ================================================================
-// LOGIN — PROF
-// ================================================================
-async function handleAdminLogin(){
-  const pwd=document.getElementById('fAdminPwd').value;
-  if(pwd!=='prof2025'){ notif('❌ Mot de passe incorrect !','err'); return; }
-  IS_PROF=true; CUR_USER={nom:'PROF',prenom:''};
-  document.getElementById('loginSection').style.display='none';
-  document.getElementById('wName').textContent='👨‍🏫 Mode Professeur';
-  showAllTabs(); goSection('results');
-  notif('✅ Connexion professeur réussie !');
-}
-
-function showStudentTabs(){ ['tabDashboard','tabMath','tabSciences','tabSociales','tabKreyo','tabFrancais'].forEach(id=>{ const e=document.getElementById(id); if(e){e.classList.add('visible');e.style.display='';} }); }
-function showAllTabs(){ document.querySelectorAll('.nav-tab').forEach(t=>{ t.classList.add('visible'); t.style.display='block'; }); }
-
-// ================================================================
-// NAVIGATION
-// ================================================================
-function goSection(name){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  const s=document.getElementById(name+'Section'); if(s) s.classList.add('active');
-  const t=document.getElementById('tab'+name.charAt(0).toUpperCase()+name.slice(1)); if(t) t.classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-  if(name==='results' && IS_PROF) loadResults();
-}
-
-// ================================================================
-// DASHBOARD CARDS
-// ================================================================
-function updateCards(){
-  ['math','sciences','sociales','kreyo','francais'].forEach(m=>{
-    const c=document.getElementById('card-'+m); if(!c) return;
-    if(SUBMITTED[m]){ c.classList.add('completed'); c.querySelector('.matiere-status').textContent='✅ Soumis'; }
-    else { c.classList.remove('completed'); c.querySelector('.matiere-status').textContent='Non soumis'; }
+// ══════════════════════════════════
+// PAGE ROUTING
+// ══════════════════════════════════
+function showPage(id){
+  ['page-login','page-exams','page-exam-view','page-prof-login','page-prof'].forEach(p=>{
+    document.getElementById(p).classList.toggle('hidden', p!==id);
   });
 }
 
-// ================================================================
-// COLLECT ANSWERS
-// ================================================================
-function collectAnswers(m){
-  const ans={};
-  Object.keys(CORRECT[m]||{}).forEach(k=>{ document.querySelectorAll(`input[name="${k}"]`).forEach(r=>{ if(r.checked) ans[k]=r.value; }); });
-  (OPEN_IDS[m]||[]).forEach(id=>{ const el=document.getElementById(id); if(el) ans[id]=el.value.trim(); });
-  return ans;
-}
-
-function calcMCQ(m,ans){
-  let s=0;
-  Object.keys(CORRECT[m]||{}).forEach(k=>{ if(ans[k]===CORRECT[m][k]) s+=(MCQ_PTS[m][k]||0); });
-  return s;
-}
-
-// ================================================================
-// SUBMIT EXAM
-// ================================================================
-async function submitExam(m){
-  if(!CUR_ID){ notif('❌ Connectez-vous d\'abord !','err'); return; }
-  if(SUBMITTED[m]){ notif('⚠️ Examen déjà soumis !','warn'); return; }
-  const btnId='btnS'+m.charAt(0).toUpperCase()+m.slice(1);
-  const btn=document.getElementById(btnId);
-  if(btn){ btn.disabled=true; btn.textContent='⏳ Envoi en cours...'; }
-  try{
-    const ans=collectAnswers(m);
-    const mcq=calcMCQ(m,ans);
-    // Build rows
-    const rows=Object.entries(ans).map(([qid,rep])=>({ eleve_id:CUR_ID, matiere:m, question_id:qid, reponse:String(rep||'') }));
-    if(rows.length) await dbPost('reponses_examens', rows);
-    await dbPost('scores',{ eleve_id:CUR_ID, matiere:m, score_obtenu:mcq, score_total:TOTAL_PTS[m] });
-    SUBMITTED[m]=true; updateCards();
-    if(btn){ btn.textContent='✅ Soumis !'; btn.style.background='linear-gradient(135deg,#00d4aa,#00b894)'; }
-    notif(`✅ ${MAT_LABEL[m]} soumis ! Score QCM : ${mcq} pts`);
-    setTimeout(()=>goSection('dashboard'),2200);
-  } catch(e){
-    if(btn){ btn.disabled=false; btn.textContent='✅ Soumettre'; }
-    notif('❌ Erreur soumission : '+e.message,'err'); console.error(e);
+// ══════════════════════════════════
+// STUDENT LOGIN
+// ══════════════════════════════════
+function doLogin(){
+  const nom    = document.getElementById('inp-nom').value.trim();
+  const prenom = document.getElementById('inp-prenom').value.trim();
+  const errEl  = document.getElementById('login-error');
+  if(!nom || !prenom){
+    errEl.textContent = 'Veuillez entrer votre nom et votre prénom.';
+    errEl.classList.remove('hidden');
+    return;
   }
+  errEl.classList.add('hidden');
+  currentStudent = {nom, prenom};
+  showExamList();
+}
+function doLogout(){
+  currentStudent = null;
+  document.getElementById('inp-nom').value='';
+  document.getElementById('inp-prenom').value='';
+  showPage('page-login');
 }
 
-// ================================================================
-// LOAD RESULTS — PROF
-// ================================================================
-async function loadResults(){
-  if(!IS_PROF) return;
-  const loader=document.getElementById('rLoader');
-  const wrap=document.getElementById('tblWrap');
-  const panel=document.getElementById('stuPanel');
-  loader.style.display='flex'; wrap.style.display='none'; panel.style.display='none';
+// ══════════════════════════════════
+// EXAM LIST
+// ══════════════════════════════════
+async function showExamList(){
+  showPage('page-exams');
+  document.getElementById('exams-welcome').textContent = `Bienvenue, ${currentStudent.prenom} ${currentStudent.nom}`;
+  const listEl = document.getElementById('exams-list');
+  listEl.innerHTML = '<div class="spinner"></div>';
 
-  try{
-    const [eleves, scores, reps] = await Promise.all([
-      dbGet('eleves'), dbGet('scores'), dbGet('reponses_examens')
-    ]);
+  // Load already submitted exams from Supabase
+  const { data: done } = await sb
+    .from('exam_responses')
+    .select('subject')
+    .eq('student_nom', currentStudent.nom)
+    .eq('student_prenom', currentStudent.prenom);
 
-    if(!eleves||eleves.length===0){
-      loader.style.display='none'; wrap.style.display='block';
-      document.getElementById('tBody').innerHTML=`<tr><td colspan="9" style="text-align:center;padding:40px;">
-        <div class="no-data"><div class="no-data-icon">📭</div><p>Aucun élève inscrit pour le moment.</p></div></td></tr>`;
-      setStats([]); return;
-    }
+  const doneSet = new Set((done||[]).map(r=>r.subject));
+  const allDone = SUBJECTS.every(s=>doneSet.has(s.id));
 
-    const MATS=['math','sciences','sociales','kreyo','francais'];
-    ALL_RES = eleves.map(eleve=>{
-      const eScores={};
-      MATS.forEach(m=>{ const s=scores.find(x=>x.eleve_id===eleve.id&&x.matiere===m); eScores[m]=s?parseFloat(s.score_obtenu):null; });
-      const eRep=reps.filter(r=>r.eleve_id===eleve.id);
-      let tot=0, maxT=0;
-      MATS.forEach(m=>{ if(eScores[m]!==null){ tot+=eScores[m]; maxT+=TOTAL_PTS[m]; } });
-      const moy=maxT>0?((tot/maxT)*10).toFixed(2):null;
-      return { eleve, eScores, eRep, tot, maxT, moy };
-    });
-
-    ALL_RES.sort((a,b)=>{ if(a.moy===null) return 1; if(b.moy===null) return -1; return parseFloat(b.moy)-parseFloat(a.moy); });
-
-    renderTable(ALL_RES);
-    setStats(ALL_RES);
-    loader.style.display='none'; wrap.style.display='block';
-  } catch(e){
-    loader.style.display='none'; wrap.style.display='block';
-    document.getElementById('tBody').innerHTML=`<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--gold);">
-      ❌ Erreur de chargement : ${e.message}<br>
-      <small style="color:var(--gray)">Vérifiez la console (F12) pour les détails.</small></td></tr>`;
-    console.error('loadResults error:', e);
-  }
-}
-
-function setStats(res){
-  const valid=res.filter(r=>r.moy!==null);
-  const passed=valid.filter(r=>parseFloat(r.moy)>=5);
-  const avg=valid.length>0?(valid.reduce((s,r)=>s+parseFloat(r.moy),0)/valid.length).toFixed(2):'—';
-  document.getElementById('sTotal').textContent=res.length;
-  document.getElementById('sAvg').textContent=avg;
-  document.getElementById('sPassed').textContent=passed.length;
-  document.getElementById('sFailed').textContent=valid.length-passed.length;
-}
-
-function renderTable(res){
-  const tb=document.getElementById('tBody');
-  if(!res||!res.length){ tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--gray);">Aucun résultat</td></tr>'; return; }
-  tb.innerHTML=res.map((r,i)=>{
-    const rank=i+1;
-    const rc=rank===1?'r1':rank===2?'r2':rank===3?'r3':'rN';
-    const m=r.moy; const mn=m?parseFloat(m):0;
-    const bc=mn>=8?'b-ex':mn>=6?'b-bi':mn>=5?'b-pa':'b-in';
-    const fs=(s,tot)=>s!==null?`<div class="score-cell"><span class="score-cell-val">${s}<small style="color:var(--gray)">/${tot}</small></span><div class="score-mini-bar"><div class="score-mini-fill" style="width:${Math.round(s/tot*100)}%"></div></div></div>`:'<span style="color:var(--gray)">—</span>';
-    return `<tr id="row-${r.eleve.id}" onclick="openStudent('${r.eleve.id}')">
-      <td><span class="rank-b ${rc}">${rank}</span></td>
-      <td><strong>${r.eleve.prenom} ${r.eleve.nom}</strong></td>
-      <td>${fs(r.eScores.math,TOTAL_PTS.math)}</td>
-      <td>${fs(r.eScores.sciences,TOTAL_PTS.sciences)}</td>
-      <td>${fs(r.eScores.sociales,TOTAL_PTS.sociales)}</td>
-      <td>${fs(r.eScores.kreyo,TOTAL_PTS.kreyo)}</td>
-      <td>${fs(r.eScores.francais,TOTAL_PTS.francais)}</td>
-      <td><span class="moy-b ${bc}">${m?m+'/10':'N/A'}</span></td>
-      <td><button class="btn-sm" style="font-size:11px;padding:6px 12px;" onclick="event.stopPropagation();openStudent('${r.eleve.id}')">👁 Détail</button></td>
-    </tr>`;
-  }).join('');
-}
-
-function filterTable(){
-  const q=document.getElementById('searchEl').value.toLowerCase();
-  const filtered=ALL_RES.filter(r=>r.eleve.nom.toLowerCase().includes(q)||r.eleve.prenom.toLowerCase().includes(q));
-  renderTable(filtered); setStats(filtered);
-}
-
-// ================================================================
-// OPEN STUDENT PANEL
-// ================================================================
-function openStudent(eid){
-  if(!IS_PROF) return;
-  document.querySelectorAll('#tBody tr').forEach(tr=>tr.classList.remove('sel'));
-  const row=document.getElementById('row-'+eid); if(row) row.classList.add('sel');
-  const res=ALL_RES.find(r=>r.eleve.id===eid); if(!res) return;
-  buildPanel(res);
-  setTimeout(()=>document.getElementById('stuPanel').scrollIntoView({behavior:'smooth',block:'start'}),150);
-}
-
-function buildPanel(res){
-  const {eleve,eScores,eRep,tot,maxT,moy}=res;
-  const init=(eleve.prenom[0]+(eleve.nom[0]||'')).toUpperCase();
-  const mn=moy?parseFloat(moy):0;
-  const bc=mn>=8?'b-ex':mn>=6?'b-bi':mn>=5?'b-pa':'b-in';
-  const MATS=['math','sciences','sociales','kreyo','francais'];
-
-  const tabs=MATS.map((m,i)=>`<button class="mat-tab${i===0?' active':''}" onclick="switchTab('${m}',this)">${MAT_LABEL[m]}</button>`).join('');
-  const contents=MATS.map((m,i)=>`<div class="mat-content${i===0?' active':''}" id="mc-${m}">${buildMatiereContent(m,eScores[m],eRep)}</div>`).join('');
-
-  const panel=document.getElementById('stuPanel');
-  panel.style.display='block';
-  panel.innerHTML=`
-  <div class="stu-panel">
-    <button class="close-btn" onclick="closePanel()">✕ Fermer ce panneau</button>
-    <div class="stu-panel-hdr">
-      <div class="stu-avatar">${init}</div>
-      <div>
-        <div class="stu-panel-name">${eleve.prenom} ${eleve.nom}</div>
-        <div class="stu-panel-info">Total MCQ + ouvertes soumises : ${tot} / ${maxT} pts &nbsp;•&nbsp; <span class="moy-b ${bc}" style="font-size:11px;">${moy?moy+'/10':'N/A'}</span></div>
+  listEl.innerHTML = '';
+  SUBJECTS.forEach(sub=>{
+    const isDone = doneSet.has(sub.id);
+    const btn = document.createElement('button');
+    btn.className = 'exam-item' + (isDone?' done':'');
+    btn.innerHTML = `
+      <span class="exam-icon">${sub.icon}</span>
+      <div style="flex:1">
+        <div class="exam-name">${sub.name}</div>
+        <div class="exam-pts">Total : ${sub.total} pts</div>
       </div>
-      <div class="stu-avg-big"><div class="stu-avg-num">${moy||'—'}</div><div class="stu-avg-lbl">/10 (moyenne)</div></div>
-    </div>
-    <div class="mat-tabs">${tabs}</div>
-    ${contents}
-  </div>`;
-}
-
-function switchTab(key,btn){
-  document.querySelectorAll('.mat-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.mat-content').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active');
-  const mc=document.getElementById('mc-'+key); if(mc) mc.classList.add('active');
-}
-
-function closePanel(){
-  document.getElementById('stuPanel').style.display='none';
-  document.querySelectorAll('#tBody tr').forEach(tr=>tr.classList.remove('sel'));
-}
-
-// ================================================================
-// BUILD MATIERE CORRECTION VIEW
-// ================================================================
-function buildMatiereContent(m, scoreObtenu, allRep){
-  const mRep=allRep.filter(r=>r.matiere===m);
-  if(!mRep.length) return `<div class="no-data"><div class="no-data-icon">📭</div><p>Pas encore soumis.</p></div>`;
-
-  const ansMap={}; mRep.forEach(r=>{ ansMap[r.question_id]=r.reponse; });
-  const correct=CORRECT[m]||{};
-  const pts=MCQ_PTS[m]||{};
-  const opts=OPT_LABELS[m]||{};
-  const exp=EXPECTED[m]||{};
-
-  let mcqScore=0, mcqTotal=0;
-  Object.keys(correct).forEach(k=>{ mcqTotal+=(pts[k]||0); if(ansMap[k]===correct[k]) mcqScore+=(pts[k]||0); });
-
-  // Score header
-  let html=`<div class="mat-score-hdr">
-    <div><div class="mat-score-lbl">Score QCM (automatique)</div>
-    <div style="color:var(--gray);font-size:11px;margin-top:2px;">Questions ouvertes = correction manuelle requise</div></div>
-    <div class="mat-score-val">${scoreObtenu!==null?scoreObtenu:mcqScore}<small style="color:var(--gray);font-size:13px;"> / ${TOTAL_PTS[m]} pts</small></div>
-  </div>`;
-
-  // MCQ review
-  if(Object.keys(correct).length){
-    html+=`<div class="rev-sec-title">✅ QCM — Score automatique : ${mcqScore} / ${mcqTotal} pts</div><div class="rev-grid">`;
-    Object.keys(correct).forEach(k=>{
-      const sAns=ansMap[k]||null;
-      const cAns=correct[k];
-      const ok=sAns===cAns;
-      const qOpts=opts[k]||{};
-      const sLbl=sAns?(qOpts[sAns]||sAns):'— Pas de réponse —';
-      const cLbl=qOpts[cAns]||cAns;
-      html+=`<div class="rev-card ${ok?'rev-ok':'rev-wrong'}">
-        <div class="rev-lbl">${ok?'✅ CORRECT':'❌ INCORRECT'} &bull; ${k.replace(/_/g,' ')} &bull; ${pts[k]||0} pts</div>
-        <div class="rev-q">Réponse de l'élève :</div>
-        ${ok?`<div class="rev-stu">✓ ${sLbl}</div>`:`<div class="rev-stu-wrong">${sLbl}</div>`}
-        ${!ok?`<div class="rev-correct">✓ Bonne réponse : <strong>${cLbl}</strong></div>`:''}
-      </div>`;
-    });
-    html+='</div>';
-  }
-
-  // Open questions review
-  const openKeys=(OPEN_IDS[m]||[]).filter(k=>k in ansMap);
-  if(openKeys.length){
-    html+=`<div class="rev-sec-title">📝 Questions ouvertes — Correction manuelle</div><div style="display:flex;flex-direction:column;gap:10px;">`;
-    openKeys.forEach(k=>{
-      const sAns=ansMap[k];
-      const expAns=exp[k];
-      html+=`<div class="rev-card rev-open">
-        <div class="rev-lbl">📝 ${k.replace(/_/g,' ')}</div>
-        <div class="rev-q">Réponse de l'élève :</div>
-        <div class="open-box">${sAns&&sAns.length>0?escHtml(sAns):'<em style="color:var(--gray)">Aucune réponse</em>'}</div>
-        ${expAns?`<div class="expected-box"><div class="expected-lbl">💡 Réponse / Corrigé attendu :</div>${escHtml(expAns)}</div>`:''}
-      </div>`;
-    });
-    html+='</div>';
-  }
-  return html;
-}
-
-function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ================================================================
-// EXPORT CSV
-// ================================================================
-function exportCSV(){
-  if(!ALL_RES.length){ notif('Aucune donnée à exporter','warn'); return; }
-  const rows=[['Rang','Nom','Prénom','Maths','Sc.Exp','Sc.Soc','Kreyòl','Français','Moyenne/10']];
-  ALL_RES.forEach((r,i)=>{
-    rows.push([i+1,r.eleve.nom,r.eleve.prenom,
-      r.eScores.math??'—',r.eScores.sciences??'—',r.eScores.sociales??'—',
-      r.eScores.kreyo??'—',r.eScores.francais??'—',r.moy??'N/A']);
+      ${isDone
+        ? '<span class="badge badge-green">✓ Soumis</span>'
+        : '<span style="color:#f59e0b;font-size:1.1rem">→</span>'}
+    `;
+    if(!isDone) btn.onclick = ()=>startExam(sub.id);
+    listEl.appendChild(btn);
   });
-  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
-  a.download=`resultats_${new Date().toLocaleDateString('fr')}.csv`;
-  a.click();
+
+  document.getElementById('exams-done-msg').classList.toggle('hidden', !allDone);
 }
 
-// ================================================================
-// ENTER KEY
-// ================================================================
-document.addEventListener('keydown',e=>{
-  if(e.key!=='Enter') return;
-  const ls=document.getElementById('loginSection');
-  if(ls&&ls.style.display!=='none'){
-    const ab=document.getElementById('adminBox');
-    if(ab&&ab.style.display==='block') handleAdminLogin();
-    else handleLogin();
+// ══════════════════════════════════
+// EXAM VIEW
+// ══════════════════════════════════
+function startExam(subjectId){
+  currentExamId = subjectId;
+  examAnswers   = {};
+  const exam = EXAMS[subjectId];
+  document.getElementById('exam-title').textContent = exam.title;
+  document.getElementById('exam-total-pts').textContent = `Total : ${exam.total} points`;
+
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  exam.questions.forEach((q,i)=>{
+    container.appendChild(buildQuestion(q, i+1));
+  });
+  updateProgress();
+  showPage('page-exam-view');
+}
+
+function buildQuestion(q, num){
+  const div = document.createElement('div');
+  div.className = 'q-card';
+  const head = `<div class="q-head">
+    <span class="q-num">${num}</span>
+    <p class="q-text">${escHtml(q.text)}</p>
+    <span class="q-pts">${q.pts} pts</span>
+  </div>`;
+
+  let body = '';
+  if(q.type==='qcm'){
+    body = `<div class="opts" id="opts-${q.id}">`;
+    q.opts.forEach((opt,i)=>{
+      const lbl = q.labels[i];
+      body += `<button class="opt-btn" data-qid="${q.id}" data-lbl="${lbl}" onclick="selectOpt(this,'${q.id}','${lbl}')">
+        <strong>${lbl})</strong> ${escHtml(opt)}
+      </button>`;
+    });
+    body += `</div>`;
+  } else {
+    const large = q.pts >= 40;
+    if(large){
+      body = `<div class="open-input"><textarea id="ans-${q.id}" oninput="updateProgress()" rows="4" placeholder="Écrivez votre réponse ici..."></textarea></div>`;
+    } else {
+      body = `<div class="open-input"><input id="ans-${q.id}" type="text" oninput="updateProgress()" placeholder="Votre réponse..."/></div>`;
+    }
   }
-});
+
+  div.innerHTML = head + body;
+  return div;
+}
+
+function selectOpt(btn, qId, lbl){
+  examAnswers[qId] = lbl;
+  document.querySelectorAll(`.opt-btn[data-qid="${qId}"]`).forEach(b=>{
+    b.classList.toggle('selected', b.dataset.lbl===lbl);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const exam = EXAMS[currentExamId];
+  let answered = 0;
+  exam.questions.forEach(q=>{
+    if(q.type==='qcm'){
+      if(examAnswers[q.id]) answered++;
+    } else {
+      const el = document.getElementById('ans-'+q.id);
+      if(el && el.value.trim()) answered++;
+    }
+  });
+  document.getElementById('exam-progress').textContent = `${answered}/${exam.questions.length} questions répondues`;
+}
+
+function gatherAnswers(){
+  const exam = EXAMS[currentExamId];
+  exam.questions.forEach(q=>{
+    if(q.type!=='qcm'){
+      const el = document.getElementById('ans-'+q.id);
+      if(el) examAnswers[q.id] = el.value.trim();
+    }
+  });
+}
+
+function askConfirm(){
+  gatherAnswers();
+  const area = document.getElementById('submit-area');
+  area.innerHTML = `
+    <span style="color:#fbbf24;font-size:.85rem">⚠ Confirmer ?</span>
+    <button class="btn btn-ghost btn-sm" onclick="cancelConfirm()">Annuler</button>
+    <button class="btn btn-green btn-sm" onclick="submitExam()">Oui, soumettre</button>
+  `;
+}
+function cancelConfirm(){
+  document.getElementById('submit-area').innerHTML = `<button class="btn btn-primary" onclick="askConfirm()">📤 Soumettre</button>`;
+}
+
+async function submitExam(){
+  gatherAnswers();
+  const btn = document.querySelector('#submit-area button:last-child');
+  if(btn){ btn.disabled=true; btn.textContent='Envoi...'; }
+
+  const exam  = EXAMS[currentExamId];
+  // auto-score QCM
+  let autoScore = 0;
+  exam.questions.forEach(q=>{
+    if(q.type==='qcm' && (examAnswers[q.id]||'').trim()===q.ans.trim()) autoScore += q.pts;
+  });
+
+  const { error } = await sb.from('exam_responses').insert({
+    student_nom:    currentStudent.nom,
+    student_prenom: currentStudent.prenom,
+    subject:        currentExamId,
+    answers:        JSON.stringify(examAnswers),
+    auto_score:     autoScore,
+    total:          exam.total,
+    submitted_at:   new Date().toISOString()
+  });
+
+  if(error){
+    alert('Erreur lors de la soumission. Veuillez réessayer.');
+    cancelConfirm();
+    return;
+  }
+  showExamList();
+}
+
+// ══════════════════════════════════
+// PROFESSOR
+// ══════════════════════════════════
+const PROF_CODE = 'cejjd2026';
+
+function doProf(){
+  const code  = document.getElementById('prof-code').value;
+  const errEl = document.getElementById('prof-error');
+  if(code !== PROF_CODE){
+    errEl.textContent = 'Code incorrect.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  errEl.classList.add('hidden');
+  showPage('page-prof');
+  loadProfData();
+}
+function profLogout(){
+  document.getElementById('prof-code').value='';
+  showPage('page-login');
+}
+
+async function loadProfData(){
+  document.getElementById('prof-loading').style.display='block';
+  document.getElementById('tab-rank-content').classList.add('hidden');
+  document.getElementById('tab-detail-content').classList.add('hidden');
+
+  const { data: rows } = await sb.from('exam_responses').select('*').order('submitted_at',{ascending:false});
+  profData.responses = rows||[];
+
+  // group by student
+  const map = {};
+  profData.responses.forEach(r=>{
+    const key = r.student_nom+'||'+r.student_prenom;
+    if(!map[key]) map[key] = { nom:r.student_nom, prenom:r.student_prenom, subjects:{} };
+    map[key].subjects[r.subject] = r;
+  });
+
+  // compute totals & moyenne
+  const list = Object.values(map).map(s=>{
+    let totalScore=0, totalPossible=0;
+    SUBJECTS.forEach(sub=>{
+      if(s.subjects[sub.id]){
+        totalScore    += s.subjects[sub.id].final_score ?? s.subjects[sub.id].auto_score ?? 0;
+        totalPossible += sub.total;
+      }
+    });
+    s.totalScore    = totalScore;
+    s.totalPossible = totalPossible;
+    s.moyenne       = totalPossible > 0 ? (totalScore/totalPossible*10) : 0;
+    return s;
+  }).sort((a,b)=>b.moyenne-a.moyenne);
+
+  profData.ranked = list;
+  document.getElementById('prof-loading').style.display='none';
+  document.getElementById('prof-stats').textContent = `${list.length} élèves · ${profData.responses.length} soumissions`;
+  renderRanking();
+}
+
+function renderRanking(){
+  document.getElementById('tab-rank-content').classList.remove('hidden');
+  const tbody = document.getElementById('rank-body');
+  tbody.innerHTML='';
+  const list = profData.ranked;
+
+  if(!list.length){
+    document.getElementById('rank-empty').classList.remove('hidden');
+    return;
+  }
+
+  list.forEach((s,i)=>{
+    const rank = i+1;
+    const medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+    const cls   = s.moyenne>=7?'score-good':s.moyenne>=5?'score-med':'score-bad';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="medal">${medal}</span></td>
+      <td><strong style="color:#e2e8f0">${s.prenom} ${s.nom}</strong></td>
+      ${SUBJECTS.map(sub=>{
+        const r = s.subjects[sub.id];
+        const sc = r ? (r.final_score??r.auto_score??0) : null;
+        return `<td style="text-align:center">${r ? `<span style="color:#94a3b8;font-size:.8rem">${sc}/${sub.total}</span>` : '<span style="color:#374151">—</span>'}</td>`;
+      }).join('')}
+      <td style="text-align:center"><strong style="color:#e2e8f0">${s.totalScore}/${s.totalPossible}</strong></td>
+      <td style="text-align:center"><strong class="${cls}" style="font-size:1.1rem">${s.moyenne.toFixed(1)}</strong></td>
+      <td style="text-align:center">
+        <button class="btn btn-ghost btn-sm" onclick="showStudentDetail('${s.nom}','${s.prenom}')">🔍</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function switchTab(tab){
+  document.getElementById('tab-rank').classList.toggle('active', tab==='rank');
+  document.getElementById('tab-detail').classList.toggle('active', tab==='detail');
+  document.getElementById('tab-rank-content').classList.toggle('hidden', tab!=='rank');
+  document.getElementById('tab-detail-content').classList.toggle('hidden', tab!=='detail');
+}
+
+function showStudentDetail(nom, prenom){
+  const s = profData.ranked.find(x=>x.nom===nom && x.prenom===prenom);
+  if(!s) return;
+  currentDetailStudent = s;
+
+  document.getElementById('tab-detail').style.display='';
+  document.getElementById('tab-detail').textContent = `📋 ${prenom} ${nom}`;
+  switchTab('detail');
+
+  const cls = s.moyenne>=7?'score-good':s.moyenne>=5?'score-med':'score-bad';
+  document.getElementById('detail-header').innerHTML = `
+    <h3 style="color:#fff;font-size:1.2rem">${s.prenom} ${s.nom}</h3>
+    <p style="margin-top:.3rem;color:#64748b;font-size:.9rem">
+      Moyenne générale : <span class="${cls}" style="font-size:1.3rem">${s.moyenne.toFixed(1)}/10</span>
+      &nbsp;·&nbsp; Total : ${s.totalScore}/${s.totalPossible} pts
+    </p>
+  `;
+
+  const subjectsEl = document.getElementById('detail-subjects');
+  subjectsEl.innerHTML='';
+  SUBJECTS.forEach(sub=>{
+    subjectsEl.appendChild(buildSubjectDetail(s, sub));
+  });
+}
+
+function buildSubjectDetail(s, sub){
+  const resp = s.subjects[sub.id];
+  const exam = EXAMS[sub.id];
+  const wrap = document.createElement('div');
+  wrap.className = 'detail-wrap';
+
+  if(!resp){
+    wrap.innerHTML = `<div class="detail-head" style="opacity:.4">
+      <span style="font-size:1.5rem">${sub.icon}</span>
+      <span style="color:#94a3b8">${sub.name}</span>
+      <span class="badge badge-red" style="margin-left:auto">Non soumis</span>
+    </div>`;
+    return wrap;
+  }
+
+  const answers    = typeof resp.answers==='string' ? JSON.parse(resp.answers) : (resp.answers||{});
+  const autoScore  = resp.auto_score ?? 0;
+  const finalScore = resp.final_score ?? autoScore;
+
+  wrap.innerHTML = `
+    <div class="detail-head" onclick="toggleDetail(this)">
+      <span style="font-size:1.5rem">${sub.icon}</span>
+      <div style="flex:1">
+        <div style="color:#e2e8f0;font-weight:600">${sub.name}</div>
+        <div style="font-size:.78rem;color:#64748b">QCM auto : ${autoScore} pts</div>
+      </div>
+      <div class="score-input-wrap" onclick="event.stopPropagation()">
+        <input type="number" id="sc-${sub.id}-${s.nom}-${s.prenom}" value="${finalScore}" min="0" max="${sub.total}" style="width:4rem;text-align:center;padding:.3rem .5rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:.4rem;color:#e2e8f0;font-size:.85rem"/>
+        <span style="color:#64748b;font-size:.82rem">/${sub.total}</span>
+        <button class="btn btn-amber btn-sm" onclick="saveScore('${resp.id}','${sub.id}','${s.nom}','${s.prenom}')">💾</button>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="detail-body">
+      ${exam.questions.map((q,i)=>{
+        const sa = answers[q.id]||'';
+        let isCorrect = false;
+        let studentDisplay = sa || '<em style="color:#374151">Pas de réponse</em>';
+        let correctDisplay = q.ans || 'Évaluation manuelle';
+
+        if(q.type==='qcm'){
+          isCorrect = sa.trim()===q.ans.trim();
+          const sIdx = q.labels.indexOf(sa);
+          const cIdx = q.labels.indexOf(q.ans);
+          if(sa) studentDisplay = `${sa}) ${q.opts[sIdx]||sa}`;
+          correctDisplay = `${q.ans}) ${q.opts[cIdx]||q.ans}`;
+        }
+
+        return `<div class="ans-row">
+          <div style="display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.4rem">
+            <span style="color:#64748b;font-size:.75rem;flex-shrink:0;width:1rem">${i+1}.</span>
+            <span style="color:#94a3b8;font-size:.82rem;flex:1">${escHtml(q.text)}</span>
+            <span style="color:#f59e0b;font-size:.75rem;flex-shrink:0">${q.pts}pts</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-left:1.3rem">
+            <div>
+              <div class="ans-label">Réponse élève</div>
+              <div class="ans-val ${q.type==='qcm'?(isCorrect?'correct-ans':'wrong-ans'):'open-ans'}">${studentDisplay} ${q.type==='qcm'?isCorrect?'✓':'✗':''}</div>
+            </div>
+            <div>
+              <div class="ans-label">Bonne réponse</div>
+              <div class="ans-val correct-ref">${escHtml(correctDisplay)}</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+  return wrap;
+}
+
+function toggleDetail(head){
+  const body    = head.nextElementSibling;
+  const chevron = head.querySelector('.chevron');
+  const isOpen  = body.classList.toggle('open');
+  chevron.classList.toggle('open', isOpen);
+}
+
+async function saveScore(responseId, subjectId, nom, prenom){
+  const inpId = `sc-${subjectId}-${nom}-${prenom}`;
+  const val   = parseFloat(document.getElementById(inpId).value)||0;
+  await sb.from('exam_responses').update({final_score: val}).eq('id', responseId);
+  // refresh
+  await loadProfData();
+  showStudentDetail(nom, prenom);
+}
+
+// ══════════════════════════════════
+// UTILS
+// ══════════════════════════════════
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 </script>
 </body>
 </html>
