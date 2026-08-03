@@ -176,6 +176,15 @@ const ZetwalCommon = (() => {
         }
     }
 
+    /* ── Nav transparente → figée au scroll ─────────────────── */
+    function initNavScroll() {
+        const nav = document.querySelector('.nav');
+        if (!nav) return;
+        function update() { nav.classList.toggle('scrolled', window.scrollY > 40); }
+        window.addEventListener('scroll', update, { passive: true });
+        update();
+    }
+
     /* ── Reveal au scroll ───────────────────────────────────── */
     function initReveal() {
         function reveal() {
@@ -320,9 +329,12 @@ const ZetwalCommon = (() => {
     function init(opts = {}) {
         initBackdrop();
         initParticles();
-        initCursor();
+        // cursor:false — désactive le curseur personnalisé (effet daté sur certaines pages)
+        if (opts.cursor !== false) initCursor();
+        else document.documentElement.classList.add('no-custom-cursor');
         initTheme();
         initReveal();
+        initNavScroll();
         initNav(opts.page, opts.brand);
         // authWidget:false — pages qui ont déjà leur propre système de connexion (ex: shop.html)
         if (opts.authWidget !== false) {
