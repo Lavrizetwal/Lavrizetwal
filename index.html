@@ -32,13 +32,30 @@
         /* ══════════════════════════════════════
            HERO
         ══════════════════════════════════════ */
-        .hero{min-height:64vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:190px 20px 50px;position:relative;will-change:transform}
-        .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,9vw,4.8rem);font-weight:600;letter-spacing:6px;color:var(--gold-pale);margin-bottom:18px}
-        .hero-sub{font-size:0.72rem;letter-spacing:4px;color:rgba(255,255,255,0.45);text-transform:uppercase;font-weight:500}
-        .big-sphere{width:64px;height:64px;background:radial-gradient(circle at 35% 30%,#fff,var(--gold) 45%,var(--gold-deep) 100%);border-radius:50%;margin:34px auto;box-shadow:0 0 40px rgba(201,168,76,0.35)}
+        .hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:160px 20px 60px;position:relative}
+        .hero-kicker{font-size:0.68rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;font-weight:600;margin-bottom:28px}
+        .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.6rem,13vw,8rem);font-weight:600;letter-spacing:2px;line-height:0.95;color:var(--text);margin-bottom:22px}
+        .hero-sub{font-size:1rem;letter-spacing:0.5px;color:rgba(255,255,255,0.5);font-weight:400;font-family:'Cormorant Garamond',serif;font-style:italic;max-width:34ch;margin:0 auto}
 
-        .main-grid{max-width:1200px;margin:0 auto;padding:50px 20px 110px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:28px}
-        @media(max-width:400px){.main-grid{grid-template-columns:1fr}}
+        .hero-cta{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:44px;flex-wrap:wrap}
+        .btn-primary{padding:15px 34px;background:var(--gold);color:#000;text-decoration:none;font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:2px;transition:var(--transition);cursor:none}
+        .btn-primary:hover{background:var(--gold-bright);transform:translateY(-2px)}
+        .btn-secondary{padding:15px 34px;background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.18);text-decoration:none;font-size:0.7rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:2px;transition:var(--transition);cursor:none}
+        .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+        #home-info-bloc{width:100%;max-width:520px;margin:64px auto 0;display:flex;flex-direction:column;gap:12px;padding:0 16px}
+        .hero-quote{border-top:1px solid var(--border);padding-top:24px;text-align:center;display:none;animation:fadeIn 0.6s ease}
+        .hero-quote-date{font-size:0.52rem;color:rgba(201,168,76,0.45);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px}
+        .hero-quote-text{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-style:italic;color:rgba(255,255,255,0.75);line-height:1.75;margin-bottom:12px}
+        .hero-quote-author{font-size:0.6rem;color:var(--gold);font-weight:700;letter-spacing:2px;text-transform:uppercase}
+        .hero-status-row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+        .hero-greeting{font-size:0.75rem;font-weight:500;color:rgba(255,255,255,0.4)}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+        .main-grid{max-width:1240px;margin:0 auto;padding:20px 24px 140px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+        .card-span-7{grid-column:span 7}
+        .card-span-5{grid-column:span 5}
+        @media(max-width:900px){.main-grid{grid-template-columns:1fr;padding:20px 20px 100px}.card-span-7,.card-span-5{grid-column:span 1}}
 
         /* Rangée d'infos sous le titre (statut/pwen ajoutés au dropdown) */
         .info-row{margin-bottom:15px;border-bottom:1px solid rgba(201,168,76,0.1);padding-bottom:10px;text-align:left}
@@ -63,18 +80,23 @@
     </nav>
 
     <header class="hero">
-        <h1 class="hero-title">ZETWAL</h1>
-        <p class="hero-sub">Lidè nan Inovasyon ak Ekselans</p>
-        <div class="big-sphere"></div>
+        <p class="hero-kicker reveal">Ayiti · Inovasyon · Ekselans</p>
+        <h1 class="hero-title reveal">ZETWAL</h1>
+        <p class="hero-sub reveal">Lidè nan Inovasyon ak Ekselans</p>
 
-        <div id="home-info-bloc" style="width:100%;max-width:580px;margin:26px auto 0;display:flex;flex-direction:column;gap:12px;padding:0 16px">
-          <div id="quote-bloc" style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.18);border-radius:16px;padding:20px 24px;text-align:center;display:none;animation:fadeIn 0.6s ease;">
-            <div id="quote-date" style="font-size:0.52rem;color:rgba(201,168,76,0.45);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px"></div>
-            <blockquote id="quote-text" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:rgba(255,255,255,0.85);line-height:1.75;margin-bottom:12px;quotes:none"></blockquote>
-            <div id="quote-author" style="font-size:0.6rem;color:var(--gold);font-weight:700;letter-spacing:2px;text-transform:uppercase"></div>
+        <div class="hero-cta reveal">
+            <a href="#services" class="btn-primary">Dekouvri sèvis nou yo</a>
+            <a href="https://wa.me/79961103506" target="_blank" class="btn-secondary">Kontakte nou</a>
+        </div>
+
+        <div id="home-info-bloc" class="reveal">
+          <div id="quote-bloc" class="hero-quote">
+            <div id="quote-date" class="hero-quote-date"></div>
+            <blockquote id="quote-text" class="hero-quote-text"></blockquote>
+            <div id="quote-author" class="hero-quote-author"></div>
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:13px 20px">
-            <div id="greeting-txt" style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.72)">Bonjou 👋</div>
+          <div class="hero-status-row">
+            <div id="greeting-txt" class="hero-greeting">Bonjou 👋</div>
             <div id="store-status-badge" style="display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:6px 16px;font-size:0.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase">
               <span id="store-dot" style="width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0"></span>
               <span id="store-label"></span>
@@ -83,8 +105,8 @@
         </div>
     </header>
 
-    <main class="main-grid">
-        <div class="card-wrap reveal section-parallax" onclick="location.href='lavri.html'">
+    <main id="services" class="main-grid">
+        <div class="card-wrap reveal section-parallax card-span-7" onclick="location.href='lavri.html'">
             <div class="liquid-border">
                 <div class="item-icon">🧺</div>
                 <h2 class="item-title">Lavri Zetwal</h2>
@@ -92,7 +114,7 @@
                 <span class="btn-gold">Antre nan Lavri</span>
             </div>
         </div>
-        <div class="card-wrap reveal section-parallax" onclick="location.href='shop.html'">
+        <div class="card-wrap reveal section-parallax card-span-5" onclick="location.href='shop.html'">
             <div class="liquid-border">
                 <div class="item-icon">🛒</div>
                 <h2 class="item-title">Shop Zetwal</h2>
@@ -100,7 +122,7 @@
                 <span class="btn-gold">Vizite Shop la</span>
             </div>
         </div>
-        <div class="card-wrap reveal section-parallax" onclick="location.href='mall.html'">
+        <div class="card-wrap reveal section-parallax card-span-5" onclick="location.href='mall.html'">
             <div class="liquid-border">
                 <div class="item-icon">🏛️</div>
                 <h2 class="item-title">Zetwal Mall</h2>
@@ -108,7 +130,7 @@
                 <span class="btn-gold">Dekouvri Mall la</span>
             </div>
         </div>
-        <div class="card-wrap reveal section-parallax" onclick="location.href='games.html'">
+        <div class="card-wrap reveal section-parallax card-span-7" onclick="location.href='games.html'">
             <div class="liquid-border">
                 <div class="item-icon">🎮</div>
                 <h2 class="item-title">Jwèt Zetwal</h2>
