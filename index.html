@@ -1,504 +1,1558 @@
 <!DOCTYPE html>
 <html lang="ht">
 <head>
-    <link rel="icon" type="image/png" href="logo.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#050505">
-    <meta name="description" content="ZETWAL ORGANISATION — Lavri, Shop, Mall ak Jwèt. Lidè nan inovasyon ak ekselans an Ayiti.">
-    <title>ZETWAL ORGANISATION | Inovasyon ak Ekselans</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300&family=Montserrat:wght@300;400;500;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="common.css">
-    <script src="common.js"></script>
-    <style>
-    /* ═══════════════════════════════════════════════════════════════
-       ZETWAL — Akèy. Zewo imaj : tout se tipografi, liy ak limyè.
-       Prefiks zw- pou pa antre an konfli ak common.css
-       ═══════════════════════════════════════════════════════════════ */
-    :root{
-      --zw-gold: var(--gold, #D4AF37);
-      --zw-gold-soft: rgba(212,175,55,.55);
-      --zw-gold-dim: rgba(212,175,55,.16);
-      --zw-gold-line: rgba(212,175,55,.22);
-      --zw-ink: var(--text, #FFFFFF);
-      --zw-mute: rgba(255,255,255,.46);
-      --zw-mute-2: rgba(255,255,255,.30);
-      --zw-line: rgba(255,255,255,.09);
-      --zw-surface: rgba(255,255,255,.022);
-      --zw-surface-2: rgba(255,255,255,.045);
-      --zw-fast: 160ms cubic-bezier(.22,1,.36,1);
-      --zw-med: 340ms cubic-bezier(.22,1,.36,1);
-      --zw-slow: 720ms cubic-bezier(.22,1,.36,1);
-    }
-    html{scroll-behavior:smooth}
-    body{overflow-x:hidden}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>ZETWAL ORGANISATION — Inovasyon ak Ekselans</title>
+<meta name="description" content="ZETWAL ORGANISATION : Lavri, Shop, Mall ak Jwèt. Lidè nan inovasyon ak ekselans an Ayiti.">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ════════════════════════════════════════════════════════════════
+   ZETWAL ORGANISATION — Akèy
+   Yon sèl fichye. Zewo imaj. Tout se tipografi, liy ak limyè.
+   ════════════════════════════════════════════════════════════════ */
 
-    /* Syèl la : etwal diskrè, pa gen okenn imaj */
-    #zw-sky{position:fixed;inset:0;z-index:-9;pointer-events:none;opacity:.85}
+/* ── 1. Tokens ────────────────────────────────────────────────── */
+:root{
+  --bg:#050505; --bg-2:#0A0A0A; --bg-3:#101010;
+  --gold:#D4AF37; --gold-lt:#F0D98A; --gold-dp:#B89020;
+  --g-08:rgba(212,175,55,.08); --g-14:rgba(212,175,55,.14);
+  --g-24:rgba(212,175,55,.24); --g-45:rgba(212,175,55,.45);
+  --ink:#FFFFFF; --ink-2:rgba(255,255,255,.62); --ink-3:rgba(255,255,255,.40);
+  --ink-4:rgba(255,255,255,.24); --line:rgba(255,255,255,.08);
+  --ok:#00E08A; --bad:#FF6B6B;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Montserrat',system-ui,sans-serif;
+  --fast:150ms cubic-bezier(.22,1,.36,1);
+  --med:360ms cubic-bezier(.22,1,.36,1);
+  --slow:820ms cubic-bezier(.19,1,.22,1);
+  --nav:70px;
+}
 
-    /* ZETWAL an fon */
-    #bg-text-zetwal{position:fixed;inset:0;z-index:-8;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
-    #bg-text-zetwal span{font-family:'Cormorant Garamond',serif;font-size:clamp(10rem,22vw,22rem);font-weight:600;letter-spacing:.04em;text-transform:uppercase;user-select:none;color:rgba(201,168,76,.032);white-space:nowrap}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:400;
+  line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+body.lock{overflow:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--g-24);color:var(--gold-lt)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:2px}
 
-    /* ── Animasyon antre (endepandan de common.js) ── */
-    .zw-up{opacity:0;transform:translateY(18px);transition:opacity var(--zw-slow),transform var(--zw-slow)}
-    .zw-up.zw-in{opacity:1;transform:none}
-    .zw-d1{transition-delay:80ms}.zw-d2{transition-delay:160ms}.zw-d3{transition-delay:240ms}
-    .zw-d4{transition-delay:320ms}.zw-d5{transition-delay:400ms}
+/* ── 2. Fon: syèl, gwo mo, limyè ki swiv sourit la ────────────── */
+#sky{position:fixed;inset:0;z-index:-9;pointer-events:none}
+#spot{position:fixed;width:640px;height:640px;left:0;top:0;margin:-320px 0 0 -320px;z-index:-8;
+  pointer-events:none;opacity:0;transition:opacity 700ms ease;
+  background:radial-gradient(circle,rgba(212,175,55,.055),transparent 62%)}
+#ghost{position:fixed;inset:0;z-index:-7;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;overflow:hidden}
+#ghost b{font-family:var(--serif);font-weight:600;font-size:clamp(9rem,21vw,21rem);
+  letter-spacing:.05em;color:rgba(212,175,55,.028);white-space:nowrap;user-select:none}
+#grain{position:fixed;inset:0;z-index:-6;pointer-events:none;opacity:.16;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E")}
 
-    /* ═══════════════ HERO ═══════════════ */
-    .zw-hero{position:relative;min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:150px 20px 70px}
-    .zw-constel{position:absolute;top:50%;left:50%;transform:translate(-50%,-74%);width:min(760px,92vw);height:auto;pointer-events:none;z-index:-1;opacity:.9}
-    .zw-constel line{stroke:var(--zw-gold);stroke-width:.7;opacity:.30;stroke-dasharray:var(--len,200);stroke-dashoffset:var(--len,200);transition:stroke-dashoffset 1.6s cubic-bezier(.22,1,.36,1)}
-    .zw-hero.zw-in .zw-constel line{stroke-dashoffset:0}
-    .zw-constel circle{fill:var(--zw-gold);opacity:0;transition:opacity 900ms ease}
-    .zw-hero.zw-in .zw-constel circle{opacity:.75}
+/* ── 3. Animasyon tèks ────────────────────────────────────────── */
+/* lèt pa lèt */
+.ch{display:inline-block;overflow:hidden;vertical-align:bottom;padding:.02em .04em .1em;margin:0 -.04em -.1em}
+.ch>i{display:inline-block;font-style:inherit;transform:translateY(112%) rotate(6deg);
+  opacity:0;filter:blur(6px);
+  transition:transform 900ms cubic-bezier(.19,1,.22,1),opacity 700ms ease,filter 700ms ease;
+  transition-delay:calc(var(--i) * 42ms)}
+.in .ch>i{transform:none;opacity:1;filter:blur(0)}
+/* mo pa mo */
+.wd{display:inline-block;overflow:hidden;vertical-align:bottom;padding:.02em .06em .12em;margin:0 -.06em -.12em}
+.wd>i{display:inline-block;font-style:inherit;transform:translateY(105%);opacity:0;
+  transition:transform 760ms cubic-bezier(.19,1,.22,1),opacity 520ms ease;
+  transition-delay:calc(var(--i) * 78ms)}
+.in .wd>i{transform:none;opacity:1}
+/* blòk ki monte */
+.up{opacity:0;transform:translateY(22px);transition:opacity var(--slow),transform var(--slow)}
+.up.in{opacity:1;transform:none}
+.d1{transition-delay:90ms}.d2{transition-delay:180ms}.d3{transition-delay:270ms}
+.d4{transition-delay:360ms}.d5{transition-delay:450ms}
+/* liy dore ki trase tèt li */
+.draw{width:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transition:width 1.2s cubic-bezier(.19,1,.22,1) 260ms}
+.draw.in{width:var(--w,260px)}
 
-    .zw-kicker{font-size:.63rem;letter-spacing:4.5px;color:var(--zw-gold);text-transform:uppercase;font-weight:600;margin-bottom:26px;display:inline-flex;align-items:center;gap:14px}
-    .zw-kicker::before,.zw-kicker::after{content:'';width:32px;height:1px;background:linear-gradient(90deg,transparent,var(--zw-gold-soft))}
-    .zw-kicker::after{background:linear-gradient(90deg,var(--zw-gold-soft),transparent)}
+/* ── 4. Nav ───────────────────────────────────────────────────── */
+#prog{position:fixed;top:0;left:0;height:2px;width:0;z-index:1001;
+  background:linear-gradient(90deg,var(--gold-dp),var(--gold-lt));transition:width 90ms linear}
+.nav{position:fixed;top:0;left:0;right:0;height:var(--nav);z-index:1000;display:flex;align-items:center;
+  transition:background var(--med),backdrop-filter var(--med),border-color var(--med);
+  border-bottom:1px solid transparent}
+.nav.solid{background:rgba(5,5,5,.72);backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);border-bottom-color:var(--g-14)}
+.nav-in{width:100%;max-width:1280px;margin:0 auto;padding:0 26px;display:flex;align-items:center;gap:22px}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand .mark{width:30px;height:30px;flex-shrink:0;object-fit:contain;border-radius:50%;
+  filter:drop-shadow(0 0 9px rgba(212,175,55,.30));transition:transform var(--med),filter var(--med)}
+.brand:hover .mark{transform:rotate(-8deg) scale(1.06);filter:drop-shadow(0 0 14px rgba(212,175,55,.5))}
+.brand b{font-family:var(--serif);font-size:1.02rem;font-weight:600;letter-spacing:2.6px;white-space:nowrap}
+.brand b em{font-style:normal;color:var(--gold)}
+.menu{display:flex;gap:4px;margin-left:auto;list-style:none}
+.menu a{position:relative;display:block;padding:9px 14px;font-size:.63rem;font-weight:600;
+  letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-3);transition:color var(--fast)}
+.menu a:hover,.menu a.on{color:var(--gold)}
+.menu a::after{content:'';position:absolute;left:14px;right:14px;bottom:4px;height:1px;
+  background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform var(--med)}
+.menu a:hover::after,.menu a.on::after{transform:scaleX(1)}
+.nav-act{display:flex;align-items:center;gap:10px;margin-left:8px;position:relative}
+.pill{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 17px;border-radius:99px;
+  font-size:.61rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+  background:transparent;border:1px solid var(--g-24);color:var(--gold);font-family:var(--sans);
+  transition:background var(--fast),border-color var(--fast),color var(--fast),transform var(--fast)}
+.pill:hover{background:var(--g-08);border-color:var(--gold);transform:translateY(-1px)}
+.pill.full{background:var(--gold);color:#0A0A0A;border-color:var(--gold)}
+.pill.full:hover{background:var(--gold-lt)}
+.pill svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.7;fill:none}
+.av{width:28px;height:28px;border-radius:50%;background:var(--g-14);border:1px solid var(--g-24);
+  display:grid;place-items:center;font-size:.66rem;font-weight:700;color:var(--gold);flex-shrink:0}
 
-    .zw-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.8rem,14vw,8.5rem);font-weight:600;letter-spacing:3px;line-height:.94;color:var(--zw-ink);margin:0 0 18px;position:relative}
-    .zw-title span{display:inline-block}
-    .zw-rule{width:0;height:1px;background:linear-gradient(90deg,transparent,var(--zw-gold),transparent);margin:0 auto 22px;transition:width 1.1s cubic-bezier(.22,1,.36,1) .3s}
-    .zw-hero.zw-in .zw-rule{width:min(300px,60vw)}
-    .zw-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.12rem;letter-spacing:.4px;color:rgba(255,255,255,.55);max-width:34ch;margin:0 auto}
+/* pwen ki parèt dirèkteman nan bouton kont lan */
+.pts{display:inline-flex;align-items:baseline;gap:4px;padding:2px 8px;border-radius:99px;
+  background:var(--g-14);color:var(--gold);font-family:var(--serif);font-size:.82rem;font-weight:700;
+  line-height:1.3;letter-spacing:.5px}
+.pts s{font-family:var(--sans);font-size:.5rem;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;opacity:.75;text-decoration:none}
+#who-btn{gap:9px}
+#who-nm{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-    .zw-cta{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:42px;flex-wrap:wrap}
-    .zw-btn{position:relative;overflow:hidden;padding:15px 32px;text-decoration:none;font-size:.68rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;border-radius:2px;transition:transform var(--zw-fast),background var(--zw-fast),border-color var(--zw-fast),color var(--zw-fast)}
-    .zw-btn:focus-visible{outline:2px solid var(--zw-gold);outline-offset:3px}
-    .zw-btn-gold{background:var(--zw-gold);color:#0A0A0A}
-    .zw-btn-gold:hover{background:#F0D98A;transform:translateY(-2px)}
-    .zw-btn-ghost{background:transparent;color:var(--zw-ink);border:1px solid rgba(255,255,255,.18)}
-    .zw-btn-ghost:hover{border-color:var(--zw-gold);color:var(--zw-gold);transform:translateY(-2px)}
-    .zw-btn-gold::after{content:'';position:absolute;inset:0;left:-120%;width:60%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-22deg);transition:left var(--zw-slow)}
-    .zw-btn-gold:hover::after{left:150%}
+/* kat kont */
+.acct{position:absolute;top:52px;right:0;width:268px;padding:18px;border-radius:10px;
+  background:rgba(12,12,12,.96);backdrop-filter:blur(20px);border:1px solid var(--line);
+  box-shadow:0 26px 60px rgba(0,0,0,.6);opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:opacity var(--med),transform var(--med),visibility var(--med);z-index:20}
+.acct.open{opacity:1;visibility:visible;transform:none}
+.acct-who{display:flex;align-items:center;gap:11px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.acct-who .av{width:38px;height:38px;font-size:.8rem}
+.acct-nm{font-size:.8rem;font-weight:600;line-height:1.3;word-break:break-word}
+.acct-ml{font-size:.62rem;color:var(--ink-3);word-break:break-all}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row .k{font-size:.58rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-3)}
+.row .v{font-size:.82rem;font-weight:600}
+.row .v.gold{color:var(--gold);font-family:var(--serif);font-size:1.24rem;font-weight:700}
+.acct .pill{width:100%;justify-content:center;margin-top:14px}
 
-    /* Sitiyasyon + sitasyon */
-    #home-info-bloc{width:100%;max-width:540px;margin:58px auto 0;display:flex;flex-direction:column;gap:16px;padding:0 16px}
-    .hero-quote{border-top:1px solid var(--zw-line);padding-top:24px;text-align:center;display:none}
-    .hero-quote.zw-show{display:block;animation:zwFade .7s cubic-bezier(.22,1,.36,1)}
-    @keyframes zwFade{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-    .hero-quote-date{font-size:.52rem;color:rgba(201,168,76,.45);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px}
-    .hero-quote-text{font-family:'Cormorant Garamond',serif;font-size:1.18rem;font-style:italic;color:rgba(255,255,255,.78);line-height:1.75;margin-bottom:12px}
-    .hero-quote-author{font-size:.58rem;color:var(--zw-gold);font-weight:700;letter-spacing:2px;text-transform:uppercase}
-    .hero-status-row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-    .hero-greeting{font-size:.74rem;font-weight:500;color:var(--zw-mute)}
-    #store-status-badge{display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:6px 15px;font-size:.58rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase}
-    #store-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+/* ── Modal koneksyon ─────────────────────────────────────────── */
+.mask{position:fixed;inset:0;z-index:1020;display:grid;place-items:center;padding:22px;
+  background:rgba(3,3,3,.82);backdrop-filter:blur(8px);
+  opacity:0;visibility:hidden;transition:opacity var(--med),visibility var(--med)}
+.mask.open{opacity:1;visibility:visible}
+.box{width:100%;max-width:396px;border-radius:14px;padding:30px 28px 26px;position:relative;
+  background:linear-gradient(165deg,#111,#0A0A0A);border:1px solid var(--g-14);
+  box-shadow:0 36px 90px rgba(0,0,0,.7);transform:translateY(16px) scale(.985);
+  transition:transform var(--med)}
+.mask.open .box{transform:none}
+.box .p-x{position:absolute;top:16px;right:16px;margin:0}
+.box .logo{width:44px;height:44px;border-radius:50%;object-fit:contain;display:block;margin:0 auto 16px;
+  filter:drop-shadow(0 0 12px rgba(212,175,55,.35))}
+.box h3{font-family:var(--serif);font-size:1.5rem;font-weight:600;text-align:center;letter-spacing:.6px}
+.box .lead{font-size:.74rem;color:var(--ink-3);text-align:center;margin:7px 0 22px}
+.tabs{display:flex;gap:4px;padding:4px;border-radius:99px;background:rgba(255,255,255,.04);margin-bottom:20px}
+.tabs button{flex:1;padding:9px 0;border:0;border-radius:99px;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--ink-3);transition:background var(--fast),color var(--fast)}
+.tabs button.on{background:var(--gold);color:#0A0A0A}
+.fld{margin-bottom:13px;position:relative}
+.fld label{display:block;font-size:.55rem;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--ink-4);margin-bottom:7px}
+.fld input{width:100%;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:8px;
+  padding:13px 14px;color:var(--ink);font-family:var(--sans);font-size:.84rem;transition:border-color var(--fast)}
+.fld input:focus{outline:none;border-color:var(--g-24)}
+.fld .eye{position:absolute;right:8px;bottom:7px;width:32px;height:32px;border:0;background:none;
+  cursor:pointer;color:var(--ink-4);display:grid;place-items:center;transition:color var(--fast)}
+.fld .eye:hover{color:var(--gold)}
+.fld .eye svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.5;fill:none}
+.box .btn{width:100%;justify-content:center;margin-top:6px}
+.or{display:flex;align-items:center;gap:12px;margin:18px 0;
+  font-size:.53rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-4)}
+.or::before,.or::after{content:'';flex:1;height:1px;background:var(--line)}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:11px;padding:13px;
+  border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--ink);
+  font-family:var(--sans);font-size:.72rem;font-weight:600;cursor:pointer;
+  transition:border-color var(--fast),background var(--fast)}
+.gbtn:hover{border-color:var(--g-24);background:rgba(255,255,255,.06)}
+.gbtn svg{width:17px;height:17px}
+.note{margin-top:15px;text-align:center;font-size:.66rem;color:var(--ink-4)}
+.note a{color:var(--gold);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.err{display:none;margin-top:14px;padding:11px 13px;border-radius:8px;font-size:.73rem;line-height:1.5;
+  background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.24);color:#FFA3A3}
+.err.ok{background:rgba(0,224,138,.07);border-color:rgba(0,224,138,.24);color:#7BE8BC}
+.err.show{display:block}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(10,10,10,.28);
+  border-top-color:#0A0A0A;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
 
-    .zw-scroll{margin-top:52px;display:flex;flex-direction:column;align-items:center;gap:9px;color:var(--zw-mute-2);font-size:.55rem;letter-spacing:2.5px;text-transform:uppercase;text-decoration:none;transition:color var(--zw-fast)}
-    .zw-scroll:hover{color:var(--zw-gold)}
-    .zw-scroll i{display:block;width:1px;height:34px;background:linear-gradient(180deg,var(--zw-gold-soft),transparent);animation:zwDrop 2.4s ease-in-out infinite}
-    @keyframes zwDrop{0%,100%{transform:scaleY(.45);transform-origin:top;opacity:.5}50%{transform:scaleY(1);opacity:1}}
+/* blòk kont nan meni telefòn nan */
+#dr-auth{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+#dr-auth .who{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+#dr-auth .who .av{width:42px;height:42px;font-size:.92rem}
+#dr-auth .nm{font-family:var(--serif);font-size:1.15rem;font-weight:600;line-height:1.2}
+#dr-auth .sub{font-size:.6rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4)}
+#dr-auth .pill{width:100%;justify-content:center;margin-bottom:9px}
 
-    /* ═══════════════ SÈVIS ═══════════════ */
-    .zw-sec-head{max-width:1240px;margin:0 auto;padding:0 24px 30px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
-    .zw-sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,4vw,2.7rem);font-weight:600;letter-spacing:1px;color:var(--zw-ink);margin:0}
-    .zw-sec-note{font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--zw-mute-2);padding-bottom:8px}
+/* meni telefòn */
+.burger{display:none;width:38px;height:38px;margin-left:auto;background:none;border:0;cursor:pointer;
+  flex-direction:column;justify-content:center;align-items:flex-end;gap:5px}
+.burger span{display:block;height:1px;background:var(--ink);transition:transform var(--med),width var(--med),opacity var(--med)}
+.burger span:nth-child(1){width:22px}.burger span:nth-child(2){width:15px}
+.burger.x span:nth-child(1){transform:translateY(3px) rotate(45deg)}
+.burger.x span:nth-child(2){width:22px;transform:translateY(-3px) rotate(-45deg)}
+#drawer{position:fixed;inset:0;z-index:999;background:rgba(5,5,5,.97);backdrop-filter:blur(24px);
+  display:flex;flex-direction:column;justify-content:center;padding:0 30px;
+  opacity:0;visibility:hidden;transition:opacity var(--med),visibility var(--med)}
+#drawer.open{opacity:1;visibility:visible}
+#drawer a{font-family:var(--serif);font-size:2.5rem;font-weight:500;letter-spacing:1px;
+  padding:13px 0;border-bottom:1px solid var(--line);color:var(--ink-2);
+  transform:translateY(18px);opacity:0;transition:transform var(--med),opacity var(--med),color var(--fast)}
+#drawer.open a{transform:none;opacity:1}
+#drawer a:nth-child(1){transition-delay:60ms}#drawer a:nth-child(2){transition-delay:120ms}
+#drawer a:nth-child(3){transition-delay:180ms}#drawer a:nth-child(4){transition-delay:240ms}
+#drawer a:nth-child(5){transition-delay:300ms}
+#drawer a:active,#drawer a:hover{color:var(--gold)}
 
-    .zw-services{max-width:1240px;margin:0 auto;padding:0 24px 130px;display:grid;grid-template-columns:repeat(12,1fr);gap:22px}
-    .zw-svc{position:relative;grid-column:span 6;display:flex;flex-direction:column;justify-content:space-between;gap:26px;min-height:300px;padding:34px 32px 30px;
-      background:linear-gradient(160deg,var(--zw-surface-2),var(--zw-surface));border:1px solid var(--zw-line);border-radius:4px;overflow:hidden;
-      text-decoration:none;color:inherit;cursor:pointer;transition:transform var(--zw-med),border-color var(--zw-med),background var(--zw-med),box-shadow var(--zw-med)}
-    .zw-svc.wide{grid-column:span 7}
-    .zw-svc.narrow{grid-column:span 5}
-    .zw-svc:hover,.zw-svc:focus-visible{transform:translateY(-4px);border-color:var(--zw-gold-line);background:linear-gradient(160deg,rgba(212,175,55,.05),var(--zw-surface-2));box-shadow:0 22px 50px rgba(0,0,0,.45)}
-    .zw-svc:focus-visible{outline:2px solid var(--zw-gold);outline-offset:3px}
-    /* liy dore ki travèse kat la — animasyon siyati */
-    .zw-svc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--zw-gold),transparent);transform:translateX(-100%);transition:transform var(--zw-slow)}
-    .zw-svc:hover::before,.zw-svc:focus-visible::before{transform:translateX(100%)}
-    /* limyè dous nan kwen an */
-    .zw-svc::after{content:'';position:absolute;top:-40%;right:-25%;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.10),transparent 65%);opacity:0;transition:opacity var(--zw-med);pointer-events:none}
-    .zw-svc:hover::after{opacity:1}
+/* ── 5. Hero ──────────────────────────────────────────────────── */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:calc(var(--nav) + 46px) 22px 54px}
+.constel{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);width:min(880px,96vw);
+  z-index:-1;pointer-events:none}
+.constel line{stroke:var(--gold);stroke-width:.65;opacity:.26;
+  stroke-dasharray:var(--l,220);stroke-dashoffset:var(--l,220);
+  transition:stroke-dashoffset 1.9s cubic-bezier(.19,1,.22,1) var(--dl,0ms)}
+.hero.in .constel line{stroke-dashoffset:0}
+.constel circle{fill:var(--gold);opacity:0;transition:opacity 800ms ease var(--dl,0ms)}
+.hero.in .constel circle{opacity:.7}
 
-    .zw-svc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
-    .zw-num{font-family:'Cormorant Garamond',serif;font-size:.9rem;color:var(--zw-gold);letter-spacing:2px;opacity:.7}
-    .zw-emblem{width:58px;height:58px;flex-shrink:0}
-    .zw-emblem path,.zw-emblem circle,.zw-emblem line,.zw-emblem rect,.zw-emblem polyline{
-      fill:none;stroke:var(--zw-gold);stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round;
-      stroke-dasharray:var(--len,300);stroke-dashoffset:var(--len,300);transition:stroke-dashoffset 1.5s cubic-bezier(.22,1,.36,1)}
-    .zw-svc.zw-in .zw-emblem path,.zw-svc.zw-in .zw-emblem circle,.zw-svc.zw-in .zw-emblem line,
-    .zw-svc.zw-in .zw-emblem rect,.zw-svc.zw-in .zw-emblem polyline{stroke-dashoffset:0}
-    .zw-emblem .dot{fill:var(--zw-gold);stroke:none;stroke-dasharray:none;stroke-dashoffset:0;opacity:0;transition:opacity .8s ease .6s}
-    .zw-svc.zw-in .zw-emblem .dot{opacity:.85}
+.kick{display:inline-flex;align-items:center;gap:15px;font-size:.6rem;font-weight:600;
+  letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:30px}
+.kick s{display:block;width:34px;height:1px;background:var(--g-45);text-decoration:none;
+  transform:scaleX(0);transition:transform 900ms cubic-bezier(.19,1,.22,1) 500ms}
+.in .kick s{transform:scaleX(1)}
+.kick s:first-child{transform-origin:right}.kick s:last-child{transform-origin:left}
 
-    .zw-svc-name{font-family:'Cormorant Garamond',serif;font-size:clamp(1.7rem,3.4vw,2.25rem);font-weight:600;letter-spacing:.5px;color:var(--zw-ink);margin:0 0 12px;transition:color var(--zw-fast)}
-    .zw-svc:hover .zw-svc-name{color:var(--zw-gold)}
-    .zw-svc-desc{font-size:.83rem;line-height:1.75;color:var(--zw-mute);max-width:46ch;margin:0}
-    .zw-svc-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:20px;border-top:1px solid var(--zw-line);flex-wrap:wrap}
-    .zw-tag{font-size:.55rem;letter-spacing:2px;text-transform:uppercase;color:var(--zw-gold);border:1px solid var(--zw-gold-dim);border-radius:20px;padding:5px 13px}
-    .zw-go{display:inline-flex;align-items:center;gap:9px;font-size:.63rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--zw-ink);transition:gap var(--zw-fast),color var(--zw-fast)}
-    .zw-svc:hover .zw-go{gap:15px;color:var(--zw-gold)}
-    .zw-go svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.6;fill:none}
+.big{font-family:var(--serif);font-weight:600;font-size:clamp(4.1rem,15.5vw,10rem);line-height:.9;
+  letter-spacing:.045em;margin:0 0 20px;text-indent:.045em}
+.rot{height:2.05rem;overflow:hidden;position:relative;margin-top:10px}
+.rot ul{list-style:none;transition:transform 620ms cubic-bezier(.7,0,.2,1)}
+.rot li{height:2.05rem;display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;font-size:1.28rem;color:var(--gold-lt);letter-spacing:.5px}
+.tag{font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--ink-3);letter-spacing:.4px}
 
-    /* Ikòn sosyal : SVG, pa gen imaj ekstèn */
-    .social-icon svg{width:21px;height:21px;fill:none;stroke:var(--zw-gold);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;opacity:.72;transition:opacity var(--zw-fast),transform var(--zw-fast)}
-    .social-icon:hover svg{opacity:1;transform:translateY(-2px)}
+.cta{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:40px;flex-wrap:wrap}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:10px;
+  padding:15px 30px;border-radius:2px;font-size:.66rem;font-weight:700;letter-spacing:1.6px;
+  text-transform:uppercase;border:1px solid transparent;cursor:pointer;font-family:var(--sans);
+  transition:transform var(--fast),background var(--fast),color var(--fast),border-color var(--fast)}
+.btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.7;fill:none;transition:transform var(--med)}
+.btn:hover svg{transform:translateX(4px)}
+.btn-g{background:var(--gold);color:#0A0A0A}
+.btn-g:hover{background:var(--gold-lt);transform:translateY(-2px)}
+.btn-g::after{content:'';position:absolute;top:0;bottom:0;left:-130%;width:55%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);
+  transform:skewX(-22deg);transition:left 900ms cubic-bezier(.19,1,.22,1)}
+.btn-g:hover::after{left:160%}
+.btn-o{border-color:rgba(255,255,255,.18);color:var(--ink)}
+.btn-o:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
 
-    /* ═══════════════ RESPONSIVE ═══════════════ */
-    @media(max-width:980px){
-      .zw-services{grid-template-columns:1fr;padding:0 20px 100px;gap:18px}
-      .zw-svc,.zw-svc.wide,.zw-svc.narrow{grid-column:span 1;min-height:0;padding:28px 24px 24px;gap:22px}
-      .zw-sec-head{padding:0 20px 24px}
-      .zw-hero{min-height:88vh;padding:130px 18px 56px}
-      .zw-title{letter-spacing:2px}
-      .zw-cta{gap:12px}
-      .zw-btn{padding:14px 26px;flex:1 1 auto;text-align:center}
-    }
-    @media(max-width:520px){
-      .zw-kicker::before,.zw-kicker::after{width:18px}
-      .zw-sub{font-size:1rem}
-      .zw-svc-desc{font-size:.8rem}
-      .zw-emblem{width:46px;height:46px}
-      #home-info-bloc{margin-top:44px}
-      .zw-constel{display:none}
-    }
-    @media(prefers-reduced-motion:reduce){
-      *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
-      .zw-up{opacity:1;transform:none}
-      #zw-sky{display:none}
-    }
-    </style>
+.stat{display:flex;align-items:center;justify-content:center;gap:13px;flex-wrap:wrap;margin-top:44px}
+.hi{font-size:.73rem;color:var(--ink-3)}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:99px;
+  font-size:.57rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+  border:1px solid var(--line);color:var(--ink-3)}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--ink-4);flex-shrink:0}
+.badge.open{color:var(--ok);border-color:rgba(0,224,138,.26);background:rgba(0,224,138,.06)}
+.badge.open i{background:var(--ok);box-shadow:0 0 9px rgba(0,224,138,.9);animation:beat 2.4s ease-in-out infinite}
+.badge.shut{color:var(--bad);border-color:rgba(255,107,107,.24);background:rgba(255,107,107,.06)}
+.badge.shut i{background:var(--bad)}
+@keyframes beat{0%,100%{opacity:1}50%{opacity:.35}}
+
+.cue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;
+  align-items:center;gap:10px;font-size:.53rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--ink-4);transition:color var(--fast)}
+.cue:hover{color:var(--gold)}
+.cue i{width:1px;height:38px;background:linear-gradient(180deg,var(--g-45),transparent);
+  animation:fall 2.6s ease-in-out infinite}
+@keyframes fall{0%,100%{transform:scaleY(.4);transform-origin:top;opacity:.45}50%{transform:scaleY(1);opacity:1}}
+
+/* ── 6. Bandwòl k ap woule ─────────────────────────────────────── */
+.strip{position:relative;padding:26px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  overflow:hidden;background:linear-gradient(180deg,rgba(212,175,55,.022),transparent)}
+.strip-t{display:flex;width:max-content;animation:roll 34s linear infinite}
+.strip:hover .strip-t{animation-play-state:paused}
+.strip-t p{display:flex;align-items:center;gap:34px;padding-right:34px;
+  font-family:var(--serif);font-size:1.55rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;white-space:nowrap;color:transparent;
+  -webkit-text-stroke:.6px rgba(212,175,55,.42)}
+.strip-t p b{color:var(--gold);-webkit-text-stroke:0;font-weight:600}
+.strip-t p s{width:5px;height:5px;border-radius:50%;background:var(--g-45);text-decoration:none;flex-shrink:0}
+@keyframes roll{to{transform:translateX(-50%)}}
+.strip::before,.strip::after{content:'';position:absolute;top:0;bottom:0;width:110px;z-index:2;pointer-events:none}
+.strip::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.strip::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
+
+/* ── 7. Seksyon ───────────────────────────────────────────────── */
+.wrap{max-width:1280px;margin:0 auto;padding:0 26px}
+.sec{padding:104px 0}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-bottom:44px}
+.eyebrow{font-size:.58rem;font-weight:600;letter-spacing:3.4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.h2{font-family:var(--serif);font-size:clamp(2.1rem,5.2vw,3.4rem);font-weight:600;line-height:1.08;letter-spacing:.5px}
+.count{font-family:var(--serif);font-size:.85rem;letter-spacing:3px;color:var(--ink-4);padding-bottom:9px;white-space:nowrap}
+
+/* ── 8. Kat sèvis ─────────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.card{position:relative;grid-column:span 6;display:flex;flex-direction:column;justify-content:space-between;
+  gap:30px;min-height:326px;padding:34px 32px 28px;border-radius:5px;overflow:hidden;
+  background:linear-gradient(158deg,rgba(255,255,255,.05),rgba(255,255,255,.018));
+  border:1px solid var(--line);isolation:isolate;
+  transition:transform var(--med),border-color var(--med),box-shadow var(--med)}
+.card.w7{grid-column:span 7}.card.w5{grid-column:span 5}
+.card:hover,.card:focus-visible{transform:translateY(-5px);border-color:var(--g-24);
+  box-shadow:0 26px 58px rgba(0,0,0,.5)}
+/* liy dore ki travèse — animasyon siyati */
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;z-index:2;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transform:translateX(-101%);transition:transform 900ms cubic-bezier(.19,1,.22,1)}
+.card:hover::before,.card:focus-visible::before{transform:translateX(101%)}
+/* limyè nan kwen an */
+.card::after{content:'';position:absolute;top:-46%;right:-22%;width:300px;height:300px;border-radius:50%;
+  z-index:-1;background:radial-gradient(circle,rgba(212,175,55,.13),transparent 64%);
+  opacity:0;transition:opacity var(--med)}
+.card:hover::after{opacity:1}
+
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.no{font-family:var(--serif);font-size:.92rem;letter-spacing:2.4px;color:var(--gold);opacity:.68}
+.em{width:56px;height:56px;flex-shrink:0}
+.em path,.em circle,.em polyline{fill:none;stroke:var(--gold);stroke-width:1.1;
+  stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:var(--l,300);stroke-dashoffset:var(--l,300);
+  transition:stroke-dashoffset 1.6s cubic-bezier(.19,1,.22,1) 200ms}
+.card.in .em path,.card.in .em circle,.card.in .em polyline{stroke-dashoffset:0}
+.em .pt{fill:var(--gold);stroke:none;stroke-dasharray:none;stroke-dashoffset:0;opacity:0;
+  transition:opacity 700ms ease 900ms}
+.card.in .em .pt{opacity:.8}
+
+.card h3{font-family:var(--serif);font-size:clamp(1.7rem,3.5vw,2.3rem);font-weight:600;
+  letter-spacing:.4px;margin-bottom:13px;transition:color var(--fast)}
+.card:hover h3{color:var(--gold)}
+.card p{font-size:.83rem;line-height:1.78;color:var(--ink-3);max-width:47ch}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding-top:20px;border-top:1px solid var(--line)}
+.chip{font-size:.55rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  border:1px solid var(--g-14);border-radius:99px;padding:6px 14px}
+.go{display:inline-flex;align-items:center;gap:9px;font-size:.62rem;font-weight:700;letter-spacing:1.7px;
+  text-transform:uppercase;transition:gap var(--fast),color var(--fast)}
+.go svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.7;fill:none}
+.card:hover .go{gap:16px;color:var(--gold)}
+
+/* ── 9. Sitasyon ──────────────────────────────────────────────── */
+.quote{display:none;text-align:center;padding:96px 0}
+.quote.show{display:block}
+.quote .qm{font-family:var(--serif);font-size:4.4rem;line-height:.4;color:var(--g-24);display:block;margin-bottom:22px}
+.quote blockquote{font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:clamp(1.45rem,3.9vw,2.5rem);line-height:1.5;color:rgba(255,255,255,.9);
+  max-width:22ch;margin:0 auto 26px}
+.quote .who{font-size:.6rem;font-weight:700;letter-spacing:2.6px;text-transform:uppercase;color:var(--gold)}
+.quote .day{font-size:.55rem;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink-4);margin-top:12px}
+
+/* ── 10. Kontak ───────────────────────────────────────────────── */
+.contact{border-top:1px solid var(--line);padding:92px 0 0}
+.c-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:56px;align-items:start}
+.c-lead{font-family:var(--serif);font-size:clamp(1.9rem,4.6vw,3rem);font-weight:600;line-height:1.14;margin-bottom:24px}
+.c-sub{font-size:.85rem;color:var(--ink-3);max-width:40ch;margin-bottom:30px}
+.c-list{display:flex;flex-direction:column;gap:2px}
+.c-item{display:flex;align-items:center;gap:16px;padding:17px 0;border-bottom:1px solid var(--line);
+  transition:padding-left var(--med),border-color var(--med)}
+.c-item:hover{padding-left:11px;border-bottom-color:var(--g-24)}
+.c-ic{width:34px;height:34px;border-radius:50%;border:1px solid var(--g-14);display:grid;place-items:center;flex-shrink:0;
+  transition:background var(--fast),border-color var(--fast)}
+.c-item:hover .c-ic{background:var(--g-08);border-color:var(--gold)}
+.c-ic svg{width:16px;height:16px;stroke:var(--gold);stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.c-k,.c-v{display:block}
+.c-k{font-size:.55rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-4);margin-bottom:2px}
+.c-v{font-size:.86rem;font-weight:500}
+.c-item .arw{margin-left:auto;width:15px;height:15px;stroke:var(--ink-4);stroke-width:1.6;fill:none;
+  transition:stroke var(--fast),transform var(--med)}
+.c-item:hover .arw{stroke:var(--gold);transform:translateX(4px)}
+
+footer{margin-top:86px;border-top:1px solid var(--line);padding:34px 0 40px;
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+footer .fb{font-family:var(--serif);font-size:.98rem;letter-spacing:2.6px;font-weight:600}
+footer .fb em{font-style:normal;color:var(--gold)}
+footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-4)}
+#top{display:inline-flex;align-items:center;gap:9px;font-size:.56rem;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-3);cursor:pointer;background:none;border:0;font-family:var(--sans);
+  transition:color var(--fast)}
+#top:hover{color:var(--gold)}
+#top svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.6;fill:none;transition:transform var(--med)}
+#top:hover svg{transform:translateY(-3px)}
+
+/* ── 11. De bouton yo : Asistan ak Anbyans ────────────────────── */
+.dock{position:fixed;right:22px;bottom:22px;z-index:960;display:flex;flex-direction:column;gap:11px}
+.dk{position:relative;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:rgba(12,12,12,.86);backdrop-filter:blur(16px);border:1px solid var(--g-24);color:var(--gold);
+  box-shadow:0 12px 32px rgba(0,0,0,.55);transition:transform var(--fast),border-color var(--fast),background var(--fast)}
+.dk:hover{transform:translateY(-3px);border-color:var(--gold);background:rgba(212,175,55,.10)}
+.dk svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dk b{position:absolute;right:-3px;bottom:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:99px;
+  background:var(--gold);color:#0A0A0A;font-size:.5rem;font-weight:700;letter-spacing:.5px;
+  display:grid;place-items:center;text-transform:uppercase;box-shadow:0 3px 10px rgba(0,0,0,.5)}
+.dk-tip{position:absolute;right:60px;top:50%;transform:translateY(-50%) translateX(6px);white-space:nowrap;
+  padding:6px 11px;border-radius:4px;background:rgba(12,12,12,.95);border:1px solid var(--line);
+  font-size:.56rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-2);
+  opacity:0;pointer-events:none;transition:opacity var(--fast),transform var(--fast)}
+.dk:hover .dk-tip{opacity:1;transform:translateY(-50%)}
+
+.panel{position:fixed;top:0;right:0;bottom:0;width:392px;max-width:94vw;z-index:1010;display:flex;flex-direction:column;
+  background:rgba(8,8,8,.97);backdrop-filter:blur(24px);border-left:1px solid var(--line);
+  box-shadow:-30px 0 70px rgba(0,0,0,.6);transform:translateX(102%);
+  transition:transform var(--med);}
+.panel.open{transform:none}
+.p-head{display:flex;align-items:center;gap:12px;padding:20px 20px 16px;border-bottom:1px solid var(--line)}
+.p-head .ic{width:34px;height:34px;border-radius:50%;background:var(--g-08);border:1px solid var(--g-14);
+  display:grid;place-items:center;flex-shrink:0}
+.p-head .ic svg{width:17px;height:17px;stroke:var(--gold);stroke-width:1.5;fill:none}
+.p-ttl{font-family:var(--serif);font-size:1.06rem;font-weight:600;letter-spacing:.6px;line-height:1.2}
+.p-sub{font-size:.56rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-4)}
+.p-x{margin-left:auto;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:none;
+  color:var(--ink-3);cursor:pointer;display:grid;place-items:center;transition:color var(--fast),border-color var(--fast)}
+.p-x:hover{color:var(--gold);border-color:var(--g-24)}
+.p-x svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.7;fill:none}
+.p-body{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:88%;padding:12px 14px;border-radius:12px;font-size:.81rem;line-height:1.65;white-space:pre-line}
+.msg.me{align-self:flex-end;background:var(--gold);color:#0A0A0A;font-weight:600;border-bottom-right-radius:3px}
+.msg.ai{align-self:flex-start;background:rgba(255,255,255,.045);border:1px solid var(--line);
+  color:var(--ink-2);border-bottom-left-radius:3px}
+.msg.ai b{color:var(--gold);font-weight:600}
+.p-chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 20px 12px}
+.p-chips button{font-size:.66rem;padding:7px 12px;border-radius:99px;background:none;cursor:pointer;
+  border:1px solid var(--line);color:var(--ink-3);font-family:var(--sans);text-align:left;
+  transition:color var(--fast),border-color var(--fast)}
+.p-chips button:hover{color:var(--gold);border-color:var(--g-24)}
+.p-ask{display:flex;gap:9px;padding:14px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.p-ask input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;
+  padding:12px 14px;color:var(--ink);font-family:var(--sans);font-size:.8rem}
+.p-ask input:focus{outline:none;border-color:var(--g-24)}
+.p-ask button{width:44px;border-radius:8px;border:0;background:var(--gold);color:#0A0A0A;cursor:pointer;
+  display:grid;place-items:center;transition:background var(--fast)}
+.p-ask button:hover{background:var(--gold-lt)}
+.p-ask button svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;fill:none}
+.veil{position:fixed;inset:0;z-index:1005;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);
+  opacity:0;visibility:hidden;transition:opacity var(--med),visibility var(--med)}
+.veil.open{opacity:1;visibility:visible}
+
+@media(max-width:640px){
+  .panel{top:auto;left:0;width:100%;max-width:none;height:84dvh;border-left:0;border-top:1px solid var(--g-14);
+    border-radius:16px 16px 0 0;transform:translateY(102%)}
+  .panel.open{transform:none}
+  .dock{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));flex-direction:row}
+  .dk{width:46px;height:46px}
+  .dk-tip{display:none}
+}
+
+/* ── 12. Ekran ki pi piti ─────────────────────────────────────── */
+@media(max-width:1020px){
+  .grid{grid-template-columns:1fr;gap:16px}
+  .card,.card.w7,.card.w5{grid-column:span 1;min-height:0;padding:28px 24px 24px;gap:24px}
+  .c-grid{grid-template-columns:1fr;gap:38px}
+  .sec{padding:82px 0}
+}
+@media(max-width:820px){
+  .menu,.nav-act .pill span{display:none}
+  .burger{display:flex}
+  .nav-act{display:none}
+  .hero{padding-top:calc(var(--nav) + 30px)}
+  .strip-t p{font-size:1.2rem;gap:26px;padding-right:26px}
+}
+@media(max-width:520px){
+  .wrap{padding:0 18px}
+  .constel{display:none}
+  .kick{letter-spacing:3.4px;font-size:.55rem}
+  .kick s{width:20px}
+  .rot,.rot li{height:1.75rem}
+  .rot li{font-size:1.08rem}
+  .tag{font-size:.95rem}
+  .btn{padding:14px 22px;font-size:.62rem;flex:1 1 auto;justify-content:center}
+  .em{width:46px;height:46px}
+  #drawer a{font-size:2rem}
+  .sec{padding:66px 0}
+  .quote{padding:70px 0}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .ch>i,.wd>i{transform:none;opacity:1;filter:none}
+  .up{opacity:1;transform:none}
+  .draw{width:var(--w,260px)}
+  #sky,#spot,#grain{display:none}
+  .strip-t{animation:none}
+}
+</style>
 </head>
-<body data-page="index">
+<body>
 
-    <canvas id="zw-sky" aria-hidden="true"></canvas>
-    <div id="bg-text-zetwal" aria-hidden="true"><span>ZETWAL</span></div>
+<div id="prog"></div>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div id="spot" aria-hidden="true"></div>
+<div id="ghost" aria-hidden="true"><b>ZETWAL</b></div>
+<div id="grain" aria-hidden="true"></div>
 
-    <nav class="nav">
-        <div class="nav-inner">
-            <a href="index.html" class="nav-logo">
-                <img src="logo.png" alt="Zetwal">
-                <span class="nav-brand" id="nav-brand-text">ZETWAL <span>ORGANISATION</span></span>
-            </a>
-            <ul class="nav-links" id="nav-links"></ul>
-            <div class="nav-auth" id="zetwal-auth-mount"></div>
+<!-- ══════════ NAV ══════════ -->
+<nav class="nav" id="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html" aria-label="Zetwal Organisation">
+      <img class="mark" src="logo.png" alt="" width="30" height="30">
+      <b>ZETWAL <em>ORGANISATION</em></b>
+    </a>
+
+    <ul class="menu">
+      <li><a href="index.html" class="on">Akèy</a></li>
+      <li><a href="lavri.html">Lavri</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="mall.html">Mall</a></li>
+      <li><a href="games.html">Jwèt</a></li>
+    </ul>
+
+    <div class="nav-act">
+      <button class="pill" id="login-btn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        <span>Konekte</span>
+      </button>
+
+      <button class="pill" id="who-btn" type="button" style="display:none;padding-left:6px" aria-expanded="false">
+        <span class="av" id="who-av">Z</span><span id="who-nm">Kont</span>
+        <span class="pts" id="who-pt">0.0<s>pwen</s></span>
+      </button>
+
+      <div class="acct" id="acct">
+        <div class="acct-who">
+          <div class="av" id="a-av">Z</div>
+          <div><div class="acct-nm" id="a-nm">—</div><div class="acct-ml" id="a-ml">—</div></div>
         </div>
-    </nav>
-
-    <header class="zw-hero zw-up" id="zw-hero">
-        <svg class="zw-constel" viewBox="0 0 760 300" fill="none" aria-hidden="true">
-          <line x1="86"  y1="196" x2="196" y2="118"/>
-          <line x1="196" y1="118" x2="318" y2="152"/>
-          <line x1="318" y1="152" x2="392" y2="52"/>
-          <line x1="392" y1="52"  x2="486" y2="126"/>
-          <line x1="486" y1="126" x2="596" y2="86"/>
-          <line x1="596" y1="86"  x2="672" y2="188"/>
-          <line x1="318" y1="152" x2="356" y2="248"/>
-          <circle cx="86"  cy="196" r="2.6"/><circle cx="196" cy="118" r="3.4"/>
-          <circle cx="318" cy="152" r="2.6"/><circle cx="392" cy="52"  r="4"/>
-          <circle cx="486" cy="126" r="2.6"/><circle cx="596" cy="86"  r="3.2"/>
-          <circle cx="672" cy="188" r="2.4"/><circle cx="356" cy="248" r="2.4"/>
-        </svg>
-
-        <p class="zw-kicker">Ayiti · Inovasyon · Ekselans</p>
-        <h1 class="zw-title"><span>ZETWAL</span></h1>
-        <div class="zw-rule"></div>
-        <p class="zw-sub">Lidè nan Inovasyon ak Ekselans</p>
-
-        <div class="zw-cta">
-            <a href="#services" class="zw-btn zw-btn-gold">Dekouvri sèvis nou yo</a>
-            <a href="https://wa.me/79961103506" target="_blank" rel="noopener" class="zw-btn zw-btn-ghost">Kontakte nou</a>
-        </div>
-
-        <div id="home-info-bloc">
-          <div id="quote-bloc" class="hero-quote">
-            <div id="quote-date" class="hero-quote-date"></div>
-            <blockquote id="quote-text" class="hero-quote-text"></blockquote>
-            <div id="quote-author" class="hero-quote-author"></div>
-          </div>
-          <div class="hero-status-row">
-            <div id="greeting-txt" class="hero-greeting">Bonjou 👋</div>
-            <div id="store-status-badge">
-              <span id="store-dot"></span>
-              <span id="store-label"></span>
-            </div>
-          </div>
-        </div>
-
-        <a href="#services" class="zw-scroll" aria-label="Ale nan sèvis yo"><span>Sèvis</span><i></i></a>
-    </header>
-
-    <div class="zw-sec-head zw-up">
-        <h2 class="zw-sec-title">Kat mond, yon sèl zetwal</h2>
-        <div class="zw-sec-note">01 — 04</div>
+        <div class="row"><span class="k">Statit</span><span class="v" id="a-st">Itilizatè</span></div>
+        <div class="row"><span class="k">Pwen ou genyen</span><span class="v gold" id="a-pt">0.0</span></div>
+        <a href="admin.html" class="pill full" id="a-admin" style="display:none">Aksè Administrasyon</a>
+        <button class="pill" id="a-out" type="button">Dekonekte</button>
+      </div>
     </div>
 
-    <main id="services" class="zw-services">
+    <button class="burger" id="burger" type="button" aria-label="Meni" aria-expanded="false">
+      <span></span><span></span>
+    </button>
+  </div>
+</nav>
 
-        <a href="lavri.html" class="zw-svc wide zw-up zw-d1">
-            <div class="zw-svc-top">
-                <span class="zw-num">01</span>
-                <svg class="zw-emblem" viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M24 5c6.5 8.2 11 14.2 11 19.6A11 11 0 0 1 13 24.6C13 19.2 17.5 13.2 24 5Z" style="--len:95"/>
-                    <path d="M18.5 25.5c0 3.4 2.6 6 5.8 6" style="--len:16"/>
-                    <circle class="dot" cx="33" cy="12" r="1.4"/><circle class="dot" cx="39" cy="19" r="1"/>
-                </svg>
-            </div>
-            <div>
-                <h3 class="zw-svc-name">Lavri Zetwal</h3>
-                <p class="zw-svc-desc">Sèvis blanchisri futuriste ak teknologie ekolojik pou yon pwòpte san parèy nan mwens pase 24h.</p>
-            </div>
-            <div class="zw-svc-foot">
-                <span class="zw-tag">Mwens pase 24h</span>
-                <span class="zw-go">Antre nan Lavri
-                    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                </span>
-            </div>
+<div id="drawer">
+  <a href="index.html">Akèy</a>
+  <a href="lavri.html">Lavri</a>
+  <a href="shop.html">Shop</a>
+  <a href="mall.html">Mall</a>
+  <a href="games.html">Jwèt</a>
+
+  <div id="dr-auth">
+    <div class="who" id="dr-who" style="display:none">
+      <span class="av" id="dr-av">Z</span>
+      <div>
+        <div class="nm" id="dr-nm">—</div>
+        <div class="sub"><span id="dr-st">Itilizatè</span> · <span id="dr-pt">0.0</span> pwen</div>
+      </div>
+    </div>
+    <button class="pill full" id="dr-login" type="button">Konekte</button>
+    <a href="admin.html" class="pill full" id="dr-admin" style="display:none">Aksè Administrasyon</a>
+    <button class="pill" id="dr-out" type="button" style="display:none">Dekonekte</button>
+  </div>
+</div>
+
+<!-- ══════════ MODAL KONEKSYON ══════════ -->
+<div class="mask" id="mask" role="dialog" aria-modal="true" aria-labelledby="m-ttl">
+  <div class="box">
+    <button class="p-x" id="m-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <img class="logo" src="logo.png" alt="" width="44" height="44">
+    <h3 id="m-ttl">Byenveni</h3>
+    <p class="lead" id="m-lead">Konekte pou w wè pwen ou yo.</p>
+
+    <div class="tabs">
+      <button type="button" class="on" data-tab="in">Konekte</button>
+      <button type="button" data-tab="up">Kreye kont</button>
+    </div>
+
+    <div class="fld" id="f-name" style="display:none">
+      <label for="m-name">Non ou</label>
+      <input id="m-name" type="text" autocomplete="name" placeholder="Non ak siyati">
+    </div>
+    <div class="fld">
+      <label for="m-mail">Imel</label>
+      <input id="m-mail" type="email" autocomplete="email" placeholder="non@imel.com">
+    </div>
+    <div class="fld">
+      <label for="m-pass">Modpas</label>
+      <input id="m-pass" type="password" autocomplete="current-password" placeholder="••••••••">
+      <button class="eye" id="m-eye" type="button" aria-label="Montre modpas la">
+        <svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+
+    <button class="btn btn-g" id="m-go" type="button">Konekte</button>
+
+    <div class="or">oswa</div>
+    <button class="gbtn" id="m-google" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.4Z"/>
+        <path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z"/>
+        <path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2L6.4 14Z"/>
+        <path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.4 3-4.1 5.6-4.1Z"/>
+      </svg>
+      Kontinye ak Google
+    </button>
+
+    <p class="note" id="m-note"><a id="m-forgot">Ou bliye modpas ou ?</a></p>
+    <div class="err" id="m-err"></div>
+  </div>
+</div>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero" id="hero">
+  <svg class="constel" viewBox="0 0 880 340" fill="none" aria-hidden="true">
+    <line x1="70"  y1="228" x2="196" y2="132" style="--l:158;--dl:0ms"/>
+    <line x1="196" y1="132" x2="336" y2="176" style="--l:147;--dl:160ms"/>
+    <line x1="336" y1="176" x2="440" y2="54"  style="--l:160;--dl:320ms"/>
+    <line x1="440" y1="54"  x2="556" y2="140" style="--l:145;--dl:480ms"/>
+    <line x1="556" y1="140" x2="694" y2="96"  style="--l:145;--dl:640ms"/>
+    <line x1="694" y1="96"  x2="806" y2="216" style="--l:164;--dl:800ms"/>
+    <line x1="336" y1="176" x2="392" y2="292" style="--l:129;--dl:520ms"/>
+    <circle cx="70"  cy="228" r="2.4" style="--dl:200ms"/><circle cx="196" cy="132" r="3.4" style="--dl:340ms"/>
+    <circle cx="336" cy="176" r="2.6" style="--dl:480ms"/><circle cx="440" cy="54"  r="4.2" style="--dl:620ms"/>
+    <circle cx="556" cy="140" r="2.6" style="--dl:760ms"/><circle cx="694" cy="96"  r="3.2" style="--dl:900ms"/>
+    <circle cx="806" cy="216" r="2.4" style="--dl:1040ms"/><circle cx="392" cy="292" r="2.4" style="--dl:700ms"/>
+  </svg>
+
+  <p class="kick"><s></s><span data-split="ch">Ayiti · Inovasyon · Ekselans</span><s></s></p>
+  <h1 class="big" data-split="ch" aria-label="ZETWAL">ZETWAL</h1>
+  <div class="draw" style="--w:min(320px,62vw);margin:0 auto 24px"></div>
+
+  <p class="tag" data-split="wd">Lidè nan Inovasyon ak Ekselans</p>
+  <div class="rot" aria-hidden="true">
+    <ul id="rot">
+      <li>Lavri</li><li>Shop</li><li>Mall</li><li>Jwèt</li><li>Lavri</li>
+    </ul>
+  </div>
+
+  <div class="cta up d3">
+    <a href="#sevis" class="btn btn-g">Dekouvri sèvis nou yo
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg></a>
+    <a href="https://wa.me/79961103506" target="_blank" rel="noopener" class="btn btn-o">Kontakte nou
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+
+  <div class="stat up d4">
+    <span class="hi" id="hi">Bonjou</span>
+    <span class="badge" id="badge"><i></i><span id="badge-t">Chajman…</span></span>
+  </div>
+
+  <a href="#sevis" class="cue" aria-label="Ale nan sèvis yo"><span>Sèvis</span><i></i></a>
+</header>
+
+<!-- ══════════ BANDWÒL ══════════ -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-t" id="strip"></div>
+</div>
+
+<!-- ══════════ SÈVIS ══════════ -->
+<section class="sec" id="sevis">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <div class="eyebrow up">Sèvis nou yo</div>
+        <h2 class="h2" data-split="wd">Kat mond, yon sèl zetwal</h2>
+        <div class="draw" style="--w:120px;margin-top:18px"></div>
+      </div>
+      <div class="count up d2">01 — 04</div>
+    </div>
+
+    <div class="grid">
+
+      <a href="lavri.html" class="card w7">
+        <div class="card-top">
+          <span class="no">01</span>
+          <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M24 5c6.6 8.3 11 14.3 11 19.7A11 11 0 0 1 13 24.7C13 19.3 17.4 13.3 24 5Z" style="--l:96"/>
+            <path d="M18.4 25.6c0 3.4 2.6 6.1 5.8 6.1" style="--l:17"/>
+            <circle class="pt" cx="33.5" cy="11.5" r="1.4"/><circle class="pt" cx="39" cy="18.5" r="1"/>
+          </svg>
+        </div>
+        <div>
+          <h3 data-scramble>Lavri Zetwal</h3>
+          <p>Sèvis blanchisri futuriste ak teknologie ekolojik pou yon pwòpte san parèy nan mwens pase 24h.</p>
+        </div>
+        <div class="card-foot">
+          <span class="chip">Mwens pase 24h</span>
+          <span class="go">Antre nan Lavri <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a href="shop.html" class="card w5">
+        <div class="card-top">
+          <span class="no">02</span>
+          <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M11 16h26l-2.5 24h-21L11 16Z" style="--l:101"/>
+            <path d="M18 20v-5a6 6 0 0 1 12 0v5" style="--l:35"/>
+            <circle class="pt" cx="18" cy="27" r="1.3"/><circle class="pt" cx="30" cy="27" r="1.3"/>
+          </svg>
+        </div>
+        <div>
+          <h3 data-scramble>Shop Zetwal</h3>
+          <p>Eksplore yon seleksyon prim nan pi bon pwodwi lokal ak entènasyonal ak livrezon ultra-rapid.</p>
+        </div>
+        <div class="card-foot">
+          <span class="chip">Livrezon rapid</span>
+          <span class="go">Vizite Shop la <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a href="mall.html" class="card w5">
+        <div class="card-top">
+          <span class="no">03</span>
+          <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M9 41V17l15-8 15 8v24" style="--l:97"/>
+            <path d="M9 25h30" style="--l:31"/><path d="M9 33h30" style="--l:31"/>
+            <path d="M20 41v-8h8v8" style="--l:25"/>
+            <circle class="pt" cx="24" cy="14" r="1.4"/>
+          </svg>
+        </div>
+        <div>
+          <h3 data-scramble>Zetwal Mall</h3>
+          <p>Premye mall futuriste nan peyi a ak 4 etaj ki dedye a plezi w, soti nan komès rive nan byennèt.</p>
+        </div>
+        <div class="card-foot">
+          <span class="chip">4 etaj</span>
+          <span class="go">Dekouvri Mall la <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a href="games.html" class="card w7">
+        <div class="card-top">
+          <span class="no">04</span>
+          <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M17 17h14a9 9 0 0 1 8.8 10.8l-1.4 6.6A5 5 0 0 1 30 35.2L28 32h-8l-2 3.2a5 5 0 0 1-8.4-.8l-1.4-6.6A9 9 0 0 1 17 17Z" style="--l:122"/>
+            <path d="M16 24h5" style="--l:6"/><path d="M18.5 21.5v5" style="--l:6"/>
+            <circle class="pt" cx="30" cy="23" r="1.5"/><circle class="pt" cx="34" cy="26.5" r="1.5"/>
+          </svg>
+        </div>
+        <div>
+          <h3 data-scramble>Jwèt Zetwal</h3>
+          <p>Genyen pwen pandan w ap amize w! Patisipe nan Duel Mental ak lòt jwèt entèaktif.</p>
+        </div>
+        <div class="card-foot">
+          <span class="chip">Genyen pwen</span>
+          <span class="go">Kòmanse Jwe <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SITASYON ══════════ -->
+<section class="quote" id="quote">
+  <div class="wrap">
+    <span class="qm" aria-hidden="true">“</span>
+    <blockquote id="q-txt"></blockquote>
+    <div class="who" id="q-who"></div>
+    <div class="day" id="q-day"></div>
+  </div>
+</section>
+
+<!-- ══════════ KONTAK ══════════ -->
+<section class="contact">
+  <div class="wrap">
+    <div class="c-grid">
+      <div>
+        <div class="eyebrow up">Kontak</div>
+        <h2 class="c-lead" data-split="wd">Nou la pou ou, chak jou.</h2>
+        <p class="c-sub up d2">Ekri nou sou WhatsApp oswa Telegram. Nou reponn rapid.</p>
+        <div class="draw" style="--w:90px"></div>
+      </div>
+
+      <div class="c-list up d2">
+        <a class="c-item" href="https://wa.me/79961103506" target="_blank" rel="noopener">
+          <span class="c-ic"><svg viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4.6A8.2 8.2 0 1 1 8.4 19l-4.9 1.5Z"/><path d="M9 9.4c.2 1.2.8 2.3 1.7 3.2.9.9 2 1.5 3.2 1.7l1-1.3 1.8.8-.3 1.6c-1.9.3-4-.6-5.6-2.2-1.6-1.6-2.5-3.7-2.2-5.6l1.6-.3.8 1.8L9 9.4Z"/></svg></span>
+          <span><span class="c-k">WhatsApp</span><span class="c-v">+7 996 110 35 06</span></span>
+          <svg class="arw" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-
-        <a href="shop.html" class="zw-svc narrow zw-up zw-d2">
-            <div class="zw-svc-top">
-                <span class="zw-num">02</span>
-                <svg class="zw-emblem" viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M11 16h26l-2.5 24h-21L11 16Z" style="--len:100"/>
-                    <path d="M18 20v-5a6 6 0 0 1 12 0v5" style="--len:34"/>
-                    <circle class="dot" cx="18" cy="27" r="1.3"/><circle class="dot" cx="30" cy="27" r="1.3"/>
-                </svg>
-            </div>
-            <div>
-                <h3 class="zw-svc-name">Shop Zetwal</h3>
-                <p class="zw-svc-desc">Eksplore yon seleksyon prim nan pi bon pwodwi lokal ak entènasyonal ak livrezon ultra-rapid.</p>
-            </div>
-            <div class="zw-svc-foot">
-                <span class="zw-tag">Livrezon rapid</span>
-                <span class="zw-go">Vizite Shop la
-                    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                </span>
-            </div>
+        <a class="c-item" href="https://t.me/MikeNestor14" target="_blank" rel="noopener">
+          <span class="c-ic"><svg viewBox="0 0 24 24"><path d="M21 4.5 2.9 11.3l4.9 1.6L20 5.6l-9.9 8.8.3 5 2.9-3.6 4.6 3.4L21 4.5Z"/></svg></span>
+          <span><span class="c-k">Telegram</span><span class="c-v">@MikeNestor14</span></span>
+          <svg class="arw" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-
-        <a href="mall.html" class="zw-svc narrow zw-up zw-d3">
-            <div class="zw-svc-top">
-                <span class="zw-num">03</span>
-                <svg class="zw-emblem" viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M9 41V17l15-8 15 8v24" style="--len:96"/>
-                    <path d="M9 25h30M9 33h30" style="--len:62"/>
-                    <path d="M20 41v-8h8v8" style="--len:24"/>
-                    <circle class="dot" cx="24" cy="14" r="1.4"/>
-                </svg>
-            </div>
-            <div>
-                <h3 class="zw-svc-name">Zetwal Mall</h3>
-                <p class="zw-svc-desc">Premye mall futuriste nan peyi a ak 4 étaj ki dedye a plezi w, soti nan komès rive nan byennèt.</p>
-            </div>
-            <div class="zw-svc-foot">
-                <span class="zw-tag">4 etaj</span>
-                <span class="zw-go">Dekouvri Mall la
-                    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                </span>
-            </div>
-        </a>
-
-        <a href="games.html" class="zw-svc wide zw-up zw-d4">
-            <div class="zw-svc-top">
-                <span class="zw-num">04</span>
-                <svg class="zw-emblem" viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M17 17h14a9 9 0 0 1 8.8 10.8l-1.4 6.6A5 5 0 0 1 30 35.2L28 32h-8l-2 3.2a5 5 0 0 1-8.4-.8l-1.4-6.6A9 9 0 0 1 17 17Z" style="--len:120"/>
-                    <path d="M16 24h5M18.5 21.5v5" style="--len:16"/>
-                    <circle class="dot" cx="30" cy="23" r="1.5"/><circle class="dot" cx="34" cy="26" r="1.5"/>
-                </svg>
-            </div>
-            <div>
-                <h3 class="zw-svc-name">Jwèt Zetwal</h3>
-                <p class="zw-svc-desc">Genyen pwen pandan w ap amize w! Patisipe nan Duel Mental ak lòt jwèt entèaktif.</p>
-            </div>
-            <div class="zw-svc-foot">
-                <span class="zw-tag">Genyen pwen</span>
-                <span class="zw-go">Kòmanse Jwe
-                    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                </span>
-            </div>
-        </a>
-
-    </main>
+        <div class="c-item">
+          <span class="c-ic"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg></span>
+          <span><span class="c-k">Adrès</span><span class="c-v">5, 3ème Imp, Ruelle Yamoul</span></span>
+        </div>
+      </div>
+    </div>
 
     <footer>
-        <div class="footer-logo">ZETWAL <span>ORGANISATION</span></div>
-        <div class="footer-address">📍 5, 3ème Imp, Ruelle Yamoul</div>
-        <div class="social-icons">
-            <a href="https://wa.me/79961103506" target="_blank" rel="noopener" class="social-icon" aria-label="WhatsApp">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5l1.3-4.6A8.2 8.2 0 1 1 8.4 19l-4.9 1.5Z"/><path d="M9 9.4c.2 1.2.8 2.3 1.7 3.2.9.9 2 1.5 3.2 1.7l1-1.3 1.8.8-.3 1.6c-1.9.3-4-.6-5.6-2.2-1.6-1.6-2.5-3.7-2.2-5.6l1.6-.3.8 1.8L9 9.4Z"/></svg>
-            </a>
-            <a href="https://t.me/MikeNestor14" target="_blank" rel="noopener" class="social-icon" aria-label="Telegram">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4.5 2.9 11.3l4.9 1.6L20 5.6l-9.9 8.8.3 5 2.9-3.6 4.6 3.4L21 4.5Z"/><path d="m7.8 12.9.3 5"/></svg>
-            </a>
-        </div>
-        <div class="copyright">© 2026 ZETWAL ORGANISATION — TOUT DWA REZÈVE.</div>
+      <div class="fb">ZETWAL <em>ORGANISATION</em></div>
+      <small>© 2026 — Tout dwa rezève</small>
+      <button id="top" type="button"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg> Anwo</button>
     </footer>
+  </div>
+</section>
 
-    <script>
-    /* ═════════ 1. Baz la (menm entèfas ak rès sit la) ═════════ */
-    ZetwalCommon.init({ page: 'index', brand: 'ORGANISATION', cursor: false });
+<div class="veil" id="veil"></div>
 
-    /* Statit + pwen ajoute nan dropdown la */
-    const dropdown = document.getElementById('auth-dropdown');
-    if (dropdown) {
-        const extraRows = document.createElement('div');
-        extraRows.innerHTML = `
-            <div class="info-row"><div class="info-label">Statit</div><div class="info-value" id="card-status">Utilisateur</div></div>
-            <div class="info-row"><div class="info-label">Pwen ou genyen</div><div class="info-value" id="card-points" style="color:var(--gold);font-size:1.2rem">0.0</div></div>
-            <div class="admin-link" id="admin-access" style="display:none;margin-bottom:12px"><a href="admin.html" class="btn-gold" style="width:100%;text-align:center;display:block;padding:10px 0;font-size:0.6rem">Aksè Administrasyon</a></div>
-        `;
-        const sep = dropdown.querySelector('.auth-drop-sep');
-        if (sep) dropdown.insertBefore(extraRows, sep); else dropdown.appendChild(extraRows);
-    }
+<aside class="panel" id="panel" aria-hidden="true">
+  <div class="p-head">
+    <span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg></span>
+    <div><div class="p-ttl">Asistan Zetwal</div><div class="p-sub">Paj akèy</div></div>
+    <button class="p-x" id="p-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="p-body" id="p-body"></div>
+  <div class="p-chips" id="p-chips"></div>
+  <div class="p-ask">
+    <input id="p-in" type="text" placeholder="Poze yon kesyon sou paj sa…" autocomplete="off">
+    <button id="p-go" type="button" aria-label="Voye"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z"/></svg></button>
+  </div>
+</aside>
 
-    const firebaseConfig = ZETWAL_CONFIG.firebase;
-    const db = firebase.firestore();
-    const sb = supabase.createClient(ZETWAL_CONFIG.supabase.url, ZETWAL_CONFIG.supabase.anonKey);
+<div class="dock">
+  <button class="dk" id="ai-btn" type="button" aria-label="Asistan Zetwal">
+    <svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>
+    <span class="dk-tip">Asistan</span>
+  </button>
+  <button class="dk" id="fx-btn" type="button" aria-label="Chanje anbyans">
+    <svg id="fx-ic" viewBox="0 0 24 24"><path d="M12 2.5 14.6 9h6.9l-5.6 4.1 2.1 6.6-6-4.1-6 4.1 2.1-6.6L2.5 9h6.9L12 2.5Z"/></svg>
+    <b id="fx-lb">Etwal</b>
+    <span class="dk-tip">Anbyans</span>
+  </button>
+</div>
 
-    window.addEventListener('zetwal:authchange', async (e) => {
-        const user = e.detail.user;
-        if (user) {
-            const name = user.displayName || user.phoneNumber || "Itilizatè";
-            db.collection("users").doc(user.uid).onSnapshot(doc => {
-                const el = document.getElementById('card-points');
-                if (el) el.textContent = doc.exists ? (doc.data().points || 0).toFixed(1) : '0.0';
-            });
-            const admins = ['mikenestorlive@gmail.com', 'schnaydernaderice1@gmail.com'];
-            let status = "Utilisateur";
-            if (user.email && admins.includes(user.email)) {
-                status = "Admin";
-                const a = document.getElementById('admin-access');
-                if (a) a.style.display = 'block';
-            } else {
-                const { data: p } = await sb.from('products').select('id').eq('client_email', user.email).limit(1);
-                const { data: w } = await sb.from('wash_records').select('id').eq('client_name', name).limit(1);
-                if ((p && p.length) || (w && w.length)) status = "Client";
-            }
-            const st = document.getElementById('card-status');
-            if (st) st.textContent = status;
-            updateGreeting(name);
-        } else {
-            updateGreeting(null);
-        }
+<script>
+/* ══════════════════════════════════════════════════════════════
+   ZETWAL — yon sèl fichye, zewo depandans lokal.
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+/* ── 0. Konfigirasyon (sèl kote pou chanje kle yo) ────────────── */
+var CONFIG = {
+  supabaseUrl : 'https://mzwibzvdcwapqrtbhxox.supabase.co',
+  supabaseKey : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c',
+  firebase : {
+    apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+    authDomain: "lavrizetwal.firebaseapp.com",
+    projectId: "lavrizetwal",
+    storageBucket: "lavrizetwal.firebasestorage.app",
+    messagingSenderId: "291921316186",
+    appId: "1:291921316186:web:f55e8b34526960df394b63"
+  },
+  admins : ['mikenestorlive@gmail.com','schnaydernaderice1@gmail.com'],
+  openHour : 8, closeHour : 20        // orè otomatik si magazen an pa fòse
+};
+
+var $  = function(s,r){ return (r||document).querySelector(s); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+var CALM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ══ 1. ANIMASYON TÈKS ════════════════════════════════════════ */
+/* 1a. Koupe an lèt oswa an mo */
+function split(el){
+  var mode = el.getAttribute('data-split');
+  var text = el.textContent.trim();
+  if(!el.getAttribute('aria-label')) el.setAttribute('aria-label', text);
+  var frag = document.createDocumentFragment(), n = 0;
+
+  if(mode === 'wd'){
+    text.split(/\s+/).forEach(function(w,k,arr){
+      var s = document.createElement('span');
+      s.className = 'wd'; s.setAttribute('aria-hidden','true');
+      s.style.setProperty('--i', n++);
+      s.innerHTML = '<i>' + w + '</i>';
+      frag.appendChild(s);
+      if(k < arr.length - 1) frag.appendChild(document.createTextNode(' '));
     });
+  } else {
+    text.split('').forEach(function(c){
+      if(c === ' '){ frag.appendChild(document.createTextNode(' ')); return; }
+      var s = document.createElement('span');
+      s.className = 'ch'; s.setAttribute('aria-hidden','true');
+      s.style.setProperty('--i', n++);
+      s.innerHTML = '<i>' + c + '</i>';
+      frag.appendChild(s);
+    });
+  }
+  el.textContent = '';
+  el.appendChild(frag);
+}
+$$('[data-split]').forEach(split);
 
-    /* ═════════ 2. Salitasyon · Statit magazen · Sitasyon ═════════ */
-    function haitiHour() {
-        const now = new Date();
-        return new Date(now.getTime() + now.getTimezoneOffset() * 60000 - 5 * 3600000).getHours();
+/* 1b. Tèks ki "brase" anvan li poze */
+var GLY = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÈÒÀ0123456789/\\<>*#';
+function scramble(el){
+  if(CALM || el._busy) return;
+  var final = el.getAttribute('data-txt') || el.textContent;
+  el.setAttribute('data-txt', final);
+  el._busy = true;
+  var frames = 0, total = 26, chars = final.split('');
+  var id = setInterval(function(){
+    frames++;
+    var p = frames / total;
+    el.textContent = chars.map(function(c,i){
+      if(c === ' ') return ' ';
+      if(i / chars.length < p) return c;
+      return GLY[(Math.random() * GLY.length) | 0];
+    }).join('');
+    if(frames >= total){ clearInterval(id); el.textContent = final; el._busy = false; }
+  }, 26);
+}
+$$('[data-scramble]').forEach(function(h){
+  var card = h.closest('.card') || h;
+  card.addEventListener('mouseenter', function(){ scramble(h); });
+  card.addEventListener('focus', function(){ scramble(h); });
+});
+
+/* 1c. Revelasyon lè eleman an parèt */
+var pop = $$('.up,.draw,[data-split],.card,.hero,.head,.c-lead');
+function showAll(){ pop.forEach(function(e){ e.classList.add('in'); }); }
+if(!('IntersectionObserver' in window) || CALM){ showAll(); }
+else{
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+      var h = e.target.querySelector && e.target.querySelector('[data-scramble]');
+      if(h) setTimeout(function(){ scramble(h); }, 260);
+    });
+  }, { threshold: .16, rootMargin: '0px 0px -7% 0px' });
+  pop.forEach(function(e){ io.observe(e); });
+  setTimeout(showAll, 3200);            // filè sekirite : anyen pa dwe rete envizib
+}
+setTimeout(function(){ $('#hero').classList.add('in'); }, 60);
+
+/* 1d. Mo k ap vire nan hero a */
+(function(){
+  var ul = $('#rot'); if(!ul || CALM) return;
+  var n = ul.children.length - 1, i = 0;
+  setInterval(function(){
+    i++;
+    ul.style.transition = 'transform 620ms cubic-bezier(.7,0,.2,1)';
+    ul.style.transform  = 'translateY(-' + (i * (100 / (n + 1))) + '%)';
+    if(i === n){
+      setTimeout(function(){
+        ul.style.transition = 'none';
+        ul.style.transform = 'translateY(0)';
+        i = 0;
+      }, 660);
     }
-    function updateGreeting(name) {
-        const h = haitiHour();
-        const [word, emoji] = h < 12 ? ['Bonjou', '☀️'] : h < 18 ? ['Bon aprèmidi', '🌤️'] : ['Bonswa', '🌙'];
-        const el = document.getElementById('greeting-txt');
-        if (el) el.textContent = name ? `${word}, ${name.split(' ')[0]} ${emoji}` : `${word} ${emoji}`;
+  }, 2600);
+})();
+
+/* 1e. Bandwòl k ap woule */
+(function(){
+  var box = $('#strip'); if(!box) return;
+  var words = ['Lavri','Shop','Mall','Jwèt','Inovasyon','Ekselans','Ayiti'];
+  var line = words.map(function(w){
+    return (w === 'Ayiti' || w === 'Ekselans' || w === 'Inovasyon')
+      ? '<b>' + w + '</b>' : w;
+  }).join('<s></s>');
+  box.innerHTML = '<p>' + line + '<s></s></p><p>' + line + '<s></s></p>';
+})();
+
+/* ══ 2. NAV, PWOGRÈ, MENI ═════════════════════════════════════ */
+var nav = $('#nav'), prog = $('#prog'), ticking = false;
+function onScroll(){
+  var y = window.pageYOffset;
+  nav.classList.toggle('solid', y > 40);
+  var max = document.documentElement.scrollHeight - innerHeight;
+  prog.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  ticking = false;
+}
+addEventListener('scroll', function(){
+  if(!ticking){ ticking = true; requestAnimationFrame(onScroll); }
+}, { passive:true });
+onScroll();
+
+var burger = $('#burger'), drawer = $('#drawer');
+burger.addEventListener('click', function(){
+  var open = drawer.classList.toggle('open');
+  burger.classList.toggle('x', open);
+  burger.setAttribute('aria-expanded', open);
+  document.body.classList.toggle('lock', open);
+});
+$$('#drawer a').forEach(function(a){
+  a.addEventListener('click', function(){
+    drawer.classList.remove('open'); burger.classList.remove('x');
+    document.body.classList.remove('lock');
+  });
+});
+$('#top').addEventListener('click', function(){ scrollTo({ top:0, behavior: CALM ? 'auto' : 'smooth' }); });
+addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  drawer.classList.remove('open'); burger.classList.remove('x');
+  document.body.classList.remove('lock');
+  $('#acct').classList.remove('open');
+});
+
+/* ══ 3. LIMYÈ KI SWIV SOURIT LA ═══════════════════════════════ */
+(function(){
+  var sp = $('#spot');
+  if(!sp || CALM || matchMedia('(pointer: coarse)').matches) return;
+  var x = 0, y = 0, run = false;
+  addEventListener('mousemove', function(e){
+    x = e.clientX; y = e.clientY; sp.style.opacity = 1;
+    if(run) return; run = true;
+    requestAnimationFrame(function(){
+      sp.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      run = false;
+    });
+  }, { passive:true });
+  addEventListener('mouseleave', function(){ sp.style.opacity = 0; });
+})();
+
+/* ══ 4. ANBYANS : ETWAL · NÈJ · LAPLI · ANYEN ═════════════════ */
+var FX = (function(){
+  var cv = $('#sky'); if(!cv) return { set:function(){}, name:function(){ return 'anyen'; } };
+  var ctx = cv.getContext('2d'), W=0, H=0, bits=[], raf=null,
+      dpr = Math.min(devicePixelRatio || 1, 2),
+      MODES = ['etwal','nej','lapli','anyen'], idx = 0;
+
+  function size(){
+    W = cv.width = innerWidth * dpr; H = cv.height = innerHeight * dpr;
+    cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px';
+  }
+  function seed(){
+    var small = innerWidth < 700, m = MODES[idx];
+    bits = [];
+    var n = m === 'etwal' ? (small ? 44 : 86)
+          : m === 'nej'   ? (small ? 50 : 110)
+          : m === 'lapli' ? (small ? 60 : 130) : 0;
+    for(var i=0;i<n;i++){
+      if(m === 'etwal') bits.push({ x:Math.random()*W, y:Math.random()*H,
+        r:(Math.random()*1.05+.3)*dpr, a:Math.random()*6.28, s:Math.random()*.011+.004,
+        big:Math.random()>.87 });
+      else if(m === 'nej') bits.push({ x:Math.random()*W, y:Math.random()*H,
+        r:(Math.random()*1.7+.7)*dpr, vy:(Math.random()*.42+.18)*dpr,
+        vx:(Math.random()-.5)*.22*dpr, a:Math.random()*6.28, o:Math.random()*.4+.35 });
+      else bits.push({ x:Math.random()*W, y:Math.random()*H,
+        len:(Math.random()*13+7)*dpr, vy:(Math.random()*4.4+3.4)*dpr,
+        vx:.7*dpr, o:Math.random()*.26+.14 });
     }
-    updateGreeting(null);
-
-    async function updateStoreStatus() {
-        const dot = document.getElementById('store-dot');
-        const label = document.getElementById('store-label');
-        const badge = document.getElementById('store-status-badge');
-        if (!dot) return;
-        let force = null;
-        try {
-            const { data } = await sb.from('site_settings').select('value').eq('key', 'store_force').single();
-            if (data && data.value && data.value !== 'null') force = data.value;
-        } catch (e) {}
-        const h = haitiHour();
-        const isOpen = force === 'open' ? true : force === 'closed' ? false : (h >= 8 && h < 20);
-        if (isOpen) {
-            dot.style.background = '#00E08A';
-            dot.style.boxShadow = '0 0 8px rgba(0,224,138,.9)';
-            badge.style.background = 'rgba(0,224,138,.07)';
-            badge.style.border = '1px solid rgba(0,224,138,.28)';
-            badge.style.color = '#00E08A';
-            label.textContent = 'Magazen nou yo ouvri';
-        } else {
-            const hoursLeft = h < 8 ? 8 - h : (24 - h) + 8;
-            dot.style.background = '#FF5C5C';
-            dot.style.boxShadow = '0 0 8px rgba(255,92,92,.8)';
-            badge.style.background = 'rgba(255,92,92,.07)';
-            badge.style.border = '1px solid rgba(255,92,92,.24)';
-            badge.style.color = '#FF7A7A';
-            label.textContent = `Magazen nou yo ap ouvri nan ${hoursLeft}h`;
-        }
+  }
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    var m = MODES[idx], i, p;
+    if(m === 'etwal'){
+      for(i=0;i<bits.length;i++){ p = bits[i]; p.a += p.s;
+        var o = (Math.sin(p.a)*.5+.5) * (p.big ? .9 : .5);
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+        ctx.fillStyle = 'rgba(212,175,55,' + o.toFixed(3) + ')';
+        ctx.shadowBlur = p.big ? 9*dpr : 0; ctx.shadowColor = 'rgba(212,175,55,.6)';
+        ctx.fill(); }
+      ctx.shadowBlur = 0;
+    } else if(m === 'nej'){
+      for(i=0;i<bits.length;i++){ p = bits[i];
+        p.a += .01; p.y += p.vy; p.x += p.vx + Math.sin(p.a)*.35*dpr;
+        if(p.y > H + 6){ p.y = -6; p.x = Math.random()*W; }
+        if(p.x > W + 6) p.x = -6; if(p.x < -6) p.x = W + 6;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+        ctx.fillStyle = 'rgba(255,255,255,' + p.o.toFixed(3) + ')';
+        ctx.fill(); }
+    } else if(m === 'lapli'){
+      ctx.lineCap = 'round';
+      for(i=0;i<bits.length;i++){ p = bits[i];
+        p.y += p.vy; p.x += p.vx;
+        if(p.y > H + p.len){ p.y = -p.len; p.x = Math.random()*W; }
+        if(p.x > W + 4) p.x = -4;
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx*2.2, p.y - p.len);
+        ctx.strokeStyle = 'rgba(190,205,225,' + p.o.toFixed(3) + ')';
+        ctx.lineWidth = 1.05*dpr; ctx.stroke(); }
     }
-    updateStoreStatus();
-    setInterval(updateStoreStatus, 5 * 60 * 1000);
+    raf = requestAnimationFrame(frame);
+  }
+  function go(){ if(!raf && MODES[idx] !== 'anyen') raf = requestAnimationFrame(frame); }
+  function halt(){ if(raf){ cancelAnimationFrame(raf); raf = null; } ctx.clearRect(0,0,W,H); }
 
-    async function loadDailyQuote() {
-        try {
-            const [rWeek, rDay] = await Promise.all([
-                sb.from('site_settings').select('value').eq('key', 'quote_week').single(),
-                sb.from('site_settings').select('value').eq('key', 'quote_active_day').single()
-            ]);
-            if (!rWeek.data || !rDay.data) return;
-            const quotes = JSON.parse(rWeek.data.value || '[]');
-            const idx = parseInt(rDay.data.value || '0');
-            const q = quotes[idx] || quotes[0];
-            if (!q || !q.text) return;
-            const dateStr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('quote-date').textContent = dateStr;
-            document.getElementById('quote-text').textContent = `" ${q.text} "`;
-            document.getElementById('quote-author').textContent = q.author ? `— ${q.author}` : '';
-            document.getElementById('quote-bloc').classList.add('zw-show');
-        } catch (e) {}
+  size(); if(CALM){ idx = 3; } else { seed(); go(); }
+  var t; addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(function(){ size(); seed(); }, 220); });
+  document.addEventListener('visibilitychange', function(){ document.hidden ? halt() : go(); });
+
+  return {
+    next: function(){ idx = (idx + 1) % MODES.length; halt(); seed(); go(); return MODES[idx]; },
+    name: function(){ return MODES[idx]; }
+  };
+})();
+
+(function(){
+  var btn = $('#fx-btn'), lb = $('#fx-lb'), ic = $('#fx-ic');
+  var LOOK = {
+    etwal : { t:'Etwal', d:'M12 2.5 14.6 9h6.9l-5.6 4.1 2.1 6.6-6-4.1-6 4.1 2.1-6.6L2.5 9h6.9L12 2.5Z' },
+    nej   : { t:'Nèj',   d:'M12 2v20M4.2 7l15.6 10M19.8 7 4.2 17M12 6.4 9.4 4M12 6.4 14.6 4M12 17.6 9.4 20M12 17.6 14.6 20' },
+    lapli : { t:'Lapli', d:'M7 16.5A4.5 4.5 0 0 1 7.6 7.6a5.6 5.6 0 0 1 10.6 1.6A3.8 3.8 0 0 1 17.6 16.5M8.5 19l-1 2.5M12.5 19l-1 2.5M16.5 19l-1 2.5' },
+    anyen : { t:'Anyen', d:'M4.2 4.2l15.6 15.6M12 2.5 14.6 9h6.9l-5.6 4.1 2.1 6.6-6-4.1-6 4.1 2.1-6.6L2.5 9h6.9L12 2.5Z' }
+  };
+  function paint(k){
+    ic.innerHTML = '<path d="' + LOOK[k].d + '"></path>';
+    lb.textContent = LOOK[k].t;
+  }
+  paint(FX.name());
+  btn.addEventListener('click', function(){ paint(FX.next()); });
+})();
+
+/* ══ 5. DONE REYÈL — Supabase ═════════════════════════════════ */
+var sb = null;
+try { sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey); }
+catch(e){ console.warn('Supabase:', e.message); }
+
+function haitiHour(){
+  var d = new Date();
+  return new Date(d.getTime() + d.getTimezoneOffset()*60000 - 5*3600000).getHours();
+}
+function greet(name){
+  var h = haitiHour();
+  var w = h < 12 ? 'Bonjou' : (h < 18 ? 'Bon aprèmidi' : 'Bonswa');
+  $('#hi').textContent = name ? (w + ', ' + String(name).split(' ')[0]) : w;
+}
+greet(null);
+
+async function storeStatus(){
+  var b = $('#badge'), t = $('#badge-t'), force = null;
+  if(sb){
+    try{
+      var r = await sb.from('site_settings').select('value').eq('key','store_force').single();
+      if(r.data && r.data.value && r.data.value !== 'null') force = r.data.value;
+    }catch(e){}
+  }
+  var h = haitiHour();
+  var open = force === 'open' ? true
+           : force === 'closed' ? false
+           : (h >= CONFIG.openHour && h < CONFIG.closeHour);
+  b.className = 'badge ' + (open ? 'open' : 'shut');
+  if(open){ t.textContent = 'Magazen nou yo ouvri'; }
+  else{
+    var left = h < CONFIG.openHour ? CONFIG.openHour - h : (24 - h) + CONFIG.openHour;
+    t.textContent = 'Magazen nou yo ap ouvri nan ' + left + 'h';
+  }
+}
+storeStatus();
+setInterval(storeStatus, 300000);
+
+/* Menm sitasyon ki nan site_settings.quote_week. Si baz la pa reponn,
+   paj la kontinye montre sitasyon jou a olye li rete vid. */
+var QUOTE_FALLBACK = [
+  {text:"Chak jou se yon nouvo chans.",        author:"Zetwal"},
+  {text:"Travay ak kè kontan.",                author:"Zetwal"},
+  {text:"Pasyans bay fòs.",                    author:"Zetwal"},
+  {text:"Ti pa ti pa, zwazo fè nich li.",      author:"Pwovèb"},
+  {text:"Kalite anvan kantite.",               author:"Zetwal"},
+  {text:"Chak kliyan konte.",                  author:"Zetwal"},
+  {text:"Repo se pati nan travay la.",         author:"Zetwal"}
+];
+var QUOTE_NOW = null;
+
+function paintQuote(q){
+  if(!q || !q.text) return;
+  QUOTE_NOW = q;
+  $('#q-txt').textContent = q.text;
+  $('#q-who').textContent = q.author ? '— ' + q.author : '';
+  $('#q-day').textContent = new Date().toLocaleDateString('fr-FR',
+    { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  var sec = $('#quote'); sec.classList.add('show');
+  if(!CALM && 'IntersectionObserver' in window){
+    var o = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); o.unobserve(e.target); } });
+    }, { threshold:.2 });
+    o.observe(sec);
+  } else sec.classList.add('in');
+}
+
+async function dailyQuote(){
+  paintQuote(QUOTE_FALLBACK[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]);
+  if(!sb) return;
+  try{
+    var r = await Promise.all([
+      sb.from('site_settings').select('value').eq('key','quote_week').single(),
+      sb.from('site_settings').select('value').eq('key','quote_active_day').single()
+    ]);
+    if(!r[0].data || !r[1].data) return;
+    var list = JSON.parse(r[0].data.value || '[]');
+    var q = list[parseInt(r[1].data.value || '0', 10)] || list[0];
+    paintQuote(q);
+  }catch(e){}
+}
+dailyQuote();
+
+/* ══ 6. KONT ITILIZATÈ — Firebase ═════════════════════════════
+   Konekte ak imel/modpas oswa ak Google.
+   Apre koneksyon : non an ak kantite pwen yo parèt nan bar anwo a,
+   nan kat kont lan, ak nan meni telefòn nan.
+   ═══════════════════════════════════════════════════════════ */
+var auth = null, fs = null, unsubPts = null;
+try{
+  if(window.firebase && firebase.apps && firebase.apps.length === 0) firebase.initializeApp(CONFIG.firebase);
+  auth = firebase.auth(); fs = firebase.firestore();
+}catch(e){ console.warn('Firebase:', e.message); }
+
+var acct = $('#acct'), mask = $('#mask'), errBox = $('#m-err'), goBtn = $('#m-go');
+var MODE = 'in';   // 'in' = konekte · 'up' = kreye kont
+
+function msg(txt, ok){
+  errBox.textContent = txt;
+  errBox.className = 'err show' + (ok ? ' ok' : '');
+}
+function clearMsg(){ errBox.className = 'err'; errBox.textContent = ''; }
+function busy(on, label){
+  goBtn.disabled = on;
+  goBtn.innerHTML = on ? '<span class="spin"></span> Tann yon ti moman…' : label;
+}
+var ERRORS = {
+  'auth/invalid-email'        : "Imel sa a pa gen bon fòm lan.",
+  'auth/user-not-found'       : "Nou pa jwenn okenn kont ak imel sa. Kreye youn.",
+  'auth/wrong-password'       : "Modpas la pa bon. Eseye ankò.",
+  'auth/invalid-credential'   : "Imel oswa modpas la pa bon.",
+  'auth/email-already-in-use' : "Gen yon kont ki deja itilize imel sa. Konekte pito.",
+  'auth/weak-password'        : "Modpas la twò kout — mete omwen 6 karaktè.",
+  'auth/missing-password'     : "Antre modpas ou.",
+  'auth/too-many-requests'    : "Twòp eseye. Tann yon ti moman anvan w reeseye.",
+  'auth/popup-closed-by-user' : "Ou fèmen fenèt Google la anvan li fini.",
+  'auth/popup-blocked'        : "Navigatè a bloke fenèt la. Otorize l epi eseye ankò.",
+  'auth/network-request-failed': "Koneksyon entènèt la pa bon. Verifye epi eseye ankò.",
+  'auth/operation-not-allowed': "Metòd koneksyon sa poko aktive nan Firebase."
+};
+function say(e){ return ERRORS[e && e.code] || (e && e.message) || "Yon bagay pa mache. Eseye ankò."; }
+
+/* ── Louvri / fèmen modal la ── */
+function openAuth(){
+  clearMsg(); mask.classList.add('open'); document.body.classList.add('lock');
+  setTimeout(function(){ $('#m-mail').focus(); }, 260);
+}
+function shutAuth(){ mask.classList.remove('open'); document.body.classList.remove('lock'); }
+$('#login-btn').addEventListener('click', openAuth);
+$('#dr-login').addEventListener('click', function(){
+  $('#drawer').classList.remove('open'); $('#burger').classList.remove('x');
+  openAuth();
+});
+$('#m-x').addEventListener('click', shutAuth);
+mask.addEventListener('click', function(e){ if(e.target === mask) shutAuth(); });
+addEventListener('keydown', function(e){ if(e.key === 'Escape') shutAuth(); });
+
+/* ── Chanje ant « Konekte » ak « Kreye kont » ── */
+$$('.tabs button').forEach(function(b){
+  b.addEventListener('click', function(){
+    $$('.tabs button').forEach(function(o){ o.classList.remove('on'); });
+    b.classList.add('on');
+    MODE = b.getAttribute('data-tab');
+    var up = MODE === 'up';
+    $('#f-name').style.display = up ? '' : 'none';
+    $('#m-ttl').textContent    = up ? 'Kreye kont ou' : 'Byenveni';
+    $('#m-lead').textContent   = up ? 'Kreye yon kont pou w kòmanse ranmase pwen.'
+                                    : 'Konekte pou w wè pwen ou yo.';
+    $('#m-pass').setAttribute('autocomplete', up ? 'new-password' : 'current-password');
+    $('#m-note').style.display = up ? 'none' : '';
+    goBtn.textContent = up ? 'Kreye kont mwen' : 'Konekte';
+    clearMsg();
+  });
+});
+$('#m-eye').addEventListener('click', function(){
+  var f = $('#m-pass');
+  f.type = f.type === 'password' ? 'text' : 'password';
+  f.focus();
+});
+
+/* ── Imel + modpas ── */
+async function submitAuth(){
+  if(!auth){ msg("Koneksyon endisponib pou kounye a."); return; }
+  var mail = $('#m-mail').value.trim(),
+      pass = $('#m-pass').value,
+      name = $('#m-name').value.trim();
+  if(!mail){ msg("Antre imel ou."); $('#m-mail').focus(); return; }
+  if(!pass){ msg("Antre modpas ou."); $('#m-pass').focus(); return; }
+  if(MODE === 'up' && !name){ msg("Antre non ou."); $('#m-name').focus(); return; }
+
+  clearMsg();
+  var label = MODE === 'up' ? 'Kreye kont mwen' : 'Konekte';
+  busy(true, label);
+  try{
+    if(MODE === 'up'){
+      var cred = await auth.createUserWithEmailAndPassword(mail, pass);
+      if(cred.user && name) await cred.user.updateProfile({ displayName: name });
+      await seedUser(cred.user, name);
+    } else {
+      await auth.signInWithEmailAndPassword(mail, pass);
     }
-    loadDailyQuote();
+    busy(false, label);
+    shutAuth();
+  }catch(e){
+    busy(false, label);
+    msg(say(e));
+  }
+}
+goBtn.addEventListener('click', submitAuth);
+['m-mail','m-pass','m-name'].forEach(function(id){
+  $('#' + id).addEventListener('keydown', function(e){ if(e.key === 'Enter') submitAuth(); });
+});
 
-    /* ═════════ 3. Animasyon antre ═════════ */
-    (function(){
-        const items = document.querySelectorAll('.zw-up');
-        if (!('IntersectionObserver' in window)) { items.forEach(el => el.classList.add('zw-in')); return; }
-        const io = new IntersectionObserver((entries) => {
-            entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('zw-in'); io.unobserve(en.target); } });
-        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-        items.forEach(el => io.observe(el));
-        // filè sekirite : anyen pa dwe rete envizib
-        setTimeout(() => items.forEach(el => el.classList.add('zw-in')), 2600);
-    })();
+/* ── Google ── */
+$('#m-google').addEventListener('click', async function(){
+  if(!auth) return;
+  clearMsg();
+  try{
+    var r = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    await seedUser(r.user, r.user && r.user.displayName);
+    shutAuth();
+  }catch(e){ msg(say(e)); }
+});
 
-    /* ═════════ 4. Syèl etwal — kanva lejè, san imaj ═════════ */
-    (function(){
-        const cv = document.getElementById('zw-sky');
-        if (!cv || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const ctx = cv.getContext('2d');
-        let W = 0, H = 0, stars = [], raf = null, dpr = Math.min(devicePixelRatio || 1, 2);
+/* ── Modpas bliye ── */
+$('#m-forgot').addEventListener('click', async function(){
+  var mail = $('#m-mail').value.trim();
+  if(!mail){ msg("Antre imel ou anvan, epi klike ankò."); $('#m-mail').focus(); return; }
+  try{
+    await auth.sendPasswordResetEmail(mail);
+    msg("Nou voye yon lyen nan " + mail + " pou w chanje modpas ou.", true);
+  }catch(e){ msg(say(e)); }
+});
 
-        function build() {
-            W = cv.width = innerWidth * dpr;
-            H = cv.height = innerHeight * dpr;
-            cv.style.width = innerWidth + 'px';
-            cv.style.height = innerHeight + 'px';
-            const n = innerWidth < 700 ? 42 : 78;
-            stars = Array.from({ length: n }, () => ({
-                x: Math.random() * W, y: Math.random() * H,
-                r: (Math.random() * 1.1 + 0.35) * dpr,
-                a: Math.random(), sp: Math.random() * 0.012 + 0.004,
-                big: Math.random() > 0.88
-            }));
-        }
-        function frame() {
-            ctx.clearRect(0, 0, W, H);
-            for (const s of stars) {
-                s.a += s.sp;
-                const o = (Math.sin(s.a) * 0.5 + 0.5) * (s.big ? 0.85 : 0.5);
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(212,175,55,' + o.toFixed(3) + ')';
-                if (s.big) { ctx.shadowBlur = 8 * dpr; ctx.shadowColor = 'rgba(212,175,55,.55)'; }
-                else ctx.shadowBlur = 0;
-                ctx.fill();
-            }
-            ctx.shadowBlur = 0;
-            raf = requestAnimationFrame(frame);
-        }
-        function start() { if (!raf) frame(); }
-        function stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+/* ── Kreye fich itilizatè a (pwen kòmanse a 0) ── */
+async function seedUser(user, name){
+  if(!fs || !user) return;
+  try{
+    var ref = fs.collection('users').doc(user.uid);
+    var snap = await ref.get();
+    if(!snap.exists){
+      await ref.set({
+        name  : name || user.displayName || '',
+        email : user.email || '',
+        points: 0,
+        createdAt: new Date().toISOString()
+      }, { merge:true });
+    }
+  }catch(e){ console.warn('users doc:', e.message); }
+}
 
-        build(); start();
-        let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => { build(); }, 200); });
-        document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
-    })();
-    </script>
+/* ── Montre / kache kat kont lan ── */
+$('#who-btn').addEventListener('click', function(e){
+  e.stopPropagation();
+  var open = acct.classList.toggle('open');
+  $('#who-btn').setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', function(e){
+  if(!acct.contains(e.target) && !$('#who-btn').contains(e.target)) acct.classList.remove('open');
+});
+function signOut(){
+  if(auth) auth.signOut();
+  acct.classList.remove('open');
+  $('#drawer').classList.remove('open'); $('#burger').classList.remove('x');
+  document.body.classList.remove('lock');
+}
+$('#a-out').addEventListener('click', signOut);
+$('#dr-out').addEventListener('click', signOut);
+
+/* ── Pwen yo : konte an montan ── */
+function countTo(el, to){
+  var from = parseFloat(el.textContent) || 0;
+  if(CALM || from === to){ el.textContent = to.toFixed(1); return; }
+  var t0 = performance.now();
+  (function step(t){
+    var k = Math.min((t - t0) / 620, 1);
+    el.textContent = (from + (to - from) * (1 - Math.pow(1 - k, 3))).toFixed(1);
+    if(k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+function setPoints(n){
+  countTo($('#a-pt'), n);
+  countTo($('#dr-pt'), n);
+  var w = $('#who-pt');
+  w.innerHTML = n.toFixed(1) + '<s>pwen</s>';
+}
+function initial(s){ return (s || 'Z').trim().charAt(0).toUpperCase() || 'Z'; }
+
+/* ── Chak fwa eta koneksyon an chanje ── */
+if(auth) auth.onAuthStateChanged(async function(user){
+  if(unsubPts){ unsubPts(); unsubPts = null; }
+
+  if(!user){
+    $('#login-btn').style.display = '';
+    $('#who-btn').style.display   = 'none';
+    $('#dr-login').style.display  = '';
+    $('#dr-who').style.display    = 'none';
+    $('#dr-out').style.display    = 'none';
+    $('#dr-admin').style.display  = 'none';
+    $('#a-admin').style.display   = 'none';
+    acct.classList.remove('open');
+    greet(null);
+    return;
+  }
+
+  var name = user.displayName || user.email || user.phoneNumber || 'Itilizatè';
+  var first = String(name).split(' ')[0];
+
+  $('#login-btn').style.display = 'none';
+  $('#who-btn').style.display   = '';
+  $('#dr-login').style.display  = 'none';
+  $('#dr-who').style.display    = 'flex';
+  $('#dr-out').style.display    = '';
+
+  $('#who-nm').textContent = first;
+  $('#who-av').textContent = initial(name);
+  $('#a-av').textContent   = initial(name);
+  $('#dr-av').textContent  = initial(name);
+  $('#a-nm').textContent   = name;
+  $('#dr-nm').textContent  = first;
+  $('#a-ml').textContent   = user.email || user.phoneNumber || '';
+  greet(name);
+
+  await seedUser(user, name);
+
+  /* pwen an dirèk depi Firestore */
+  if(fs){
+    unsubPts = fs.collection('users').doc(user.uid).onSnapshot(function(doc){
+      var pts = doc.exists ? (doc.data().points || 0) : 0;
+      setPoints(Number(pts) || 0);
+    }, function(){ setPoints(0); });
+  }
+
+  /* statit : Admin · Kliyan · Itilizatè */
+  var status = 'Itilizatè';
+  if(user.email && CONFIG.admins.indexOf(user.email.toLowerCase()) !== -1){
+    status = 'Admin';
+    $('#a-admin').style.display  = '';
+    $('#dr-admin').style.display = '';
+  } else if(sb){
+    try{
+      var a = await sb.from('sales').select('id').eq('client_email', user.email).limit(1);
+      var b = await sb.from('wash_records').select('id').eq('customer_name', name).limit(1);
+      if((a.data && a.data.length) || (b.data && b.data.length)) status = 'Kliyan';
+    }catch(e){}
+  }
+  $('#a-st').textContent  = status;
+  $('#dr-st').textContent = status;
+});
+
+/* ══ 7. ASISTAN PAJ AKÈY ══════════════════════════════════════
+   Repons yo ekri davans epi yo pran done reyèl paj la.
+   Si kesyon an pa gen rapò ak paj sa, li di sa avèk dousè.
+   ═══════════════════════════════════════════════════════════ */
+var KB = [
+  { k:['sevis','sevis','kisa','ofri','mond','kat','sant'],
+    a:function(){ return "Zetwal gen kat sèvis :\n\n• <b>Lavri Zetwal</b> — lave rad ou nan mwens pase 24h.\n• <b>Shop Zetwal</b> — pwodwi lokal ak entènasyonal, livrezon rapid.\n• <b>Zetwal Mall</b> — premye mall futuriste nan peyi a, 4 etaj.\n• <b>Jwèt Zetwal</b> — jwe epi genyen pwen.\n\nKlike sou kat ki nan seksyon « Kat mond, yon sèl zetwal » la."; } },
+
+  { k:['le','lè','ouvri','fenmen','ferme','ore','ouve','ouvè','orè','magazen'],
+    a:function(){
+      var t = $('#badge-t').textContent;
+      return t + ".\n\nOrè nòmal la se <b>8:00 nan maten rive 8:00 nan aswè</b>, sou lè Ayiti. Administratè a ka fòse magazen an ouvri oswa fèmen depi konsòl la."; } },
+
+  { k:['kontak','kontakte','whatsapp','telegram','telefon','nimewo','ekri','rele','adres','kote','ye'],
+    a:function(){ return "Ou ka jwenn nou konsa :\n\n• <b>WhatsApp</b> : +7 996 110 35 06\n• <b>Telegram</b> : @MikeNestor14\n• <b>Adrès</b> : 5, 3ème Imp, Ruelle Yamoul\n\nSeksyon « Kontak » anba paj la gen tout lyen yo."; } },
+
+  { k:['lavri','lave','rad','blanchisri','pwopte','24h','sechaj','pliyaj'],
+    a:function(){ return "<b>Lavri Zetwal</b> lave rad ou ak teknoloji ekolojik, nan mwens pase 24h.\n\nPou tarif yo ak kalkilatè a, ale nan paj Lavri a — se kat <b>01</b> la."; } },
+
+  { k:['shop','achte','pwodwi','livrezon','komande','kòmande','magazen','pri'],
+    a:function(){ return "<b>Shop Zetwal</b> gen yon seleksyon pwodwi lokal ak entènasyonal, ak livrezon ultra-rapid.\n\nAle nan kat <b>02</b> la pou w wè tout katalòg la epi pase yon kòmand."; } },
+
+  { k:['mall','etaj','byennet','byennèt','komes','komès'],
+    a:function(){ return "<b>Zetwal Mall</b> se premye mall futuriste nan peyi a. Li gen <b>4 etaj</b>, soti nan komès rive nan byennèt.\n\nKat <b>03</b> la mennen w la."; } },
+
+  { k:['jwet','jwèt','jwe','pwen','duel','mental','amize','pwen'],
+    a:function(){ return "<b>Jwèt Zetwal</b> se kote w jwe epi w genyen pwen — Duel Mental ak lòt jwèt entèaktif.\n\nPwen ou yo parèt nan kont ou, anwo adwat, lè w konekte. Kat <b>04</b> la mennen w nan jwèt yo."; } },
+
+  { k:['konekte','kont','login','enskri','pwen mwen','dekonekte','google'],
+    a:function(){ return "Klike sou bouton <b>Konekte</b> anwo adwat la — sou telefòn li nan meni an.\n\nOu ka konekte ak <b>imel ak modpas</b>, oswa ak <b>Google</b>. Si w poko gen kont, chwazi « Kreye kont ».\n\nLè w konekte, <b>non w</b> ak <b>kantite pwen ou</b> parèt dirèkteman anwo adwat la."; } },
+
+  { k:['admin','administrasyon','administrate','konsol','konsòl','jere'],
+    a:function(){ return "Konsòl administrasyon an rezève pou administratè yo sèlman.\n\nSi ou se yon administratè, konekte ak imel ou : lyen <b>Aksè Administrasyon</b> an ap parèt nan kat kont lan, anwo adwat. Se depi la yo chanje statit magazen an ak sitasyon jou a."; } },
+
+  { k:['sitasyon','sitasyon jodi','pawol','pawòl','quote','jodi'],
+    a:function(){
+      if(QUOTE_NOW) return "Sitasyon jodi a se :\n\n<b>« " + QUOTE_NOW.text + " »</b>" + (QUOTE_NOW.author ? "\n— " + QUOTE_NOW.author : "") + "\n\nSe administratè a ki chwazi l chak semèn depi konsòl la.";
+      return "Sitasyon an ap chaje. Li parèt pi ba nan paj la, anba seksyon sèvis yo."; } },
+
+  { k:['anbyans','efe','nej','nèj','lapli','etwal','bouton','fon','animasyon'],
+    a:function(){ return "Bouton anba adwat la chanje anbyans paj la : <b>Etwal</b>, <b>Nèj</b>, <b>Lapli</b>, oswa <b>Anyen</b>.\n\nKlike sou li otan fwa ou vle. Si telefòn ou mande mwens mouvman, nou koupe tout animasyon otomatikman."; } },
+
+  { k:['zetwal','ki moun','konpayi','organisation','oganizasyon','nou ye'],
+    a:function(){ return "<b>ZETWAL ORGANISATION</b> se yon òganizasyon ayisyen : lavri, boutik, mall ak jwèt, tout anba yon sèl non.\n\nDeviz la se senp — inovasyon ak ekselans."; } }
+];
+
+var SUGG = ["Ki sèvis nou genyen ?","Ki lè magazen an ouvri ?","Kijan pou m kontakte nou ?","Kisa sitasyon jodi a ye ?"];
+
+function norm(t){
+  return (t||'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s]/g,' ');
+}
+var KW_W = (function(){
+  var f = {}, w = {};
+  KB.forEach(function(e){ e.k.forEach(function(k){ f[k] = (f[k]||0) + 1; }); });
+  Object.keys(f).forEach(function(k){ w[k] = 1 / f[k]; });
+  return w;
+})();
+function answer(q){
+  var t = ' ' + norm(q) + ' ', best = null, bs = 0;
+  KB.forEach(function(e){
+    var sc = 0;
+    e.k.forEach(function(k){ if(t.indexOf(norm(k)) !== -1) sc += (KW_W[k] || 1); });
+    if(sc > bs){ bs = sc; best = e; }
+  });
+  if(best && bs >= 0.25) return best.a();
+  return "Padon — mwen konnen sèlman sa ki sou paj akèy Zetwal la, kidonk mwen p ap eseye reponn sa pou m pa ba w yon move enfòmasyon.\n\nMen sa mwen ka esplike w :\n• Sèvis nou yo\n• Lè magazen an ouvri\n• Kijan pou w kontakte nou\n• Kijan pou w konekte ak genyen pwen";
+}
+
+(function(){
+  var pan = $('#panel'), veil = $('#veil'), body = $('#p-body'), chips = $('#p-chips'), inp = $('#p-in');
+  var started = false;
+
+  function bubble(txt, who){
+    var d = document.createElement('div');
+    d.className = 'msg ' + who;
+    if(who === 'ai') d.innerHTML = txt; else d.textContent = txt;
+    body.appendChild(d);
+    body.scrollTop = body.scrollHeight;
+  }
+  function ask(q){
+    q = (q || '').trim(); if(!q) return;
+    bubble(q, 'me');
+    inp.value = '';
+    setTimeout(function(){ bubble(answer(q), 'ai'); }, 240);
+  }
+  function open(){
+    pan.classList.add('open'); veil.classList.add('open');
+    pan.setAttribute('aria-hidden','false');
+    if(!started){
+      started = true;
+      bubble("Bonjou ! Mwen se asistan paj akèy Zetwal la. Mwen ka reponn kesyon sou sèvis nou yo, orè magazen an, kontak, kont ou ak pwen ou yo.\n\nKisa ou vle konnen ?", 'ai');
+      SUGG.forEach(function(q){
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = q;
+        b.addEventListener('click', function(){ ask(q); });
+        chips.appendChild(b);
+      });
+    }
+    setTimeout(function(){ inp.focus(); }, 320);
+  }
+  function shut(){
+    pan.classList.remove('open'); veil.classList.remove('open');
+    pan.setAttribute('aria-hidden','true');
+  }
+  $('#ai-btn').addEventListener('click', open);
+  $('#p-x').addEventListener('click', shut);
+  veil.addEventListener('click', shut);
+  $('#p-go').addEventListener('click', function(){ ask(inp.value); });
+  inp.addEventListener('keydown', function(e){ if(e.key === 'Enter') ask(inp.value); });
+  addEventListener('keydown', function(e){ if(e.key === 'Escape') shut(); });
+})();
+
+})();
+</script>
 </body>
 </html>
