@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <style>
 /* ════════════════════════════════════════════════════════════════
@@ -231,11 +232,33 @@ var NAME = P.get('name') || 'Jwè';
 $('#nm').textContent = String(NAME).split(' ')[0];
 $('#av').textContent = (String(NAME).trim().charAt(0) || 'J').toUpperCase();
 
-var db = null;
+var db = null, fbAuth = null;
 try{
   if(window.firebase && firebase.apps && firebase.apps.length === 0) firebase.initializeApp(CONFIG.firebase);
+  fbAuth = firebase.auth();
   db = firebase.firestore();
-}catch(e){ console.warn('Firestore:', e.message); }
+}catch(e){ console.warn('Firebase:', e.message); }
+
+/* La session Firebase se partage entre les onglets du même site.
+   Sans elle, Firestore refuse toute écriture : c'est elle qui prouve
+   que les points modifiés sont bien ceux du joueur connecté. */
+var AUTH_UID = null, authReady = false, waiters = [];
+function whenAuth(){
+  return new Promise(function(res){
+    if(authReady) return res(AUTH_UID);
+    waiters.push(res);
+  });
+}
+if(fbAuth){
+  fbAuth.onAuthStateChanged(function(u){
+    AUTH_UID = u ? u.uid : null;
+    authReady = true;
+    waiters.splice(0).forEach(function(f){ f(AUTH_UID); });
+    if(!AUTH_UID) toast('Ou pa konekte — pwen yo p ap konte. Retounen nan hub la.');
+    else if(UID && UID !== AUTH_UID) UID = AUTH_UID;
+    if(AUTH_UID){ UID = AUTH_UID; loadBest(); }
+  });
+} else { authReady = true; }
 
 function toast(t){
   var el = $('#toast'); el.textContent = t; el.classList.add('on');
@@ -430,24 +453,27 @@ async function over(why){
 }
 
 async function saveRun(gained, sc, record){
-  if(!db || !UID){
-    $('#end-note').textContent = 'Nou pa ka anrejistre : ouvri jwèt la depi hub la pandan w konekte.';
+  if(!db){ $('#end-note').textContent = 'Koneksyon an pa disponib.'; return; }
+  var uid = await whenAuth();
+  if(!uid){
+    $('#end-note').textContent = 'Pwen yo pa konte : ou pa konekte. Retounen nan hub la epi konekte anvan w jwe.';
     return;
   }
+  UID = uid;
   if(saving) return; saving = true;
   try{
-    await db.collection('users').doc(UID)
+    await db.collection('users').doc(uid)
       .set({ points: firebase.firestore.FieldValue.increment(gained) }, { merge:true });
   }catch(e){
-    $('#end-note').textContent = "Pwen yo pa antre — verifye règ Firestore yo.";
+    $('#end-note').textContent = 'Pwen yo pa antre — ' + (e.message || 'erè Firestore') ;
     saving = false; return;
   }
   try{
-    var ref = db.collection('leaderboards').doc(CONFIG.gameId + '_' + UID);
+    var ref = db.collection('leaderboards').doc(CONFIG.gameId + '_' + uid);
     var snap = await ref.get();
     var prev = snap.exists ? (snap.data().score || 0) : 0;
     if(sc > prev){
-      await ref.set({ gameId:CONFIG.gameId, uid:UID, username:NAME,
+      await ref.set({ gameId:CONFIG.gameId, uid:uid, username:NAME,
         score:sc, updatedAt:new Date().toISOString() }, { merge:true });
     }
     if(sc > prev && !record){ best = Math.max(best, prev); }
@@ -458,13 +484,14 @@ async function saveRun(gained, sc, record){
 }
 
 /* Pi bon nòt anvan an */
-(async function(){
+async function loadBest(){
   if(!db || !UID) return;
   try{
     var snap = await db.collection('leaderboards').doc(CONFIG.gameId + '_' + UID).get();
     if(snap.exists){ best = snap.data().score || 0; $('#best').textContent = best; }
   }catch(e){}
-})();
+}
+loadBest();
 
 /* ══ 5. KONTWÒL ═══════════════════════════════════════════════ */
 var DIRS = { U:{x:0,y:-1}, D:{x:0,y:1}, L:{x:-1,y:0}, R:{x:1,y:0} };
@@ -504,7 +531,7 @@ document.addEventListener('visibilitychange', function(){ if(document.hidden) to
 
 /* ══ 6. DEPA ══════════════════════════════════════════════════ */
 reset(); fit();
-if(!UID) toast('Ouvri jwèt la depi hub la pou pwen ou yo konte.');
+if(!UID && authReady && !AUTH_UID) toast('Ouvri jwèt la depi hub la pou pwen ou yo konte.');
 
 })();
 </script>
