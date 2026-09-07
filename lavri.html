@@ -293,6 +293,22 @@ a{color:inherit;text-decoration:none}
 .m-go svg{width:14px;height:14px;fill:currentColor}
 @media(hover:none){.mach.free .m-go{opacity:1;transform:none}}
 
+/* Magazen fèmen */
+.shut{display:none;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;text-align:center;
+  padding:26px 24px;border-radius:6px;border:1px solid rgba(255,107,107,.22);
+  background:linear-gradient(168deg,rgba(255,107,107,.07),rgba(255,255,255,.014))}
+.shut.on{display:flex}
+.shut .ic{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,107,107,.28);
+  display:grid;place-items:center;flex-shrink:0}
+.shut .ic svg{width:20px;height:20px;stroke:var(--bad);stroke-width:1.4;fill:none;stroke-linecap:round}
+.shut-t{font-family:var(--serif);font-size:1.45rem;font-weight:600;color:var(--ink)}
+.shut-d{font-size:.82rem;color:var(--ink-3);margin-top:4px}
+.hero-shut{display:none;align-items:center;gap:9px;margin-top:40px;padding:9px 20px;border-radius:99px;
+  font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--bad);border:1px solid rgba(255,107,107,.24);background:rgba(255,107,107,.06)}
+.hero-shut.on{display:inline-flex}
+.hero-shut i{width:7px;height:7px;border-radius:50%;background:var(--bad);flex-shrink:0}
+
 /* ══ TARIF ════════════════════════════════════════════════════ */
 .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
 .plan{position:relative;display:flex;flex-direction:column;padding:34px 28px 28px;border-radius:6px;
@@ -302,6 +318,14 @@ a{color:inherit;text-decoration:none}
 .plan.best{border-color:var(--g-24);background:linear-gradient(168deg,rgba(212,175,55,.08),rgba(255,255,255,.02))}
 .plan.best::before{content:'';position:absolute;inset:0;border-radius:6px;pointer-events:none;
   box-shadow:inset 0 0 60px rgba(212,175,55,.07)}
+.p-shot{position:absolute;inset:0;z-index:-1;opacity:0;background-size:cover;background-position:center;
+  transform:scale(1.06);transition:opacity 900ms cubic-bezier(.19,1,.22,1),transform 1.4s cubic-bezier(.19,1,.22,1)}
+.p-shot.on{opacity:1;transform:none}
+.p-shot::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(178deg,rgba(5,5,5,.50) 0%,rgba(5,5,5,.72) 40%,rgba(5,5,5,.95) 100%)}
+.plan.pic{border-color:rgba(255,255,255,.14)}
+.plan.pic:hover .p-shot{transform:scale(1.05)}
+.plan.pic .p-name,.plan.pic .p-price{text-shadow:0 2px 18px rgba(0,0,0,.6)}
 .p-flag{position:absolute;top:16px;right:16px;font-size:.5rem;font-weight:700;letter-spacing:1.6px;
   text-transform:uppercase;color:#0A0A0A;background:var(--gold);padding:4px 10px;border-radius:99px}
 .p-lab{font-size:.55rem;letter-spacing:2.6px;text-transform:uppercase;color:var(--ink-4);margin-bottom:10px}
@@ -505,6 +529,15 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(10,10,10,.28);border-top-color:#0A0A0A;
   animation:sp .7s linear infinite;display:inline-block}
 @keyframes sp{to{transform:rotate(360deg)}}
+.pq-ic{width:54px;height:54px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;
+  font-family:var(--serif);font-size:1.6rem;font-weight:700;border:1px solid var(--g-24);background:var(--g-08);color:var(--gold)}
+.pq-ic.pos{color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.07)}
+.pq-ic.neg{color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.07)}
+.pq-why{font-size:.78rem;color:var(--ink-3);text-align:center;margin-bottom:18px;line-height:1.6}
+.pq-code{padding:16px;border-radius:10px;text-align:center;border:1px dashed var(--g-24);background:rgba(255,255,255,.03)}
+.pq-code span{font-family:var(--sans);font-size:1.8rem;font-weight:700;letter-spacing:.34em;color:var(--gold);
+  padding-left:.34em}
+.pq-help{font-size:.68rem;color:var(--ink-4);text-align:center;margin:14px 0 18px;line-height:1.65}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,90px);z-index:1030;display:flex;
   align-items:center;gap:10px;padding:13px 20px;border-radius:99px;background:rgba(12,12,12,.96);
   border:1px solid var(--g-24);font-size:.76rem;opacity:0;pointer-events:none;
@@ -668,6 +701,8 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       <span class="live-k">Machin<br>an tout</span></div>
   </div>
 
+  <div class="hero-shut" id="hero-shut"><i></i><span id="hero-shut-t">Magazen an fèmen</span></div>
+
   <a href="#machin" class="cue" aria-label="Wè machin yo"><span>Machin yo</span><i></i></a>
 </header>
 
@@ -683,6 +718,12 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
         <div class="draw" style="--w:120px;margin-top:16px"></div>
       </div>
       <div class="count up d2" id="mach-updated">—</div>
+    </div>
+    <div class="shut" id="shut">
+      <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg></span>
+      <div><div class="shut-t" id="shut-t">Magazen nou yo fèmen kounye a</div>
+        <div class="shut-d" id="shut-d">Nou louvri chak jou 8:00 nan maten rive 8:00 nan aswè. Ekri nou sou WhatsApp, n ap reponn ou.</div></div>
+      <a class="btn btn-wa" href="https://wa.me/79961103506" target="_blank" rel="noopener" style="flex:0 0 auto">Ekri nou</a>
     </div>
     <div class="mgrid" id="mgrid"></div>
     <p class="up d3" style="margin-top:22px;font-size:.73rem;color:var(--ink-4);text-align:center">
@@ -846,6 +887,21 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <b id="fx-lb">Bibit</b>
     <span class="dk-tip">Anbyans</span>
   </button>
+</div>
+
+<div class="mask" id="pmask" role="dialog" aria-modal="true" aria-labelledby="pq-ttl">
+  <div class="box">
+    <button class="p-x" id="pq-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="pq-ic" id="pq-ic" aria-hidden="true"></div>
+    <h3 id="pq-ttl">Demann pwen</h3>
+    <p class="lead" id="pq-lead">—</p>
+    <div class="pq-why" id="pq-why"></div>
+    <div class="pq-code"><span id="pq-code">——————</span></div>
+    <p class="pq-help">Bay administratè a kòd sa a pou l ka fè chanjman an. Li valab pou 30 minit.<br>
+      Ou resevwa menm kòd la pa imel tou.</p>
+    <button class="btn btn-g" id="pq-ok" type="button">Mwen bay kòd la</button>
+    <button class="gbtn" id="pq-no" type="button" style="margin-top:9px">Se pa mwen — refize</button>
+  </div>
 </div>
 
 <div class="mask" id="mask" role="dialog" aria-modal="true" aria-labelledby="m-ttl">
@@ -1145,7 +1201,11 @@ async function applyMedia(){
     var m = map[el.getAttribute('data-media')]; if(!m) return;
     if(el.tagName === 'IMG'){ el.src = m.url; if(m.alt) el.alt = m.alt; return; }
     var img = new Image();
-    img.onload = function(){ el.style.backgroundImage='url("'+m.url+'")'; el.classList.add('on'); };
+    img.onload = function(){
+      el.style.backgroundImage = 'url("' + m.url + '")';
+      el.classList.add('on');
+      var pl = el.closest('.plan'); if(pl) pl.classList.add('pic');
+    };
     img.src = m.url;
   });
 }
@@ -1168,6 +1228,7 @@ async function loadPrices(){
 function renderPlans(){
   $('#plans').innerHTML = PRICES.plans.map(function(p,i){
     return '<div class="plan up d'+(i+1)+(p.best?' best':'')+'">'
+      + '<span class="p-shot" data-media="lavri.plan.'+esc(p.id)+'" aria-hidden="true"></span>'
       + (p.best ? '<span class="p-flag">Pi chwazi</span>' : '')
       + '<div class="p-lab">'+esc(p.lab||'')+'</div>'
       + '<div class="p-name">'+esc(p.name)+'</div>'
@@ -1182,6 +1243,7 @@ function renderPlans(){
       + '</div>';
   }).join('');
   $$('#plans .plan').forEach(watch);
+  applyMedia();                       /* foto kat tarif yo, si admin lan mete youn */
   $$('#plans [data-plan]').forEach(function(b){
     b.addEventListener('click', function(){
       var p = PRICES.plans.filter(function(x){ return x.id === b.getAttribute('data-plan'); })[0];
@@ -1311,8 +1373,69 @@ $('#print-btn').addEventListener('click', function(){ window.print(); });
 
 /* ══ 8. MACHIN YO — done reyèl, an dirèk ══════════════════════ */
 var machines = [], ticker = null;
+var STORE = { open:true, force:null, openH:8, closeH:20 };
+var LAVRI = { mode:'auto', busy:7 };
+
+function haitiHour(){
+  var d = new Date();
+  return new Date(d.getTime() + d.getTimezoneOffset()*60000 - 5*3600000).getHours();
+}
+async function loadStore(){
+  if(sb){
+    try{
+      var r = await sb.from('site_settings').select('key,value').in('key',['store_force','lavri_mode','lavri_auto_busy']);
+      (r.data||[]).forEach(function(row){
+        if(row.key === 'store_force' && row.value && row.value !== 'null') STORE.force = row.value;
+        if(row.key === 'lavri_mode' && row.value) LAVRI.mode = row.value;
+        if(row.key === 'lavri_auto_busy' && row.value !== null) LAVRI.busy = parseInt(row.value,10) || 0;
+      });
+    }catch(e){}
+  }
+  var h = haitiHour();
+  STORE.open = STORE.force === 'open' ? true
+             : STORE.force === 'closed' ? false
+             : (h >= STORE.openH && h < STORE.closeH);
+  paintStore();
+}
+function paintStore(){
+  var closed = !STORE.open;
+  $('#shut').classList.toggle('on', closed);
+  $('#hero-shut').classList.toggle('on', closed);
+  if(closed){
+    var h = haitiHour();
+    var left = h < STORE.openH ? STORE.openH - h : (24 - h) + STORE.openH;
+    $('#hero-shut-t').textContent = 'Magazen an fèmen — n ap louvri nan ' + left + 'h';
+    $('#shut-d').textContent = 'Nou louvri chak jou ' + STORE.openH + ':00 nan maten rive '
+      + (STORE.closeH - 12) + ':00 nan aswè. Ekri nou sou WhatsApp, n ap reponn ou.';
+  }
+}
+
+/* Mòd otomatik : lè magazen an ouvri, se sistèm nan ki fè sikl yo vire.
+   Menm rezilta pou tout moun — li kalkile sou lè a, li pa okazan.
+   Nan mòd manyèl, se sa admin lan mete nan tab la ki parèt. */
+function autoMachines(){
+  var base = machines.length ? machines : [];
+  if(!base.length) return [];
+  if(!STORE.open){
+    return base.map(function(m){ return { code:m.code, name:m.name, status:'closed', position:m.position }; });
+  }
+  var busyWanted = Math.max(0, Math.min(LAVRI.busy, base.length));
+  var now = Date.now(), CYCLE = 45*60000;
+  return base.map(function(m,i){
+    if(i >= busyWanted) return { code:m.code, name:m.name, status:'available', position:m.position };
+    var offset = (i * CYCLE) / Math.max(1, busyWanted);
+    var elapsed = (now + offset) % CYCLE;
+    var loads = [6,8,9,11,12,14,7,10,13,5];
+    return { code:m.code, name:m.name, status:'busy', position:m.position,
+      load_kg: loads[i % loads.length],
+      started_at: new Date(now - elapsed).toISOString(),
+      ends_at:   new Date(now + (CYCLE - elapsed)).toISOString() };
+  });
+}
+function shown(){ return LAVRI.mode === 'auto' ? autoMachines() : machines; }
 
 function stateOf(m){
+  if(m.status === 'closed') return { s:'closed', left:0, pct:0 };
   if(m.status === 'off') return { s:'off', left:0, pct:0 };
   if(m.status !== 'busy' || !m.ends_at) return { s:'free', left:0, pct:100 };
   var end = new Date(m.ends_at).getTime();
@@ -1330,25 +1453,28 @@ function mmss(s){
 
 function renderMachines(){
   var g = $('#mgrid');
-  if(!machines.length){
+  var list = shown();
+  if(!list.length){
     g.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--ink-3);font-size:.82rem;padding:30px 0">'
       + 'Enfòmasyon machin yo poko disponib. Ekri nou sou WhatsApp epi n ap di w tousuit sa ki lib.</p>';
     return;
   }
   var C = 2 * Math.PI * 46;
-  g.innerHTML = machines.map(function(m,i){
+  g.innerHTML = list.map(function(m,i){
     var st = stateOf(m);
     var bad = st.s === 'free' ? '<span class="m-bad free">✓ Disponib</span>'
             : st.s === 'soon' ? '<span class="m-bad soon">Byento lib</span>'
             : st.s === 'busy' ? '<span class="m-bad busy">Okipe</span>'
+            : st.s === 'closed' ? '<span class="m-bad off">Fèmen</span>'
             :                   '<span class="m-bad off">An reparasyon</span>';
     var mid = st.s === 'free'
       ? '<div class="m-time" style="color:var(--ok)">LIB</div><div class="m-unit">kounye a</div>'
-      : st.s === 'off'
-        ? '<div class="m-time" style="color:var(--ink-3)">—</div><div class="m-unit">endisponib</div>'
+      : st.s === 'off' || st.s === 'closed'
+        ? '<div class="m-time" style="color:var(--ink-3)">—</div><div class="m-unit">'
+          + (st.s === 'closed' ? 'magazen fèmen' : 'endisponib') + '</div>'
         : '<div class="m-time" data-cd="'+i+'">'+mmss(st.left)+'</div><div class="m-unit">ki rete</div>';
     var off = C - (st.pct/100) * C;
-    return '<div class="mach ' + (st.s === 'free' ? 'free' : st.s === 'off' ? 'off' : '') + '"'
+    return '<div class="mach ' + (st.s === 'free' ? 'free' : (st.s === 'off' || st.s === 'closed') ? 'off' : '') + '"'
       + (st.s === 'free' ? ' role="button" tabindex="0" data-book="' + esc(m.name || m.code) + '"' : '') + '>'
       + '<div class="m-top"><span class="m-id">' + esc(m.code || ('MCH-' + (i+1))) + '</span>' + bad + '</div>'
       + '<div class="m-ring ' + (st.s === 'free' ? 'is-free' : st.s === 'busy' || st.s === 'soon' ? 'is-busy' : '') + '">'
@@ -1356,7 +1482,7 @@ function renderMachines(){
         + '<circle class="fg" cx="52" cy="52" r="46" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '" data-ring="' + i + '"/></svg>'
         + '<div class="m-mid">' + mid + '</div></div>'
       + '<div class="m-name">' + esc(m.name || ('Machin ' + (i+1))) + '</div>'
-      + '<div class="m-sub">' + (st.s === 'free' ? 'Prè pou itilize' : st.s === 'off' ? 'Machin nan an reparasyon' : m.load_kg ? esc(m.load_kg) + ' kg nan machin nan' : 'Nan travay') + '</div>'
+      + '<div class="m-sub">' + (st.s === 'free' ? 'Prè pou itilize' : st.s === 'closed' ? 'N ap louvri pi ta' : st.s === 'off' ? 'Machin nan an reparasyon' : m.load_kg ? esc(m.load_kg) + ' kg nan machin nan' : 'Nan travay') + '</div>'
       + (st.s === 'free'
           ? '<div class="m-go"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1.1.1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.7-1.2-4.5-4-4.6-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.3 0 .5l-.3.5-.3.3c-.1.1-.2.3-.1.5.1.3.6 1.2 1.4 1.9 1 .9 1.8 1.2 2.1 1.3.2.1.4.1.5-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.1.1.6-.1 1.2Z"/></svg> Rezève sou WhatsApp</div>'
           : '')
@@ -1376,8 +1502,17 @@ function renderMachines(){
 }
 
 function updateLive(){
-  var free = 0, soon = null, tot = machines.length;
-  machines.forEach(function(m){
+  var list = shown();
+  var free = 0, soon = null, tot = list.length;
+  if(!STORE.open){
+    $('#live-free').textContent = '0';
+    $('#live-tot').textContent = tot || '—';
+    var nx0 = $('#live-next'); nx0.textContent = 'Fèmen'; nx0.style.fontSize = '1rem';
+    var d0 = $('#live-dot'); d0.style.background = 'var(--bad)'; d0.style.boxShadow = '0 0 9px rgba(255,107,107,.9)';
+    $('#live-free').className = 'live-n warm';
+    return;
+  }
+  list.forEach(function(m){
     var st = stateOf(m);
     if(st.s === 'free') free++;
     else if(st.s !== 'off' && (soon === null || st.left < soon)) soon = st.left;
@@ -1394,8 +1529,9 @@ function updateLive(){
 }
 
 function tickMachines(){
+  if(!STORE.open){ updateLive(); return; }
   var redraw = false;
-  machines.forEach(function(m,i){
+  shown().forEach(function(m,i){
     var st = stateOf(m);
     var t = $('[data-cd="' + i + '"]');
     if(t && (st.s === 'busy' || st.s === 'soon')) t.textContent = mmss(st.left);
@@ -1410,6 +1546,7 @@ function tickMachines(){
 }
 
 async function loadMachines(){
+  await loadStore();
   if(!sb){ renderMachines(); return; }
   try{
     var r = await sb.from('wash_machines').select('*').order('position');
@@ -1417,7 +1554,8 @@ async function loadMachines(){
     machines = r.data || [];
   }catch(e){ machines = []; }
   renderMachines();
-  $('#mach-updated').textContent = 'Mizajou ' + new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+  $('#mach-updated').textContent = (LAVRI.mode === 'auto' ? 'Otomatik · ' : '')
+    + 'Mizajou ' + new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
   if(!ticker) ticker = setInterval(tickMachines, 1000);
 }
 loadMachines();
@@ -1570,6 +1708,7 @@ function initial(s){ return (s || 'Z').trim().charAt(0).toUpperCase() || 'Z'; }
 
 if(auth) auth.onAuthStateChanged(async function(user){
   if(unsubPts){ unsubPts(); unsubPts = null; }
+  pqWatch(null);
   if(!user){
     $('#login-btn').style.display=''; $('#who-btn').style.display='none';
     $('#dr-login').style.display=''; $('#dr-who').style.display='none';
@@ -1602,7 +1741,70 @@ if(auth) auth.onAuthStateChanged(async function(user){
     }catch(e){}
   }
   $('#a-st').textContent = status; $('#dr-st').textContent = status;
+  pqWatch(user);
 });
+
+/* ══ DEMANN PWEN — kòd konfimasyon kliyan an ══════════════════ */
+var PQ = { row:null, sub:null };
+function pqShow(r){
+  PQ.row = r;
+  var up = Number(r.delta) >= 0;
+  $('#pq-ic').className = 'pq-ic ' + (up ? 'pos' : 'neg');
+  $('#pq-ic').textContent = (up ? '+' : '') + r.delta;
+  $('#pq-ttl').textContent = up ? 'Yon administratè vle ajoute pwen' : 'Yon administratè vle retire pwen';
+  $('#pq-lead').textContent = up
+    ? 'Nou vle mete ' + Math.abs(r.delta) + ' pwen nan kont ou.'
+    : 'Nou vle wete ' + Math.abs(r.delta) + ' pwen nan kont ou.';
+  $('#pq-why').textContent = r.reason ? '« ' + r.reason + ' »' : '';
+  $('#pq-code').textContent = r.code || '——————';
+  $('#pmask').classList.add('open');
+  document.body.classList.add('lock');
+}
+function pqHide(){ $('#pmask').classList.remove('open'); document.body.classList.remove('lock'); }
+$('#pq-x').addEventListener('click', pqHide);
+$('#pq-ok').addEventListener('click', pqHide);
+$('#pq-no').addEventListener('click', async function(){
+  if(PQ.row && sb){
+    try{ await sb.from('point_requests').update({ status:'refused' }).eq('id', PQ.row.id); }catch(e){}
+  }
+  pqHide();
+});
+
+async function pqCheck(user){
+  if(!sb || !user || !user.email) return;
+  try{
+    var r = await sb.from('point_requests').select('*')
+      .eq('email', user.email.toLowerCase()).eq('status','pending')
+      .order('created_at', { ascending:false }).limit(1);
+    var row = (r.data || [])[0];
+    if(!row) return;
+    if(new Date(row.expires_at).getTime() < Date.now()) return;
+    if(PQ.row && PQ.row.id === row.id) return;
+    try{
+      await sb.from('point_requests').update({
+        uid: user.uid,
+        user_name: user.displayName || user.email,
+        seen_at: new Date().toISOString()
+      }).eq('id', row.id);
+    }catch(e){}
+    pqShow(row);
+  }catch(e){}
+}
+function pqWatch(user){
+  if(PQ.sub){ try{ PQ.sub.unsubscribe(); }catch(e){} PQ.sub = null; }
+  if(PQ.timer){ clearInterval(PQ.timer); PQ.timer = null; }
+  if(!user) return;
+  pqCheck(user);
+  PQ.timer = setInterval(function(){ pqCheck(user); }, 25000);
+  try{
+    if(sb && sb.channel){
+      PQ.sub = sb.channel('pq-' + user.uid)
+        .on('postgres_changes', { event:'INSERT', schema:'public', table:'point_requests' },
+            function(){ pqCheck(user); })
+        .subscribe();
+    }
+  }catch(e){}
+}
 
 /* ══ 10. ASISTAN LAVRI ════════════════════════════════════════ */
 var KB = [
@@ -1614,14 +1816,20 @@ var KB = [
         return '• ' + o.name + ' : +' + fmt(o.price) + ' HTG' + (o.note ? ' (' + o.note + ')' : '');
       }).join('\n') + "\n\nSèvi ak kalkilatè a pi ba a pou w wè pri egzak ou."; } },
 
-  { k:['machin','disponib','lib','okipe','rezeve','tann','kounye'],
+  { k:['machin','disponib','lib','okipe','rezeve','tann','kounye','fenmen','louvri','le','ore'],
     a:function(){
-      if(!machines.length) return "Enfòmasyon machin yo poko konekte sou paj sa. Ekri nou sou WhatsApp epi n ap di w tousuit sa ki lib.";
+      if(!STORE.open){
+        var h = haitiHour();
+        var left = h < STORE.openH ? STORE.openH - h : (24 - h) + STORE.openH;
+        return "Magazen an <b>fèmen</b> kounye a — n ap louvri nan <b>" + left + "h</b>.\n\nOrè nou se 8:00 nan maten rive 8:00 nan aswè. Ou ka toujou ekri nou sou WhatsApp epi n ap reponn ou lè nou louvri.";
+      }
+      var machines2 = shown();
+      if(!machines2.length) return "Enfòmasyon machin yo poko konekte sou paj sa. Ekri nou sou WhatsApp epi n ap di w tousuit sa ki lib.";
       var free = 0, soon = null;
-      machines.forEach(function(m){ var s = stateOf(m);
+      machines2.forEach(function(m){ var s = stateOf(m);
         if(s.s === 'free') free++; else if(s.s !== 'off' && (soon === null || s.left < soon)) soon = s.left; });
-      if(free) return "Gen <b>" + free + " machin</b> ki lib sou " + machines.length + " kounye a.\n\nKlike sou yon machin vèt nan seksyon « Machin yo, kounye a » pou w rezève l sou WhatsApp.";
-      return "Tout " + machines.length + " machin yo okipe kounye a." + (soon !== null ? "\n\nPwochèn ki lib nan <b>" + mmss(soon) + "</b>." : "") + "\n\nEkri nou sou WhatsApp pou nou mete w sou lis la."; } },
+      if(free) return "Gen <b>" + free + " machin</b> ki lib sou " + machines2.length + " kounye a.\n\nKlike sou yon machin vèt nan seksyon « Machin yo, kounye a » pou w rezève l sou WhatsApp.";
+      return "Tout " + machines2.length + " machin yo okipe kounye a." + (soon !== null ? "\n\nPwochèn ki lib nan <b>" + mmss(soon) + "</b>." : "") + "\n\nEkri nou sou WhatsApp pou nou mete w sou lis la."; } },
 
   { k:['tan','konbe tan','24','lè','delè','rapid','ekspres','prese'],
     a:function(){ return "Rad ou prè nan <b>mwens pase 24 èdtan</b>.\n\nSi w prese, chwazi opsyon <b>Sèvis ekspres</b> nan kalkilatè a : rad ou prè nan <b>6 èdtan</b> pou +" + fmt(200) + " HTG."; } },
