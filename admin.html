@@ -1404,8 +1404,23 @@ tbody tr:last-child td{border-bottom:none}
 
 <div id="sb-band">
   <span data-icon="alert" data-size="sm"></span>
-  <span><b>Écriture bloquée.</b> La console n'a pas de session Supabase : vous pouvez tout consulter, mais rien enregistrer. Reconnectez-vous, ou créez votre compte dans Supabase → Authentication avec le même mot de passe.</span>
-  <button class="btn btn-ghost btn-sm" onclick="handleSignOut()">Se reconnecter</button>
+  <span><b>Écriture bloquée.</b> La console n'a pas de session Supabase : vous pouvez tout consulter, mais rien enregistrer.<span id="sb-why"></span></span>
+  <button class="btn btn-gold btn-sm" onclick="openSupaLogin()">Ouvrir la session</button>
+</div>
+
+<div class="overlay" id="supa-modal" role="dialog" aria-modal="true" aria-labelledby="sup-title">
+  <div class="sheet" style="max-width:420px">
+    <div class="sheet-head"><h3 id="sup-title">Session Supabase</h3>
+      <button class="sheet-x" onclick="closeModal('supa-modal')" aria-label="Fermer"><span data-icon="close" data-size="sm"></span></button></div>
+    <p class="card-sub" style="margin:0 0 16px">Vos données sont protégées : seule une session Supabase autorise l'enregistrement. C'est un compte à part de celui de la console — créez-le dans Supabase → Authentication → Users, avec « Auto Confirm User » coché.</p>
+    <div class="field"><label for="sup-mail">Adresse e-mail</label>
+      <input type="email" id="sup-mail" class="input" autocomplete="username"></div>
+    <div class="field"><label for="sup-pass">Mot de passe Supabase</label>
+      <input type="password" id="sup-pass" class="input" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doSupaLogin()"></div>
+    <div class="auth-err" id="sup-err" role="alert"></div>
+    <button class="btn btn-gold btn-block" id="sup-btn" onclick="doSupaLogin()" style="margin-top:8px">Ouvrir la session</button>
+  </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1783,14 +1798,15 @@ function showAuthWall(){
    La console lit avec la clé anon, mais elle n'écrit
    que si l'administrateur a une session Supabase.
    ═════════════════════════════════════════════════ */
-let supaOk = false;
+let supaOk = false, supaErr = '', lockOn = null, lastPass = '';
 
 async function supaSignIn(email, pass){
+  lastPass = pass || lastPass;
   try{
-    const {error} = await db.auth.signInWithPassword({email:email.trim(), password:pass});
+    const {error} = await db.auth.signInWithPassword({email:(email||'').trim(), password:pass});
     supaOk = !error;
-    if(error) console.warn('Session Supabase refusée :', error.message);
-  }catch(e){ supaOk=false; console.warn('Session Supabase :', e.message); }
+    supaErr = error ? error.message : '';
+  }catch(e){ supaOk=false; supaErr=e.message||''; }
   paintSupaBand();
   return supaOk;
 }
@@ -1799,15 +1815,53 @@ async function checkSupaSession(){
     const {data} = await db.auth.getSession();
     supaOk = !!(data && data.session);
   }catch(e){ supaOk=false; }
+  /* Les écritures ne sont verrouillées que si zetwal-securite.sql a été
+     exécuté. On le sait à l'existence de la table admin_emails. */
+  try{
+    const {error} = await db.from('admin_emails').select('email').limit(1);
+    lockOn = !error;
+  }catch(e){ lockOn = false; }
   paintSupaBand();
   return supaOk;
 }
 function paintSupaBand(){
   const b=document.getElementById('sb-band'); if(!b) return;
   const inApp = document.getElementById('app')?.classList.contains('show');
-  b.classList.toggle('show', !!inApp && !supaOk && !_tempPermsActive);
+  const show = !!inApp && !supaOk && lockOn === true && !_tempPermsActive;
+  b.classList.toggle('show', show);
+  const why=document.getElementById('sb-why');
+  if(why) why.textContent = supaErr ? ' (' + supaErr + ')' : '';
   paintIcons();
 }
+window.openSupaLogin=()=>{
+  const em=document.getElementById('sup-mail');
+  if(em && currentUser && currentUser.email) em.value=currentUser.email;
+  const pw=document.getElementById('sup-pass'); if(pw) pw.value='';
+  const er=document.getElementById('sup-err'); if(er) er.classList.remove('show');
+  document.getElementById('supa-modal')?.classList.add('open');
+  setTimeout(()=>document.getElementById('sup-pass')?.focus(),200);
+};
+window.doSupaLogin=async()=>{
+  const mail=document.getElementById('sup-mail').value.trim();
+  const pass=document.getElementById('sup-pass').value;
+  const er=document.getElementById('sup-err');
+  const btn=document.getElementById('sup-btn');
+  if(!mail||!pass){ er.innerHTML=icon('alert','sm')+'<span>Entrez votre e-mail et votre mot de passe.</span>'; er.classList.add('show'); return; }
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Connexion…';
+  const ok=await supaSignIn(mail,pass);
+  btn.disabled=false; btn.textContent='Ouvrir la session';
+  if(ok){
+    closeModal('supa-modal');
+    toast('Session Supabase ouverte — vous pouvez enregistrer','success');
+  }else{
+    const msg = /Invalid login/i.test(supaErr)
+      ? "E-mail ou mot de passe refusé par Supabase. Ce compte doit exister dans Supabase → Authentication → Users, avec ce mot de passe."
+      : (/Email not confirmed/i.test(supaErr)
+          ? "Ce compte Supabase n'est pas confirmé. Recréez-le en cochant « Auto Confirm User »."
+          : supaErr || 'Connexion impossible.');
+    er.innerHTML=icon('alert','sm')+'<span>'+escH(msg)+'</span>'; er.classList.add('show');
+  }
+};
 window.supaSignIn=supaSignIn;
 window.checkSupaSession=checkSupaSession;
 
@@ -2881,7 +2935,7 @@ async function loadMachinesAdmin(){
     });
     if(machBusy>machRows.length) machBusy=machRows.length;
     renderMachMode(); renderMachAdmin();
-    if(!machTimer) machTimer=setInterval(()=>{ if(currentTab==='machines') renderMachAdmin(); },1000);
+    if(!machTimer) machTimer=setInterval(machTick,1000);
   }catch(e){
     box.innerHTML=errorState('Machines indisponibles',
       "La table wash_machines n'existe pas encore. Exécutez zetwal-lavri.sql dans Supabase.",
@@ -2929,6 +2983,9 @@ function mmss(x){ return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%6
 
 function renderMachAdmin(){
   const c=document.getElementById('mach-admin'); if(!c) return;
+  /* on garde ce que l'utilisateur avait déjà tapé */
+  const keep={};
+  c.querySelectorAll('input[id^=mkg-],select[id^=mdur-]').forEach(el=>{ keep[el.id]=el.value; });
   if(!machRows.length){
     c.innerHTML=emptyState('drop','Aucune machine',"Exécutez zetwal-lavri.sql pour créer les dix machines.");
     return;
@@ -2944,9 +3001,11 @@ function renderMachAdmin(){
         : st.s==='busy' ? '<span style="color:var(--warn)">Occupée — '+mmss(st.left)+' restantes'+(m.load_kg?' · '+m.load_kg+' kg':'')+'</span>'
         : '<span style="color:var(--muted)">En réparation</span>')+'</div>'
       +(st.s==='free'
-        ? '<div class="mrow"><input type="number" class="input" id="mkg-'+escH(m.id)+'" placeholder="kg" min="1" max="30" style="max-width:80px">'
-          +'<select class="input" id="mdur-'+escH(m.id)+'"><option value="30">30 min</option><option value="45" selected>45 min</option>'
-          +'<option value="60">60 min</option><option value="90">1 h 30</option></select></div>'
+        ? '<div class="mrow"><input type="number" class="input" id="mkg-'+escH(m.id)+'" placeholder="Poids en kg" min="1" max="30" inputmode="numeric">'
+          +'<select class="input" id="mdur-'+escH(m.id)+'" style="max-width:118px">'
+          +'<option value="20">20 min</option><option value="30">30 min</option>'
+          +'<option value="45" selected>45 min</option><option value="60">60 min</option>'
+          +'<option value="75">1 h 15</option><option value="90">1 h 30</option></select></div>'
         : '')
       +'<div class="mcell-b">'
         +(st.s==='free'?'<button class="btn btn-gold btn-sm" onclick="machStart(\''+escH(m.id)+'\')">'+icon('bolt','sm')+' Lancer</button>':'')
@@ -2957,10 +3016,32 @@ function renderMachAdmin(){
       +'</div></div>';
   }).join('');
   c.innerHTML='<div class="mach-grid">'+html+'</div>';
+  Object.keys(keep).forEach(id=>{ const el=document.getElementById(id); if(el&&keep[id]!=='') el.value=keep[id]; });
+  machLastSig=machSig();
   const sum=document.getElementById('mach-summary');
   if(sum) sum.textContent=free+' libre(s) · '+busy+' occupée(s)'+(off?' · '+off+' en panne':'');
   paintIcons();
 }
+/* Le compte à rebours se met à jour tout seul, mais on ne redessine
+   PAS la grille : sinon le poids et la durée qu'on est en train de
+   taper seraient effacés à chaque seconde. */
+function machSig(){
+  return machRows.map(m=>{ const st=machState(m); return m.id+':'+st.s; }).join('|');
+}
+let machLastSig='';
+function machTick(){
+  if(currentTab!=='machines') return;
+  if(!machRows.length) return;
+  const sig=machSig();
+  if(sig!==machLastSig){ renderMachAdmin(); return; }
+  machRows.forEach(m=>{
+    const st=machState(m);
+    if(st.s!=='busy') return;
+    const el=document.querySelector('#mcl-'+CSS.escape(m.id)+' .mcell-s span');
+    if(el) el.textContent='Occupée — '+mmss(st.left)+' restantes'+(m.load_kg?' · '+m.load_kg+' kg':'');
+  });
+}
+
 async function machSave(id,patch){
   try{
     const {error}=await db.from('wash_machines').update(patch).eq('id',id);
