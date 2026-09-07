@@ -538,6 +538,14 @@ tbody tr:last-child td{border-bottom:none}
 .sheet-acts{display:flex;gap:10px;margin-top:var(--s5)}
 .sheet-acts .btn{flex:1}
 
+/* Bandeau : session Supabase absente */
+#sb-band{position:fixed;left:0;right:0;top:0;z-index:9500;display:none;align-items:center;gap:12px;
+  padding:11px 20px;background:rgba(255,107,107,.12);border-bottom:1px solid var(--bad-line);
+  backdrop-filter:blur(14px);font-size:.8rem;color:#FFB4B4}
+#sb-band.show{display:flex}
+#sb-band b{color:#fff;font-weight:600}
+#sb-band .btn{margin-left:auto;flex:none}
+
 /* Images du site */
 .mgrp{margin-bottom:var(--s7)}
 .mgrp-t{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
@@ -1394,6 +1402,12 @@ tbody tr:last-child td{border-bottom:none}
   </div>
 </aside>
 
+<div id="sb-band">
+  <span data-icon="alert" data-size="sm"></span>
+  <span><b>Écriture bloquée.</b> La console n'a pas de session Supabase : vous pouvez tout consulter, mais rien enregistrer. Reconnectez-vous, ou créez votre compte dans Supabase → Authentication avec le même mot de passe.</span>
+  <button class="btn btn-ghost btn-sm" onclick="handleSignOut()">Se reconnecter</button>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1526,6 +1540,15 @@ function skeletonCards(n){let h='';for(let i=0;i<(n||6);i++)h+='<div class="skel
 function skeletonRows(cols,n){let h='';for(let i=0;i<(n||5);i++){h+='<tr>';for(let c=0;c<cols;c++)h+='<td><div class="skeleton sk-line" style="margin:0"></div></td>';h+='</tr>';}return h;}
 
 let toastTimer;
+/* Traduit le refus RLS en une phrase utile plutôt qu'en jargon Postgres */
+function rlsHint(e){
+  const m=(e&&e.message)||'';
+  if(/row-level security|violates row-level|permission denied|JWT/i.test(m))
+    return "refusé — la console n'a pas de session Supabase. Déconnectez-vous puis reconnectez-vous.";
+  return m;
+}
+window.rlsHint=rlsHint;
+
 window.toast=(msg,type='info')=>{
   const t=document.getElementById('toast');
   const ic = type==='success'?'check':type==='error'?'alert':'sparkle';
@@ -1716,6 +1739,7 @@ async function bootSession(email, isAdmin, perms){
   document.getElementById('who-av').textContent = (email[0]||'Z').toUpperCase();
   document.getElementById('who-role').textContent = isAdmin?'Administrateur':'Accès temporaire';
   buildNav(); paintIcons();
+  if(isAdmin) await checkSupaSession();
   await Promise.all([loadProducts(),loadWashRecords(),loadSales(),loadOrders(),loadNotifications(),loadRates()]);
   loadStats();
   if(!isAdmin && perms) applyTempAccessRestrictions(perms);
@@ -1747,13 +1771,46 @@ async function onUserChange(user){
   await bootSession(user.email,false,t.permissions);
 }
 function show(id){document.getElementById(id)?.classList.add('show');}
-function hide(id){const el=document.getElementById(id);if(el){el.classList.remove('show');el.classList.add('hidden');}}
+function hide(id){const el=document.getElementById(id);if(el){el.classList.remove('show');el.classList.add('hidden');el.style.display='';}}
 function showEl(id){document.getElementById(id)?.classList.add('show');}
 function showAuthWall(){
   const aw=document.getElementById('auth-wall');
   if(aw){aw.classList.remove('hidden');aw.style.display='grid';}
   document.getElementById('app')?.classList.remove('show');
 }
+/* ═════════════════════════════════════════════════
+   SESSION SUPABASE — droit d'écriture
+   La console lit avec la clé anon, mais elle n'écrit
+   que si l'administrateur a une session Supabase.
+   ═════════════════════════════════════════════════ */
+let supaOk = false;
+
+async function supaSignIn(email, pass){
+  try{
+    const {error} = await db.auth.signInWithPassword({email:email.trim(), password:pass});
+    supaOk = !error;
+    if(error) console.warn('Session Supabase refusée :', error.message);
+  }catch(e){ supaOk=false; console.warn('Session Supabase :', e.message); }
+  paintSupaBand();
+  return supaOk;
+}
+async function checkSupaSession(){
+  try{
+    const {data} = await db.auth.getSession();
+    supaOk = !!(data && data.session);
+  }catch(e){ supaOk=false; }
+  paintSupaBand();
+  return supaOk;
+}
+function paintSupaBand(){
+  const b=document.getElementById('sb-band'); if(!b) return;
+  const inApp = document.getElementById('app')?.classList.contains('show');
+  b.classList.toggle('show', !!inApp && !supaOk && !_tempPermsActive);
+  paintIcons();
+}
+window.supaSignIn=supaSignIn;
+window.checkSupaSession=checkSupaSession;
+
 window.handleLogin = async ()=>{
   const emailVal=document.getElementById('login-email').value.trim();
   const passVal =document.getElementById('login-pass').value;
@@ -1762,6 +1819,10 @@ window.handleLogin = async ()=>{
   if(!emailVal||!passVal){ err.innerHTML=icon('alert','sm')+'<span>Entrez votre e-mail et votre mot de passe.</span>'; err.classList.add('show'); return; }
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Connexion…';
   const fail=(m)=>{ err.innerHTML=icon('alert','sm')+'<span>'+escH(m)+'</span>'; err.classList.add('show'); btn.disabled=false; btn.textContent='Se connecter'; };
+
+  /* Session Supabase : c'est elle qui autorise les écritures.
+     Sans elle la console reste en lecture seule et le dit clairement. */
+  supaSignIn(emailVal, passVal);
 
   if(auth){
     try{ await auth.signInWithEmailAndPassword(emailVal,passVal); return; }
@@ -1796,6 +1857,8 @@ window.handleLogin = async ()=>{
 };
 window.handleSignOut = async ()=>{
   try{ if(auth) await auth.signOut(); }catch(e){}
+  try{ await db.auth.signOut(); }catch(e){}
+  document.getElementById('sb-band')?.classList.remove('show');
   currentUser=null; _tempPermsActive=null;
   document.getElementById('temp-band')?.remove();
   showAuthWall();
@@ -2014,7 +2077,7 @@ window.saveProduct = async ()=>{
     generateQRForProduct(data);
     await loadProducts();
   }catch(e){
-    toast('Enregistrement impossible : '+e.message,'error');
+    toast('Enregistrement impossible : '+rlsHint(e),'error');
   }finally{
     btn.disabled=false; btn.innerHTML=icon('save','sm')+' Enregistrer et générer le QR';
   }
@@ -2776,7 +2839,7 @@ window.uploadMedia=async(slot,input)=>{
     toast('Image en ligne — '+Math.round(up.size/1024)+' Ko','success');
   }catch(e){
     if(card) card.classList.remove('busy');
-    toast('Envoi impossible : '+e.message,'error');
+    toast('Envoi impossible : '+rlsHint(e),'error');
   }
 };
 window.clearMedia=async(slot)=>{
@@ -2786,14 +2849,14 @@ window.clearMedia=async(slot)=>{
     const row=mediaRows.find(r=>r.slot===slot); if(row) row.url=null;
     renderMedia();
     toast("Emplacement vidé — le visuel d'origine revient",'success');
-  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
 };
 window.saveMediaAlt=async(slot,val)=>{
   try{
     await db.from('site_media').update({alt:(val||'').trim(),updated_at:new Date().toISOString()}).eq('slot',slot);
     const row=mediaRows.find(r=>r.slot===slot); if(row) row.alt=(val||'').trim();
     toast('Texte alternatif enregistré','success');
-  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
 };
 window.loadMedia=loadMedia;
 
@@ -2846,14 +2909,14 @@ window.setMachMode=async(m)=>{
   try{
     await db.from('site_settings').upsert({key:'lavri_mode',value:m,updated_at:new Date().toISOString()},{onConflict:'key'});
     toast(m==='auto'?'Mode automatique activé':'Mode manuel activé','success');
-  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
 };
 window.setAutoBusy=async(v)=>{
   machBusy=parseInt(v,10);
   try{
     await db.from('site_settings').upsert({key:'lavri_auto_busy',value:String(machBusy),updated_at:new Date().toISOString()},{onConflict:'key'});
     toast(machBusy+' machine(s) occupée(s) sur la page publique','success');
-  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
 };
 
 function machState(m){
@@ -2904,7 +2967,7 @@ async function machSave(id,patch){
     if(error) throw error;
     const r=machRows.find(x=>x.id===id); if(r) Object.assign(r,patch);
     renderMachAdmin();
-  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
 }
 window.machStart=(id)=>{
   const kg=parseFloat(document.getElementById('mkg-'+id)?.value)||null;
@@ -2957,7 +3020,7 @@ window.createPointRequest=async()=>{
     document.getElementById('pt-why').value='';
     toast('Demande créée — transmettez le code au client','success');
     loadPointRequests();
-  }catch(e){ toast('Création impossible : '+e.message,'error'); }
+  }catch(e){ toast('Création impossible : '+rlsHint(e),'error'); }
 };
 
 async function loadPointRequests(){
@@ -3045,7 +3108,7 @@ window.applyPoints=async(id)=>{
       applied_at:new Date().toISOString(),balance_after:after}).eq('id',id);
     toast('Points mis à jour — nouveau solde : '+after.toFixed(1),'success');
     loadPointRequests();
-  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
 };
 window.cancelPointRequest=async(id)=>{
   try{
@@ -3117,7 +3180,7 @@ window.setStoreForce=async(val)=>{
     toast(val==='null'?'Horaire automatique rétabli':val==='open'?'Magasin forcé ouvert':'Magasin forcé fermé','success');
     await refreshStoreStatus();
     if(currentTab==='home') renderHome();
-  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
 };
 async function loadQuotes(){
   try{
@@ -3167,7 +3230,7 @@ window.activateQuote=async(i)=>{
     await db.from('site_settings').upsert({key:'quote_active_day',value:String(i),updated_at:new Date().toISOString()});
     toast('Citation '+(i+1)+' affichée','success');
     renderQuotesForm(); renderQuotePreview();
-  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
 };
 window.addQuoteRow=()=>{
   if(quotesData.length>=7){ toast('Sept citations au maximum','error'); return; }
@@ -3200,7 +3263,7 @@ window.uploadQuotePhoto=async(i,input)=>{
     toast('Photo enregistrée — '+Math.round(up.size/1024)+' Ko','success');
   }catch(e){
     renderQuotesForm();
-    toast('Envoi impossible : '+e.message,'error');
+    toast('Envoi impossible : '+rlsHint(e),'error');
   }
 };
 window.clearQuotePhoto=async(i)=>{
@@ -3224,7 +3287,7 @@ window.saveQuotes=async(silent)=>{
       toast('Citations enregistrées','success');
     }
     renderQuotePreview();
-  }catch(e){ toast('Enregistrement impossible : '+e.message,'error'); }
+  }catch(e){ toast('Enregistrement impossible : '+rlsHint(e),'error'); }
 };
 window.saveRates=async()=>{
   const newUSD=parseFloat(document.getElementById('setting-rate-usd')?.value);
@@ -3243,7 +3306,7 @@ window.saveRates=async()=>{
     toast('1 USD = '+newUSD+' HTG · 1 DOP = '+newPeso+' HTG','success');
     renderSalesTable(allSales); updateSalesKPIs(); renderProducts(allProducts);
     if(document.getElementById('tab-analytics')?.classList.contains('active')) refreshAnalytics();
-  }catch(e){ toast('Enregistrement impossible : '+e.message,'error'); }
+  }catch(e){ toast('Enregistrement impossible : '+rlsHint(e),'error'); }
 };
 function updateRatePreviews(){
   const u=parseFloat(document.getElementById('setting-rate-usd')?.value)||RATE_USD;
