@@ -1484,6 +1484,7 @@ const NAV=[
     {id:'history',label:'Fiches enregistrées',icon:'history'}
   ]},
   {g:'Réglages', items:[
+    {id:'media',label:'Images du site',icon:'image'},
     {id:'settings',label:'Paramètres',icon:'settings'},
     {id:'access',label:'Accès temporaires',icon:'key'}
   ]}
@@ -1501,6 +1502,7 @@ const TAB_META={
   history:{t:'Fiches de lavage',s:'Suivi et statuts'},
   analytics:{t:'Analytics',s:'Tendances et répartitions'},
   calculator:{t:'Calculatrice',s:'Marges et revenus'},
+  media:{t:'Images du site',s:'Visuels des pages publiques'},
   settings:{t:'Paramètres',s:'Magasin, taux et citations'},
   access:{t:'Accès temporaires',s:'Sessions limitées dans le temps'}
 };
@@ -2652,7 +2654,7 @@ function mediaCard(r){
         +' value="'+escH(r.alt||'')+'" onchange="saveMediaAlt(\''+id+'\',this.value)">'
       +'<div class="macts">'
         +'<button class="btn btn-gold btn-sm" onclick="document.getElementById(\'mf-'+id+'\').click()">'
-          +icon('upload','sm')+(has?' Remplacer':' Choisir')+'</button>'
+          +icon('camera','sm')+(has?' Remplacer':' Choisir')+'</button>'
         +(has?'<button class="btn btn-bad btn-sm" onclick="clearMedia(\''+id+'\')">'+icon('trash','sm')+' Vider</button>':'')
       +'</div>'
       +'<input type="file" accept="image/*" class="mfile" id="mf-'+id+'" onchange="uploadMedia(\''+id+'\',this)">'
