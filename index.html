@@ -329,6 +329,20 @@ a{color:inherit;text-decoration:none}
   opacity:0;transition:opacity var(--med)}
 .card:hover::after{opacity:1}
 
+/* foto ki ranpli tout kat la — tèks la rete sou li */
+.shot{position:absolute;inset:0;z-index:-1;opacity:0;transform:scale(1.06);
+  background-size:cover;background-position:center;
+  transition:opacity 900ms cubic-bezier(.19,1,.22,1),transform 1.4s cubic-bezier(.19,1,.22,1)}
+.shot.on{opacity:1;transform:none}
+.shot::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(178deg,rgba(5,5,5,.46) 0%,rgba(5,5,5,.64) 44%,rgba(5,5,5,.94) 100%)}
+.card.pic{border-color:rgba(255,255,255,.14)}
+.card.pic:hover .shot{transform:scale(1.05)}
+.card.pic h3{text-shadow:0 2px 18px rgba(0,0,0,.55)}
+.card.pic p{color:rgba(255,255,255,.72);text-shadow:0 1px 12px rgba(0,0,0,.5)}
+.card.pic .em{opacity:.9;filter:drop-shadow(0 2px 10px rgba(0,0,0,.7))}
+.card.pic .card-foot{border-top-color:rgba(255,255,255,.16)}
+
 .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
 .no{font-family:var(--serif);font-size:.92rem;letter-spacing:2.4px;color:var(--gold);opacity:.68}
 .em{width:56px;height:56px;flex-shrink:0}
@@ -357,7 +371,23 @@ a{color:inherit;text-decoration:none}
 /* ── 9. Sitasyon ──────────────────────────────────────────────── */
 .quote{display:none;text-align:center;padding:96px 0}
 .quote.show{display:block}
-.quote .qm{font-family:var(--serif);font-size:4.4rem;line-height:.4;color:var(--g-24);display:block;margin-bottom:22px}
+.q-av{width:74px;height:74px;border-radius:50%;margin:0 auto 22px;position:relative;
+  display:grid;place-items:center;overflow:hidden;
+  border:1px solid var(--g-24);background:var(--g-08);
+  opacity:0;transform:scale(.86);transition:opacity 700ms ease,transform 700ms cubic-bezier(.19,1,.22,1)}
+.quote.in .q-av{opacity:1;transform:none}
+.q-av::after{content:'';position:absolute;inset:-6px;border-radius:50%;
+  border:1px solid var(--g-14);pointer-events:none}
+.q-av img{width:100%;height:100%;object-fit:cover;display:block}
+.q-av span{font-family:var(--serif);font-size:1.6rem;font-weight:600;color:var(--gold)}
+.q-bg{position:absolute;inset:0;z-index:-1;opacity:0;background-size:cover;background-position:center;
+  transition:opacity 1.1s ease}
+.q-bg.on{opacity:.16}
+.q-bg::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 12%,var(--bg) 78%)}
+.quote{position:relative;overflow:hidden}
+.quote .qm{position:absolute;top:52px;left:50%;transform:translateX(-50%);z-index:0;
+  font-family:var(--serif);font-size:11rem;line-height:1;color:var(--gold);opacity:.055;pointer-events:none}
 .quote blockquote{font-family:var(--serif);font-style:italic;font-weight:300;
   font-size:clamp(1.45rem,3.9vw,2.5rem);line-height:1.5;color:rgba(255,255,255,.9);
   max-width:22ch;margin:0 auto 26px}
@@ -510,7 +540,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <nav class="nav" id="nav">
   <div class="nav-in">
     <a class="brand" href="index.html" aria-label="Zetwal Organisation">
-      <img class="mark" src="logo.png" alt="" width="30" height="30">
+      <img class="mark" src="logo.png" alt="" width="30" height="30" data-media="global.logo">
       <b>ZETWAL <em>ORGANISATION</em></b>
     </a>
 
@@ -576,7 +606,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <div class="mask" id="mask" role="dialog" aria-modal="true" aria-labelledby="m-ttl">
   <div class="box">
     <button class="p-x" id="m-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    <img class="logo" src="logo.png" alt="" width="44" height="44">
+    <img class="logo" src="logo.png" alt="" width="44" height="44" data-media="global.logo">
     <h3 id="m-ttl">Byenveni</h3>
     <p class="lead" id="m-lead">Konekte pou w wè pwen ou yo.</p>
 
@@ -621,6 +651,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 
 <!-- ══════════ HERO ══════════ -->
 <header class="hero" id="hero">
+  <span class="shot" data-media="home.hero" style="z-index:-2" aria-hidden="true"></span>
   <svg class="constel" viewBox="0 0 880 340" fill="none" aria-hidden="true">
     <line x1="70"  y1="228" x2="196" y2="132" style="--l:158;--dl:0ms"/>
     <line x1="196" y1="132" x2="336" y2="176" style="--l:147;--dl:160ms"/>
@@ -681,6 +712,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <div class="grid">
 
       <a href="lavri.html" class="card w7">
+        <span class="shot" data-media="home.card.lavri" aria-hidden="true"></span>
         <div class="card-top">
           <span class="no">01</span>
           <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
@@ -700,6 +732,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       </a>
 
       <a href="shop.html" class="card w5">
+        <span class="shot" data-media="home.card.shop" aria-hidden="true"></span>
         <div class="card-top">
           <span class="no">02</span>
           <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
@@ -719,6 +752,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       </a>
 
       <a href="mall.html" class="card w5">
+        <span class="shot" data-media="home.card.mall" aria-hidden="true"></span>
         <div class="card-top">
           <span class="no">03</span>
           <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
@@ -739,6 +773,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       </a>
 
       <a href="games.html" class="card w7">
+        <span class="shot" data-media="home.card.jwet" aria-hidden="true"></span>
         <div class="card-top">
           <span class="no">04</span>
           <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
@@ -763,7 +798,9 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 
 <!-- ══════════ SITASYON ══════════ -->
 <section class="quote" id="quote">
-  <div class="wrap">
+  <span class="q-bg" data-media="home.quote" aria-hidden="true"></span>
+  <div class="wrap" style="position:relative;z-index:1">
+    <div class="q-av" id="q-av" aria-hidden="true"><span>Z</span></div>
     <span class="qm" aria-hidden="true">“</span>
     <blockquote id="q-txt"></blockquote>
     <div class="who" id="q-who"></div>
@@ -1124,6 +1161,44 @@ function greet(name){
 }
 greet(null);
 
+/* ── Imaj yo : yon sèl demann, tout paj la ranpli ──
+   Si yon anplasman vid, eleman an kenbe aparans orijinal li. */
+async function applyMedia(){
+  if(!sb) return;
+  var rows = [];
+  try{
+    var r = await sb.from('site_media').select('slot,url,alt');
+    if(r.error) throw r.error;
+    rows = r.data || [];
+  }catch(e){ return; }
+
+  var map = {};
+  rows.forEach(function(r){ if(r.url) map[r.slot] = r; });
+
+  $$('[data-media]').forEach(function(el){
+    var m = map[el.getAttribute('data-media')];
+    if(!m) return;
+    if(el.tagName === 'IMG'){
+      el.src = m.url;
+      if(m.alt) el.alt = m.alt;
+      return;
+    }
+    var img = new Image();
+    img.onload = function(){
+      el.style.backgroundImage = 'url("' + m.url + '")';
+      el.classList.add('on');
+      var card = el.closest('.card');
+      if(card) card.classList.add('pic');
+      if(m.alt){
+        var host = card || el.parentElement;
+        if(host && !host.getAttribute('aria-label')) host.setAttribute('aria-label', m.alt);
+      }
+    };
+    img.src = m.url;
+  });
+}
+applyMedia();
+
 async function storeStatus(){
   var b = $('#badge'), t = $('#badge-t'), force = null;
   if(sb){
@@ -1161,18 +1236,45 @@ var QUOTE_NOW = null;
 
 function paintQuote(q){
   if(!q || !q.text) return;
+  var same = QUOTE_NOW && QUOTE_NOW.text === q.text && QUOTE_NOW.photo === q.photo;
   QUOTE_NOW = q;
-  $('#q-txt').textContent = q.text;
+
+  /* tèks la koupe an mo pou li ka parèt mo pa mo */
+  var box = $('#q-txt');
+  box.textContent = q.text;
+  box.removeAttribute('aria-label');
+  box.setAttribute('data-split','wd');
+  split(box);
+
   $('#q-who').textContent = q.author ? '— ' + q.author : '';
   $('#q-day').textContent = new Date().toLocaleDateString('fr-FR',
     { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-  var sec = $('#quote'); sec.classList.add('show');
-  if(!CALM && 'IntersectionObserver' in window){
-    var o = new IntersectionObserver(function(es){
-      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); o.unobserve(e.target); } });
-    }, { threshold:.2 });
-    o.observe(sec);
-  } else sec.classList.add('in');
+
+  /* pòtrè otè a — li soti nan konsòl admin lan */
+  var av = $('#q-av');
+  if(q.photo){
+    av.innerHTML = '<img src="' + q.photo + '" alt="' + (q.author || '') + '">';
+    av.style.display = '';
+  } else if(q.author){
+    av.innerHTML = '<span>' + q.author.trim().charAt(0).toUpperCase() + '</span>';
+    av.style.display = '';
+  } else {
+    av.style.display = 'none';
+  }
+
+  var sec = $('#quote');
+  sec.classList.add('show');
+  if(same && sec.classList.contains('in')) return;
+
+  if(CALM || !('IntersectionObserver' in window)){ sec.classList.add('in'); return; }
+  sec.classList.remove('in');
+  var o = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); o.unobserve(e.target); } });
+  }, { threshold:.22 });
+  o.observe(sec);
+  /* si li deja anba je a lè done a rive */
+  var r = sec.getBoundingClientRect();
+  if(r.top < innerHeight * .8 && r.bottom > 0) sec.classList.add('in');
 }
 
 async function dailyQuote(){
@@ -1476,6 +1578,9 @@ var KB = [
     a:function(){
       if(QUOTE_NOW) return "Sitasyon jodi a se :\n\n<b>« " + QUOTE_NOW.text + " »</b>" + (QUOTE_NOW.author ? "\n— " + QUOTE_NOW.author : "") + "\n\nSe administratè a ki chwazi l chak semèn depi konsòl la.";
       return "Sitasyon an ap chaje. Li parèt pi ba nan paj la, anba seksyon sèvis yo."; } },
+
+  { k:['foto','imaj','photo','pic','ekran','vizyel'],
+    a:function(){ return "Tout imaj ki sou sit la soti nan konsòl administrasyon an, seksyon <b>Imaj</b>.\n\nChak kat sèvis ka gen pwòp foto pa l ki ranpli tout kat la, ak tèks la sou li. Si pa gen foto, anblèm dore a rete — sit la pa janm gen twou."; } },
 
   { k:['anbyans','efe','nej','nèj','lapli','etwal','bouton','fon','animasyon'],
     a:function(){ return "Bouton anba adwat la chanje anbyans paj la : <b>Etwal</b>, <b>Nèj</b>, <b>Lapli</b>, oswa <b>Anyen</b>.\n\nKlike sou li otan fwa ou vle. Si telefòn ou mande mwens mouvman, nou koupe tout animasyon otomatikman."; } },
