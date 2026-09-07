@@ -18,6 +18,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
@@ -311,6 +312,51 @@ h1,h2,h3,h4{line-height:1.2;font-weight:600;letter-spacing:-.01em}
   background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px}
 .field select option{background:#151515;color:#fff}
 input[type=checkbox]{accent-color:var(--gold);width:16px;height:16px;cursor:pointer;flex:none}
+/* Grille de formulaire */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 var(--s4)}
+.form-grid .span2{grid-column:1 / -1}
+@media(max-width:700px){.form-grid{grid-template-columns:1fr}}
+.quick-row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Machines */
+.mode-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mode-btn{flex:1;min-width:190px;text-align:left;padding:16px 18px;border-radius:var(--r-md);cursor:pointer;
+  border:1px solid var(--line);background:var(--bg-deep);color:var(--text);font-family:inherit;
+  transition:border-color var(--fast),background var(--fast)}
+.mode-btn:hover{border-color:var(--line-gold)}
+.mode-btn.on{border-color:var(--gold);background:var(--gold-a08)}
+.mode-btn b{display:block;font-size:.9rem;margin-bottom:4px}
+.mode-btn span{font-size:.76rem;color:var(--muted);line-height:1.5;display:block}
+.mach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:var(--s4)}
+.mcell{border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4);background:var(--surface)}
+.mcell.free{border-color:rgba(0,224,138,.28)}
+.mcell.busy{border-color:rgba(255,184,77,.28)}
+.mcell.off{opacity:.62}
+.mcell-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:var(--s3)}
+.mcell-n{font-size:.9rem;font-weight:600}
+.mcell-c{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.mcell-s{font-size:.76rem;color:var(--muted);margin-bottom:var(--s3);min-height:20px}
+.mcell-b{display:flex;gap:6px;flex-wrap:wrap}
+.mcell-b .btn{flex:1;justify-content:center;min-width:0}
+.mrow{display:flex;gap:8px;align-items:center;margin-bottom:var(--s3)}
+.mrow input,.mrow select{flex:1;min-width:0}
+
+/* Points */
+.preq{border:1px solid var(--line-gold);border-radius:var(--r-md);padding:var(--s5);background:var(--gold-a08);
+  margin-bottom:var(--s4)}
+.preq-h{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:var(--s4)}
+.preq-w{font-size:.94rem;font-weight:600}
+.preq-e{font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.preq-d{font-family:var(--display);font-size:1.9rem;font-weight:700;line-height:1}
+.preq-d.up{color:var(--ok)}.preq-d.down{color:var(--bad)}
+.preq-code{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:var(--s4);border-radius:var(--r-md);
+  background:var(--bg-deep);border:1px dashed var(--line-gold);margin-bottom:var(--s4)}
+.preq-code b{font-family:var(--mono);font-size:1.6rem;letter-spacing:.32em;color:var(--gold)}
+.preq-code small{font-size:.72rem;color:var(--muted);line-height:1.5}
+.preq-in{display:flex;gap:8px;flex-wrap:wrap}
+.preq-in input{flex:1;min-width:150px;font-family:var(--mono);letter-spacing:.24em;text-align:center}
+.preq-seen{font-size:.72rem;color:var(--ok);display:inline-flex;align-items:center;gap:6px}
+
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:var(--s5)}
 .toolbar .input{flex:1;min-width:180px}
 .toolbar select.input{flex:0 0 auto;width:auto;min-width:150px}
@@ -1083,6 +1129,56 @@ tbody tr:last-child td{border-bottom:none}
     <section class="panel" id="tab-analytics"></section>
     <section class="panel" id="tab-calculator"></section>
 
+    <!-- ═════ MACHINES ═════ -->
+    <section class="panel" id="tab-machines">
+      <div class="card">
+        <div class="card-head">
+          <h3><span data-icon="settings"></span> Mode d'affichage</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadMachinesAdmin()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button>
+        </div>
+        <p class="card-sub">En mode automatique, la page Lavri fait tourner les cycles toute seule pendant les heures d'ouverture, et affiche tout fermé quand le magasin est fermé. En mode manuel, elle affiche exactement ce que vous réglez ci-dessous.</p>
+        <div id="mach-mode"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="drop"></span> Les machines</h3><span class="chip" id="mach-summary">—</span></div>
+        <div id="mach-admin"></div>
+      </div>
+    </section>
+
+    <!-- ═════ POINTS CLIENTS ═════ -->
+    <section class="panel" id="tab-points">
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="plus"></span> Nouvelle demande</h3></div>
+        <p class="card-sub">Le client reçoit un code à 6 chiffres. Il vous le donne, vous le saisissez, et seulement là ses points changent. Sans le code, rien ne bouge.</p>
+        <div class="form-grid">
+          <div class="field"><label for="pt-mail">Adresse e-mail du client</label>
+            <input type="email" id="pt-mail" class="input" placeholder="kliyan@gmail.com"></div>
+          <div class="field"><label for="pt-delta">Points</label>
+            <input type="number" id="pt-delta" class="input" placeholder="Ex : 50 pour ajouter, -20 pour retirer" step="0.5"></div>
+          <div class="field span2"><label for="pt-why">Motif (le client le verra)</label>
+            <input type="text" id="pt-why" class="input" placeholder="Ex : achat de points en magasin, gain au Duel Mental…"></div>
+        </div>
+        <div class="quick-row" style="margin-top:var(--s4)">
+          <button class="btn btn-quiet btn-sm" onclick="ptQuick(10)">+10</button>
+          <button class="btn btn-quiet btn-sm" onclick="ptQuick(50)">+50</button>
+          <button class="btn btn-quiet btn-sm" onclick="ptQuick(100)">+100</button>
+          <button class="btn btn-quiet btn-sm" onclick="ptQuick(-10)">−10</button>
+          <button class="btn btn-quiet btn-sm" onclick="ptQuick(-50)">−50</button>
+        </div>
+        <button class="btn btn-gold btn-block" style="margin-top:var(--s5)" onclick="createPointRequest()">
+          <span data-icon="send" data-size="sm"></span> Créer la demande et générer le code</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="clock"></span> Demandes en cours</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadPointRequests()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
+        <div id="pt-pending"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="history"></span> Historique</h3></div>
+        <div id="pt-history"></div>
+      </div>
+    </section>
+
     <!-- ═════ IMAGES DU SITE ═════ -->
     <section class="panel" id="tab-media">
       <div class="card">
@@ -1480,10 +1576,12 @@ const NAV=[
     {id:'calculator',label:'Calculatrice',icon:'calculator'}
   ]},
   {g:'Laverie', items:[
+    {id:'machines',label:'Machines',icon:'settings'},
     {id:'wash',label:'Nouvelle fiche',icon:'drop'},
     {id:'history',label:'Fiches enregistrées',icon:'history'}
   ]},
   {g:'Réglages', items:[
+    {id:'points',label:'Points clients',icon:'trophy'},
     {id:'media',label:'Images du site',icon:'image'},
     {id:'settings',label:'Paramètres',icon:'settings'},
     {id:'access',label:'Accès temporaires',icon:'key'}
@@ -1502,6 +1600,8 @@ const TAB_META={
   history:{t:'Fiches de lavage',s:'Suivi et statuts'},
   analytics:{t:'Analytics',s:'Tendances et répartitions'},
   calculator:{t:'Calculatrice',s:'Marges et revenus'},
+  machines:{t:'Machines',s:'État des machines de la laverie'},
+  points:{t:'Points clients',s:'Ajouter ou retirer des points'},
   media:{t:'Images du site',s:'Visuels des pages publiques'},
   settings:{t:'Paramètres',s:'Magasin, taux et citations'},
   access:{t:'Accès temporaires',s:'Sessions limitées dans le temps'}
@@ -1562,6 +1662,8 @@ window.switchTab = (name)=>{
   if(name==='calculator')    initCalculator();
   if(name==='settings')      initSettings();
   if(name==='media')         loadMedia();
+  if(name==='machines')      loadMachinesAdmin();
+  if(name==='points')        initPoints();
   if(name==='wash')          initWashTarifs();
   if(name==='add')           initColorPicker();
   if(name==='access')        setTimeout(()=>{ if(typeof window.initAccessTab==='function') window.initAccessTab(); },80);
@@ -2695,6 +2797,265 @@ window.saveMediaAlt=async(slot,val)=>{
 };
 window.loadMedia=loadMedia;
 
+/* ════════════════════════════════════════════════════════════
+   §12ter — MACHINES DE LA LAVERIE
+   ════════════════════════════════════════════════════════════ */
+let machRows=[], machMode='auto', machBusy=7, machTimer=null;
+
+async function loadMachinesAdmin(){
+  const box=document.getElementById('mach-admin'); if(!box) return;
+  if(!machRows.length) box.innerHTML='<div class="mach-grid">'+skeletonCards(6)+'</div>';
+  try{
+    const [m,s]=await Promise.all([
+      db.from('wash_machines').select('*').order('position'),
+      db.from('site_settings').select('key,value').in('key',['lavri_mode','lavri_auto_busy'])
+    ]);
+    if(m.error) throw m.error;
+    machRows=m.data||[];
+    (s.data||[]).forEach(r=>{
+      if(r.key==='lavri_mode') machMode=r.value||'auto';
+      if(r.key==='lavri_auto_busy') machBusy=parseInt(r.value||'7',10);
+    });
+    if(machBusy>machRows.length) machBusy=machRows.length;
+    renderMachMode(); renderMachAdmin();
+    if(!machTimer) machTimer=setInterval(()=>{ if(currentTab==='machines') renderMachAdmin(); },1000);
+  }catch(e){
+    box.innerHTML=errorState('Machines indisponibles',
+      "La table wash_machines n'existe pas encore. Exécutez zetwal-lavri.sql dans Supabase.",
+      'loadMachinesAdmin()',e.message);
+  }
+}
+function renderMachMode(){
+  const c=document.getElementById('mach-mode'); if(!c) return;
+  c.innerHTML='<div class="mode-row">'
+    +'<button class="mode-btn'+(machMode==='auto'?' on':'')+'" onclick="setMachMode(\'auto\')">'
+      +'<b>Automatique</b><span>La page fait tourner les cycles pendant les heures d\'ouverture. Magasin fermé = tout est marqué fermé.</span></button>'
+    +'<button class="mode-btn'+(machMode==='manual'?' on':'')+'" onclick="setMachMode(\'manual\')">'
+      +'<b>Manuel</b><span>La page affiche exactement l\'état que vous réglez ci-dessous, ouvert ou fermé.</span></button>'
+    +'</div>'
+    +(machMode==='auto'
+      ? '<div class="field" style="margin-top:var(--s5);max-width:320px"><label for="mach-busy">Machines occupées en mode automatique</label>'
+        +'<select id="mach-busy" class="input" onchange="setAutoBusy(this.value)">'
+        + Array.from({length:(machRows.length||10)+1},(_,i)=>
+            '<option value="'+i+'"'+(i===machBusy?' selected':'')+'>'+i+' occupée(s) · '+((machRows.length||10)-i)+' disponible(s)</option>').join('')
+        +'</select><div class="hint">Le client verra ce partage tant que le magasin est ouvert.</div></div>'
+      : '');
+}
+window.setMachMode=async(m)=>{
+  machMode=m; renderMachMode(); renderMachAdmin();
+  try{
+    await db.from('site_settings').upsert({key:'lavri_mode',value:m,updated_at:new Date().toISOString()},{onConflict:'key'});
+    toast(m==='auto'?'Mode automatique activé':'Mode manuel activé','success');
+  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+};
+window.setAutoBusy=async(v)=>{
+  machBusy=parseInt(v,10);
+  try{
+    await db.from('site_settings').upsert({key:'lavri_auto_busy',value:String(machBusy),updated_at:new Date().toISOString()},{onConflict:'key'});
+    toast(machBusy+' machine(s) occupée(s) sur la page publique','success');
+  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+};
+
+function machState(m){
+  if(m.status==='off') return {s:'off',left:0};
+  if(m.status!=='busy'||!m.ends_at) return {s:'free',left:0};
+  const left=Math.round((new Date(m.ends_at).getTime()-Date.now())/1000);
+  return left<=0?{s:'free',left:0}:{s:'busy',left};
+}
+function mmss(x){ return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0'); }
+
+function renderMachAdmin(){
+  const c=document.getElementById('mach-admin'); if(!c) return;
+  if(!machRows.length){
+    c.innerHTML=emptyState('drop','Aucune machine',"Exécutez zetwal-lavri.sql pour créer les dix machines.");
+    return;
+  }
+  let free=0,busy=0,off=0;
+  const html=machRows.map(m=>{
+    const st=machState(m);
+    if(st.s==='free')free++; else if(st.s==='busy')busy++; else off++;
+    return '<div class="mcell '+st.s+'" id="mcl-'+escH(m.id)+'">'
+      +'<div class="mcell-h"><span class="mcell-n">'+escH(m.name||m.code)+'</span><span class="mcell-c">'+escH(m.code||'')+'</span></div>'
+      +'<div class="mcell-s">'+(
+          st.s==='free' ? '<span style="color:var(--ok)">Disponible</span>'
+        : st.s==='busy' ? '<span style="color:var(--warn)">Occupée — '+mmss(st.left)+' restantes'+(m.load_kg?' · '+m.load_kg+' kg':'')+'</span>'
+        : '<span style="color:var(--muted)">En réparation</span>')+'</div>'
+      +(st.s==='free'
+        ? '<div class="mrow"><input type="number" class="input" id="mkg-'+escH(m.id)+'" placeholder="kg" min="1" max="30" style="max-width:80px">'
+          +'<select class="input" id="mdur-'+escH(m.id)+'"><option value="30">30 min</option><option value="45" selected>45 min</option>'
+          +'<option value="60">60 min</option><option value="90">1 h 30</option></select></div>'
+        : '')
+      +'<div class="mcell-b">'
+        +(st.s==='free'?'<button class="btn btn-gold btn-sm" onclick="machStart(\''+escH(m.id)+'\')">'+icon('bolt','sm')+' Lancer</button>':'')
+        +(st.s==='busy'?'<button class="btn btn-ghost btn-sm" onclick="machFree(\''+escH(m.id)+'\')">'+icon('check','sm')+' Libérer</button>'
+                       +'<button class="btn btn-quiet btn-sm" onclick="machExtend(\''+escH(m.id)+'\',10)">+10 min</button>':'')
+        +(st.s==='off'?'<button class="btn btn-ghost btn-sm" onclick="machFree(\''+escH(m.id)+'\')">'+icon('check','sm')+' Remettre en service</button>'
+                      :'<button class="btn btn-quiet btn-sm" onclick="machOff(\''+escH(m.id)+'\')">'+icon('ban','sm')+' Panne</button>')
+      +'</div></div>';
+  }).join('');
+  c.innerHTML='<div class="mach-grid">'+html+'</div>';
+  const sum=document.getElementById('mach-summary');
+  if(sum) sum.textContent=free+' libre(s) · '+busy+' occupée(s)'+(off?' · '+off+' en panne':'');
+  paintIcons();
+}
+async function machSave(id,patch){
+  try{
+    const {error}=await db.from('wash_machines').update(patch).eq('id',id);
+    if(error) throw error;
+    const r=machRows.find(x=>x.id===id); if(r) Object.assign(r,patch);
+    renderMachAdmin();
+  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+}
+window.machStart=(id)=>{
+  const kg=parseFloat(document.getElementById('mkg-'+id)?.value)||null;
+  const min=parseInt(document.getElementById('mdur-'+id)?.value||'45',10);
+  const now=new Date();
+  machSave(id,{status:'busy',load_kg:kg,started_at:now.toISOString(),
+    ends_at:new Date(now.getTime()+min*60000).toISOString()});
+  toast('Cycle lancé pour '+min+' minutes','success');
+};
+window.machFree=(id)=>{ machSave(id,{status:'available',load_kg:null,started_at:null,ends_at:null}); toast('Machine libérée','success'); };
+window.machOff=(id)=>{ machSave(id,{status:'off',load_kg:null,started_at:null,ends_at:null}); toast('Machine marquée en panne','success'); };
+window.machExtend=(id,min)=>{
+  const r=machRows.find(x=>x.id===id); if(!r||!r.ends_at) return;
+  machSave(id,{ends_at:new Date(new Date(r.ends_at).getTime()+min*60000).toISOString()});
+  toast('+'+min+' minutes','success');
+};
+window.loadMachinesAdmin=loadMachinesAdmin;
+
+/* ════════════════════════════════════════════════════════════
+   §12quater — POINTS DES CLIENTS
+   Une modification n'est jamais appliquée sans le code du client.
+   ════════════════════════════════════════════════════════════ */
+let fstore=null, preqRows=[];
+function getStore(){
+  if(fstore) return fstore;
+  try{ fstore=firebase.firestore(); }catch(e){ fstore=null; }
+  return fstore;
+}
+function initPoints(){ loadPointRequests(); }
+window.ptQuick=(n)=>{
+  const el=document.getElementById('pt-delta');
+  el.value=(parseFloat(el.value)||0)+n;
+  el.focus();
+};
+function code6(){ return String(Math.floor(100000+Math.random()*900000)); }
+
+window.createPointRequest=async()=>{
+  const mail=(document.getElementById('pt-mail').value||'').trim().toLowerCase();
+  const delta=parseFloat(document.getElementById('pt-delta').value);
+  const why=(document.getElementById('pt-why').value||'').trim();
+  if(!mail||mail.indexOf('@')<0){ toast("Entrez l'adresse e-mail du client",'error'); return; }
+  if(!delta||isNaN(delta)){ toast('Entrez un nombre de points (négatif pour retirer)','error'); return; }
+  try{
+    const row={email:mail,delta:delta,reason:why||null,code:code6(),status:'pending',
+      created_by:(currentUser&&currentUser.email)||'admin',
+      expires_at:new Date(Date.now()+30*60000).toISOString()};
+    const {error}=await db.from('point_requests').insert(row);
+    if(error) throw error;
+    document.getElementById('pt-delta').value='';
+    document.getElementById('pt-why').value='';
+    toast('Demande créée — transmettez le code au client','success');
+    loadPointRequests();
+  }catch(e){ toast('Création impossible : '+e.message,'error'); }
+};
+
+async function loadPointRequests(){
+  const p=document.getElementById('pt-pending'), h=document.getElementById('pt-history');
+  if(!p) return;
+  try{
+    const {data,error}=await db.from('point_requests').select('*').order('created_at',{ascending:false}).limit(60);
+    if(error) throw error;
+    preqRows=data||[];
+    const now=Date.now();
+    const pend=preqRows.filter(r=>r.status==='pending'&&new Date(r.expires_at).getTime()>now);
+    const past=preqRows.filter(r=>!(r.status==='pending'&&new Date(r.expires_at).getTime()>now));
+    p.innerHTML=pend.length?pend.map(preqCard).join('')
+      :emptyState('check','Aucune demande en attente','Créez une demande ci-dessus pour modifier les points d\'un client.');
+    h.innerHTML=past.length?'<table class="table stack"><thead><tr><th>Client</th><th>Points</th><th>Motif</th><th>État</th><th>Date</th></tr></thead><tbody>'
+      +past.slice(0,25).map(r=>'<tr>'
+        +'<td data-l="Client">'+escH(r.user_name||r.email)+'</td>'
+        +'<td data-l="Points" style="color:'+(r.delta>=0?'var(--ok)':'var(--bad)')+';font-weight:600">'+(r.delta>0?'+':'')+r.delta+'</td>'
+        +'<td data-l="Motif">'+escH(r.reason||'—')+'</td>'
+        +'<td data-l="État">'+({applied:'Appliqué',refused:'Refusé par le client',expired:'Expiré',pending:'Expiré'}[r.status]||r.status)+'</td>'
+        +'<td data-l="Date">'+new Date(r.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</td>'
+      +'</tr>').join('')+'</tbody></table>'
+      :emptyState('history','Aucun historique','Les modifications de points apparaîtront ici.');
+    paintIcons();
+  }catch(e){
+    p.innerHTML=errorState('Points indisponibles',
+      "La table point_requests n'existe pas encore. Exécutez zetwal-pwen-machin.sql dans Supabase.",
+      'loadPointRequests()',e.message);
+  }
+}
+function preqCard(r){
+  const up=r.delta>=0;
+  const subject=encodeURIComponent('Kòd pou pwen Zetwal ou yo');
+  const body=encodeURIComponent(
+    'Bonjou,\n\nNou vle '+(up?'ajoute':'retire')+' '+Math.abs(r.delta)+' pwen '+(up?'nan':'sou')+' kont Zetwal ou.'
+    +(r.reason?'\nMotif : '+r.reason:'')
+    +'\n\nKòd konfimasyon ou se : '+r.code
+    +'\n\nBay administratè a kòd sa pou nou ka fè chanjman an. Li valab pou 30 minit.\n\nZetwal Organisation');
+  return '<div class="preq">'
+    +'<div class="preq-h"><div><div class="preq-w">'+escH(r.user_name||r.email)+'</div>'
+      +'<div class="preq-e">'+escH(r.email)+'</div>'
+      +(r.reason?'<div style="font-size:.78rem;color:var(--muted);margin-top:6px">'+escH(r.reason)+'</div>':'')
+      +(r.seen_at?'<div class="preq-seen" style="margin-top:8px">'+icon('check','sm')+' Le client a vu la demande sur le site</div>':'')
+      +'</div>'
+      +'<div class="preq-d '+(up?'up':'down')+'">'+(up?'+':'')+r.delta+'</div></div>'
+    +'<div class="preq-code"><b>'+escH(r.code)+'</b>'
+      +'<small>Le client doit vous donner ce code.<br>Il l\'a reçu par e-mail, et il le voit à l\'écran s\'il est connecté.</small>'
+      +'<a class="btn btn-ghost btn-sm" href="mailto:'+escH(r.email)+'?subject='+subject+'&body='+body+'">'+icon('send','sm')+' Envoyer par e-mail</a>'
+    +'</div>'
+    +'<div class="preq-in">'
+      +'<input type="text" class="input" id="pc-'+escH(r.id)+'" placeholder="Code du client" maxlength="6" inputmode="numeric">'
+      +'<button class="btn btn-gold btn-sm" onclick="applyPoints(\''+escH(r.id)+'\')">'+icon('check','sm')+' Appliquer</button>'
+      +'<button class="btn btn-quiet btn-sm" onclick="cancelPointRequest(\''+escH(r.id)+'\')">Annuler</button>'
+    +'</div></div>';
+}
+
+async function findUid(r){
+  if(r.uid) return r.uid;
+  const fs=getStore(); if(!fs) return null;
+  try{
+    const q=await fs.collection('users').where('email','==',r.email).limit(1).get();
+    if(!q.empty) return q.docs[0].id;
+  }catch(e){}
+  return null;
+}
+window.applyPoints=async(id)=>{
+  const r=preqRows.find(x=>x.id===id); if(!r) return;
+  const typed=(document.getElementById('pc-'+id).value||'').trim();
+  if(typed!==String(r.code)){ toast('Le code ne correspond pas','error'); return; }
+  if(new Date(r.expires_at).getTime()<Date.now()){ toast('Cette demande a expiré','error'); loadPointRequests(); return; }
+  const fs=getStore();
+  if(!fs){ toast('Firestore indisponible','error'); return; }
+  const uid=await findUid(r);
+  if(!uid){ toast("Compte introuvable. Demandez au client de se connecter une fois sur le site.",'error'); return; }
+  try{
+    const ref=fs.collection('users').doc(uid);
+    const after=await fs.runTransaction(async(t)=>{
+      const doc=await t.get(ref);
+      const cur=doc.exists?(doc.data().points||0):0;
+      const next=Math.max(0,Number(cur)+Number(r.delta));
+      t.set(ref,{points:next},{merge:true});
+      return next;
+    });
+    await db.from('point_requests').update({status:'applied',uid:uid,
+      applied_at:new Date().toISOString(),balance_after:after}).eq('id',id);
+    toast('Points mis à jour — nouveau solde : '+after.toFixed(1),'success');
+    loadPointRequests();
+  }catch(e){ toast('Modification impossible : '+e.message,'error'); }
+};
+window.cancelPointRequest=async(id)=>{
+  try{
+    await db.from('point_requests').update({status:'expired'}).eq('id',id);
+    toast('Demande annulée','success'); loadPointRequests();
+  }catch(e){ toast('Annulation impossible : '+e.message,'error'); }
+};
+window.loadPointRequests=loadPointRequests;
+window.initPoints=initPoints;
+
 function renderNotifList(list){
   const c=document.getElementById('notif-list'); if(!c) return;
   if(!list.length){
@@ -3196,6 +3557,7 @@ const TEMP_TABS=[
   {id:'sales',label:'Ventes'},{id:'orders',label:'Commandes'},{id:'notifications',label:'Notifications'},
   {id:'scan',label:'Scanner'},{id:'wash',label:'Fiche de lavage'},{id:'history',label:'Fiches enregistrées'},
   {id:'analytics',label:'Analytics'},{id:'calculator',label:'Calculatrice'},
+  {id:'machines',label:'Machines'},{id:'points',label:'Points clients'},
   {id:'media',label:'Images du site'},{id:'settings',label:'Paramètres'}
 ];
 function applyTempAccessRestrictions(perms){
