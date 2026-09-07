@@ -1457,7 +1457,7 @@ async function seedUser(user, name){
     if(!snap.exists){
       await ref.set({
         name  : name || user.displayName || '',
-        email : user.email || '',
+        email : (user.email || '').toLowerCase(),
         points: 0,
         createdAt: new Date().toISOString()
       }, { merge:true });
