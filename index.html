@@ -489,6 +489,15 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
   .dk-tip{display:none}
 }
 
+.pq-ic{width:54px;height:54px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;
+  font-family:var(--serif);font-size:1.6rem;font-weight:700;border:1px solid var(--g-24);background:var(--g-08);color:var(--gold)}
+.pq-ic.pos{color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.07)}
+.pq-ic.neg{color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.07)}
+.pq-why{font-size:.78rem;color:var(--ink-3);text-align:center;margin-bottom:18px;line-height:1.6}
+.pq-code{padding:16px;border-radius:10px;text-align:center;border:1px dashed var(--g-24);background:rgba(255,255,255,.03)}
+.pq-code span{font-family:var(--sans);font-size:1.8rem;font-weight:700;letter-spacing:.34em;color:var(--gold);
+  padding-left:.34em}
+.pq-help{font-size:.68rem;color:var(--ink-4);text-align:center;margin:14px 0 18px;line-height:1.65}
 /* ── 12. Ekran ki pi piti ─────────────────────────────────────── */
 @media(max-width:1020px){
   .grid{grid-template-columns:1fr;gap:16px}
@@ -603,6 +612,21 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 </div>
 
 <!-- ══════════ MODAL KONEKSYON ══════════ -->
+<div class="mask" id="pmask" role="dialog" aria-modal="true" aria-labelledby="pq-ttl">
+  <div class="box">
+    <button class="p-x" id="pq-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="pq-ic" id="pq-ic" aria-hidden="true"></div>
+    <h3 id="pq-ttl">Demann pwen</h3>
+    <p class="lead" id="pq-lead">—</p>
+    <div class="pq-why" id="pq-why"></div>
+    <div class="pq-code"><span id="pq-code">——————</span></div>
+    <p class="pq-help">Bay administratè a kòd sa a pou l ka fè chanjman an. Li valab pou 30 minit.<br>
+      Ou resevwa menm kòd la pa imel tou.</p>
+    <button class="btn btn-g" id="pq-ok" type="button">Mwen bay kòd la</button>
+    <button class="gbtn" id="pq-no" type="button" style="margin-top:9px">Se pa mwen — refize</button>
+  </div>
+</div>
+
 <div class="mask" id="mask" role="dialog" aria-modal="true" aria-labelledby="m-ttl">
   <div class="box">
     <button class="p-x" id="m-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
@@ -1482,6 +1506,7 @@ function initial(s){ return (s || 'Z').trim().charAt(0).toUpperCase() || 'Z'; }
 if(auth) auth.onAuthStateChanged(async function(user){
   if(unsubPts){ unsubPts(); unsubPts = null; }
 
+  pqWatch(null);
   if(!user){
     $('#login-btn').style.display = '';
     $('#who-btn').style.display   = 'none';
@@ -1538,7 +1563,70 @@ if(auth) auth.onAuthStateChanged(async function(user){
   }
   $('#a-st').textContent  = status;
   $('#dr-st').textContent = status;
+  pqWatch(user);
 });
+
+/* ══ DEMANN PWEN — kòd konfimasyon kliyan an ══════════════════ */
+var PQ = { row:null, sub:null };
+function pqShow(r){
+  PQ.row = r;
+  var up = Number(r.delta) >= 0;
+  $('#pq-ic').className = 'pq-ic ' + (up ? 'pos' : 'neg');
+  $('#pq-ic').textContent = (up ? '+' : '') + r.delta;
+  $('#pq-ttl').textContent = up ? 'Yon administratè vle ajoute pwen' : 'Yon administratè vle retire pwen';
+  $('#pq-lead').textContent = up
+    ? 'Nou vle mete ' + Math.abs(r.delta) + ' pwen nan kont ou.'
+    : 'Nou vle wete ' + Math.abs(r.delta) + ' pwen nan kont ou.';
+  $('#pq-why').textContent = r.reason ? '« ' + r.reason + ' »' : '';
+  $('#pq-code').textContent = r.code || '——————';
+  $('#pmask').classList.add('open');
+  document.body.classList.add('lock');
+}
+function pqHide(){ $('#pmask').classList.remove('open'); document.body.classList.remove('lock'); }
+$('#pq-x').addEventListener('click', pqHide);
+$('#pq-ok').addEventListener('click', pqHide);
+$('#pq-no').addEventListener('click', async function(){
+  if(PQ.row && sb){
+    try{ await sb.from('point_requests').update({ status:'refused' }).eq('id', PQ.row.id); }catch(e){}
+  }
+  pqHide();
+});
+
+async function pqCheck(user){
+  if(!sb || !user || !user.email) return;
+  try{
+    var r = await sb.from('point_requests').select('*')
+      .eq('email', user.email.toLowerCase()).eq('status','pending')
+      .order('created_at', { ascending:false }).limit(1);
+    var row = (r.data || [])[0];
+    if(!row) return;
+    if(new Date(row.expires_at).getTime() < Date.now()) return;
+    if(PQ.row && PQ.row.id === row.id) return;
+    try{
+      await sb.from('point_requests').update({
+        uid: user.uid,
+        user_name: user.displayName || user.email,
+        seen_at: new Date().toISOString()
+      }).eq('id', row.id);
+    }catch(e){}
+    pqShow(row);
+  }catch(e){}
+}
+function pqWatch(user){
+  if(PQ.sub){ try{ PQ.sub.unsubscribe(); }catch(e){} PQ.sub = null; }
+  if(PQ.timer){ clearInterval(PQ.timer); PQ.timer = null; }
+  if(!user) return;
+  pqCheck(user);
+  PQ.timer = setInterval(function(){ pqCheck(user); }, 25000);
+  try{
+    if(sb && sb.channel){
+      PQ.sub = sb.channel('pq-' + user.uid)
+        .on('postgres_changes', { event:'INSERT', schema:'public', table:'point_requests' },
+            function(){ pqCheck(user); })
+        .subscribe();
+    }
+  }catch(e){}
+}
 
 /* ══ 7. ASISTAN PAJ AKÈY ══════════════════════════════════════
    Repons yo ekri davans epi yo pran done reyèl paj la.
