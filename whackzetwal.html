@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#050505">
+<title>Whack-a-Star — Zetwal Games</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<style>
+
+/* ════════════════════════════════════════════════════════════════
+   SNAKE ZETWAL — yon sèl fichye, zewo depandans lokal.
+   ════════════════════════════════════════════════════════════════ */
+:root{
+  --bg:#050505; --gold:#D4AF37; --gold-lt:#F0D98A; --gold-dp:#B89020;
+  --g-08:rgba(212,175,55,.08); --g-14:rgba(212,175,55,.14); --g-24:rgba(212,175,55,.24);
+  --ink:#fff; --ink-2:rgba(255,255,255,.62); --ink-3:rgba(255,255,255,.40);
+  --ink-4:rgba(255,255,255,.24); --line:rgba(255,255,255,.08);
+  --ok:#00E08A; --bad:#FF6B6B;
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Montserrat',system-ui,sans-serif;
+  --fast:150ms cubic-bezier(.22,1,.36,1); --med:360ms cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);
+  display:flex;flex-direction:column;align-items:center;overflow:hidden;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;user-select:none}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+#grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.14;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E")}
+
+/* ── Bar anwo ── */
+.top{position:relative;z-index:2;width:100%;max-width:560px;padding:14px 18px 0;
+  display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:99px;
+  border:1px solid var(--line);color:var(--ink-3);font-size:.58rem;font-weight:700;
+  letter-spacing:1.4px;text-transform:uppercase;transition:color var(--fast),border-color var(--fast)}
+.back:hover{color:var(--gold);border-color:var(--g-24)}
+.back svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none}
+.who{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:.62rem;color:var(--ink-3)}
+.who b{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  background:var(--g-14);border:1px solid var(--g-24);color:var(--gold);font-size:.62rem}
+
+/* ── Tablo nòt ── */
+.hud{position:relative;z-index:2;width:100%;max-width:560px;padding:16px 18px 12px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.hud > div{padding:11px 8px;border-radius:8px;text-align:center;
+  border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.hud .k{font-size:.5rem;letter-spacing:1.7px;text-transform:uppercase;color:var(--ink-4);margin-bottom:4px}
+.hud .v{font-family:var(--serif);font-size:1.5rem;font-weight:700;line-height:1}
+.hud .v.gold{color:var(--gold-lt)}
+.hud .v.ok{color:var(--ok)}
+
+/* ── Teren an ── */
+.arena{position:relative;z-index:2;width:100%;max-width:560px;padding:0 18px;flex:1;
+  display:flex;align-items:center;justify-content:center;min-height:0}
+.board{position:relative;width:100%;aspect-ratio:1;max-height:100%;border-radius:12px;overflow:hidden;
+  border:1px solid var(--g-14);background:linear-gradient(168deg,rgba(255,255,255,.035),rgba(255,255,255,.008));
+  box-shadow:0 26px 70px rgba(0,0,0,.6),inset 0 0 60px rgba(212,175,55,.03)}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.halo{position:absolute;inset:-30%;pointer-events:none;
+  background:radial-gradient(circle,rgba(212,175,55,.07),transparent 62%);
+  animation:breathe 5s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── Kouch anwo teren an ── */
+.veil{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:24px;
+  background:rgba(5,5,5,.86);backdrop-filter:blur(6px);text-align:center;
+  opacity:0;visibility:hidden;transition:opacity var(--med),visibility var(--med)}
+.veil.on{opacity:1;visibility:visible}
+.veil h2{font-family:var(--serif);font-size:2rem;font-weight:600;margin-bottom:8px}
+.veil h2.bad{color:var(--bad)}
+.veil p{font-size:.8rem;color:var(--ink-3);line-height:1.7;max-width:32ch;margin:0 auto 20px}
+.veil .rows{width:100%;max-width:260px;margin:0 auto 22px}
+.veil .row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:9px 0;font-size:.76rem;border-bottom:1px solid var(--line)}
+.veil .row span:first-child{color:var(--ink-3)}
+.veil .row b{font-family:var(--serif);font-size:1.05rem;color:var(--gold)}
+.veil .row b.ok{color:var(--ok)}
+.btns{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;
+  border-radius:4px;border:1px solid transparent;cursor:pointer;font-family:var(--sans);
+  font-size:.64rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:transparent;
+  transition:transform var(--fast),background var(--fast),border-color var(--fast),color var(--fast)}
+.btn-g{background:var(--gold);color:#0A0A0A}
+.btn-g:hover{background:var(--gold-lt);transform:translateY(-2px)}
+.btn-o{border-color:rgba(255,255,255,.18);color:var(--ink)}
+.btn-o:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.medal{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;
+  border:1px solid var(--g-24);background:var(--g-08)}
+.medal svg{width:28px;height:28px;stroke:var(--gold);stroke-width:1.3;fill:none;stroke-linecap:round}
+.medal.bad{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)}
+.medal.bad svg{stroke:var(--bad)}
+
+/* ── Kontwòl ── */
+.pad{position:relative;z-index:2;width:100%;max-width:560px;padding:14px 18px calc(18px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:10px;justify-content:center}
+.hint{font-size:.62rem;color:var(--ink-4);text-align:center;line-height:1.6}
+.dpad{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(2,52px);gap:8px}
+.dpad button{border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  color:var(--gold);cursor:pointer;display:grid;place-items:center;transition:background var(--fast)}
+.dpad button:active{background:var(--g-14)}
+.dpad button svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round}
+.dpad .up{grid-column:2}
+.pausebtn{width:52px;height:52px;border-radius:8px;border:1px solid var(--line);
+  background:rgba(255,255,255,.04);color:var(--ink-3);cursor:pointer;display:grid;place-items:center}
+.pausebtn:hover{color:var(--gold);border-color:var(--g-24)}
+.pausebtn svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none}
+@media(hover:hover) and (pointer:fine){ .dpad{display:none} }
+@media(hover:none){ .hint{display:none} }
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);z-index:60;
+  padding:12px 20px;border-radius:99px;background:rgba(12,12,12,.96);border:1px solid var(--g-24);
+  font-size:.74rem;opacity:0;pointer-events:none;transition:transform var(--med),opacity var(--med)}
+.toast.on{transform:translate(-50%,0);opacity:1}
+@media(max-height:700px){ .hud .v{font-size:1.2rem} .hud div{padding:8px 6px} }
+@media(prefers-reduced-motion:reduce){ *{animation:none!important;transition-duration:.001ms!important} }
+
+/* ── Twou yo ── */
+.holes{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);gap:10px;padding:14px}
+.hole{position:relative;border-radius:14px;border:1px solid var(--line);cursor:pointer;
+  background:radial-gradient(ellipse at 50% 38%,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  display:grid;place-items:center;overflow:hidden;transition:border-color var(--fast),background var(--fast)}
+.hole::after{content:'';position:absolute;left:14%;right:14%;top:18%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)}
+.hole:active{background:rgba(255,255,255,.05)}
+.hole svg{width:58%;height:58%;pointer-events:none;overflow:visible;
+  filter:drop-shadow(0 0 12px rgba(212,175,55,.7));
+  transform:scale(0) rotate(-25deg);opacity:0;
+  transition:transform 180ms cubic-bezier(.34,1.56,.64,1),opacity 140ms ease}
+.hole.up svg{transform:scale(1) rotate(0);opacity:1}
+.hole.gone svg{transform:scale(.4) rotate(18deg);opacity:0;transition-duration:130ms}
+.hole svg path{fill:var(--gold);stroke:none}
+.hole.gold svg{filter:drop-shadow(0 0 18px rgba(255,243,196,.95))}
+.hole.gold svg path{fill:#FFF3C4}
+.hole.hit{border-color:var(--g-24)}
+.hole .ring{position:absolute;width:16%;height:16%;border-radius:50%;border:2px solid var(--gold);
+  opacity:0;pointer-events:none}
+.hole.hit .ring{animation:ping 450ms ease-out}
+@keyframes ping{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(6)}}
+.hole .pop{position:absolute;font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--gold-lt);
+  opacity:0;pointer-events:none}
+.hole.hit .pop{animation:rise 620ms ease-out}
+@keyframes rise{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-34px)}}
+.hole.miss{animation:shake 260ms ease}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* ── Bar tan ── */
+.timebar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.07);z-index:4}
+.timebar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold-dp),var(--gold-lt));
+  transform-origin:left;transition:transform 1s linear}
+.timebar i.low{background:linear-gradient(90deg,#B84A4A,#FF6B6B)}
+.combo{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:4;
+  font-size:.58rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);
+  padding:5px 13px;border-radius:99px;border:1px solid var(--g-24);background:rgba(5,5,5,.72);
+  opacity:0;transition:opacity var(--fast)}
+.combo.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="grain" aria-hidden="true"></div>
+
+<div class="top">
+  <a class="back" href="games.html"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Hub</a>
+  <div class="who"><b id="av">J</b><span id="nm">Jwè</span></div>
+</div>
+
+<div class="hud">
+  <div><div class="k">Zetwal tape</div><div class="v gold" id="score">0</div></div>
+  <div><div class="k">Pi bon nòt</div><div class="v" id="best">0</div></div>
+  <div><div class="k">Tan ki rete</div><div class="v ok" id="time">30</div></div>
+</div>
+
+<div class="arena">
+  <div class="board" id="board">
+    <div class="halo" aria-hidden="true"></div>
+    <div class="combo" id="combo"></div>
+    <div class="holes" id="holes"></div>
+    <div class="timebar"><i id="tbar"></i></div>
+
+    <div class="veil on" id="v-start">
+      <div>
+        <div class="medal"><svg viewBox="0 0 24 24"><path d="M12 2.6 14.3 8.4h6.1l-4.9 3.7 1.9 5.9-5.4-3.7-5.4 3.7 1.9-5.9L3.6 8.4h6.1L12 2.6Z"/><path d="M5 21h14"/></svg></div>
+        <h2>Whack-a-Star</h2>
+        <p>Trant segonn. Tape chak zetwal ki parèt anvan li disparèt.<br>
+           Chak zetwal ba w <b style="color:var(--gold)">1 pwen</b>, epi zetwal blan an ba w <b style="color:var(--gold)">3</b>.</p>
+        <div class="btns"><button class="btn btn-g" id="go">Kòmanse</button></div>
+        <p class="hint" style="margin-top:16px">Klike sou zetwal la · sou telefòn, tape ak dwèt ou</p>
+      </div>
+    </div>
+
+    <div class="veil" id="v-pause">
+      <div><h2>An poz</h2><p>Konte a kanpe. Jwèt la ap tann ou.</p>
+        <div class="btns"><button class="btn btn-g" id="resume">Kontinye</button></div></div>
+    </div>
+
+    <div class="veil" id="v-end">
+      <div>
+        <div class="medal" id="end-medal"></div>
+        <h2 id="end-t">Tan an fini</h2>
+        <p id="end-d">Men rezilta w.</p>
+        <div class="rows">
+          <div class="row"><span>Zetwal tape</span><b id="end-stars">0</b></div>
+          <div class="row"><span>Pi bon seri</span><b id="end-combo">0</b></div>
+          <div class="row"><span>Presizyon</span><b id="end-acc">0%</b></div>
+          <div class="row"><span>Pwen ajoute</span><b class="ok" id="end-pts">0</b></div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-g" id="again">Rejwe</button>
+          <a class="btn btn-o" href="games.html">Retounen nan hub</a>
+        </div>
+        <p class="hint" id="end-note" style="margin-top:14px"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pad">
+  <button class="pausebtn" id="pause" aria-label="Poze"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button>
+  <p class="hint">Espas = poz · Chak seri de 5 ba w yon bonis</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+var CONFIG = {
+  firebase : {
+    apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+    authDomain: "lavrizetwal.firebaseapp.com",
+    projectId: "lavrizetwal",
+    storageBucket: "lavrizetwal.firebasestorage.app",
+    messagingSenderId: "291921316186",
+    appId: "1:291921316186:web:f55e8b34526960df394b63"
+  },
+  gameId   : 'whack',
+  gameName : 'Whack-a-Star',
+  seconds  : 30,
+  holes    : 9,
+  upStart  : 1050,   /* konbe tan yon zetwal rete deyò okòmansman */
+  upMin    : 480,
+  gapStart : 720,    /* tan ant de zetwal */
+  gapMin   : 300,
+  goldOdds : 0.12,   /* chans pou yon zetwal blan */
+  goldPts  : 3,
+  comboAt  : 5       /* chak seri de 5 ba yon bonis */
+};
+var $ = function(s){ return document.querySelector(s); };
+var CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+var P = new URLSearchParams(location.search);
+var UID  = P.get('uid') || '';
+var NAME = P.get('name') || 'Jwè';
+
+$('#nm').textContent = String(NAME).split(' ')[0];
+$('#av').textContent = (String(NAME).trim().charAt(0) || 'J').toUpperCase();
+
+var db = null, fbAuth = null;
+try{
+  if(window.firebase && firebase.apps && firebase.apps.length === 0) firebase.initializeApp(CONFIG.firebase);
+  fbAuth = firebase.auth();
+  db = firebase.firestore();
+}catch(e){ console.warn('Firebase:', e.message); }
+
+/* La session Firebase se partage entre les onglets du même site.
+   Sans elle, Firestore refuse toute écriture : c'est elle qui prouve
+   que les points modifiés sont bien ceux du joueur connecté. */
+var AUTH_UID = null, authReady = false, waiters = [];
+function whenAuth(){
+  return new Promise(function(res){
+    if(authReady) return res(AUTH_UID);
+    waiters.push(res);
+  });
+}
+if(fbAuth){
+  fbAuth.onAuthStateChanged(function(u){
+    AUTH_UID = u ? u.uid : null;
+    authReady = true;
+    waiters.splice(0).forEach(function(f){ f(AUTH_UID); });
+    if(!AUTH_UID) toast('Ou pa konekte — pwen yo p ap konte. Retounen nan hub la.');
+    else if(UID && UID !== AUTH_UID) UID = AUTH_UID;
+    if(AUTH_UID){ UID = AUTH_UID; loadBest(); }
+  });
+} else { authReady = true; }
+
+function toast(t){
+  var el = $('#toast'); el.textContent = t; el.classList.add('on');
+  clearTimeout(el._h); el._h = setTimeout(function(){ el.classList.remove('on'); }, 3000);
+}
+
+
+/* ══ 1. ETA ═══════════════════════════════════════════════════ */
+var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2 14.7 8.6l6.9.6-5.2 4.6 1.5 6.8L12 17l-5.9 3.6 1.5-6.8L2.4 9.2l6.9-.6L12 2.2Z"/></svg>';
+var holes = [], score = 0, hits = 0, taps = 0, combo = 0, bestCombo = 0, best = 0;
+var alive = false, paused = false, left = CONFIG.seconds;
+var upMs = CONFIG.upStart, gapMs = CONFIG.gapStart;
+var tUp = null, tGap = null, tSec = null, active = -1, isGold = false;
+
+(function build(){
+  var box = $('#holes'), h = '';
+  for(var i=0;i<CONFIG.holes;i++){
+    h += '<button class="hole" data-i="'+i+'" aria-label="Twou '+(i+1)+'">'
+       + '<span class="ring"></span><span class="pop"></span>' + STAR + '</button>';
+  }
+  box.innerHTML = h;
+  holes = Array.prototype.slice.call(box.children);
+  holes.forEach(function(el){
+    el.addEventListener('click', function(){ tap(parseInt(el.getAttribute('data-i'),10), el); });
+  });
+})();
+
+function paint(){
+  $('#score').textContent = score;
+  $('#best').textContent  = best;
+  $('#time').textContent  = left;
+  var t = $('#tbar');
+  t.style.transform = 'scaleX(' + (left/CONFIG.seconds) + ')';
+  t.classList.toggle('low', left <= 6);
+  var c = $('#combo');
+  if(combo >= 3){ c.textContent = 'Seri ' + combo; c.classList.add('on'); }
+  else c.classList.remove('on');
+}
+
+/* ══ 2. BOUK JWÈT ═════════════════════════════════════════════ */
+function hide(){
+  if(active < 0) return;
+  var el = holes[active];
+  el.classList.remove('up'); el.classList.add('gone');
+  setTimeout(function(){ el.classList.remove('gone','gold'); }, 150);
+  active = -1;
+}
+function pop(){
+  if(!alive || paused) return;
+  var i;
+  do { i = (Math.random()*CONFIG.holes)|0; } while(i === active && CONFIG.holes > 1);
+  active = i; isGold = Math.random() < CONFIG.goldOdds;
+  var el = holes[i];
+  el.classList.add('up');
+  el.classList.toggle('gold', isGold);
+  clearTimeout(tUp);
+  tUp = setTimeout(function(){
+    if(active === i){          /* rate : seri a kase */
+      combo = 0; paint();
+      hide(); schedule();
+    }
+  }, isGold ? upMs*0.8 : upMs);
+}
+function schedule(){
+  clearTimeout(tGap);
+  tGap = setTimeout(pop, gapMs * (0.7 + Math.random()*0.6));
+}
+function tap(i, el){
+  if(!alive || paused) return;
+  taps++;
+  if(i !== active){
+    combo = 0;
+    el.classList.add('miss');
+    setTimeout(function(){ el.classList.remove('miss'); }, 260);
+    paint();
+    return;
+  }
+  var gain = isGold ? CONFIG.goldPts : 1;
+  hits++; combo++;
+  if(combo > bestCombo) bestCombo = combo;
+  if(combo % CONFIG.comboAt === 0) gain += 2;      /* bonis seri */
+  score += gain;
+  el.querySelector('.pop').textContent = '+' + gain;
+  el.classList.add('hit');
+  setTimeout(function(){ el.classList.remove('hit'); }, 640);
+  hide();
+  /* jwèt la vin pi rapid */
+  upMs  = Math.max(CONFIG.upMin,  upMs  - 14);
+  gapMs = Math.max(CONFIG.gapMin, gapMs - 9);
+  paint();
+  schedule();
+}
+function tick(){
+  if(!alive || paused) return;
+  left--;
+  paint();
+  if(left <= 0) over();
+}
+function start(){
+  score = 0; hits = 0; taps = 0; combo = 0; bestCombo = 0;
+  left = CONFIG.seconds; upMs = CONFIG.upStart; gapMs = CONFIG.gapStart;
+  alive = true; paused = false; active = -1;
+  holes.forEach(function(e){ e.classList.remove('up','gone','gold','hit','miss'); });
+  $('#v-start').classList.remove('on');
+  $('#v-end').classList.remove('on');
+  $('#v-pause').classList.remove('on');
+  paint();
+  clearInterval(tSec); tSec = setInterval(tick, 1000);
+  schedule();
+}
+function togglePause(force){
+  if(!alive) return;
+  paused = (force===undefined) ? !paused : force;
+  $('#v-pause').classList.toggle('on', paused);
+  if(paused){ clearTimeout(tGap); clearTimeout(tUp); hide(); }
+  else schedule();
+}
+/* ══ 4. FEN PATI ══════════════════════════════════════════════ */
+var saving = false;
+async function over(){
+  alive = false;
+  clearInterval(tSec); clearTimeout(tGap); clearTimeout(tUp); hide();
+  var gained = score;
+  var acc = taps ? Math.round(hits/taps*100) : 0;
+  $('#end-stars').textContent = hits;
+  $('#end-combo').textContent = bestCombo;
+  $('#end-acc').textContent   = acc + '%';
+  $('#end-pts').textContent   = '+' + gained;
+  $('#end-d').textContent = acc >= 85 ? 'Men presizyon !' : acc >= 60 ? 'Bon pati.' : 'Kontinye pratike.';
+  $('#end-note').textContent = '';
+
+  var record = score > best;
+  if(record){
+    best = score;
+    $('#best').textContent = best;
+    $('#end-t').textContent = 'Nouvo rekò !';
+    $('#end-t').classList.remove('bad');
+    $('#end-medal').classList.remove('bad');
+    $('#end-medal').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 4M17 6h2.5a2.5 2.5 0 0 1-2.5 4"/></svg>';
+  } else {
+    $('#end-t').textContent = 'Tan an fini';
+    $('#end-t').classList.remove('bad');
+    $('#end-medal').classList.remove('bad');
+    $('#end-medal').innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8v5m0 3.5v.1"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>';
+  }
+  $('#v-end').classList.add('on');
+
+  if(gained > 0) await saveRun(gained, score, record);
+  else $('#end-note').textContent = 'Ou pa tape okenn zetwal — pa gen pwen pou pati sa.';
+}
+
+async function saveRun(gained, sc, record){
+  if(!db){ $('#end-note').textContent = 'Koneksyon an pa disponib.'; return; }
+  var uid = await whenAuth();
+  if(!uid){
+    $('#end-note').textContent = 'Pwen yo pa konte : ou pa konekte. Retounen nan hub la epi konekte anvan w jwe.';
+    return;
+  }
+  UID = uid;
+  if(saving) return; saving = true;
+  try{
+    await db.collection('users').doc(uid)
+      .set({ points: firebase.firestore.FieldValue.increment(gained) }, { merge:true });
+  }catch(e){
+    $('#end-note').textContent = 'Pwen yo pa antre — ' + (e.message || 'erè Firestore') ;
+    saving = false; return;
+  }
+  try{
+    var ref = db.collection('leaderboards').doc(CONFIG.gameId + '_' + uid);
+    var snap = await ref.get();
+    var prev = snap.exists ? (snap.data().score || 0) : 0;
+    if(sc > prev){
+      await ref.set({ gameId:CONFIG.gameId, uid:uid, username:NAME,
+        score:sc, updatedAt:new Date().toISOString() }, { merge:true });
+    }
+    if(sc > prev && !record){ best = Math.max(best, prev); }
+  }catch(e){}
+  $('#end-note').textContent = '+' + gained + ' pwen antre sou kont ou.';
+  try{ if(window.opener) window.opener.postMessage({ zetwal:'game-over', game:CONFIG.gameId, score:sc }, '*'); }catch(e){}
+  saving = false;
+}
+
+/* Pi bon nòt anvan an */
+async function loadBest(){
+  if(!db || !UID) return;
+  try{
+    var snap = await db.collection('leaderboards').doc(CONFIG.gameId + '_' + UID).get();
+    if(snap.exists){ best = snap.data().score || 0; $('#best').textContent = best; }
+  }catch(e){}
+}
+loadBest();
+
+
+/* ══ 5. KONTWÒL ═══════════════════════════════════════════════ */
+addEventListener('keydown', function(e){
+  if(e.key === ' '){ e.preventDefault(); if(alive) togglePause(); else start(); }
+  if(e.key === 'Enter' && !alive) start();
+});
+$('#pause').addEventListener('click', function(){ togglePause(); });
+$('#go').addEventListener('click', start);
+$('#again').addEventListener('click', start);
+$('#resume').addEventListener('click', function(){ togglePause(false); });
+document.addEventListener('visibilitychange', function(){ if(document.hidden) togglePause(true); });
+
+/* ══ 6. DEPA ══════════════════════════════════════════════════ */
+paint();
+if(!UID && authReady && !AUTH_UID) toast('Ouvri jwèt la depi hub la pou pwen ou yo konte.');
+
+})();
+</script>
+</body>
+</html>
