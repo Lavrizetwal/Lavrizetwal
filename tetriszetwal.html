@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#050505">
+<title>Tetris Zetwal — Zetwal Games</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<style>
+
+/* ════════════════════════════════════════════════════════════════
+   SNAKE ZETWAL — yon sèl fichye, zewo depandans lokal.
+   ════════════════════════════════════════════════════════════════ */
+:root{
+  --bg:#050505; --gold:#D4AF37; --gold-lt:#F0D98A; --gold-dp:#B89020;
+  --g-08:rgba(212,175,55,.08); --g-14:rgba(212,175,55,.14); --g-24:rgba(212,175,55,.24);
+  --ink:#fff; --ink-2:rgba(255,255,255,.62); --ink-3:rgba(255,255,255,.40);
+  --ink-4:rgba(255,255,255,.24); --line:rgba(255,255,255,.08);
+  --ok:#00E08A; --bad:#FF6B6B;
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Montserrat',system-ui,sans-serif;
+  --fast:150ms cubic-bezier(.22,1,.36,1); --med:360ms cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);
+  display:flex;flex-direction:column;align-items:center;overflow:hidden;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;user-select:none}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+#grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.14;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E")}
+
+/* ── Bar anwo ── */
+.top{position:relative;z-index:2;width:100%;max-width:560px;padding:14px 18px 0;
+  display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:99px;
+  border:1px solid var(--line);color:var(--ink-3);font-size:.58rem;font-weight:700;
+  letter-spacing:1.4px;text-transform:uppercase;transition:color var(--fast),border-color var(--fast)}
+.back:hover{color:var(--gold);border-color:var(--g-24)}
+.back svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none}
+.who{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:.62rem;color:var(--ink-3)}
+.who b{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  background:var(--g-14);border:1px solid var(--g-24);color:var(--gold);font-size:.62rem}
+
+/* ── Tablo nòt ── */
+.hud{position:relative;z-index:2;width:100%;max-width:560px;padding:16px 18px 12px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.hud > div{padding:11px 8px;border-radius:8px;text-align:center;
+  border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.hud .k{font-size:.5rem;letter-spacing:1.7px;text-transform:uppercase;color:var(--ink-4);margin-bottom:4px}
+.hud .v{font-family:var(--serif);font-size:1.5rem;font-weight:700;line-height:1}
+.hud .v.gold{color:var(--gold-lt)}
+.hud .v.ok{color:var(--ok)}
+
+/* ── Teren an ── */
+.arena{position:relative;z-index:2;width:100%;max-width:560px;padding:0 18px;flex:1;
+  display:flex;align-items:center;justify-content:center;min-height:0}
+.board{position:relative;width:100%;aspect-ratio:1;max-height:100%;border-radius:12px;overflow:hidden;
+  border:1px solid var(--g-14);background:linear-gradient(168deg,rgba(255,255,255,.035),rgba(255,255,255,.008));
+  box-shadow:0 26px 70px rgba(0,0,0,.6),inset 0 0 60px rgba(212,175,55,.03)}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.halo{position:absolute;inset:-30%;pointer-events:none;
+  background:radial-gradient(circle,rgba(212,175,55,.07),transparent 62%);
+  animation:breathe 5s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── Kouch anwo teren an ── */
+.veil{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:24px;
+  background:rgba(5,5,5,.86);backdrop-filter:blur(6px);text-align:center;
+  opacity:0;visibility:hidden;transition:opacity var(--med),visibility var(--med)}
+.veil.on{opacity:1;visibility:visible}
+.veil h2{font-family:var(--serif);font-size:2rem;font-weight:600;margin-bottom:8px}
+.veil h2.bad{color:var(--bad)}
+.veil p{font-size:.8rem;color:var(--ink-3);line-height:1.7;max-width:32ch;margin:0 auto 20px}
+.veil .rows{width:100%;max-width:260px;margin:0 auto 22px}
+.veil .row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:9px 0;font-size:.76rem;border-bottom:1px solid var(--line)}
+.veil .row span:first-child{color:var(--ink-3)}
+.veil .row b{font-family:var(--serif);font-size:1.05rem;color:var(--gold)}
+.veil .row b.ok{color:var(--ok)}
+.btns{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;
+  border-radius:4px;border:1px solid transparent;cursor:pointer;font-family:var(--sans);
+  font-size:.64rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:transparent;
+  transition:transform var(--fast),background var(--fast),border-color var(--fast),color var(--fast)}
+.btn-g{background:var(--gold);color:#0A0A0A}
+.btn-g:hover{background:var(--gold-lt);transform:translateY(-2px)}
+.btn-o{border-color:rgba(255,255,255,.18);color:var(--ink)}
+.btn-o:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.medal{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;
+  border:1px solid var(--g-24);background:var(--g-08)}
+.medal svg{width:28px;height:28px;stroke:var(--gold);stroke-width:1.3;fill:none;stroke-linecap:round}
+.medal.bad{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)}
+.medal.bad svg{stroke:var(--bad)}
+
+/* ── Kontwòl ── */
+.pad{position:relative;z-index:2;width:100%;max-width:560px;padding:14px 18px calc(18px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:10px;justify-content:center}
+.hint{font-size:.62rem;color:var(--ink-4);text-align:center;line-height:1.6}
+.dpad{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(2,52px);gap:8px}
+.dpad button{border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  color:var(--gold);cursor:pointer;display:grid;place-items:center;transition:background var(--fast)}
+.dpad button:active{background:var(--g-14)}
+.dpad button svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round}
+.dpad .up{grid-column:2}
+.pausebtn{width:52px;height:52px;border-radius:8px;border:1px solid var(--line);
+  background:rgba(255,255,255,.04);color:var(--ink-3);cursor:pointer;display:grid;place-items:center}
+.pausebtn:hover{color:var(--gold);border-color:var(--g-24)}
+.pausebtn svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none}
+@media(hover:hover) and (pointer:fine){ .dpad{display:none} }
+@media(hover:none){ .hint{display:none} }
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);z-index:60;
+  padding:12px 20px;border-radius:99px;background:rgba(12,12,12,.96);border:1px solid var(--g-24);
+  font-size:.74rem;opacity:0;pointer-events:none;transition:transform var(--med),opacity var(--med)}
+.toast.on{transform:translate(-50%,0);opacity:1}
+@media(max-height:700px){ .hud .v{font-size:1.2rem} .hud div{padding:8px 6px} }
+@media(prefers-reduced-motion:reduce){ *{animation:none!important;transition-duration:.001ms!important} }
+
+.board{aspect-ratio:10/19}
+.next{position:absolute;top:10px;right:10px;z-index:4;padding:8px 10px;border-radius:9px;
+  border:1px solid var(--line);background:rgba(5,5,5,.66);backdrop-filter:blur(6px);text-align:center}
+.next .k{font-size:.46rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-4);margin-bottom:4px}
+.next canvas{display:block;width:52px;height:52px}
+.tpad{display:grid;grid-template-columns:repeat(4,50px);gap:8px}
+.tpad button{height:50px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  color:var(--gold);cursor:pointer;display:grid;place-items:center}
+.tpad button:active{background:var(--g-14)}
+.tpad button svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round}
+@media(hover:hover) and (pointer:fine){ .tpad{display:none} }
+@media(hover:none){ .pad .hint{display:none} }
+@media(max-width:420px){ .tpad{grid-template-columns:repeat(4,44px)} .tpad button{height:44px} }
+</style>
+</head>
+<body>
+<div id="grain" aria-hidden="true"></div>
+
+<div class="top">
+  <a class="back" href="games.html"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Hub</a>
+  <div class="who"><b id="av">J</b><span id="nm">Jwè</span><span id="best" hidden></span></div>
+</div>
+
+<div class="hud">
+  <div><div class="k">Nòt</div><div class="v gold" id="score">0</div></div>
+  <div><div class="k">Liy</div><div class="v" id="lines">0</div></div>
+  <div><div class="k">Nivo</div><div class="v ok" id="level">1</div></div>
+</div>
+
+<div class="arena">
+  <div class="board" id="board">
+    <div class="halo" aria-hidden="true"></div>
+    <canvas id="cv" width="400" height="760" aria-label="Teren Tetris la"></canvas>
+    <div class="next"><div class="k">Pwochèn</div><canvas id="nx" width="104" height="104"></canvas></div>
+
+    <div class="veil on" id="v-start">
+      <div>
+        <div class="medal"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/></svg></div>
+        <h2>Tetris Zetwal</h2>
+        <p>Ranje pyès yo, ranpli liy yo.<br>
+           Chak nivo ba w <b style="color:var(--gold)">10 pwen</b>, epi chak liy ba w <b style="color:var(--gold)">1</b> anplis.</p>
+        <div class="btns"><button class="btn btn-g" id="go">Kòmanse</button></div>
+        <p class="hint" style="margin-top:16px">Flèch yo · Anlè = vire · Espas = lage · P = poz</p>
+      </div>
+    </div>
+
+    <div class="veil" id="v-pause">
+      <div><h2>An poz</h2><p>Pyès la ap tann ou.</p>
+        <div class="btns"><button class="btn btn-g" id="resume">Kontinye</button></div></div>
+    </div>
+
+    <div class="veil" id="v-end">
+      <div>
+        <div class="medal bad" id="end-medal"></div>
+        <h2 class="bad" id="end-t">Fini</h2>
+        <p id="end-d">Pil la rive anwo.</p>
+        <div class="rows">
+          <div class="row"><span>Liy fè</span><b id="end-lines">0</b></div>
+          <div class="row"><span>Nivo</span><b id="end-lvl">1</b></div>
+          <div class="row"><span>Nòt final</span><b id="end-score">0</b></div>
+          <div class="row"><span>Pi bon nòt ou</span><b id="end-best">0</b></div>
+          <div class="row"><span>Pwen ajoute</span><b class="ok" id="end-pts">0</b></div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-g" id="again">Rejwe</button>
+          <a class="btn btn-o" href="games.html">Retounen nan hub</a>
+        </div>
+        <p class="hint" id="end-note" style="margin-top:14px"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pad">
+  <button class="pausebtn" id="pause" aria-label="Poze"><svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg></button>
+  <div class="tpad">
+    <button data-a="L" aria-label="Agoch"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+    <button data-a="ROT" aria-label="Vire"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button>
+    <button data-a="R" aria-label="Adwat"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    <button data-a="DROP" aria-label="Lage"><svg viewBox="0 0 24 24"><path d="M12 4v13M6 12l6 6 6-6M5 21h14"/></svg></button>
+  </div>
+  <p class="hint">Flèch yo · Espas = lage</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+var CONFIG = {
+  firebase : {
+    apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+    authDomain: "lavrizetwal.firebaseapp.com",
+    projectId: "lavrizetwal",
+    storageBucket: "lavrizetwal.firebasestorage.app",
+    messagingSenderId: "291921316186",
+    appId: "1:291921316186:web:f55e8b34526960df394b63"
+  },
+  gameId    : 'tetris',
+  gameName  : 'Tetris Zetwal',
+  cols      : 10,
+  rows      : 19,
+  perLevel  : 10,       /* pwen chak nivo */
+  perLine   : 1,        /* pwen chak liy */
+  linesUp   : 10,       /* konbe liy pou monte yon nivo */
+  dropStart : 800,
+  dropMin   : 110
+};
+var $ = function(s){ return document.querySelector(s); };
+var CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+var P = new URLSearchParams(location.search);
+var UID  = P.get('uid') || '';
+var NAME = P.get('name') || 'Jwè';
+
+$('#nm').textContent = String(NAME).split(' ')[0];
+$('#av').textContent = (String(NAME).trim().charAt(0) || 'J').toUpperCase();
+
+var db = null, fbAuth = null;
+try{
+  if(window.firebase && firebase.apps && firebase.apps.length === 0) firebase.initializeApp(CONFIG.firebase);
+  fbAuth = firebase.auth();
+  db = firebase.firestore();
+}catch(e){ console.warn('Firebase:', e.message); }
+
+/* La session Firebase se partage entre les onglets du même site.
+   Sans elle, Firestore refuse toute écriture : c'est elle qui prouve
+   que les points modifiés sont bien ceux du joueur connecté. */
+var AUTH_UID = null, authReady = false, waiters = [];
+function whenAuth(){
+  return new Promise(function(res){
+    if(authReady) return res(AUTH_UID);
+    waiters.push(res);
+  });
+}
+if(fbAuth){
+  fbAuth.onAuthStateChanged(function(u){
+    AUTH_UID = u ? u.uid : null;
+    authReady = true;
+    waiters.splice(0).forEach(function(f){ f(AUTH_UID); });
+    if(!AUTH_UID) toast('Ou pa konekte — pwen yo p ap konte. Retounen nan hub la.');
+    else if(UID && UID !== AUTH_UID) UID = AUTH_UID;
+    if(AUTH_UID){ UID = AUTH_UID; loadBest(); }
+  });
+} else { authReady = true; }
+
+function toast(t){
+  var el = $('#toast'); el.textContent = t; el.classList.add('on');
+  clearTimeout(el._h); el._h = setTimeout(function(){ el.classList.remove('on'); }, 3000);
+}
+
+
+/* ══ 1. PYÈS YO ═══════════════════════════════════════════════ */
+var SHAPES = {
+  I:{ c:'#6FD8E8', m:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]] },
+  J:{ c:'#7FA9F5', m:[[1,0,0],[1,1,1],[0,0,0]] },
+  L:{ c:'#FFB84D', m:[[0,0,1],[1,1,1],[0,0,0]] },
+  O:{ c:'#F0D98A', m:[[1,1],[1,1]] },
+  S:{ c:'#00E08A', m:[[0,1,1],[1,1,0],[0,0,0]] },
+  T:{ c:'#C79BF5', m:[[0,1,0],[1,1,1],[0,0,0]] },
+  Z:{ c:'#FF7A7A', m:[[1,1,0],[0,1,1],[0,0,0]] }
+};
+var KEYS = Object.keys(SHAPES);
+
+var C = CONFIG.cols, R = CONFIG.rows;
+var cv = $('#cv'), ctx = cv.getContext('2d');
+var nx = $('#nx'), nctx = nx.getContext('2d');
+var DPR = Math.min(devicePixelRatio || 1, 2), cell = 0;
+var board = [], piece = null, next = null, bag = [];
+var score = 0, lines = 0, level = 1, best = 0;
+var alive = false, paused = false, raf = null, acc = 0, last = 0, dropMs = CONFIG.dropStart;
+var flash = [], shake = 0;
+
+function fit(){
+  var box = $('#board').getBoundingClientRect();
+  cv.width  = Math.floor(box.width  * DPR);
+  cv.height = Math.floor(box.height * DPR);
+  cell = cv.width / C;
+  nx.width = nx.height = 104 * (DPR/2 + .5);
+  draw();
+}
+addEventListener('resize', function(){ clearTimeout(fit._t); fit._t = setTimeout(fit, 150); });
+
+function blank(){
+  board = [];
+  for(var y=0;y<R;y++){ board[y] = []; for(var x=0;x<C;x++) board[y][x] = null; }
+}
+function pull(){
+  if(!bag.length){
+    bag = KEYS.slice();
+    for(var i=bag.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0, t=bag[i]; bag[i]=bag[j]; bag[j]=t; }
+  }
+  var k = bag.pop();
+  var m = SHAPES[k].m.map(function(r){ return r.slice(); });
+  return { k:k, m:m, c:SHAPES[k].c, x:((C - m[0].length)/2)|0, y:0 };
+}
+function collide(p, ox, oy, mat){
+  var m = mat || p.m;
+  for(var y=0;y<m.length;y++) for(var x=0;x<m[y].length;x++){
+    if(!m[y][x]) continue;
+    var bx = p.x + x + (ox||0), by = p.y + y + (oy||0);
+    if(bx < 0 || bx >= C || by >= R) return true;
+    if(by >= 0 && board[by][bx]) return true;
+  }
+  return false;
+}
+function rotate(m){
+  var n = m.length, out = [];
+  for(var y=0;y<n;y++){ out[y] = []; for(var x=0;x<n;x++) out[y][x] = m[n-1-x][y]; }
+  return out;
+}
+function paint(){
+  $('#score').textContent = score;
+  $('#lines').textContent = lines;
+  $('#level').textContent = level;
+  $('#best').textContent  = best;
+}
+
+/* ══ 2. DESEN ═════════════════════════════════════════════════ */
+function block(g, x, y, size, color, ghost){
+  var r = size*0.16, pad = size*0.05;
+  var gx = x*size + pad, gy = y*size + pad, w = size - pad*2;
+  g.beginPath();
+  g.moveTo(gx+r,gy); g.arcTo(gx+w,gy,gx+w,gy+w,r); g.arcTo(gx+w,gy+w,gx,gy+w,r);
+  g.arcTo(gx,gy+w,gx,gy,r); g.arcTo(gx,gy,gx+w,gy,r); g.closePath();
+  if(ghost){
+    g.strokeStyle = color; g.globalAlpha = .28; g.lineWidth = Math.max(1, size*0.07);
+    g.stroke(); g.globalAlpha = 1; return;
+  }
+  var grd = g.createLinearGradient(gx, gy, gx, gy+w);
+  grd.addColorStop(0, color);
+  grd.addColorStop(1, 'rgba(0,0,0,.35)');
+  g.fillStyle = grd; g.fill();
+  g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 1*DPR; g.stroke();
+}
+function draw(){
+  if(!cell) return;
+  var W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  if(shake > 0){ ctx.translate((Math.random()-.5)*shake*8*DPR, 0); shake = Math.max(0, shake-.06); }
+
+  ctx.strokeStyle = 'rgba(255,255,255,.035)'; ctx.lineWidth = 1;
+  for(var i=1;i<C;i++){ ctx.beginPath(); ctx.moveTo(i*cell,0); ctx.lineTo(i*cell,H); ctx.stroke(); }
+  for(var j=1;j<R;j++){ ctx.beginPath(); ctx.moveTo(0,j*cell); ctx.lineTo(W,j*cell); ctx.stroke(); }
+
+  for(var y=0;y<R;y++) for(var x=0;x<C;x++){
+    if(board[y] && board[y][x]) block(ctx, x, y, cell, board[y][x]);
+  }
+  if(piece){
+    /* lonbraj kote pyès la pral tonbe */
+    var gy = 0;
+    while(!collide(piece, 0, gy+1)) gy++;
+    piece.m.forEach(function(row,yy){ row.forEach(function(v,xx){
+      if(v) block(ctx, piece.x+xx, piece.y+yy+gy, cell, piece.c, true);
+    }); });
+    piece.m.forEach(function(row,yy){ row.forEach(function(v,xx){
+      if(v && piece.y+yy >= 0) block(ctx, piece.x+xx, piece.y+yy, cell, piece.c);
+    }); });
+  }
+  flash = flash.filter(function(f){ return performance.now() - f.t < 260; });
+  flash.forEach(function(f){
+    var k = (performance.now() - f.t)/260;
+    ctx.fillStyle = 'rgba(255,255,255,' + ((1-k)*.55).toFixed(3) + ')';
+    ctx.fillRect(0, f.y*cell, W, cell);
+  });
+  ctx.restore();
+  drawNext();
+}
+function drawNext(){
+  var s = nx.width/4;
+  nctx.clearRect(0,0,nx.width,nx.height);
+  if(!next) return;
+  var m = next.m, h = m.length, w = m[0].length;
+  var ox = (4-w)/2, oy = (4-h)/2;
+  m.forEach(function(row,y){ row.forEach(function(v,x){
+    if(v) block(nctx, x+ox, y+oy, s, next.c);
+  }); });
+}
+
+/* ══ 3. BOUK JWÈT ═════════════════════════════════════════════ */
+function spawn(){
+  piece = next || pull();
+  next = pull();
+  if(collide(piece,0,0)) return over('Pil la rive anwo.');
+  drawNext();
+}
+function lock(){
+  piece.m.forEach(function(row,y){ row.forEach(function(v,x){
+    if(v && piece.y+y >= 0) board[piece.y+y][piece.x+x] = piece.c;
+  }); });
+  var full = [];
+  for(var y=R-1;y>=0;y--){
+    var ok = true;
+    for(var x=0;x<C;x++) if(!board[y][x]){ ok = false; break; }
+    if(ok) full.push(y);
+  }
+  if(full.length){
+    full.forEach(function(y){ flash.push({ y:y, t:performance.now() }); });
+    full.sort(function(a,b){ return a-b; }).forEach(function(y){
+      board.splice(y,1);
+      var row = []; for(var x=0;x<C;x++) row.push(null);
+      board.unshift(row);
+    });
+    var pts = [0,100,300,500,800][full.length] * level;
+    score += pts; lines += full.length;
+    shake = Math.min(1, full.length*0.3);
+    var nl = Math.floor(lines / CONFIG.linesUp) + 1;
+    if(nl > level){ level = nl; toast('Nivo ' + level + ' · +' + CONFIG.perLevel + ' pwen'); }
+    dropMs = Math.max(CONFIG.dropMin, CONFIG.dropStart - (level-1)*70);
+    paint();
+  }
+  spawn();
+}
+function step(){
+  if(collide(piece,0,1)) lock();
+  else piece.y++;
+}
+function loop(t){
+  raf = requestAnimationFrame(loop);
+  if(!alive || paused){ last = t; draw(); return; }
+  if(!last) last = t;
+  acc += t - last; last = t;
+  while(acc >= dropMs){ acc -= dropMs; if(alive) step(); }
+  draw();
+}
+function act(a){
+  if(!alive || paused || !piece) return;
+  if(a === 'L' && !collide(piece,-1,0)) piece.x--;
+  if(a === 'R' && !collide(piece, 1,0)) piece.x++;
+  if(a === 'D'){ if(!collide(piece,0,1)){ piece.y++; acc = 0; } else lock(); }
+  if(a === 'ROT'){
+    var m = rotate(piece.m);
+    var kicks = [0,-1,1,-2,2];
+    for(var i=0;i<kicks.length;i++){
+      if(!collide(piece, kicks[i], 0, m)){ piece.m = m; piece.x += kicks[i]; break; }
+    }
+  }
+  if(a === 'DROP'){
+    var n = 0;
+    while(!collide(piece,0,1)){ piece.y++; n++; }
+    score += n * 2; paint(); shake = .5; lock(); acc = 0;
+  }
+  draw();
+}
+function start(){
+  blank(); bag = []; next = null;
+  score = 0; lines = 0; level = 1; dropMs = CONFIG.dropStart; acc = 0; last = 0;
+  alive = true; paused = false; flash = [];
+  spawn(); paint(); fit();
+  $('#v-start').classList.remove('on');
+  $('#v-end').classList.remove('on');
+  $('#v-pause').classList.remove('on');
+  if(!raf) raf = requestAnimationFrame(loop);
+}
+function togglePause(force){
+  if(!alive) return;
+  paused = (force===undefined) ? !paused : force;
+  $('#v-pause').classList.toggle('on', paused);
+  if(!paused) last = 0;
+}
+/* ══ 4. FEN PATI ══════════════════════════════════════════════ */
+var saving = false;
+async function over(why){
+  if(!alive) return;
+  alive = false; draw();
+  var gained = (level-1)*CONFIG.perLevel + lines*CONFIG.perLine;
+  $('#end-d').textContent = why;
+  $('#end-lines').textContent = lines;
+  $('#end-lvl').textContent = level;
+  $('#end-score').textContent = score;
+  $('#end-best').textContent = Math.max(best, score);
+  $('#end-pts').textContent = '+' + gained;
+  $('#end-note').textContent = '';
+
+  var record = score > best;
+  if(record){
+    best = score;
+    $('#best').textContent = best;
+    $('#end-t').textContent = 'Nouvo rekò !';
+    $('#end-t').classList.remove('bad');
+    $('#end-medal').classList.remove('bad');
+    $('#end-medal').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 4M17 6h2.5a2.5 2.5 0 0 1-2.5 4"/></svg>';
+  } else {
+    $('#end-t').textContent = 'Fini';
+    $('#end-t').classList.add('bad');
+    $('#end-medal').classList.add('bad');
+    $('#end-medal').innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8v5m0 3.5v.1"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>';
+  }
+  $('#v-end').classList.add('on');
+
+  if(gained > 0) await saveRun(gained, score, record);
+  else $('#end-note').textContent = 'Ou pa fè okenn liy — pa gen pwen pou pati sa.';
+}
+
+async function saveRun(gained, sc, record){
+  if(!db){ $('#end-note').textContent = 'Koneksyon an pa disponib.'; return; }
+  var uid = await whenAuth();
+  if(!uid){
+    $('#end-note').textContent = 'Pwen yo pa konte : ou pa konekte. Retounen nan hub la epi konekte anvan w jwe.';
+    return;
+  }
+  UID = uid;
+  if(saving) return; saving = true;
+  try{
+    await db.collection('users').doc(uid)
+      .set({ points: firebase.firestore.FieldValue.increment(gained) }, { merge:true });
+  }catch(e){
+    $('#end-note').textContent = 'Pwen yo pa antre — ' + (e.message || 'erè Firestore') ;
+    saving = false; return;
+  }
+  try{
+    var ref = db.collection('leaderboards').doc(CONFIG.gameId + '_' + uid);
+    var snap = await ref.get();
+    var prev = snap.exists ? (snap.data().score || 0) : 0;
+    if(sc > prev){
+      await ref.set({ gameId:CONFIG.gameId, uid:uid, username:NAME,
+        score:sc, updatedAt:new Date().toISOString() }, { merge:true });
+    }
+    if(sc > prev && !record){ best = Math.max(best, prev); }
+  }catch(e){}
+  $('#end-note').textContent = '+' + gained + ' pwen antre sou kont ou.';
+  try{ if(window.opener) window.opener.postMessage({ zetwal:'game-over', game:CONFIG.gameId, score:sc }, '*'); }catch(e){}
+  saving = false;
+}
+
+/* Pi bon nòt anvan an */
+async function loadBest(){
+  if(!db || !UID) return;
+  try{
+    var snap = await db.collection('leaderboards').doc(CONFIG.gameId + '_' + UID).get();
+    if(snap.exists){ best = snap.data().score || 0; $('#best').textContent = best; }
+  }catch(e){}
+}
+loadBest();
+
+
+/* ══ 5. KONTWÒL ═══════════════════════════════════════════════ */
+addEventListener('keydown', function(e){
+  var m = { ArrowLeft:'L', ArrowRight:'R', ArrowDown:'D', ArrowUp:'ROT',
+            q:'L', d:'R', s:'D', z:'ROT', a:'L', w:'ROT' };
+  var k = m[e.key] || m[String(e.key).toLowerCase()];
+  if(k){ e.preventDefault(); if(!alive && !$('#v-end').classList.contains('on')) start(); act(k); return; }
+  if(e.key === ' '){ e.preventDefault(); if(alive) act('DROP'); else start(); }
+  if(String(e.key).toLowerCase() === 'p'){ togglePause(); }
+  if(e.key === 'Enter' && !alive) start();
+});
+document.querySelectorAll('.tpad button').forEach(function(b){
+  b.addEventListener('click', function(){
+    if(!alive && !$('#v-end').classList.contains('on')) start();
+    act(b.getAttribute('data-a'));
+  });
+});
+$('#pause').addEventListener('click', function(){ togglePause(); });
+$('#go').addEventListener('click', start);
+$('#again').addEventListener('click', start);
+$('#resume').addEventListener('click', function(){ togglePause(false); });
+document.addEventListener('visibilitychange', function(){ if(document.hidden) togglePause(true); });
+
+/* ══ 6. DEPA ══════════════════════════════════════════════════ */
+blank(); next = pull(); fit(); paint();
+if(!UID && authReady && !AUTH_UID) toast('Ouvri jwèt la depi hub la pou pwen ou yo konte.');
+
+})();
+</script>
+</body>
+</html>
