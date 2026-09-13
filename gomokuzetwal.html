@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#050505">
+<title>Gomoku Zetwal — Zetwal Games</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+
+/* ════════════════════════════════════════════════════════════════
+   SNAKE ZETWAL — yon sèl fichye, zewo depandans lokal.
+   ════════════════════════════════════════════════════════════════ */
+:root{
+  --bg:#050505; --gold:#D4AF37; --gold-lt:#F0D98A; --gold-dp:#B89020;
+  --g-08:rgba(212,175,55,.08); --g-14:rgba(212,175,55,.14); --g-24:rgba(212,175,55,.24);
+  --ink:#fff; --ink-2:rgba(255,255,255,.62); --ink-3:rgba(255,255,255,.40);
+  --ink-4:rgba(255,255,255,.24); --line:rgba(255,255,255,.08);
+  --ok:#00E08A; --bad:#FF6B6B;
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Montserrat',system-ui,sans-serif;
+  --fast:150ms cubic-bezier(.22,1,.36,1); --med:360ms cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);
+  display:flex;flex-direction:column;align-items:center;overflow:hidden;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;user-select:none}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+#grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.14;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E")}
+
+/* ── Bar anwo ── */
+.top{position:relative;z-index:2;width:100%;max-width:560px;padding:14px 18px 0;
+  display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:99px;
+  border:1px solid var(--line);color:var(--ink-3);font-size:.58rem;font-weight:700;
+  letter-spacing:1.4px;text-transform:uppercase;transition:color var(--fast),border-color var(--fast)}
+.back:hover{color:var(--gold);border-color:var(--g-24)}
+.back svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none}
+.who{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:.62rem;color:var(--ink-3)}
+.who b{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  background:var(--g-14);border:1px solid var(--g-24);color:var(--gold);font-size:.62rem}
+
+/* ── Tablo nòt ── */
+.hud{position:relative;z-index:2;width:100%;max-width:560px;padding:16px 18px 12px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.hud > div{padding:11px 8px;border-radius:8px;text-align:center;
+  border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.hud .k{font-size:.5rem;letter-spacing:1.7px;text-transform:uppercase;color:var(--ink-4);margin-bottom:4px}
+.hud .v{font-family:var(--serif);font-size:1.5rem;font-weight:700;line-height:1}
+.hud .v.gold{color:var(--gold-lt)}
+.hud .v.ok{color:var(--ok)}
+
+/* ── Teren an ── */
+.arena{position:relative;z-index:2;width:100%;max-width:560px;padding:0 18px;flex:1;
+  display:flex;align-items:center;justify-content:center;min-height:0}
+.board{position:relative;width:100%;aspect-ratio:1;max-height:100%;border-radius:12px;overflow:hidden;
+  border:1px solid var(--g-14);background:linear-gradient(168deg,rgba(255,255,255,.035),rgba(255,255,255,.008));
+  box-shadow:0 26px 70px rgba(0,0,0,.6),inset 0 0 60px rgba(212,175,55,.03)}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.halo{position:absolute;inset:-30%;pointer-events:none;
+  background:radial-gradient(circle,rgba(212,175,55,.07),transparent 62%);
+  animation:breathe 5s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── Kouch anwo teren an ── */
+.veil{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:24px;
+  background:rgba(5,5,5,.86);backdrop-filter:blur(6px);text-align:center;
+  opacity:0;visibility:hidden;transition:opacity var(--med),visibility var(--med)}
+.veil.on{opacity:1;visibility:visible}
+.veil h2{font-family:var(--serif);font-size:2rem;font-weight:600;margin-bottom:8px}
+.veil h2.bad{color:var(--bad)}
+.veil p{font-size:.8rem;color:var(--ink-3);line-height:1.7;max-width:32ch;margin:0 auto 20px}
+.veil .rows{width:100%;max-width:260px;margin:0 auto 22px}
+.veil .row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:9px 0;font-size:.76rem;border-bottom:1px solid var(--line)}
+.veil .row span:first-child{color:var(--ink-3)}
+.veil .row b{font-family:var(--serif);font-size:1.05rem;color:var(--gold)}
+.veil .row b.ok{color:var(--ok)}
+.btns{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;
+  border-radius:4px;border:1px solid transparent;cursor:pointer;font-family:var(--sans);
+  font-size:.64rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:transparent;
+  transition:transform var(--fast),background var(--fast),border-color var(--fast),color var(--fast)}
+.btn-g{background:var(--gold);color:#0A0A0A}
+.btn-g:hover{background:var(--gold-lt);transform:translateY(-2px)}
+.btn-o{border-color:rgba(255,255,255,.18);color:var(--ink)}
+.btn-o:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.medal{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;
+  border:1px solid var(--g-24);background:var(--g-08)}
+.medal svg{width:28px;height:28px;stroke:var(--gold);stroke-width:1.3;fill:none;stroke-linecap:round}
+.medal.bad{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)}
+.medal.bad svg{stroke:var(--bad)}
+
+/* ── Kontwòl ── */
+.pad{position:relative;z-index:2;width:100%;max-width:560px;padding:14px 18px calc(18px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:10px;justify-content:center}
+.hint{font-size:.62rem;color:var(--ink-4);text-align:center;line-height:1.6}
+.dpad{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(2,52px);gap:8px}
+.dpad button{border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  color:var(--gold);cursor:pointer;display:grid;place-items:center;transition:background var(--fast)}
+.dpad button:active{background:var(--g-14)}
+.dpad button svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round}
+.dpad .up{grid-column:2}
+.pausebtn{width:52px;height:52px;border-radius:8px;border:1px solid var(--line);
+  background:rgba(255,255,255,.04);color:var(--ink-3);cursor:pointer;display:grid;place-items:center}
+.pausebtn:hover{color:var(--gold);border-color:var(--g-24)}
+.pausebtn svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none}
+@media(hover:hover) and (pointer:fine){ .dpad{display:none} }
+@media(hover:none){ .hint{display:none} }
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);z-index:60;
+  padding:12px 20px;border-radius:99px;background:rgba(12,12,12,.96);border:1px solid var(--g-24);
+  font-size:.74rem;opacity:0;pointer-events:none;transition:transform var(--med),opacity var(--med)}
+.toast.on{transform:translate(-50%,0);opacity:1}
+@media(max-height:700px){ .hud .v{font-size:1.2rem} .hud div{padding:8px 6px} }
+@media(prefers-reduced-motion:reduce){ *{animation:none!important;transition-duration:.001ms!important} }
+
+.board{aspect-ratio:1}
+canvas{cursor:crosshair}
+.turnbar{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:4;display:flex;
+  align-items:center;gap:9px;padding:6px 15px;border-radius:99px;border:1px solid var(--line);
+  background:rgba(5,5,5,.76);backdrop-filter:blur(8px);font-size:.58rem;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.turnbar i{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.turnbar i.me{background:linear-gradient(160deg,#F0D98A,#B89020)}
+.turnbar i.op{background:linear-gradient(160deg,#E8EEF5,#93A3B5)}
+.turnbar.think i{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+/* Chwazi nivo */
+.lvls{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px;margin:0 auto 20px}
+.lvl{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--line);background:rgba(255,255,255,.03);text-align:left;
+  font-family:var(--sans);color:var(--ink);transition:border-color var(--fast),background var(--fast)}
+.lvl:hover{border-color:var(--g-24)}
+.lvl.on{border-color:var(--gold);background:var(--g-08)}
+.lvl b{display:block;font-size:.82rem;margin-bottom:2px}
+.lvl span{display:block;font-size:.66rem;color:var(--ink-4);line-height:1.4}
+.lvl .n{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+  font-size:.62rem;font-weight:700;border:1px solid var(--line);color:var(--ink-3)}
+.lvl.on .n{border-color:var(--gold);color:var(--gold);background:var(--g-08)}
+.lvl.boss{border-color:rgba(255,107,107,.28)}
+.lvl.boss .n{border-color:rgba(255,107,107,.4);color:#FF9A9A}
+.lvl.boss.on{border-color:#FF6B6B;background:rgba(255,107,107,.08)}
+.lvl.boss.on .n{border-color:#FF6B6B;color:#FF6B6B;background:rgba(255,107,107,.12)}
+
+/* An liy */
+.tabsw{display:flex;gap:5px;padding:4px;border-radius:99px;background:rgba(255,255,255,.04);
+  margin:0 auto 18px;max-width:320px}
+.tabsw button{flex:1;padding:9px 0;border:0;border-radius:99px;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:.6rem;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;
+  color:var(--ink-3)}
+.tabsw button.on{background:var(--gold);color:#0A0A0A}
+.bets{display:flex;gap:7px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.bet{padding:9px 16px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.03);
+  color:var(--ink-3);font-family:var(--sans);font-size:.66rem;font-weight:700;cursor:pointer}
+.bet.on{border-color:var(--gold);background:var(--g-08);color:var(--gold)}
+.bet:disabled{opacity:.35;cursor:not-allowed}
+.search{display:flex;align-items:center;gap:12px;padding:14px;border-radius:10px;
+  border:1px dashed var(--g-24);background:rgba(255,255,255,.02);margin-bottom:16px;text-align:left}
+.search .sp{width:22px;height:22px;border-radius:50%;border:2px solid var(--g-24);
+  border-top-color:var(--gold);animation:sp 1s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+.search .tx{flex:1;font-size:.74rem;line-height:1.5;color:var(--ink-2)}
+.search .tx b{color:var(--gold)}
+.vs{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:18px}
+.vs .p{flex:1;padding:12px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.vs .p .k{font-size:.5rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-4);margin-bottom:4px}
+.vs .p .v{font-size:.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vs .x{font-family:var(--serif);font-size:1.2rem;color:var(--gold)}
+</style>
+</head>
+<body>
+<div id="grain" aria-hidden="true"></div>
+
+<div class="top">
+  <a class="back" href="games.html"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Hub</a>
+  <div class="who"><b id="av">J</b><span id="nm">Jwè</span><span id="best" hidden></span></div>
+</div>
+
+<div class="hud">
+  <div><div class="k">Advèsè</div><div class="v gold" id="foe" style="font-size:1rem">—</div></div>
+  <div><div class="k">Viktwa</div><div class="v" id="wins">0</div></div>
+  <div><div class="k">Pwen an jwèt</div><div class="v ok" id="pot">0</div></div>
+</div>
+
+<div class="arena">
+  <div class="board" id="board">
+    <div class="halo" aria-hidden="true"></div>
+    <canvas id="cv" width="700" height="700" aria-label="Damye Gomoku"></canvas>
+    <div class="turnbar" id="turnbar"><i class="me"></i><span id="turn-t">Se tou pa w</span></div>
+
+    <div class="veil on" id="v-start">
+      <div style="width:100%;max-width:340px">
+        <div class="medal"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/></svg></div>
+        <h2>Gomoku Zetwal</h2>
+        <p style="margin-bottom:18px">Aliye senk. Kont machin nan, oswa kont yon lòt jwè an liy.</p>
+
+        <div class="tabsw">
+          <button class="on" data-mode="solo">Kont machin</button>
+          <button data-mode="duel">An liy</button>
+        </div>
+
+        <div id="pane-solo">
+          <div class="lvls" id="lvls"></div>
+          <div class="btns"><button class="btn btn-g" id="go" style="width:100%">Kòmanse</button></div>
+        </div>
+
+        <div id="pane-duel" style="display:none">
+          <p style="font-size:.72rem;color:var(--ink-4);margin-bottom:12px">Konbe pwen ou vle mete an jwèt ? Chak jwè peye menm bagay la, epi moun ki genyen an pran tout.</p>
+          <div class="bets" id="bets"></div>
+          <div class="search" id="search" style="display:none">
+            <span class="sp"></span>
+            <span class="tx" id="search-tx">K ap chèche yon advèsè…</span>
+          </div>
+          <div class="btns">
+            <button class="btn btn-g" id="find" style="width:100%">Chèche yon advèsè</button>
+            <button class="btn btn-o" id="cancel" style="width:100%;display:none">Anile rechèch la</button>
+          </div>
+          <p class="hint" id="duel-note" style="margin-top:12px"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="veil" id="v-end">
+      <div>
+        <div class="medal" id="end-medal"></div>
+        <h2 id="end-t">—</h2>
+        <p id="end-d">—</p>
+        <div class="rows">
+          <div class="row"><span>Advèsè</span><b id="end-foe">—</b></div>
+          <div class="row"><span>Kou jwe</span><b id="end-moves">0</b></div>
+          <div class="row"><span>Pwen</span><b class="ok" id="end-pts">0</b></div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-g" id="again">Yon lòt pati</button>
+          <a class="btn btn-o" href="games.html">Retounen nan hub</a>
+        </div>
+        <p class="hint" id="end-note" style="margin-top:14px"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pad">
+  <button class="pausebtn" id="quit" aria-label="Abandone" title="Abandone">
+    <svg viewBox="0 0 24 24"><path d="M4 21V4h11l-1 3h6v9h-7l-1-3H4"/></svg>
+  </button>
+  <p class="hint" id="pad-hint">Klike sou yon kwazman pou poze yon pyon</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+var CONFIG = {
+  firebase : {
+    apiKey: "AIzaSyAjCnmtvu0tqlsNDEtKraKBG79y12qYeCQ",
+    authDomain: "lavrizetwal.firebaseapp.com",
+    projectId: "lavrizetwal",
+    storageBucket: "lavrizetwal.firebasestorage.app",
+    messagingSenderId: "291921316186",
+    appId: "1:291921316186:web:f55e8b34526960df394b63"
+  },
+  supabaseUrl : 'https://mzwibzvdcwapqrtbhxox.supabase.co',
+  supabaseKey : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16d2lienZkY3dhcHFydGJoeG94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzcxNTIsImV4cCI6MjA5MTc1MzE1Mn0.utazGnMswFOiArB66kfok7n2ds1Zr2wyVBRYVOFRT6c',
+  gameId   : 'gomoku',
+  gameName : 'Gomoku Zetwal',
+  N        : 15,
+  soloWin  : [10, 18, 30, 60],     /* pwen pou chak nivo */
+  bets     : [10, 25, 50]          /* pari an liy — limite pa règ Firestore yo */
+};
+var $ = function(s){ return document.querySelector(s); };
+var CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+var P = new URLSearchParams(location.search);
+var UID  = P.get('uid') || '';
+var NAME = P.get('name') || 'Jwè';
+
+$('#nm').textContent = String(NAME).split(' ')[0];
+$('#av').textContent = (String(NAME).trim().charAt(0) || 'J').toUpperCase();
+
+var db = null, fbAuth = null;
+try{
+  if(window.firebase && firebase.apps && firebase.apps.length === 0) firebase.initializeApp(CONFIG.firebase);
+  fbAuth = firebase.auth();
+  db = firebase.firestore();
+}catch(e){ console.warn('Firebase:', e.message); }
+
+/* La session Firebase se partage entre les onglets du même site.
+   Sans elle, Firestore refuse toute écriture : c'est elle qui prouve
+   que les points modifiés sont bien ceux du joueur connecté. */
+var AUTH_UID = null, authReady = false, waiters = [];
+function whenAuth(){
+  return new Promise(function(res){
+    if(authReady) return res(AUTH_UID);
+    waiters.push(res);
+  });
+}
+if(fbAuth){
+  fbAuth.onAuthStateChanged(function(u){
+    AUTH_UID = u ? u.uid : null;
+    authReady = true;
+    waiters.splice(0).forEach(function(f){ f(AUTH_UID); });
+    if(!AUTH_UID) toast('Ou pa konekte — pwen yo p ap konte. Retounen nan hub la.');
+    else if(UID && UID !== AUTH_UID) UID = AUTH_UID;
+    if(AUTH_UID){ UID = AUTH_UID; loadBest(); }
+  });
+} else { authReady = true; }
+
+function toast(t){
+  var el = $('#toast'); el.textContent = t; el.classList.add('on');
+  clearTimeout(el._h); el._h = setTimeout(function(){ el.classList.remove('on'); }, 3000);
+}
+
+
+var sb = null;
+try { sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey); }
+catch(e){ console.warn('Supabase:', e.message); }
+
+/* ══════════════════════════════════════════════════════════════
+   1. MOTÈ GOMOKU
+   Pyon 1 = nwa (li kòmanse), pyon 2 = blan.
+   ══════════════════════════════════════════════════════════════ */
+var N = CONFIG.N, SZ = N*N;
+var B = new Int8Array(SZ);
+var DIRS = [[1,0],[0,1],[1,1],[1,-1]];
+function idx(x,y){ return y*N + x; }
+function inside(x,y){ return x>=0 && y>=0 && x<N && y<N; }
+function get(x,y){ return inside(x,y) ? B[idx(x,y)] : 3; }   /* 3 = deyò */
+
+/* Senk aliye ? Retounen lis kaz yo, oswa null */
+function fiveAt(x,y,c){
+  for(var d=0;d<4;d++){
+    var dx = DIRS[d][0], dy = DIRS[d][1], line = [[x,y]];
+    var i, nx, ny;
+    for(i=1;i<5;i++){ nx=x+dx*i; ny=y+dy*i; if(get(nx,ny)!==c) break; line.push([nx,ny]); }
+    for(i=1;i<5;i++){ nx=x-dx*i; ny=y-dy*i; if(get(nx,ny)!==c) break; line.unshift([nx,ny]); }
+    if(line.length >= 5) return line.slice(0,5);
+  }
+  return null;
+}
+
+/* Fenèt 9 kaz otou yon kou, an tèks : 1 = pa m, 2 = advèsè, 0 = vid, x = mi */
+function windowStr(x,y,dx,dy,c){
+  var s = '';
+  for(var i=-4;i<=4;i++){
+    var v = get(x+dx*i, y+dy*i);
+    s += v === 3 ? 'x' : v === 0 ? '0' : (v === c ? '1' : '2');
+  }
+  return s;
+}
+var PATS = [
+  [/11111/,            1000000],   /* senk */
+  [/011110/,             80000],   /* kat lib */
+  [/11110|01111|11011|10111|11101/, 12000],  /* kat fèmen */
+  [/011100|001110/,       9000],   /* twa lib */
+  [/011010|010110/,       8000],   /* twa lib koupe */
+  [/001100/,              1200],   /* de lib */
+  [/011000|000110|010100|001010/, 500],
+  [/00100/,                120]
+];
+function lineScore(s){
+  for(var i=0;i<PATS.length;i++) if(PATS[i][0].test(s)) return PATS[i][1];
+  return 0;
+}
+/* Konbyen yon kou vo pou koulè c (san modifye damye a) */
+function moveScore(x,y,c){
+  B[idx(x,y)] = c;
+  var t = 0, fours = 0, threes = 0;
+  for(var d=0;d<4;d++){
+    var s = windowStr(x, y, DIRS[d][0], DIRS[d][1], c);
+    var v = lineScore(s);
+    t += v;
+    if(v >= 12000) fours++;
+    else if(v >= 8000) threes++;
+  }
+  B[idx(x,y)] = 0;
+  /* Doub menas : de kat, oswa yon kat ak yon twa lib — sa se yon viktwa fòse */
+  if(fours >= 2 || (fours >= 1 && threes >= 1)) t += 60000;
+  else if(threes >= 2) t += 20000;
+  return t;
+}
+function makesFour(x,y,c){
+  B[idx(x,y)] = c;
+  var ok = false;
+  for(var d=0;d<4;d++){
+    var v = lineScore(windowStr(x, y, DIRS[d][0], DIRS[d][1], c));
+    if(v >= 12000){ ok = true; break; }
+  }
+  B[idx(x,y)] = 0;
+  return ok;
+}
+function empties(){
+  var out = [];
+  for(var y=0;y<N;y++) for(var x=0;x<N;x++) if(!B[idx(x,y)]) out.push([x,y]);
+  return out;
+}
+/* Kaz vid ki toupre yon pyon ki deja poze */
+function candidates(range){
+  range = range || 2;
+  var seen = {}, out = [], any = false;
+  for(var y=0;y<N;y++) for(var x=0;x<N;x++){
+    if(!B[idx(x,y)]) continue;
+    any = true;
+    for(var dy=-range;dy<=range;dy++) for(var dx=-range;dx<=range;dx++){
+      var nx=x+dx, ny=y+dy;
+      if(!inside(nx,ny) || B[idx(nx,ny)]) continue;
+      var k = ny*N+nx;
+      if(seen[k]) continue;
+      seen[k] = 1; out.push([nx,ny]);
+    }
+  }
+  if(!any) return [[7,7]];
+  return out;
+}
+function ranked(c, limit){
+  var o = c === 1 ? 2 : 1;
+  var list = candidates(2).map(function(p){
+    return { x:p[0], y:p[1], s: moveScore(p[0],p[1],c) + moveScore(p[0],p[1],o) * 0.92 };
+  });
+  list.sort(function(a,b){ return b.s - a.s; });
+  return limit ? list.slice(0, limit) : list;
+}
+
+/* ── Viktwa fòse pa yon chèn kat (VCF) ──
+   Nou eseye sèlman kou ki fòse advèsè a reponn. */
+function vcf(c, depth){
+  var o = c === 1 ? 2 : 1;
+  /* Gen yon senk kounye a ? */
+  var cs = candidates(2), i, p;
+  for(i=0;i<cs.length;i++){
+    B[idx(cs[i][0],cs[i][1])] = c;
+    var w = fiveAt(cs[i][0], cs[i][1], c);
+    B[idx(cs[i][0],cs[i][1])] = 0;
+    if(w) return { x:cs[i][0], y:cs[i][1] };
+  }
+  if(depth <= 0) return null;
+  for(i=0;i<cs.length;i++){
+    p = cs[i];
+    if(!makesFour(p[0], p[1], c)) continue;
+    B[idx(p[0],p[1])] = c;
+    /* advèsè a oblije bloke : nou chèche kote li dwe mete pyon an */
+    var blocks = [], j, q, cs2 = candidates(2);
+    for(j=0;j<cs2.length;j++){
+      q = cs2[j];
+      B[idx(q[0],q[1])] = c;
+      var five = fiveAt(q[0], q[1], c);
+      B[idx(q[0],q[1])] = 0;
+      if(five) blocks.push(q);
+    }
+    if(blocks.length === 0){ B[idx(p[0],p[1])] = 0; continue; }
+    if(blocks.length > 1){ B[idx(p[0],p[1])] = 0; return { x:p[0], y:p[1] }; }  /* doub menas */
+    var bq = blocks[0];
+    B[idx(bq[0],bq[1])] = o;
+    var deeper = vcf(c, depth-1);
+    B[idx(bq[0],bq[1])] = 0;
+    B[idx(p[0],p[1])] = 0;
+    if(deeper) return { x:p[0], y:p[1] };
+  }
+  return null;
+}
+
+/* ── Rechèch alpha-bêta ── */
+function boardScore(c){
+  var o = c === 1 ? 2 : 1, mine = 0, his = 0;
+  for(var y=0;y<N;y++) for(var x=0;x<N;x++){
+    var v = B[idx(x,y)];
+    if(!v) continue;
+    for(var d=0;d<4;d++){
+      var dx = DIRS[d][0], dy = DIRS[d][1];
+      if(get(x-dx, y-dy) === v) continue;          /* pa konte de fwa */
+      var s = windowStr(x, y, dx, dy, v), sc = lineScore(s);
+      if(v === c) mine += sc; else his += sc;
+    }
+  }
+  return mine - his * 1.06;
+}
+function negamax(c, depth, alpha, beta){
+  var o = c === 1 ? 2 : 1;
+  var moves = ranked(c, depth >= 3 ? 8 : 12);
+  if(!moves.length) return 0;
+  for(var i=0;i<moves.length;i++){
+    var m = moves[i];
+    B[idx(m.x,m.y)] = c;
+    var val;
+    if(fiveAt(m.x, m.y, c)) val = 900000 - (4-depth);
+    else if(depth <= 1) val = boardScore(c);
+    else val = -negamax(o, depth-1, -beta, -alpha);
+    B[idx(m.x,m.y)] = 0;
+    if(val > alpha){ alpha = val; if(depth === ROOT_DEPTH) ROOT_BEST = m; }
+    if(alpha >= beta) break;
+  }
+  return alpha;
+}
+var ROOT_DEPTH = 0, ROOT_BEST = null;
+
+/* ── Sèvo a, pa nivo ── */
+var OPENINGS = [[7,7],[8,8],[6,8],[8,6],[6,6]];
+function think(c, level){
+  var o = c === 1 ? 2 : 1, i;
+  var cs = candidates(2);
+
+  /* 1. Genyen kounye a */
+  for(i=0;i<cs.length;i++){
+    B[idx(cs[i][0],cs[i][1])] = c;
+    var w = fiveAt(cs[i][0], cs[i][1], c);
+    B[idx(cs[i][0],cs[i][1])] = 0;
+    if(w) return { x:cs[i][0], y:cs[i][1] };
+  }
+  /* 2. Anpeche advèsè a genyen */
+  for(i=0;i<cs.length;i++){
+    B[idx(cs[i][0],cs[i][1])] = o;
+    var w2 = fiveAt(cs[i][0], cs[i][1], o);
+    B[idx(cs[i][0],cs[i][1])] = 0;
+    if(w2) return { x:cs[i][0], y:cs[i][1] };
+  }
+  if(level === 0){                                  /* Fasil : bon kou, men pa toujou pi bon an */
+    var r = ranked(c, 6);
+    return r[(Math.random()*Math.min(4, r.length))|0];
+  }
+  if(level === 1){                                  /* Mwayen */
+    var r1 = ranked(c, 4);
+    return r1[(Math.random()*Math.min(2, r1.length))|0];
+  }
+  /* 3. Nivo 2 ak 3 : doub menas pa m, epi bloke pa l */
+  var mine = ranked(c, 14), his = ranked(o, 14);
+  if(mine.length && mine[0].s >= 60000) return mine[0];
+  for(i=0;i<his.length;i++) if(his[i].s >= 60000){
+    /* li gen yon doub menas : nou pran kote a anvan l */
+    return { x:his[i].x, y:his[i].y };
+  }
+  if(level === 3){
+    /* 4. Viktwa fòse pa chèn kat */
+    var win = vcf(c, 6);
+    if(win) return win;
+    /* 5. Anpeche chèn kat advèsè a */
+    var lose = vcf(o, 4);
+    if(lose) return { x:lose.x, y:lose.y };
+  }
+  /* 6. Rechèch */
+  ROOT_DEPTH = level === 3 ? 4 : 2;
+  ROOT_BEST = null;
+  negamax(c, ROOT_DEPTH, -Infinity, Infinity);
+  return ROOT_BEST || ranked(c, 1)[0];
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2. DAMYE A
+   ══════════════════════════════════════════════════════════════ */
+var LEVELS = [
+  { n:'Fasil',    d:'Li jwe byen, men li bliye kèk menas.',      pts:CONFIG.soloWin[0] },
+  { n:'Mwayen',   d:'Li wè menas yo epi li bloke ou.',           pts:CONFIG.soloWin[1] },
+  { n:'Difisil',  d:'Li konstwi doub menas kont ou.',            pts:CONFIG.soloWin[2] },
+  { n:'Mòtpyon',  d:'Mike014. Li kòmanse, epi li pa fè kado.',   pts:CONFIG.soloWin[3], boss:true }
+];
+var cv = $('#cv'), ctx = cv.getContext('2d');
+var DPR = Math.min(devicePixelRatio || 1, 2), S = 0, PAD = 0;
+var level = 1, mode = 'solo', bet = CONFIG.bets[0];
+var myColor = 1, turn = 1, playing = false, thinking = false;
+var lastMove = null, winLine = null, moves = 0, wins = 0;
+var match = null, sub = null, searching = false, foeName = '—';
+
+/* Damye a dwe toujou gade menm fòm li, menm si fenèt la kout.
+   Nou fikse gwosè a nan piksèl : konsa li pa janm vin plat. */
+function sizeBoard(ratio){
+  var a = document.querySelector('.arena'), bd = document.getElementById('board');
+  if(!a || !bd) return;
+  var cs = getComputedStyle(a);
+  var aw = a.clientWidth  - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  var ah = a.clientHeight - parseFloat(cs.paddingTop)  - parseFloat(cs.paddingBottom);
+  if(aw < 40 || ah < 40) return;
+  var w = aw, h = w / ratio;
+  if(h > ah){ h = ah; w = h * ratio; }
+  bd.style.width  = Math.floor(w) + 'px';
+  bd.style.height = Math.floor(h) + 'px';
+}
+function fit(){
+  sizeBoard(1);
+  var box = $('#board').getBoundingClientRect();
+  var size = Math.floor(Math.min(box.width, box.height));
+  if(size < 40) return;
+  cv.width = cv.height = size * DPR;
+  draw();
+}
+addEventListener('resize', function(){ clearTimeout(fit._t); fit._t = setTimeout(fit, 150); });
+
+function draw(){
+  var W = cv.width;
+  if(!W) return;
+  /* Nou rekalkile chak fwa : konsa yon chanjman gwosè pa janm kite
+     damye a mwatye desine. */
+  PAD = W * 0.045;
+  S = (W - PAD*2) / (N-1);
+  ctx.clearRect(0,0,W,W);
+  /* liy yo */
+  ctx.strokeStyle = 'rgba(212,175,55,.26)';
+  ctx.lineWidth = 1*DPR;
+  for(var i=0;i<N;i++){
+    ctx.beginPath(); ctx.moveTo(PAD, PAD+i*S); ctx.lineTo(W-PAD, PAD+i*S); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD+i*S, PAD); ctx.lineTo(PAD+i*S, W-PAD); ctx.stroke();
+  }
+  /* pwen repè */
+  [[3,3],[11,3],[3,11],[11,11],[7,7]].forEach(function(p){
+    ctx.beginPath(); ctx.arc(PAD+p[0]*S, PAD+p[1]*S, 2.4*DPR, 0, 6.2832);
+    ctx.fillStyle = 'rgba(212,175,55,.55)'; ctx.fill();
+  });
+  /* pyon yo */
+  for(var y=0;y<N;y++) for(var x=0;x<N;x++){
+    var v = B[idx(x,y)]; if(!v) continue;
+    var cx = PAD+x*S, cy = PAD+y*S, r = S*0.42;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = r*0.6; ctx.shadowOffsetY = r*0.16;
+    var g = ctx.createLinearGradient(cx-r, cy-r, cx+r, cy+r);
+    if(v === 1){ g.addColorStop(0,'#F4E39B'); g.addColorStop(1,'#A87F14'); }
+    else       { g.addColorStop(0,'#FFFFFF'); g.addColorStop(1,'#8E9CAD'); }
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.2832);
+    ctx.fillStyle = g; ctx.fill();
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(cx-r*0.28, cy-r*0.3, r*0.26, 0, 6.2832);
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fill();
+  }
+  /* dènye kou */
+  if(lastMove){
+    ctx.beginPath();
+    ctx.arc(PAD+lastMove[0]*S, PAD+lastMove[1]*S, S*0.52, 0, 6.2832);
+    ctx.strokeStyle = 'rgba(0,224,138,.85)'; ctx.lineWidth = 2*DPR; ctx.stroke();
+  }
+  /* liy ki genyen an */
+  if(winLine){
+    ctx.strokeStyle = 'rgba(0,224,138,.9)';
+    ctx.lineWidth = S*0.16; ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(0,224,138,.8)'; ctx.shadowBlur = S*0.6;
+    ctx.beginPath();
+    ctx.moveTo(PAD+winLine[0][0]*S, PAD+winLine[0][1]*S);
+    ctx.lineTo(PAD+winLine[4][0]*S, PAD+winLine[4][1]*S);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+}
+function paintTurn(){
+  var bar = $('#turnbar');
+  bar.classList.toggle('think', thinking);
+  bar.querySelector('i').className = turn === myColor ? 'me' : 'op';
+  $('#turn-t').textContent = !playing ? '—'
+    : thinking ? (mode === 'solo' ? LEVELS[level].n + ' ap reflechi…' : 'Advèsè a ap jwe…')
+    : turn === myColor ? 'Se tou pa w' : 'Tou pa ' + foeName;
+  $('#foe').textContent = foeName;
+  $('#wins').textContent = wins;
+  $('#pot').textContent = mode === 'duel' ? (bet*2) : (LEVELS[level] ? LEVELS[level].pts : 0);
+}
+
+function place(x,y,c,fromNet){
+  if(B[idx(x,y)]) return false;
+  B[idx(x,y)] = c; lastMove = [x,y]; moves++;
+  var five = fiveAt(x,y,c);
+  draw(); paintTurn();
+  if(five){ winLine = five; draw(); finish(c === myColor); return true; }
+  if(moves >= SZ){ finish(null); return true; }
+  turn = c === 1 ? 2 : 1;
+  paintTurn();
+  if(mode === 'solo' && turn !== myColor) setTimeout(aiPlay, 240);
+  return true;
+}
+function aiPlay(){
+  if(!playing) return;
+  thinking = true; paintTurn();
+  setTimeout(function(){
+    var m = think(turn, level);
+    thinking = false;
+    if(m) place(m.x, m.y, turn);
+  }, 40);
+}
+cv.addEventListener('click', function(e){
+  if(!playing || thinking || turn !== myColor) return;
+  var r = cv.getBoundingClientRect();
+  var x = Math.round(((e.clientX - r.left) * (cv.width/r.width) - PAD) / S);
+  var y = Math.round(((e.clientY - r.top)  * (cv.height/r.height) - PAD) / S);
+  if(!inside(x,y) || B[idx(x,y)]) return;
+  if(mode === 'duel'){ sendMove(x,y); return; }
+  place(x,y,myColor);
+});
+
+function resetBoard(){
+  B = new Int8Array(SZ);
+  lastMove = null; winLine = null; moves = 0; thinking = false;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3. KONT AK PWEN
+   ══════════════════════════════════════════════════════════════ */
+var db = null, fbAuth = null, AUTH_UID = null, authReady = false, waiters = [];
+try{
+  if(window.firebase && firebase.apps && firebase.apps.length === 0) firebase.initializeApp(CONFIG.firebase);
+  fbAuth = firebase.auth(); db = firebase.firestore();
+}catch(e){ console.warn('Firebase:', e.message); }
+function whenAuth(){
+  return new Promise(function(res){ if(authReady) return res(AUTH_UID); waiters.push(res); });
+}
+if(fbAuth){
+  fbAuth.onAuthStateChanged(function(u){
+    AUTH_UID = u ? u.uid : null; authReady = true;
+    waiters.splice(0).forEach(function(f){ f(AUTH_UID); });
+    if(AUTH_UID){ UID = AUTH_UID; loadBest(); }
+    else toast('Ou pa konekte — pwen yo p ap konte.');
+  });
+} else authReady = true;
+
+async function addPoints(n){
+  var uid = await whenAuth();
+  if(!db || !uid || !n) return false;
+  try{
+    await db.collection('users').doc(uid)
+      .set({ points: firebase.firestore.FieldValue.increment(n) }, { merge:true });
+    return true;
+  }catch(e){ console.warn('pwen:', e.message); return false; }
+}
+async function loadBest(){
+  if(!db || !UID) return;
+  try{
+    var s = await db.collection('leaderboards').doc(CONFIG.gameId + '_' + UID).get();
+    if(s.exists){ wins = s.data().score || 0; paintTurn(); }
+  }catch(e){}
+}
+async function saveWin(total){
+  var uid = await whenAuth();
+  if(!db || !uid) return;
+  try{
+    var ref = db.collection('leaderboards').doc(CONFIG.gameId + '_' + uid);
+    var snap = await ref.get();
+    var prev = snap.exists ? (snap.data().score || 0) : 0;
+    if(total > prev) await ref.set({ gameId:CONFIG.gameId, uid:uid, username:NAME,
+      score:total, updatedAt:new Date().toISOString() }, { merge:true });
+  }catch(e){}
+  try{ if(window.opener) window.opener.postMessage({ zetwal:'game-over', game:CONFIG.gameId }, '*'); }catch(e){}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. FEN PATI
+   ══════════════════════════════════════════════════════════════ */
+async function finish(iWon){
+  playing = false;
+  var gained = 0, note = '';
+  $('#end-foe').textContent   = foeName;
+  $('#end-moves').textContent = moves;
+
+  if(iWon === null){
+    $('#end-t').textContent = 'Match nil';
+    $('#end-t').classList.remove('bad');
+    $('#end-medal').className = 'medal';
+    $('#end-medal').innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>';
+    $('#end-d').textContent = 'Damye a plen. Pèsonn pa genyen.';
+    if(mode === 'duel'){ gained = bet; note = 'Nou remèt ou pari ou a.'; }
+  } else if(iWon){
+    wins++;
+    gained = mode === 'duel' ? bet*2 : LEVELS[level].pts;
+    $('#end-t').textContent = 'Ou genyen !';
+    $('#end-t').classList.remove('bad');
+    $('#end-medal').className = 'medal';
+    $('#end-medal').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 4M17 6h2.5a2.5 2.5 0 0 1-2.5 4"/></svg>';
+    $('#end-d').textContent = mode === 'duel'
+      ? 'Ou pran tout pari a.'
+      : (level === 3 ? 'Ou bat Mike014. Sa pa fasil ditou.' : 'Ou bat nivo ' + LEVELS[level].n + '.');
+    await saveWin(wins);
+  } else {
+    $('#end-t').textContent = 'Ou pèdi';
+    $('#end-t').classList.add('bad');
+    $('#end-medal').className = 'medal bad';
+    $('#end-medal').innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8v5m0 3.5v.1"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>';
+    $('#end-d').textContent = mode === 'duel' ? 'Advèsè a pran pari a.' : 'Eseye ankò — gade menas yo pi bonè.';
+  }
+  $('#end-pts').textContent = (gained ? '+' : '') + gained;
+  if(gained > 0){
+    var ok = await addPoints(gained);
+    note = note || (ok ? '+' + gained + ' pwen antre sou kont ou.' : 'Pwen yo pa antre — verifye koneksyon w.');
+  } else if(mode === 'duel'){
+    note = 'Ou pèdi ' + bet + ' pwen ou te mete an jwèt la.';
+  }
+  $('#end-note').textContent = note;
+  $('#v-end').classList.add('on');
+  paintTurn();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. KONT MACHIN NAN
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  $('#lvls').innerHTML = LEVELS.map(function(L,i){
+    return '<button class="lvl' + (i===level?' on':'') + (L.boss?' boss':'') + '" data-l="'+i+'">'
+      + '<span class="n">' + (i+1) + '</span>'
+      + '<span><b>' + L.n + (L.boss ? ' · Mike014' : '') + '</b><span>' + L.d + ' · ' + L.pts + ' pwen</span></span>'
+      + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('.lvl'), function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.lvl').forEach(function(o){ o.classList.remove('on'); });
+      b.classList.add('on'); level = parseInt(b.getAttribute('data-l'),10);
+    });
+  });
+})();
+function startSolo(){
+  mode = 'solo'; resetBoard();
+  foeName = LEVELS[level].n + (LEVELS[level].boss ? ' · Mike014' : '');
+  /* Mike014 pran nwa : nan gomoku lib, moun ki kòmanse a gen avantaj la. */
+  myColor = LEVELS[level].boss ? 2 : 1;
+  turn = 1; playing = true;
+  $('#v-start').classList.remove('on');
+  $('#v-end').classList.remove('on');
+  fit(); paintTurn();
+  if(turn !== myColor){
+    thinking = true; paintTurn();
+    setTimeout(function(){
+      thinking = false;
+      var op = OPENINGS[(Math.random()*OPENINGS.length)|0];
+      place(op[0], op[1], 1);
+    }, 420);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. AN LIY — chèche yon advèsè epi parye
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  $('#bets').innerHTML = CONFIG.bets.map(function(v,i){
+    return '<button class="bet' + (i===0?' on':'') + '" data-b="'+v+'">' + v + ' pwen</button>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('.bet'), function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.bet').forEach(function(o){ o.classList.remove('on'); });
+      b.classList.add('on'); bet = parseInt(b.getAttribute('data-b'),10);
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.tabsw button'), function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.tabsw button').forEach(function(o){ o.classList.remove('on'); });
+      b.classList.add('on');
+      var m = b.getAttribute('data-mode');
+      $('#pane-solo').style.display = m === 'solo' ? '' : 'none';
+      $('#pane-duel').style.display = m === 'duel' ? '' : 'none';
+    });
+  });
+})();
+
+function netCleanup(){
+  if(sub){ try{ sub.unsubscribe(); }catch(e){} sub = null; }
+  if(netCleanup._t){ clearInterval(netCleanup._t); netCleanup._t = null; }
+}
+function watchMatch(id){
+  netCleanup();
+  try{
+    if(sb.channel){
+      sub = sb.channel('gomoku-' + id)
+        .on('postgres_changes', { event:'UPDATE', schema:'public', table:'game_matches', filter:'id=eq.'+id },
+            function(p){ onMatch(p.new); })
+        .subscribe();
+    }
+  }catch(e){}
+  /* filè sekirite si tan reyèl la pa pase */
+  netCleanup._t = setInterval(async function(){
+    try{
+      var r = await sb.from('game_matches').select('*').eq('id', id).single();
+      if(r.data) onMatch(r.data);
+    }catch(e){}
+  }, 2500);
+}
+function onMatch(row){
+  if(!row) return;
+  match = row;
+  if(row.status === 'waiting') return;
+  if(row.status === 'playing' && !playing){
+    foeName = (myColor === 1 ? row.guest_name : row.host_name) || 'Advèsè';
+    $('#search').style.display = 'none';
+    $('#v-start').classList.remove('on');
+    playing = true; paintTurn();
+    toast('Advèsè jwenn : ' + foeName);
+  }
+  var list = row.moves || [];
+  while(moves < list.length){
+    var m = list[moves];
+    if(B[idx(m.x, m.y)]){ moves++; continue; }
+    place(m.x, m.y, m.c, true);
+  }
+  if(row.status === 'done' && playing){
+    playing = false;
+    finish(row.winner === UID);
+  }
+}
+async function sendMove(x,y){
+  if(!match) return;
+  var list = (match.moves || []).slice();
+  list.push({ x:x, y:y, c:myColor });
+  place(x, y, myColor);
+  var patch = { moves:list, turn: myColor === 1 ? 'guest' : 'host', updated_at:new Date().toISOString() };
+  if(winLine){ patch.status = 'done'; patch.winner = UID; }
+  else if(moves >= SZ){ patch.status = 'done'; patch.winner = null; }
+  try{ await sb.from('game_matches').update(patch).eq('id', match.id); }
+  catch(e){ toast('Kou a pa pase — koneksyon an fèb.'); }
+}
+
+$('#find').addEventListener('click', async function(){
+  var uid = await whenAuth();
+  if(!uid){ toast('Konekte anvan pou w ka parye.'); return; }
+  if(!sb){ toast('Koneksyon an pa disponib.'); return; }
+  mode = 'duel'; resetBoard(); searching = true;
+  $('#find').style.display = 'none';
+  $('#cancel').style.display = '';
+  $('#search').style.display = 'flex';
+  $('#search-tx').innerHTML = 'K ap chèche yon advèsè ki mete <b>' + bet + ' pwen</b>…';
+
+  try{
+    /* 1. Èske gen yon moun k ap tann ak menm pari a ? */
+    var since = new Date(Date.now() - 4*60000).toISOString();
+    var r = await sb.from('game_matches').select('*')
+      .eq('game','gomoku').eq('status','waiting').eq('bet', bet)
+      .neq('host_uid', uid).gte('created_at', since)
+      .order('created_at').limit(1);
+    var found = (r.data || [])[0];
+
+    if(found){
+      var up = await sb.from('game_matches').update({
+        guest_uid:uid, guest_name:NAME, status:'playing', turn:'host',
+        updated_at:new Date().toISOString()
+      }).eq('id', found.id).eq('status','waiting').select();
+      if(up.data && up.data.length){
+        myColor = 2; turn = 1; match = up.data[0];
+        await addPoints(-bet);
+        watchMatch(match.id);
+        onMatch(match);
+        searching = false;
+        return;
+      }
+    }
+    /* 2. Sinon nou kreye yon tab epi nou tann */
+    var ins = await sb.from('game_matches').insert({
+      game:'gomoku', bet:bet, status:'waiting',
+      host_uid:uid, host_name:NAME, turn:'host', moves:[]
+    }).select();
+    if(!ins.data || !ins.data.length) throw new Error('pa ka kreye');
+    match = ins.data[0]; myColor = 1; turn = 1;
+    await addPoints(-bet);
+    watchMatch(match.id);
+    $('#search-tx').innerHTML = 'Ou nan lis la ak <b>' + bet + ' pwen</b>. N ap jwenn yon advèsè pou ou…';
+  }catch(e){
+    searching = false;
+    $('#find').style.display = ''; $('#cancel').style.display = 'none';
+    $('#search').style.display = 'none';
+    $('#duel-note').textContent = "Jwèt an liy nan pa disponib : egzekite zetwal-gomoku.sql nan Supabase.";
+  }
+});
+$('#cancel').addEventListener('click', async function(){
+  searching = false;
+  $('#find').style.display = ''; $('#cancel').style.display = 'none';
+  $('#search').style.display = 'none';
+  netCleanup();
+  if(match && match.status === 'waiting'){
+    try{ await sb.from('game_matches').update({ status:'cancelled' }).eq('id', match.id); }catch(e){}
+    await addPoints(bet);          /* nou remèt pari a */
+    toast('Rechèch anile — pwen ou yo remèt.');
+  }
+  match = null;
+});
+$('#quit').addEventListener('click', async function(){
+  if(!playing) return;
+  if(mode === 'duel' && match){
+    try{
+      await sb.from('game_matches').update({ status:'done',
+        winner: myColor === 1 ? match.guest_uid : match.host_uid,
+        updated_at:new Date().toISOString() }).eq('id', match.id);
+    }catch(e){}
+    playing = false; netCleanup(); finish(false);
+  } else { playing = false; finish(false); }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   7. KONTWÒL JENERAL
+   ══════════════════════════════════════════════════════════════ */
+$('#go').addEventListener('click', startSolo);
+$('#again').addEventListener('click', function(){
+  netCleanup(); match = null; playing = false; resetBoard(); draw();
+  $('#v-end').classList.remove('on');
+  $('#v-start').classList.add('on');
+  $('#find').style.display = ''; $('#cancel').style.display = 'none';
+  $('#search').style.display = 'none';
+});
+addEventListener('keydown', function(e){ if(e.key === 'Enter' && !playing) startSolo(); });
+addEventListener('beforeunload', function(){ netCleanup(); });
+
+/* ══════════════════════════════════════════════════════════════
+   8. DEPA
+   ══════════════════════════════════════════════════════════════ */
+fit(); paintTurn();
+requestAnimationFrame(fit);
+addEventListener('load', fit);
+setTimeout(fit, 300);
+if(!UID && authReady && !AUTH_UID) toast('Ouvri jwèt la depi hub la pou pwen ou yo konte.');
+
+})();
+</script>
+</body>
+</html>
