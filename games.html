@@ -581,7 +581,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <p><b>Nèf jwèt</b> ap tann ou. Pwen reyèl, klasman mondyal, pwogrè ki sovgade.<br>Konekte pou w debloke tout bagay.</p>
     <button class="btn btn-g" id="lock-login" style="width:100%">Konekte kounye a</button>
     <div class="lock-feats">
-      <div><b>9</b>Jwèt</div><div><b>∞</b>Pati</div><div><b>1</b>Klasman</div><div><b>100</b>Pwen kado</div>
+      <div><b>9</b>Jwèt</div><div><b>∞</b>Pati</div><div><b>1</b>Klasman</div><div><b>20</b>Pwen kado</div>
     </div>
   </div>
 </section>
@@ -770,7 +770,7 @@ var CONFIG = {
   },
   admins : ['mikenestorlive@gmail.com','schnaydernaderice1@gmail.com'],
   whatsapp : '79961103506',
-  startPoints : 100        /* pwen yon nouvo jwè resevwa yon sèl fwa */
+  startPoints : 20        /* pwen yon nouvo jwè resevwa yon sèl fwa */
 };
 
 var $  = function(s,r){ return (r||document).querySelector(s); };
@@ -1002,31 +1002,31 @@ var EM = {
   runner : '<circle cx="14.5" cy="4.5" r="2" style="--l:13"/><path d="M8 21l3-5.5-2.5-3L10 8l4 2 2.5 1.5M11 12.5 6.5 11M14 21l1.5-4.5" style="--l:40"/>'
 };
 var GAMES = [
-  { id:'snake',  name:'Snake Zetwal',    file:'snakezetwal.html',  cost:10, rew:'5 pwen chak zetwal',
+  { id:'snake',  name:'Snake Zetwal',    file:'snakezetwal.html',  cost:10, rew:'1 pwen chak 4 zetwal',
     cat:'klasik', tag:'hot',   c:'#00E08A', s:'rgba(0,224,138,.16)',
     d:'Manje zetwal yo, grandi, epi pa manyen mi an. Klasik la, jan li dwe ye.' },
-  { id:'flappy', name:'Flappy Zetwal',   file:'flappyzetwal.html', cost:10, rew:'2 pwen chak pòt',
+  { id:'flappy', name:'Flappy Zetwal',   file:'flappyzetwal.html', cost:10, rew:'1 pwen chak 3 pòt',
     cat:'viral',  tag:'viral', c:'#D4AF37', s:'rgba(212,175,55,.16)',
     d:'Yon ti tap, yon ti vòl. Pase ant pilye yo san ou pa manyen anyen.' },
-  { id:'tetris', name:'Tetris Zetwal',   file:'tetriszetwal.html', cost:15, rew:'10 pwen/nivo · 1 pa liy',
+  { id:'tetris', name:'Tetris Zetwal',   file:'tetriszetwal.html', cost:15, rew:'2 pwen/nivo · 1 chak 5 liy',
     cat:'klasik', tag:'hot',   c:'#A78BFA', s:'rgba(167,139,250,.16)',
     d:'Ranje pyès yo, ranpli liy yo, epi gade vitès la monte ak ou.' },
-  { id:'memory', name:'Memory Zetwal',   file:'memoryzetwal.html', cost:10, rew:'15 pwen si w fini',
+  { id:'memory', name:'Memory Zetwal',   file:'memoryzetwal.html', cost:10, rew:'6 pwen si w fini, jiska 10',
     cat:'puzzle', tag:'new',   c:'#6FD8E8', s:'rgba(111,216,232,.16)',
     d:'Jwenn chak pè kat. Memwa ou ak vitès ou ki bay pwen an.' },
-  { id:'candy',  name:'Zetwal Match',    file:'candyzetwal.html',  cost:10, rew:'Pwen chak nivo',
+  { id:'candy',  name:'Zetwal Match',    file:'candyzetwal.html',  cost:10, rew:'3 pwen chak nivo',
     cat:'viral',  tag:'viral', c:'#FF6FA5', s:'rgba(255,111,165,.16)',
     d:'Aliye twa oswa plis. Konbine kat pou w debloke yon zetwal espesyal.' },
-  { id:'whack',  name:'Whack-a-Star',    file:'whackzetwal.html',  cost:10, rew:'1 pwen chak zetwal',
+  { id:'whack',  name:'Whack-a-Star',    file:'whackzetwal.html',  cost:10, rew:'1 pwen chak 6 zetwal',
     cat:'reflex', tag:'viral', c:'#FFB84D', s:'rgba(255,184,77,.16)',
     d:'Trant segonn. Tape chak zetwal ki parèt anvan li disparèt.' },
-  { id:'gomoku', name:'Gomoku Zetwal',   file:'gomokuzetwal.html', cost:15, rew:'30 pwen chak viktwa',
+  { id:'gomoku', name:'Gomoku Zetwal',   file:'gomokuzetwal.html', cost:15, rew:'4 a 40 pwen dapre nivo a',
     cat:'puzzle', tag:'new',   c:'#E1C45A', s:'rgba(225,196,90,.16)',
     d:'Aliye senk. Kat nivo, epi dènye a pa fasil ditou.' },
-  { id:'maze',   name:'Labirent Zetwal', file:'mazezetwal.html',   cost:10, rew:'5 pwen × nivo',
+  { id:'maze',   name:'Labirent Zetwal', file:'mazezetwal.html',   cost:10, rew:'3 pwen chak nivo',
     cat:'puzzle', tag:'hot',   c:'#F0D98A', s:'rgba(240,217,138,.16)',
     d:'Jwenn sòti a. Chak nivo pi gwo, chak nivo pi peye.' },
-  { id:'runner', name:'Runner Zetwal',   file:'runnerzetwal.html', cost:10, rew:'1 pwen chak 100 m',
+  { id:'runner', name:'Runner Zetwal',   file:'runnerzetwal.html', cost:10, rew:'1 pwen chak 250 m',
     cat:'reflex', tag:'new',   c:'#FF8A5B', s:'rgba(255,138,91,.16)',
     d:'Kouri, sote, evite. Pi lwen ou ale, pi plis ou ranmase.' }
 ];
@@ -1237,8 +1237,10 @@ $('#l-go').addEventListener('click', async function(){
   var url = g.file + '?uid=' + encodeURIComponent(window._me.uid)
           + '&name=' + encodeURIComponent(window._me.displayName || window._me.email || 'Jwè')
           + '&cost=' + g.cost;
-  window.open(url, '_blank');
   toast(g.name + ' — bòn chans !');
+  /* Menm onglè : sou telefòn, navigatè yo bloke fenèt ki louvri poukont yo,
+     epi jwè a t ap peye san jwèt la pa janm parèt. */
+  setTimeout(function(){ location.href = url; }, 260);
 });
 
 /* Lè yon jwèt fèmen epi li di nou li fini, nou rafrechi klasman an */
