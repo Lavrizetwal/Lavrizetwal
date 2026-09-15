@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
-<title>TAKSI ZETWAL — Kous, manje, pake</title>
-<meta name="description" content="Taksi Zetwal : yon kous, yon livrezon manje, yon pake. Pri klè anvan ou monte.">
+<title>ZETWAL MOVE — Taksi, Manje, Pake</title>
+<meta name="description" content="Zetwal Move : yon kous, yon manje, yon pake. Tout vil la konekte.">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/logo-192.png">
@@ -20,6 +20,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+
 
 /* ════════════════════════════════════════════════════════════════
    TAKSI ZETWAL — yon sèl fichye. Zewo depandans lokal.
@@ -321,6 +322,142 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
   transition:transform var(--med),opacity var(--med);box-shadow:0 20px 50px rgba(0,0,0,.6)}
 .toast.show{transform:translate(-50%,0);opacity:1}
 
+/* ══ KONTAK ═══════════════════════════════════════════════════ */
+.contact{border-top:1px solid var(--line);padding:88px 0 0}
+.c-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:56px;align-items:start}
+.c-lead{font-family:var(--serif);font-size:clamp(1.9rem,4.6vw,3rem);font-weight:600;line-height:1.14;margin-bottom:22px}
+.c-sub{font-size:.85rem;color:var(--ink-3);max-width:40ch;margin-bottom:28px}
+.c-item{display:flex;align-items:center;gap:16px;padding:17px 0;border-bottom:1px solid var(--line);
+  transition:padding-left var(--med),border-color var(--med)}
+.c-item:hover{padding-left:11px;border-bottom-color:var(--g-24)}
+.c-ic{width:34px;height:34px;border-radius:50%;border:1px solid var(--g-14);display:grid;place-items:center;flex-shrink:0}
+.c-item:hover .c-ic{background:var(--g-08);border-color:var(--gold)}
+.c-ic svg{width:16px;height:16px;stroke:var(--gold);stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.c-k,.c-v{display:block}
+.c-k{font-size:.55rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-4);margin-bottom:2px}
+.c-v{font-size:.86rem;font-weight:500}
+.c-item .arw{margin-left:auto;width:15px;height:15px;stroke:var(--ink-4);stroke-width:1.6;fill:none;
+  transition:stroke var(--fast),transform var(--med)}
+.c-item:hover .arw{stroke:var(--gold);transform:translateX(4px)}
+footer{margin-top:82px;border-top:1px solid var(--line);padding:32px 0 40px;
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+footer .fb{font-family:var(--serif);font-size:.98rem;letter-spacing:2.6px;font-weight:600}
+footer .fb em{font-style:normal;color:var(--gold)}
+footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-4)}
+#top{display:inline-flex;align-items:center;gap:9px;font-size:.56rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ink-3);cursor:pointer;background:none;border:0;font-family:var(--sans)}
+#top:hover{color:var(--gold)}
+#top svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.6;fill:none}
+
+/* ══ DOCK · ASISTAN · MODAL ═══════════════════════════════════ */
+.dock{position:fixed;right:22px;bottom:22px;z-index:960;display:flex;flex-direction:column;gap:11px}
+.dk{position:relative;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:rgba(12,12,12,.86);backdrop-filter:blur(16px);border:1px solid var(--g-24);color:var(--gold);
+  box-shadow:0 12px 32px rgba(0,0,0,.55);transition:transform var(--fast),border-color var(--fast),background var(--fast)}
+.dk:hover{transform:translateY(-3px);border-color:var(--gold);background:rgba(212,175,55,.10)}
+.dk svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dk b{position:absolute;right:-3px;bottom:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:99px;
+  background:var(--gold);color:#0A0A0A;font-size:.5rem;font-weight:700;display:grid;place-items:center;
+  text-transform:uppercase;box-shadow:0 3px 10px rgba(0,0,0,.5)}
+.dk-tip{position:absolute;right:60px;top:50%;transform:translateY(-50%) translateX(6px);white-space:nowrap;
+  padding:6px 11px;border-radius:4px;background:rgba(12,12,12,.95);border:1px solid var(--line);
+  font-size:.56rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-2);
+  opacity:0;pointer-events:none;transition:opacity var(--fast),transform var(--fast)}
+.dk:hover .dk-tip{opacity:1;transform:translateY(-50%)}
+.panel{position:fixed;top:0;right:0;bottom:0;width:392px;max-width:94vw;z-index:1010;display:flex;flex-direction:column;
+  background:rgba(8,8,8,.97);backdrop-filter:blur(24px);border-left:1px solid var(--line);
+  box-shadow:-30px 0 70px rgba(0,0,0,.6);transform:translateX(102%);transition:transform var(--med)}
+.panel.open{transform:none}
+.p-head{display:flex;align-items:center;gap:12px;padding:20px 20px 16px;border-bottom:1px solid var(--line)}
+.p-head .ic{width:34px;height:34px;border-radius:50%;background:var(--g-08);border:1px solid var(--g-14);
+  display:grid;place-items:center;flex-shrink:0}
+.p-head .ic svg{width:17px;height:17px;stroke:var(--gold);stroke-width:1.5;fill:none}
+.p-ttl{font-family:var(--serif);font-size:1.06rem;font-weight:600;letter-spacing:.6px;line-height:1.2}
+.p-sub{font-size:.56rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-4)}
+.p-x{margin-left:auto;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:none;
+  color:var(--ink-3);cursor:pointer;display:grid;place-items:center}
+.p-x:hover{color:var(--gold);border-color:var(--g-24)}
+.p-x svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.7;fill:none}
+.p-body{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:88%;padding:12px 14px;border-radius:12px;font-size:.81rem;line-height:1.65;white-space:pre-line}
+.msg.me{align-self:flex-end;background:var(--gold);color:#0A0A0A;font-weight:600;border-bottom-right-radius:3px}
+.msg.ai{align-self:flex-start;background:rgba(255,255,255,.045);border:1px solid var(--line);
+  color:var(--ink-2);border-bottom-left-radius:3px}
+.msg.ai b{color:var(--gold);font-weight:600}
+.p-chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 20px 12px}
+.p-chips button{font-size:.66rem;padding:7px 12px;border-radius:99px;background:none;cursor:pointer;
+  border:1px solid var(--line);color:var(--ink-3);font-family:var(--sans);text-align:left}
+.p-chips button:hover{color:var(--gold);border-color:var(--g-24)}
+.p-ask{display:flex;gap:9px;padding:14px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.p-ask input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;
+  padding:12px 14px;color:var(--ink);font-family:var(--sans);font-size:.8rem}
+.p-ask input:focus{outline:none;border-color:var(--g-24)}
+.p-ask button{width:44px;border-radius:8px;border:0;background:var(--gold);color:#0A0A0A;cursor:pointer;
+  display:grid;place-items:center}
+.p-ask button svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;fill:none}
+.veil{position:fixed;inset:0;z-index:1005;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);
+  opacity:0;visibility:hidden;transition:opacity var(--med),visibility var(--med)}
+.veil.open{opacity:1;visibility:visible}
+
+.mask{position:fixed;inset:0;z-index:1020;display:grid;place-items:center;padding:22px;
+  background:rgba(3,3,3,.82);backdrop-filter:blur(8px);opacity:0;visibility:hidden;
+  transition:opacity var(--med),visibility var(--med)}
+.mask.open{opacity:1;visibility:visible}
+.box{width:100%;max-width:396px;border-radius:14px;padding:30px 28px 26px;position:relative;
+  background:linear-gradient(165deg,#111,#0A0A0A);border:1px solid var(--g-14);
+  box-shadow:0 36px 90px rgba(0,0,0,.7);transform:translateY(16px) scale(.985);transition:transform var(--med)}
+.mask.open .box{transform:none}
+.box .p-x{position:absolute;top:16px;right:16px;margin:0}
+.box .logo{width:44px;height:44px;border-radius:50%;object-fit:contain;display:block;margin:0 auto 16px;
+  filter:drop-shadow(0 0 12px rgba(212,175,55,.35))}
+.box h3{font-family:var(--serif);font-size:1.5rem;font-weight:600;text-align:center;letter-spacing:.6px}
+.box .lead{font-size:.74rem;color:var(--ink-3);text-align:center;margin:7px 0 22px}
+.tabs{display:flex;gap:4px;padding:4px;border-radius:99px;background:rgba(255,255,255,.04);margin-bottom:20px}
+.tabs button{flex:1;padding:9px 0;border:0;border-radius:99px;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-3)}
+.tabs button.on{background:var(--gold);color:#0A0A0A}
+.fld input[type=text],.fld input[type=email],.fld input[type=password],.fld input[type=number],.fld select{
+  width:100%;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:8px;
+  padding:13px 14px;color:var(--ink);font-family:var(--sans);font-size:.84rem}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--g-24)}
+.fld select option{background:#111}
+.eye{position:absolute;right:8px;bottom:7px;width:32px;height:32px;border:0;background:none;cursor:pointer;
+  color:var(--ink-4);display:grid;place-items:center}
+.eye:hover{color:var(--gold)}
+.eye svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.5;fill:none}
+.box .btn{width:100%;margin-top:6px}
+.or{display:flex;align-items:center;gap:12px;margin:18px 0;font-size:.53rem;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ink-4)}
+.or::before,.or::after{content:'';flex:1;height:1px;background:var(--line)}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:11px;padding:13px;border-radius:8px;
+  border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--ink);font-family:var(--sans);
+  font-size:.72rem;font-weight:600;cursor:pointer}
+.gbtn:hover{border-color:var(--g-24);background:rgba(255,255,255,.06)}
+.gbtn svg{width:17px;height:17px}
+.note{margin-top:15px;text-align:center;font-size:.66rem;color:var(--ink-4)}
+.note a{color:var(--gold);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.err{display:none;margin-top:14px;padding:11px 13px;border-radius:8px;font-size:.73rem;line-height:1.5;
+  background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.24);color:#FFA3A3}
+.err.ok{background:rgba(0,224,138,.07);border-color:rgba(0,224,138,.24);color:#7BE8BC}
+.err.show{display:block}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(10,10,10,.28);border-top-color:#0A0A0A;
+  animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.pq-ic{width:54px;height:54px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;
+  font-family:var(--serif);font-size:1.6rem;font-weight:700;border:1px solid var(--g-24);background:var(--g-08);color:var(--gold)}
+.pq-ic.pos{color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.07)}
+.pq-ic.neg{color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.07)}
+.pq-why{font-size:.78rem;color:var(--ink-3);text-align:center;margin-bottom:18px;line-height:1.6}
+.pq-code{padding:16px;border-radius:10px;text-align:center;border:1px dashed var(--g-24);background:rgba(255,255,255,.03)}
+.pq-code span{font-family:var(--sans);font-size:1.8rem;font-weight:700;letter-spacing:.34em;color:var(--gold);
+  padding-left:.34em}
+.pq-help{font-size:.68rem;color:var(--ink-4);text-align:center;margin:14px 0 18px;line-height:1.65}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,90px);z-index:1030;display:flex;
+  align-items:center;gap:10px;padding:13px 20px;border-radius:99px;background:rgba(12,12,12,.96);
+  border:1px solid var(--g-24);font-size:.76rem;opacity:0;pointer-events:none;
+  transition:transform var(--med),opacity var(--med);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.toast.show{transform:translate(-50%,0);opacity:1}
+
 /* ══ HERO — WOUT LA ═══════════════════════════════════════════ */
 .hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:calc(var(--nav) + 64px) 22px 50px;min-height:82svh}
@@ -445,8 +582,241 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .step-t{font-family:var(--serif);font-size:1.22rem;font-weight:600;margin-bottom:7px}
 .step-d{font-size:.78rem;color:var(--ink-3);line-height:1.7;padding-right:14px}
 
-/* ══ PANNO KOUS ═══════════════════════════════════════════════ */
-.side{position:fixed;top:0;right:0;bottom:0;width:430px;max-width:96vw;z-index:1012;display:flex;
+
+/* ══ REZO WOUT LA (fon animé) ═════════════════════════════════ */
+#roads{position:fixed;inset:0;z-index:0;pointer-events:none}
+.sec,.hero,.contact,.nav,.dock,.panel,.side{position:relative;z-index:1}
+
+/* ══ HERO ═════════════════════════════════════════════════════ */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:calc(var(--nav) + 58px) 22px 30px;min-height:auto}
+.kick{display:inline-flex;align-items:center;gap:15px;font-size:.6rem;font-weight:600;letter-spacing:5px;
+  text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.kick s{display:block;width:34px;height:1px;background:var(--g-45);text-decoration:none;
+  transform:scaleX(0);transition:transform 900ms cubic-bezier(.19,1,.22,1) .5s}
+.in .kick s{transform:scaleX(1)}
+.kick s:first-child{transform-origin:right}.kick s:last-child{transform-origin:left}
+.big{font-family:var(--serif);font-weight:600;font-size:clamp(2.9rem,10vw,6.2rem);line-height:.95;
+  letter-spacing:.04em;margin-bottom:14px;text-indent:.04em}
+.tag{font-family:var(--serif);font-style:italic;font-size:1.06rem;color:var(--ink-3)}
+
+/* Chwazi sèvis la */
+.svc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;max-width:720px;
+  margin:34px auto 0}
+.sv{position:relative;padding:20px 14px 17px;border-radius:12px;cursor:pointer;overflow:hidden;
+  border:1px solid var(--line);background:linear-gradient(168deg,rgba(255,255,255,.05),rgba(255,255,255,.014));
+  color:var(--ink);font-family:var(--sans);text-align:center;
+  transition:transform var(--med),border-color var(--med),box-shadow var(--med)}
+.sv:hover{transform:translateY(-4px);border-color:var(--sc,var(--gold))}
+.sv::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--sc,var(--gold));
+  opacity:0;transition:opacity var(--med)}
+.sv.on::before{opacity:1}
+.sv.on{border-color:var(--sc,var(--gold));background:linear-gradient(168deg,rgba(212,175,55,.10),rgba(255,255,255,.02));
+  box-shadow:0 18px 44px rgba(0,0,0,.45)}
+.sv svg{width:30px;height:30px;stroke:var(--sc,var(--gold));stroke-width:1.25;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;margin-bottom:10px}
+.sv b{display:block;font-family:var(--serif);font-size:1.18rem;font-weight:600;margin-bottom:4px}
+.sv span{display:block;font-size:.62rem;color:var(--ink-4);line-height:1.45}
+@media(max-width:600px){
+  .svc{grid-template-columns:1fr;gap:8px}
+  .sv{display:flex;align-items:center;gap:14px;text-align:left;padding:14px 16px}
+  .sv svg{margin:0;width:26px;height:26px}
+}
+
+/* ══ ESTRIKTI KOMIN ═══════════════════════════════════════════ */
+.pane{display:none}
+.pane.on{display:block;animation:fadeUp .5s cubic-bezier(.19,1,.22,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card{padding:24px 22px;border-radius:12px;border:1px solid var(--line);
+  background:linear-gradient(168deg,rgba(255,255,255,.045),rgba(255,255,255,.014))}
+.fld{margin-bottom:15px}
+.fld label{display:block;font-size:.55rem;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--ink-4);margin-bottom:7px}
+.fld input,.fld select,.fld textarea{width:100%;background:rgba(255,255,255,.045);
+  border:1px solid var(--line);border-radius:8px;padding:12px 14px;color:var(--ink);
+  font-family:var(--sans);font-size:.84rem;transition:border-color var(--fast)}
+.fld textarea{min-height:70px;resize:vertical;line-height:1.6}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--g-24)}
+.fld select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:36px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:14px}
+.fld select option{background:#111;color:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0 13px}
+@media(max-width:600px){ .two{grid-template-columns:1fr} }
+.tabs{display:flex;gap:5px;padding:4px;border-radius:99px;background:rgba(255,255,255,.04);margin-bottom:20px}
+.tabs button{flex:1;padding:10px 6px;border:0;border-radius:99px;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--ink-3);transition:background var(--fast),color var(--fast)}
+.tabs button.on{background:var(--sc,var(--gold));color:#0A0A0A}
+.hintline{font-size:.66rem;color:var(--ink-4);line-height:1.6;margin-top:10px}
+.warn{padding:12px 14px;border-radius:8px;font-size:.74rem;line-height:1.6;margin-bottom:16px;
+  border:1px solid rgba(255,184,77,.26);background:rgba(255,184,77,.07);color:#FFD9A0}
+.warn b{color:var(--warn)}
+
+/* ══ TAKSI — KAT LA ═══════════════════════════════════════════ */
+.ride{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
+@media(max-width:1020px){ .ride{grid-template-columns:1fr} }
+.mapbox{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);
+  background:rgba(255,255,255,.02);height:min(60vh,460px)}
+#map{position:absolute;inset:0;background:#0b0b0b}
+.leaflet-container{background:#0b0b0b!important;font-family:var(--sans)!important}
+.leaflet-control-attribution{background:rgba(5,5,5,.7)!important;color:var(--ink-4)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:var(--gold)!important}
+.leaflet-bar a{background:#111!important;color:var(--gold)!important;border-color:var(--line)!important}
+.map-ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;z-index:2}
+.map-ph p{font-size:.78rem;color:var(--ink-3);line-height:1.7;max-width:34ch;margin:0 auto 16px}
+.map-hint{position:absolute;left:12px;right:12px;bottom:12px;z-index:900;padding:9px 14px;border-radius:99px;
+  background:rgba(5,5,5,.86);border:1px solid var(--g-24);backdrop-filter:blur(8px);
+  font-size:.66rem;color:var(--ink-2);text-align:center;pointer-events:none}
+.pin-ab{display:flex;gap:6px;position:absolute;top:12px;left:12px;z-index:900}
+.pin-ab button{padding:8px 13px;border-radius:99px;border:1px solid var(--line);cursor:pointer;
+  background:rgba(5,5,5,.86);backdrop-filter:blur(8px);color:var(--ink-3);
+  font-family:var(--sans);font-size:.58rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase}
+.pin-ab button.on{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,.14)}
+.geo{position:absolute;top:12px;right:12px;z-index:900;width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(5,5,5,.86);backdrop-filter:blur(8px);
+  color:var(--ink-3);cursor:pointer;display:grid;place-items:center}
+.geo:hover{color:var(--gold);border-color:var(--g-24)}
+.geo svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none}
+
+.addr{position:relative;margin-bottom:13px}
+.addr .row{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:9px;
+  border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.addr .row:focus-within{border-color:var(--g-24)}
+.addr .bul{width:11px;height:11px;border-radius:50%;border:2px solid var(--gold);flex-shrink:0}
+.addr .bul.b{border-color:var(--ok)}
+.addr input{flex:1;min-width:0;background:none;border:0;color:var(--ink);font-family:var(--sans);
+  font-size:.84rem;outline:none}
+.addr .sp{width:14px;height:14px;border-radius:50%;border:2px solid var(--g-24);border-top-color:var(--gold);
+  animation:spin 1s linear infinite;display:none;flex-shrink:0}
+.addr.busy .sp{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sug{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:20;border-radius:10px;overflow:hidden;
+  border:1px solid var(--g-24);background:rgba(10,10,10,.98);backdrop-filter:blur(14px);
+  box-shadow:0 20px 50px rgba(0,0,0,.6);display:none;max-height:240px;overflow-y:auto}
+.sug.on{display:block}
+.sug button{display:block;width:100%;text-align:left;padding:11px 14px;border:0;background:none;cursor:pointer;
+  color:var(--ink-2);font-family:var(--sans);font-size:.76rem;line-height:1.4}
+.sug button:hover{background:var(--g-08);color:var(--gold)}
+.sug button + button{border-top:1px solid rgba(255,255,255,.05)}
+
+/* Machin yo */
+.cars{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.car{display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:10px;cursor:pointer;
+  border:1px solid var(--line);background:rgba(255,255,255,.028);color:var(--ink);
+  font-family:var(--sans);text-align:left;transition:border-color var(--fast),background var(--fast)}
+.car:hover{border-color:var(--g-24)}
+.car.on{border-color:var(--gold);background:var(--g-08)}
+.car svg{width:30px;height:24px;stroke:var(--gold);stroke-width:1.2;fill:none;flex-shrink:0;
+  stroke-linecap:round;stroke-linejoin:round}
+.car .n{flex:1;min-width:0}
+.car .n b{display:block;font-size:.82rem;font-weight:600}
+.car .n span{display:block;font-size:.62rem;color:var(--ink-4);margin-top:2px}
+.car .p{font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--gold)}
+.car.off{opacity:.45;cursor:not-allowed}
+
+/* Resime pri */
+.tick{padding:22px 20px 20px;border-radius:12px;position:relative;overflow:hidden;
+  border:1px solid var(--g-24);background:linear-gradient(168deg,rgba(212,175,55,.10),rgba(10,10,10,.6))}
+.t-lab{font-size:.55rem;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px}
+.t-sum{font-family:var(--serif);font-size:2.9rem;font-weight:700;color:var(--gold-lt);line-height:1}
+.t-sum s{font-family:var(--sans);font-size:.66rem;font-weight:600;letter-spacing:2px;color:var(--ink-3);
+  text-decoration:none;margin-left:8px}
+.t-alt{font-size:.68rem;color:var(--ink-4);margin-top:7px}
+.t-lines{margin-top:17px;padding-top:14px;border-top:1px solid var(--line);
+  display:flex;flex-direction:column;gap:8px}
+.t-l{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.75rem}
+.t-l span:first-child{color:var(--ink-3)}
+.t-l span:last-child{color:var(--ink);font-weight:600}
+.t-l.tot{padding-top:10px;border-top:1px solid var(--line);font-size:.86rem}
+.t-l.tot span:last-child{font-family:var(--serif);font-size:1.3rem;color:var(--gold)}
+.trip{display:flex;gap:16px;margin-top:14px;padding-top:13px;border-top:1px solid var(--line)}
+.trip div{flex:1}
+.trip .k{font-size:.5rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-4);margin-bottom:3px}
+.trip .v{font-size:.9rem;font-weight:600}
+
+/* ══ MARCHE (manje / pake) ════════════════════════════════════ */
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.vc{position:relative;display:flex;flex-direction:column;border-radius:12px;overflow:hidden;cursor:pointer;
+  border:1px solid var(--line);background:linear-gradient(168deg,rgba(255,255,255,.045),rgba(255,255,255,.014));
+  transition:transform var(--med),border-color var(--med),box-shadow var(--med)}
+.vc:hover{transform:translateY(-4px);border-color:var(--sc,var(--gold));box-shadow:0 22px 48px rgba(0,0,0,.5)}
+.vc-im{position:relative;aspect-ratio:16/9;background:rgba(255,255,255,.02);display:grid;place-items:center;overflow:hidden}
+.vc-im img{width:100%;height:100%;object-fit:cover}
+.vc-im svg{width:42px;height:42px;stroke:var(--sc,var(--gold));stroke-width:1;fill:none;opacity:.3}
+.vc-im::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,5,5,.25),transparent 40%,rgba(5,5,5,.7))}
+.vc-st{position:absolute;top:10px;right:10px;z-index:2;font-size:.52rem;font-weight:700;letter-spacing:1.1px;
+  text-transform:uppercase;padding:4px 10px;border-radius:99px;border:1px solid;backdrop-filter:blur(6px)}
+.st-open{color:var(--ok);border-color:rgba(0,224,138,.32);background:rgba(0,224,138,.14)}
+.st-shut{color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.14)}
+.vc-b{padding:15px 16px 16px;display:flex;flex-direction:column;gap:7px;flex:1}
+.vc-n{font-family:var(--serif);font-size:1.22rem;font-weight:600;line-height:1.25}
+.vc-d{font-size:.72rem;color:var(--ink-4);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden}
+.vc-m{display:flex;gap:12px;flex-wrap:wrap;font-size:.66rem;color:var(--ink-3);margin-top:auto;padding-top:9px}
+.vc-m b{color:var(--gold);font-weight:600}
+.vc-m .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-4);align-self:center}
+
+.hit{display:flex;gap:13px;padding:13px;border-radius:11px;cursor:pointer;margin-bottom:10px;
+  border:1px solid var(--line);background:rgba(255,255,255,.028);
+  transition:border-color var(--fast),background var(--fast)}
+.hit:hover{border-color:var(--sc,var(--gold));background:rgba(255,255,255,.05)}
+.hit-im{width:74px;height:74px;border-radius:9px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.04);
+  display:grid;place-items:center}
+.hit-im img{width:100%;height:100%;object-fit:cover}
+.hit-im svg{width:24px;height:24px;stroke:var(--sc,var(--gold));stroke-width:1.1;fill:none;opacity:.35}
+.hit-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.hit-n{font-size:.88rem;font-weight:600;line-height:1.3}
+.hit-v{font-size:.66rem;color:var(--ink-4)}
+.hit-v b{color:var(--ink-2);font-weight:600}
+.hit-m{display:flex;gap:10px;flex-wrap:wrap;font-size:.64rem;color:var(--ink-3);margin-top:2px}
+.hit-p{text-align:right;display:flex;flex-direction:column;justify-content:center;gap:7px;flex-shrink:0}
+.hit-p .pr{font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--gold);white-space:nowrap}
+.hit .add{padding:8px 13px;border-radius:7px;border:1px solid var(--g-24);background:var(--g-08);
+  color:var(--gold);cursor:pointer;font-family:var(--sans);font-size:.58rem;font-weight:700;
+  letter-spacing:1.1px;text-transform:uppercase}
+.hit .add:hover{background:var(--g-14)}
+.hit .add:disabled{opacity:.4;cursor:not-allowed;border-color:var(--line);color:var(--ink-4);background:none}
+.hit.off{opacity:.55}
+
+.srch{position:relative;margin-bottom:16px}
+.srch svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:15px;height:15px;
+  stroke:var(--ink-4);stroke-width:1.6;fill:none;pointer-events:none}
+.srch input{width:100%;padding:14px 16px 14px 42px;border-radius:99px;font-family:var(--sans);
+  background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--ink);font-size:.84rem}
+.srch input:focus{outline:none;border-color:var(--g-24)}
+.pills{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;
+  scrollbar-width:none;-ms-overflow-style:none}
+.pills::-webkit-scrollbar{display:none}
+.pill2{flex-shrink:0;padding:8px 15px;border-radius:99px;border:1px solid var(--line);cursor:pointer;
+  background:rgba(255,255,255,.03);color:var(--ink-3);font-family:var(--sans);font-size:.62rem;
+  font-weight:600;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.pill2.on{border-color:var(--sc,var(--gold));background:var(--g-08);color:var(--sc,var(--gold))}
+.sortrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.sortrow .res{font-size:.7rem;color:var(--ink-4)}
+.sortrow .res b{color:var(--gold)}
+.empty{text-align:center;padding:60px 20px}
+.empty svg{width:42px;height:42px;stroke:var(--gold);stroke-width:1;fill:none;opacity:.35;margin-bottom:16px}
+.empty h3{font-family:var(--serif);font-size:1.4rem;font-weight:600;margin-bottom:8px}
+.empty p{font-size:.78rem;color:var(--ink-3);max-width:40ch;margin:0 auto;line-height:1.7}
+.sk{border-radius:12px;border:1px solid var(--line);overflow:hidden;background:rgba(255,255,255,.02)}
+.sk .b{background:linear-gradient(90deg,rgba(255,255,255,.03) 25%,rgba(255,255,255,.07) 50%,rgba(255,255,255,.03) 75%);
+  background-size:200% 100%;animation:shim 1.5s ease infinite}
+@keyframes shim{to{background-position:-200% 0}}
+
+/* Panye */
+.cartbar{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,140%);
+  z-index:1005;display:flex;align-items:center;gap:16px;padding:12px 14px 12px 20px;border-radius:99px;
+  background:rgba(12,12,12,.97);border:1px solid var(--g-24);backdrop-filter:blur(16px);
+  box-shadow:0 22px 56px rgba(0,0,0,.6);transition:transform var(--med);max-width:calc(100vw - 32px)}
+.cartbar.on{transform:translate(-50%,0)}
+.cartbar .c{font-size:.72rem;color:var(--ink-2);white-space:nowrap}
+.cartbar .c b{display:block;font-family:var(--serif);font-size:1.15rem;color:var(--gold);font-weight:700}
+.cartbar .btn{padding:11px 20px}
+
+/* ══ PANNO KOTE ═══════════════════════════════════════════════ */
+.side{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:96vw;z-index:1012;display:flex;
   flex-direction:column;background:rgba(8,8,8,.98);backdrop-filter:blur(24px);
   border-left:1px solid var(--line);box-shadow:-30px 0 70px rgba(0,0,0,.6);
   transform:translateX(102%);transition:transform var(--med)}
@@ -455,41 +825,54 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .side-t{font-family:var(--serif);font-size:1.2rem;font-weight:600}
 .side-s{font-size:.56rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-4)}
 .side-b{flex:1;overflow-y:auto;padding:18px 22px}
-.rc{padding:15px 16px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.025);
+.side-f{padding:16px 22px calc(18px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.ci{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;
+  border-bottom:1px solid var(--line)}
+.ci-n{font-size:.82rem;font-weight:600;line-height:1.3}
+.ci-v{font-size:.66rem;color:var(--ink-4);margin-top:3px}
+.ci-c{display:flex;align-items:center;gap:8px}
+.qb{width:25px;height:25px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.05);
+  color:var(--ink);cursor:pointer;display:grid;place-items:center;font-family:var(--sans);font-size:.86rem}
+.qb:hover{background:rgba(255,255,255,.12)}
+.qn{min-width:16px;text-align:center;font-weight:700;font-size:.8rem}
+.rc{padding:15px 16px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.025);
   margin-bottom:12px;border-left:3px solid var(--ink-4)}
 .rc.requested{border-left-color:var(--warn)}
 .rc.accepted,.rc.on_way,.rc.picked{border-left-color:var(--ok);background:rgba(0,224,138,.04)}
 .rc.done{border-left-color:var(--gold)}
 .rc.cancelled{border-left-color:var(--bad)}
-.rc-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
-.rc-n{font-size:.84rem;font-weight:600;line-height:1.35}
+.rc-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:9px}
+.rc-n{font-size:.83rem;font-weight:600;line-height:1.35}
 .rc-b{flex-shrink:0;font-size:.52rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;
   padding:4px 10px;border-radius:99px;border:1px solid}
 .rc-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .rc-k{font-size:.5rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-4);margin-bottom:2px}
 .rc-v{font-size:.74rem;color:var(--ink-2);font-weight:600}
-.rc-m{margin-top:11px;padding:10px 12px;border-radius:7px;font-size:.72rem;line-height:1.55;
+.rc-m{margin-top:10px;padding:9px 12px;border-radius:7px;font-size:.72rem;line-height:1.55;
   background:rgba(0,224,138,.07);color:#7BE8BC;border:1px solid rgba(0,224,138,.18)}
-.rc-track{display:flex;align-items:center;gap:0;margin-top:12px}
-.rc-track i{flex:1;height:2px;background:rgba(255,255,255,.08);position:relative}
+.rc-code{margin-top:10px;padding:11px 12px;border-radius:7px;text-align:center;
+  border:1px dashed var(--g-24);background:rgba(255,255,255,.02)}
+.rc-code b{display:block;font-family:var(--sans);font-size:1.3rem;font-weight:700;letter-spacing:.3em;
+  color:var(--gold);padding-left:.3em}
+.rc-code small{font-size:.6rem;color:var(--ink-4)}
+.rc-track{display:flex;align-items:center;margin-top:11px}
+.rc-track i{flex:1;height:2px;background:rgba(255,255,255,.08)}
 .rc-track i.done{background:var(--ok)}
 .rc-track b{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.14);flex-shrink:0}
 .rc-track b.done{background:var(--ok);box-shadow:0 0 8px rgba(0,224,138,.7)}
-.nulle{text-align:center;padding:56px 16px;color:var(--ink-4);font-size:.78rem}
-.nulle svg{width:38px;height:38px;stroke:var(--gold);stroke-width:1;fill:none;opacity:.35;margin-bottom:14px}
+.nulle{text-align:center;padding:52px 16px;color:var(--ink-4);font-size:.78rem;line-height:1.7}
+.nulle svg{width:36px;height:36px;stroke:var(--gold);stroke-width:1;fill:none;opacity:.35;margin-bottom:14px}
 .nbadge{position:absolute;top:-4px;right:-4px;width:9px;height:9px;border-radius:50%;background:var(--bad);
   border:2px solid var(--bg);display:none}
 .nbadge.on{display:block}
 
-@media(max-width:1020px){
-  .order{grid-template-columns:1fr;gap:18px}
-  .tick{position:static}
-  .steps{grid-template-columns:1fr 1fr;gap:28px 0}
-  .step::before{display:none}
-  .sec{padding:80px 0}
-}
+/* Wout yo dwe rete DÈYÈ kontni an : nou bay chak bwat yon fon prèske opak. */
+.card,.tick,.vc,.hit,.sv,.mapbox,.side,.cartbar,.tabs,.srch input,.warn,.addr .row,.sug{
+  background-color:rgba(9,9,9,.82)}
+.pane .empty,.pane .sk{background-color:rgba(9,9,9,.6)}
+
 @media(max-width:820px){
-  .menu,.nav-act .pill span{display:none}
+  .menu{display:none}
   .burger{display:flex;margin-left:0}
   .nav-act{display:flex;margin-left:auto;position:static}
   .nav-act #login-btn,.nav-act #who-btn,.nav-act .acct{display:none!important}
@@ -498,21 +881,16 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 }
 @media(max-width:560px){
   .wrap{padding:0 18px}
-  .map{display:none}
-  .kinds{grid-template-columns:1fr}
-  .kind{display:flex;align-items:center;gap:12px;text-align:left;padding:13px 14px}
-  .kind svg{margin:0}
-  .two{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr;gap:24px}
-  .live{flex-direction:column;align-items:stretch;border-radius:14px;padding:4px}
-  .live-i + .live-i{border-left:0;border-top:1px solid var(--line)}
-  .t-sum{font-size:2.6rem}
+  .sec{padding:60px 0}
+  .shelf{grid-template-columns:1fr;gap:12px}
+  .mapbox{height:56vh}
+  .t-sum{font-size:2.4rem}
   .side{width:100%;max-width:none}
   .panel{top:auto;left:0;width:100%;max-width:none;height:84dvh;border-left:0;border-top:1px solid var(--g-14);
     border-radius:16px 16px 0 0;transform:translateY(102%)}
   .panel.open{transform:none}
-  .dock{right:16px;bottom:calc(16px + env(safe-area-inset-bottom));flex-direction:row}
-  .dk{width:46px;height:46px}
+  .dock{right:16px;bottom:calc(84px + env(safe-area-inset-bottom));flex-direction:row}
+  .dk{width:44px;height:44px}
   .dk-tip{display:none}
 }
 @media(prefers-reduced-motion:reduce){
@@ -521,16 +899,17 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
   .ch>i,.wd>i{transform:none;opacity:1;filter:none}
   .up{opacity:1;transform:none}
   .draw{width:var(--w,260px)}
-  #sky,#spot,#grain{display:none}
+  #sky,#spot,#grain,#roads{display:none}
 }
 </style>
 </head>
 <body>
 
 <div id="prog"></div>
+<canvas id="roads" aria-hidden="true"></canvas>
 <canvas id="sky" aria-hidden="true"></canvas>
 <div id="spot" aria-hidden="true"></div>
-<div id="ghost" aria-hidden="true"><b>TAKSI</b></div>
+<div id="ghost" aria-hidden="true"><b>MOVE</b></div>
 <div id="grain" aria-hidden="true"></div>
 
 <nav class="nav" id="nav">
@@ -542,7 +921,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <ul class="menu">
       <li><a href="index.html">Akèy</a></li>
       <li><a href="lavri.html">Lavri</a></li>
-      <li><a href="taxi.html" class="on" aria-current="page">Taksi</a></li>
+      <li><a href="taxi.html" class="on" aria-current="page">Move</a></li>
       <li><a href="shop.html">Shop</a></li>
       <li><a href="mall.html">Mall</a></li>
       <li><a href="games.html">Jwèt</a></li>
@@ -563,7 +942,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
         </div>
         <div class="row"><span class="k">Statit</span><span class="v" id="a-st">Itilizatè</span></div>
         <div class="row"><span class="k">Pwen ou genyen</span><span class="v gold" id="a-pt">0.0</span></div>
-        <button class="pill" id="a-rides" type="button">Kous mwen yo</button>
+        <button class="pill" id="a-rides" type="button">Kòmand mwen yo</button>
         <a href="admin.html" class="pill full" id="a-admin" style="display:none">Aksè Administrasyon</a>
         <button class="pill" id="a-out" type="button">Dekonekte</button>
       </div>
@@ -575,7 +954,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <div id="drawer">
   <a class="dl" href="index.html">Akèy</a>
   <a class="dl" href="lavri.html">Lavri</a>
-  <a class="dl" href="taxi.html">Taksi</a>
+  <a class="dl" href="taxi.html">Move</a>
   <a class="dl" href="shop.html">Shop</a>
   <a class="dl" href="mall.html">Mall</a>
   <a class="dl" href="games.html">Jwèt</a>
@@ -585,7 +964,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       <div><div class="nm" id="dr-nm">—</div>
         <div class="sub"><span id="dr-st">Itilizatè</span> · <span id="dr-pt">0.0</span> pwen</div></div>
     </div>
-    <button class="pill" id="dr-rides" type="button" style="display:none">Kous mwen yo</button>
+    <button class="pill" id="dr-rides" type="button" style="display:none">Kòmand mwen yo</button>
     <button class="pill full" id="dr-login" type="button">Konekte</button>
     <a href="admin.html" class="pill full" id="dr-admin" style="display:none">Aksè Administrasyon</a>
     <button class="pill" id="dr-out" type="button" style="display:none">Dekonekte</button>
@@ -593,149 +972,161 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 </div>
 
 
+
 <!-- ══════════ HERO ══════════ -->
 <header class="hero" id="hero">
-  <span class="hero-shot" data-media="taxi.hero" aria-hidden="true"></span>
+  <p class="kick"><s></s><span data-split="ch">Tout vil la konekte</span><s></s></p>
+  <h1 class="big" data-split="ch" aria-label="ZETWAL MOVE">MOVE</h1>
+  <div class="draw" style="--w:min(280px,58vw);margin:0 auto 18px"></div>
+  <p class="tag" data-split="wd">Yon kous, yon manje, yon pake — menm kote</p>
 
-  <svg class="map" viewBox="0 0 880 320" fill="none" aria-hidden="true">
-    <g class="grid">
-      <line x1="0" y1="80" x2="880" y2="80"/><line x1="0" y1="160" x2="880" y2="160"/>
-      <line x1="0" y1="240" x2="880" y2="240"/>
-      <line x1="120" y1="0" x2="120" y2="320"/><line x1="290" y1="0" x2="290" y2="320"/>
-      <line x1="460" y1="0" x2="460" y2="320"/><line x1="630" y1="0" x2="630" y2="320"/>
-      <line x1="770" y1="0" x2="770" y2="320"/>
-    </g>
-    <path id="road" class="road" style="--l:980"
-      d="M110 260 L290 260 L290 160 L460 160 L460 80 L630 80 L630 200 L790 200"/>
-    <g class="pin" style="--dl:900ms">
-      <circle cx="110" cy="260" r="9"/><circle class="dot" cx="110" cy="260" r="3.4"/>
-    </g>
-    <g class="pin" style="--dl:2200ms">
-      <circle cx="790" cy="200" r="9" stroke="#00E08A"/><circle class="dot" cx="790" cy="200" r="3.4" fill="#00E08A"/>
-    </g>
-    <path id="car" class="car" d="M-9 -5 L9 -5 L12 0 L9 5 L-9 5 L-12 0 Z" opacity="0"/>
-  </svg>
-
-  <p class="kick"><s></s><span data-split="ch">Kous · Manje · Pake</span><s></s></p>
-  <h1 class="big" data-split="ch" aria-label="TAKSI ZETWAL">TAKSI</h1>
-  <div class="draw" style="--w:min(300px,60vw);margin:0 auto 22px"></div>
-  <p class="tag" data-split="wd">Ou konnen pri a anvan ou monte</p>
-
-  <div class="live up d3" id="live" aria-live="polite">
-    <div class="live-i"><span class="dot" id="live-dot"></span>
-      <span class="live-n ok" id="live-state">—</span>
-      <span class="live-k">Sèvis<br>la</span></div>
-    <div class="live-i"><span class="live-n" id="live-zones">—</span>
-      <span class="live-k">Zòn nou<br>kouvri</span></div>
-    <div class="live-i"><span class="live-n" id="live-today">—</span>
-      <span class="live-k">Kous<br>jodi a</span></div>
+  <div class="svc up d2" id="svc" role="tablist">
+    <button class="sv on" data-s="taksi" style="--sc:#F0D98A" role="tab">
+      <svg viewBox="0 0 24 24"><path d="M5 17h14M6.5 17v1.6M17.5 17v1.6"/><path d="M4.4 17v-3.4l1.8-4.2A2 2 0 0 1 8 8.2h8a2 2 0 0 1 1.8 1.2l1.8 4.2V17"/><path d="M5.2 13.6h13.6"/><circle cx="8" cy="15.3" r="1"/><circle cx="16" cy="15.3" r="1"/><path d="M9.5 8.2V6.4h5v1.8"/></svg>
+      <b>Taksi</b><span>Moun, objè, timoun</span>
+    </button>
+    <button class="sv" data-s="manje" style="--sc:#FF8A5B" role="tab">
+      <svg viewBox="0 0 24 24"><path d="M5.5 4v6a2.5 2.5 0 0 0 5 0V4M8 4v6M8 12.5V20"/><path d="M17 4c-1.6 1.2-2.4 3-2.4 5.2 0 1.8.8 2.8 2.4 2.8s2.4-1 2.4-2.8C19.4 7 18.6 5.2 17 4Z"/><path d="M17 12v8"/></svg>
+      <b>Manje</b><span>Restoran ak plat</span>
+    </button>
+    <button class="sv" data-s="pake" style="--sc:#6FD8E8" role="tab">
+      <svg viewBox="0 0 24 24"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5v-7Z"/><path d="m4 8.5 8 4.5 8-4.5M12 13v7"/></svg>
+      <b>Pake</b><span>Magazen ak pwodwi</span>
+    </button>
   </div>
-
-  <div class="shutbadge" id="shutbadge"><i></i><span id="shut-t">Sèvis la fèmen</span></div>
 </header>
 
-<!-- ══════════ KOMANDE ══════════ -->
-<section class="sec" id="komande">
+<!-- ══════════ TAKSI ══════════ -->
+<section class="sec pane on" id="pane-taksi">
   <div class="wrap">
     <div class="head">
       <div>
-        <div class="eyebrow up">Mande yon kous</div>
-        <h2 class="h2" data-split="wd">Kote ou ye, kote ou prale</h2>
-        <div class="draw" style="--w:120px;margin-top:16px"></div>
+        <div class="eyebrow up">Mobilite</div>
+        <h2 class="h2" data-split="wd">Kote ou ye, kote sa prale</h2>
+        <div class="draw" style="--w:110px;margin-top:14px"></div>
       </div>
-      <div class="count up d2" id="order-count">01 — 03</div>
+      <div class="count up d2" id="t-count">—</div>
     </div>
 
-    <div class="order">
-      <div class="card up">
-        <div class="kinds" id="kinds"></div>
+    <div class="tabs" id="ride-mode" style="max-width:520px">
+      <button class="on" data-m="person">Yon moun</button>
+      <button data-m="object">Yon objè</button>
+      <button data-m="child">Yon timoun</button>
+    </div>
 
-        <div class="route">
-          <span class="pt a"></span><span class="pt b"></span>
-          <button class="swapz" id="swap" type="button" aria-label="Chanje sans lan">
-            <svg viewBox="0 0 24 24"><path d="M7 4v13M7 4 3.5 7.5M7 4l3.5 3.5M17 20V7M17 20l3.5-3.5M17 20l-3.5-3.5"/></svg>
+    <div class="ride">
+      <div>
+        <div class="mapbox" id="mapbox">
+          <div id="map"></div>
+          <div class="map-ph" id="map-ph">
+            <div>
+              <p>Kat la chaje sèlman lè w bezwen l, pou paj la rete rapid.</p>
+              <button class="btn btn-g" id="map-load">Louvri kat la</button>
+            </div>
+          </div>
+          <div class="pin-ab" id="pin-ab" style="display:none">
+            <button class="on" data-p="a">Mete pwen A</button>
+            <button data-p="b">Mete pwen B</button>
+          </div>
+          <button class="geo" id="geo" style="display:none" aria-label="Kote m ye">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.4M12 18.6V22M22 12h-3.4M5.4 12H2"/></svg>
           </button>
-          <div class="fld">
-            <label for="f-from">Kote w ye</label>
-            <select id="f-from"></select>
-          </div>
-          <div class="fld">
-            <label for="f-fromA">Adrès presi (kay, kafou, repè)</label>
-            <input type="text" id="f-fromA" placeholder="Egzanp : devan famasi a, ri Yamoul">
-          </div>
-          <div class="fld">
-            <label for="f-to">Kote w prale</label>
-            <select id="f-to"></select>
-          </div>
-          <div class="fld">
-            <label for="f-toA">Adrès presi</label>
-            <input type="text" id="f-toA" placeholder="Egzanp : bò legliz la">
-          </div>
+          <div class="map-hint" id="map-hint" style="display:none">Tape sou kat la pou mete pwen an</div>
         </div>
 
-        <div class="fld">
-          <label>Kilè</label>
-          <div class="chips" id="when">
-            <button class="chip on" type="button" data-w="now">Kounye a</button>
-            <button class="chip" type="button" data-w="later">Pi ta</button>
+        <div style="margin-top:16px">
+          <div class="addr" id="ad-a">
+            <div class="row"><span class="bul"></span>
+              <input type="text" id="in-a" placeholder="Kote w ye — tape yon adrès oswa tape sou kat la" autocomplete="off">
+              <span class="sp"></span></div>
+            <div class="sug" id="sug-a"></div>
           </div>
-        </div>
-        <div class="fld" id="when-box" style="display:none">
-          <label for="f-when">Ki lè egzakteman</label>
-          <input type="time" id="f-when">
-        </div>
-
-        <div class="two">
-          <div class="fld"><label for="f-name">Non ou</label>
-            <input type="text" id="f-name" placeholder="Non ak siyati" autocomplete="name"></div>
-          <div class="fld"><label for="f-tel">Telefòn</label>
-            <input type="tel" id="f-tel" placeholder="+509 …" autocomplete="tel"></div>
-        </div>
-        <div class="fld" style="margin-bottom:0">
-          <label for="f-note" id="note-lab">Nòt pou chofè a</label>
-          <textarea id="f-note" placeholder="Sa nou dwe konnen : valiz, kantite moun, bagay frajil…"></textarea>
+          <div class="addr" id="ad-b">
+            <div class="row"><span class="bul b"></span>
+              <input type="text" id="in-b" placeholder="Kote sa prale" autocomplete="off">
+              <span class="sp"></span></div>
+            <div class="sug" id="sug-b"></div>
+          </div>
         </div>
       </div>
 
-      <div class="tick up d2">
-        <div class="t-lab">Estimasyon</div>
-        <div class="t-sum"><span id="sum">—</span><s>HTG</s></div>
-        <div class="t-alt" id="sum-alt"></div>
-        <div class="t-lines" id="lines"></div>
-        <button class="btn btn-wa" id="send" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1.1.1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.7-1.2-4.5-4-4.6-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.3 0 .5l-.3.5-.3.3c-.1.1-.2.3-.1.5.1.3.6 1.2 1.4 1.9 1 .9 1.8 1.2 2.1 1.3.2.1.4.1.5-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.1.1.6-.1 1.2Z"/></svg>
-          Mande kous la
-        </button>
-        <p class="t-note" id="note">Pri a se yon estimasyon. Chofè a konfime l anvan li pati.</p>
+      <div>
+        <div class="card" id="ride-card"></div>
+        <div class="tick" style="margin-top:16px">
+          <div class="t-lab">Estimasyon</div>
+          <div class="t-sum"><span id="sum">—</span><s>HTG</s></div>
+          <div class="t-alt" id="sum-alt"></div>
+          <div class="trip" id="trip" style="display:none">
+            <div><div class="k">Distans</div><div class="v" id="t-km">—</div></div>
+            <div><div class="k">Dire</div><div class="v" id="t-min">—</div></div>
+            <div><div class="k">Tann</div><div class="v" id="t-eta">—</div></div>
+          </div>
+          <div class="t-lines" id="lines"></div>
+          <button class="btn btn-wa" id="ride-go" style="width:100%;margin-top:16px">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1.1.1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.7-1.2-4.5-4-4.6-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.3 0 .5l-.3.5-.3.3c-.1.1-.2.3-.1.5.1.3.6 1.2 1.4 1.9 1 .9 1.8 1.2 2.1 1.3.2.1.4.1.5-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.1.1.6-.1 1.2Z"/></svg>
+            Mande kous la
+          </button>
+          <p class="hintline" id="ride-note">Pri a se yon estimasyon. Chofè a konfime l anvan li pati.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ ETAP ══════════ -->
-<section class="sec">
+<!-- ══════════ MANJE ══════════ -->
+<section class="sec pane" id="pane-manje" style="--sc:#FF8A5B">
   <div class="wrap">
     <div class="head">
       <div>
-        <div class="eyebrow up">An kat etap</div>
-        <h2 class="h2" data-split="wd">Kijan sa mache</h2>
-        <div class="draw" style="--w:120px;margin-top:16px"></div>
+        <div class="eyebrow up">Restorasyon</div>
+        <h2 class="h2" data-split="wd">Kisa ou vle manje ?</h2>
+        <div class="draw" style="--w:110px;margin-top:14px"></div>
       </div>
+      <div class="count up d2" id="m-count">—</div>
     </div>
-    <div class="steps">
-      <div class="step up"><div class="step-n">1</div>
-        <div class="step-t">Ou mande</div>
-        <div class="step-d">Chwazi kote w ye ak kote w prale. Pri a parèt tousuit, anvan ou voye anyen.</div></div>
-      <div class="step up d1"><div class="step-n">2</div>
-        <div class="step-t">Nou konfime</div>
-        <div class="step-d">Yon chofè pran kous la epi nou rele w. Ou wè eta a chanje sou paj sa.</div></div>
-      <div class="step up d2"><div class="step-n">3</div>
-        <div class="step-t">Li vin chèche w</div>
-        <div class="step-d">Chofè a ale nan adrès ou ba nou an. Ou ka rele l dirèk sou WhatsApp.</div></div>
-      <div class="step up d3"><div class="step-n">4</div>
-        <div class="step-t">Ou peye sou plas</div>
-        <div class="step-d">Kach oswa pwen Zetwal. Pri a se sa nou te di a — pa gen sipriz.</div></div>
+    <div class="srch">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input type="search" id="m-q" placeholder="Chèche yon plat : diri ak legim, poul, ji…" autocomplete="off">
     </div>
+    <div class="pills" id="m-cats"></div>
+    <div class="sortrow">
+      <div class="res" id="m-res"></div>
+      <select class="pill2" id="m-sort" style="padding:9px 14px">
+        <option value="smart">Klase : pi bon chwa</option>
+        <option value="price">Pri : pi ba dabò</option>
+        <option value="time">Pi rapid dabò</option>
+        <option value="dist">Pi pre m dabò</option>
+      </select>
+    </div>
+    <div id="m-body"></div>
+  </div>
+</section>
+
+<!-- ══════════ PAKE ══════════ -->
+<section class="sec pane" id="pane-pake" style="--sc:#6FD8E8">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <div class="eyebrow up">Komès ak livrezon</div>
+        <h2 class="h2" data-split="wd">Achte, nou pote l ba ou</h2>
+        <div class="draw" style="--w:110px;margin-top:14px"></div>
+      </div>
+      <div class="count up d2" id="p-count">—</div>
+    </div>
+    <div class="srch">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input type="search" id="p-q" placeholder="Chèche yon pwodwi : siman, chemiz, batri…" autocomplete="off">
+    </div>
+    <div class="pills" id="p-cats"></div>
+    <div class="sortrow">
+      <div class="res" id="p-res"></div>
+      <select class="pill2" id="p-sort" style="padding:9px 14px">
+        <option value="smart">Klase : pi bon chwa</option>
+        <option value="price">Pri : pi ba dabò</option>
+        <option value="dist">Pi pre m dabò</option>
+      </select>
+    </div>
+    <div id="p-body"></div>
   </div>
 </section>
 
@@ -746,7 +1137,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       <div>
         <div class="eyebrow up">Kontak</div>
         <h2 class="c-lead" data-split="wd">Yon ijans ? Rele nou.</h2>
-        <p class="c-sub up d2">Pou yon kous kounye a, yon livrezon presi, oswa yon kesyon sou pri.</p>
+        <p class="c-sub up d2">Pou yon kous kounye a, yon livrezon presi, oswa pou vin patnè ak nou.</p>
         <div class="draw" style="--w:90px"></div>
       </div>
       <div class="up d2">
@@ -767,17 +1158,35 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       </div>
     </div>
     <footer>
-      <div class="fb">TAKSI <em>ZETWAL</em></div>
+      <div class="fb">ZETWAL <em>MOVE</em></div>
       <small>© 2026 Zetwal Organisation — Tout dwa rezève</small>
       <button id="top" type="button"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg> Anwo</button>
     </footer>
   </div>
 </section>
 
-<!-- ══════════ KOUS MWEN YO ══════════ -->
+<!-- ══════════ PANYE ══════════ -->
+<div class="cartbar" id="cartbar">
+  <span class="c" id="cart-txt">—<b id="cart-tot">0 HTG</b></span>
+  <button class="btn btn-g" id="cart-open">Fini kòmand la</button>
+</div>
+
+<aside class="side" id="cart" aria-hidden="true">
+  <div class="side-h">
+    <div><div class="side-t" id="cart-title">Panye ou a</div><div class="side-s" id="cart-sub">Vid</div></div>
+    <button class="p-x" id="cart-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="side-b" id="cart-body"></div>
+  <div class="side-f" id="cart-foot" style="display:none">
+    <div id="cart-sum"></div>
+    <button class="btn btn-wa" id="cart-go" style="width:100%;margin-top:12px">Konfime kòmand la</button>
+    <button class="btn btn-o" id="cart-clr" style="width:100%;margin-top:8px">Vide panye a</button>
+  </div>
+</aside>
+
 <aside class="side" id="rides" aria-hidden="true">
   <div class="side-h">
-    <div><div class="side-t">Kous mwen yo</div><div class="side-s" id="rides-sub">—</div></div>
+    <div><div class="side-t">Kòmand mwen yo</div><div class="side-s" id="rides-sub">—</div></div>
     <button class="p-x" id="rides-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="side-b" id="rides-list"></div>
@@ -789,19 +1198,19 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <aside class="panel" id="panel" aria-hidden="true">
   <div class="p-head">
     <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg></span>
-    <div><div class="p-ttl">Asistan Taksi</div><div class="p-sub">Taksi & Livrezon</div></div>
+    <div><div class="p-ttl">Asistan Move</div><div class="p-sub">Taksi · Manje · Pake</div></div>
     <button class="p-x" id="p-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="p-body" id="p-body"></div>
   <div class="p-chips" id="p-chips"></div>
   <div class="p-ask">
-    <input id="p-in" type="text" placeholder="Poze yon kesyon sou kous yo…" autocomplete="off">
+    <input id="p-in" type="text" placeholder="Poze yon kesyon sou sèvis yo…" autocomplete="off">
     <button id="p-go" type="button" aria-label="Voye"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z"/></svg></button>
   </div>
 </aside>
 
 <div class="dock">
-  <button class="dk" id="ai-btn" type="button" aria-label="Asistan Taksi">
+  <button class="dk" id="ai-btn" type="button" aria-label="Asistan Move">
     <svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>
     <span class="dk-tip">Asistan</span>
   </button>
@@ -871,7 +1280,6 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <script>
 (function(){
 'use strict';
-
 /* ══════════════════════════════════════════════════════════════
    0. KONFIGIRASYON — sèl kote pou chanje bagay yo
    ══════════════════════════════════════════════════════════════ */
@@ -1104,276 +1512,1024 @@ async function applyMedia(){
 applyMedia();
 
 
-/* ══ 6. KONFIGIRASYON SÈVIS LA ════════════════════════════════
-   Tout sa ki anba a chanje depi site_settings.taxi_config.
-   Tan ou pa mete kle sa, se valè sa yo k ap sèvi.
-   ═══════════════════════════════════════════════════════════ */
-var TAXI = {
-  base   : 250,     /* pri depa, menm zòn */
-  step   : 150,     /* chak zòn ki separe de pwen yo */
-  night  : 1.25,    /* apre 20h ak anvan 6h */
-  minFare: 200,
-  kinds  : {
-    taksi : { n:'Taksi',   fee:0,   d:'Yon kous pou ou',        mult:1 },
-    manje : { n:'Manje',   fee:100, d:'Nou al chèche manje w',  mult:1 },
-    pake  : { n:'Pake',    fee:75,  d:'Yon bagay pou livre',    mult:1 }
+
+/* ══════════════════════════════════════════════════════════════
+   6. REZO WOUT LA — idantite vizyèl la
+   Yon sèl canvas dèyè tout bagay. Li pa janm pran yon klik.
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var cv = document.getElementById('roads');
+  if(!cv || CALM) { if(cv) cv.style.display='none'; return; }
+  var ctx = cv.getContext('2d', { alpha:true });
+  var DPR = Math.min(devicePixelRatio || 1, 2);
+  var W = 0, H = 0, roads = [], cars = [], raf = null, small = false, hidden = false;
+
+  /* Chak wout : yon seri pwen an fraksyon ekran, ak yon pwofondè.
+     Pwofondè ba = lwen (fen, fonse, dousman). */
+  var PLAN = [
+    { z:.30, p:[[-.05,.18],[.24,.18],[.34,.30],[.62,.30],[.72,.16],[1.05,.16]] },
+    { z:.42, p:[[-.05,.52],[.18,.52],[.30,.40],[.55,.40],[.68,.52],[1.05,.52]] },
+    { z:.34, p:[[.12,-.05],[.12,.34],[.26,.46],[.26,1.05]] },
+    { z:.55, p:[[-.05,.78],[.30,.78],[.44,.66],[.78,.66],[.90,.80],[1.05,.80]] },
+    { z:.46, p:[[.84,-.05],[.84,.28],[.72,.40],[.72,1.05]] },
+    { z:.70, p:[[-.05,1.02],[.22,1.02],[.38,.88],[.70,.88],[.86,1.00],[1.05,1.00]] },
+    { z:.24, p:[[-.05,.66],[.40,.66],[.52,.56],[1.05,.56]] },
+    { z:.62, p:[[.46,-.05],[.46,.22],[.58,.34],[.58,.72],[.48,.84],[.48,1.05]] }
+  ];
+
+  function size(){
+    var r = 8;
+    W = cv.width  = Math.floor(innerWidth  * DPR);
+    H = cv.height = Math.floor(innerHeight * DPR);
+    cv.style.width = innerWidth + 'px';
+    cv.style.height = innerHeight + 'px';
+    small = innerWidth < 760;
+    build();
+  }
+  function pts(r){
+    return r.p.map(function(q){ return { x:q[0]*W, y:q[1]*H }; });
+  }
+  function build(){
+    roads = PLAN.slice(0, small ? 5 : PLAN.length).map(function(r){
+      var P = pts(r), segs = [], total = 0;
+      for(var i=0;i<P.length-1;i++){
+        var dx = P[i+1].x - P[i].x, dy = P[i+1].y - P[i].y;
+        var len = Math.hypot(dx, dy);
+        segs.push({ a:P[i], b:P[i+1], len:len, at:total });
+        total += len;
+      }
+      return { z:r.z, P:P, segs:segs, len:total, flow:Math.random() };
+    });
+    cars = [];
+    var n = small ? 4 : 11;
+    for(var i=0;i<n;i++){
+      var r = roads[i % roads.length];
+      cars.push({
+        r: r, t: Math.random(),
+        sp: (0.000016 + Math.random()*0.000022) * (0.5 + r.z),
+        dir: Math.random() < .28 ? -1 : 1
+      });
+    }
+  }
+  function at(r, t){
+    var d = ((t % 1) + 1) % 1 * r.len, s;
+    for(var i=0;i<r.segs.length;i++){
+      s = r.segs[i];
+      if(d <= s.at + s.len){
+        var k = s.len ? (d - s.at) / s.len : 0;
+        return { x: s.a.x + (s.b.x - s.a.x)*k, y: s.a.y + (s.b.y - s.a.y)*k,
+                 ang: Math.atan2(s.b.y - s.a.y, s.b.x - s.a.x) };
+      }
+    }
+    s = r.segs[r.segs.length-1];
+    return { x:s.b.x, y:s.b.y, ang:Math.atan2(s.b.y - s.a.y, s.b.x - s.a.x) };
+  }
+  function drawRoad(r, t){
+    ctx.beginPath();
+    ctx.moveTo(r.P[0].x, r.P[0].y);
+    for(var i=1;i<r.P.length;i++) ctx.lineTo(r.P[i].x, r.P[i].y);
+    ctx.lineWidth = (0.8 + r.z*2.2) * DPR;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(212,175,55,' + (0.030 + r.z*0.055).toFixed(3) + ')';
+    ctx.stroke();
+    /* yon limyè ki pase sou wout la, tankou yon flo */
+    var f = ((t*0.00006 + r.flow) % 1);
+    var p = at(r, f);
+    var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 120*DPR*r.z + 30*DPR);
+    g.addColorStop(0, 'rgba(212,175,55,' + (0.05*r.z).toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(212,175,55,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 120*DPR*r.z + 30*DPR, 0, 6.2832); ctx.fill();
+  }
+  function drawCar(c, dt){
+    c.t += c.sp * dt * c.dir;
+    var p = at(c.r, c.t);
+    var s = (2.2 + c.r.z*4.6) * DPR;
+    var fade = 1;
+    var tt = ((c.t % 1) + 1) % 1;
+    if(tt < .05) fade = tt/.05; else if(tt > .95) fade = (1-tt)/.05;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.ang + (c.dir < 0 ? Math.PI : 0));
+    ctx.globalAlpha = (0.20 + c.r.z*0.42) * fade;
+    ctx.fillStyle = '#F0D98A';
+    ctx.beginPath();
+    ctx.moveTo(-s*1.5, -s*0.5); ctx.lineTo(s*1.1, -s*0.5);
+    ctx.lineTo(s*1.6, 0); ctx.lineTo(s*1.1, s*0.5); ctx.lineTo(-s*1.5, s*0.5);
+    ctx.closePath(); ctx.fill();
+    if(c.r.z > .45){
+      ctx.globalAlpha = 0.16 * fade;
+      ctx.beginPath(); ctx.arc(s*2.6, 0, s*1.5, 0, 6.2832); ctx.fill();
+    }
+    ctx.restore();
+  }
+  var last = 0;
+  function loop(t){
+    raf = requestAnimationFrame(loop);
+    if(hidden) { last = t; return; }
+    var dt = Math.min(50, t - (last || t)); last = t;
+    ctx.clearRect(0,0,W,H);
+    roads.forEach(function(r){ drawRoad(r, t); });
+    cars.forEach(function(c){ drawCar(c, dt); });
+  }
+  addEventListener('resize', function(){ clearTimeout(size._t); size._t = setTimeout(size, 200); });
+  document.addEventListener('visibilitychange', function(){ hidden = document.hidden; });
+  size();
+  raf = requestAnimationFrame(loop);
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   7. KONFIGIRASYON — tout soti nan site_settings.move_config
+   ══════════════════════════════════════════════════════════════ */
+var MV = {
+  currency : 'HTG',
+  city     : { lat:18.5392, lng:-72.3364, zoom:13 },   /* Pòtoprens */
+  ride : {
+    base:150, perKm:55, perMin:6, minFare:250, night:1.25,
+    etaMin:6, etaMax:18,
+    vehicles:[
+      { id:'moto',  n:'Moto',      d:'1 moun · pi rapid',      mult:0.72, cap:1 },
+      { id:'konpak',n:'Konpak',    d:'3 moun · konfòtab',      mult:1.00, cap:3 },
+      { id:'van',   n:'Van',       d:'6 moun · bagay volimen', mult:1.45, cap:6 }
+    ]
   },
-  zones : [
-    { id:'yamoul',   n:'Ruelle Yamoul · baz nou', t:0 },
-    { id:'delmas',   n:'Delmas',                  t:1 },
-    { id:'petion',   n:'Pétion-Ville',            t:2 },
-    { id:'centre',   n:'Centre-ville',            t:2 },
-    { id:'tabarre',  n:'Tabarre',                 t:3 },
-    { id:'carrefour',n:'Carrefour',               t:4 },
-    { id:'croix',    n:'Croix-des-Bouquets',      t:4 }
-  ]
+  object : { base:120, perKm:38, sizes:[
+      { id:'ti',   n:'Ti pake',   d:'Anba 3 kg — dokiman, telefòn', fee:0 },
+      { id:'mwayen',n:'Mwayen',   d:'3 a 15 kg — òdinatè, sak',     fee:150 },
+      { id:'gwo',  n:'Gwo',       d:'Plis pase 15 kg — bwat, valiz', fee:350 }
+    ], insureRate:0.02 },
+  child  : { fee:250, note:'Chofè ki abilite sèlman' },
+  deliv  : { base:100, perKm:35, freeOver:0 },
+  fees   : { service:0.00 }
 };
-var kind = 'taksi', whenType = 'now', myRides = [], STORE = { open:true, force:null };
 var RATES = { usd:136, dop:2.3 };
-var LS_SEEN = 'zetwal_rides_seen_v1';
+var svc = 'taksi', rideMode = 'person', vehicle = 'konpak';
+var A = null, B = null, route = null, me = null;
+var myRides = [], myOrders = [], venues = [], items = [], cart = [], cartVenue = null;
+var LS_SEEN = 'zetwal_move_seen_v1';
 
-var KIND_SVG = {
-  taksi:'<path d="M5 17h14M6.5 17v1.6M17.5 17v1.6"/><path d="M4.4 17v-3.4l1.8-4.2A2 2 0 0 1 8 8.2h8a2 2 0 0 1 1.8 1.2l1.8 4.2V17"/><path d="M5.2 13.6h13.6"/><circle cx="8" cy="15.3" r="1"/><circle cx="16" cy="15.3" r="1"/><path d="M9.5 8.2V6.4h5v1.8"/>',
-  manje:'<path d="M5.5 4.5v6a2.5 2.5 0 0 0 5 0v-6M8 4.5v6"/><path d="M8 13v7"/><path d="M17 4.5c-1.6 1.2-2.4 3-2.4 5.2 0 1.8.8 2.8 2.4 2.8s2.4-1 2.4-2.8c0-2.2-.8-4-2.4-5.2Z"/><path d="M17 12.5V20"/>',
-  pake :'<path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5v-7Z"/><path d="m4 8.5 8 4.5 8-4.5M12 13v7"/><path d="M8 6.2 16 10.8"/>'
-};
-
-function haitiHour(){
-  var d = new Date();
-  return new Date(d.getTime() + d.getTimezoneOffset()*60000 - 5*3600000).getHours();
+function hh(){ var d=new Date(); return new Date(d.getTime()+d.getTimezoneOffset()*60000-5*3600000).getHours(); }
+function isNight(){ var h = hh(); return h >= 22 || h < 6; }
+function km(a,b){
+  if(!a || !b) return 0;
+  var R = 6371, dLat = (b.lat-a.lat)*Math.PI/180, dLng = (b.lng-a.lng)*Math.PI/180;
+  var s = Math.sin(dLat/2)*Math.sin(dLat/2)
+        + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1-s));
 }
-function fmtP(n){ return fmt(n); }
-
 async function loadConfig(){
   if(!sb) return;
   try{
     var r = await sb.from('site_settings').select('key,value')
-      .in('key',['taxi_config','rate_usd','rate_peso','store_force']);
+      .in('key',['move_config','rate_usd','rate_peso']);
     (r.data||[]).forEach(function(row){
       if(row.key === 'rate_usd'  && parseFloat(row.value) > 0) RATES.usd = parseFloat(row.value);
       if(row.key === 'rate_peso' && parseFloat(row.value) > 0) RATES.dop = parseFloat(row.value);
-      if(row.key === 'store_force' && row.value && row.value !== 'null') STORE.force = row.value;
-      if(row.key === 'taxi_config' && row.value){
+      if(row.key === 'move_config' && row.value){
         try{
           var c = JSON.parse(row.value);
-          if(c && c.zones && c.zones.length) TAXI = Object.assign(TAXI, c);
+          if(c.ride)   MV.ride   = Object.assign(MV.ride, c.ride);
+          if(c.object) MV.object = Object.assign(MV.object, c.object);
+          if(c.child)  MV.child  = Object.assign(MV.child, c.child);
+          if(c.deliv)  MV.deliv  = Object.assign(MV.deliv, c.deliv);
+          if(c.city)   MV.city   = Object.assign(MV.city, c.city);
         }catch(e){}
       }
     });
   }catch(e){}
-  var h = haitiHour();
-  STORE.open = STORE.force === 'open' ? true : STORE.force === 'closed' ? false
-             : (h >= CONFIG.openH && h < CONFIG.closeH);
-  paintService();
-  buildZones(); buildKinds(); compute();
+  buildRideCard(); price();
 }
-function paintService(){
-  $('#live-zones').textContent = TAXI.zones.length;
-  var b = $('#shutbadge');
-  b.classList.toggle('on', !STORE.open);
-  $('#live-state').textContent = STORE.open ? 'Ouvri' : 'Fèmen';
-  $('#live-state').className = 'live-n' + (STORE.open ? ' ok' : '');
-  var d = $('#live-dot');
-  d.style.background = STORE.open ? 'var(--ok)' : 'var(--bad)';
-  d.style.boxShadow  = STORE.open ? '0 0 9px rgba(0,224,138,.9)' : '0 0 9px rgba(255,107,107,.9)';
-  if(!STORE.open){
-    var h = haitiHour();
-    var left = h < CONFIG.openH ? CONFIG.openH - h : (24 - h) + CONFIG.openH;
-    $('#shut-t').textContent = 'Sèvis la fèmen — n ap louvri nan ' + left + 'h · ou ka toujou mande';
+
+/* ══ 8. CHWAZI SÈVIS LA ═══════════════════════════════════════ */
+$$('#svc .sv').forEach(function(b){
+  b.addEventListener('click', function(){
+    $$('#svc .sv').forEach(function(o){ o.classList.remove('on'); });
+    b.classList.add('on');
+    svc = b.getAttribute('data-s');
+    ['taksi','manje','pake'].forEach(function(k){
+      $('#pane-'+k).classList.toggle('on', k === svc);
+    });
+    if(svc === 'manje' || svc === 'pake') loadMarket(svc);
+    paintCart();
+    var y = $('#pane-'+svc).getBoundingClientRect().top + scrollY - 70;
+    scrollTo({ top:y, behavior: CALM ? 'auto' : 'smooth' });
+  });
+});
+$$('#ride-mode button').forEach(function(b){
+  b.addEventListener('click', function(){
+    $$('#ride-mode button').forEach(function(o){ o.classList.remove('on'); });
+    b.classList.add('on'); rideMode = b.getAttribute('data-m');
+    buildRideCard(); price();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════
+   9. KAT LA — OpenStreetMap ak Leaflet, chaje sèlman sou demann
+   ══════════════════════════════════════════════════════════════ */
+var map = null, mk = {}, line = null, pinTarget = 'a', mapReady = false;
+
+function loadLeaflet(){
+  return new Promise(function(res, rej){
+    if(window.L) return res();
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(css);
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
+    s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+function pinIcon(kind){
+  var c = kind === 'b' ? '#00E08A' : '#F0D98A';
+  return L.divIcon({
+    className:'', iconSize:[26,26], iconAnchor:[13,13],
+    html:'<div style="width:26px;height:26px;border-radius:50%;border:2px solid '+c
+      +';background:rgba(5,5,5,.86);box-shadow:0 0 14px '+c+'88;display:grid;place-items:center">'
+      +'<span style="width:8px;height:8px;border-radius:50%;background:'+c+'"></span></div>'
+  });
+}
+async function openMap(){
+  $('#map-load').disabled = true;
+  $('#map-load').textContent = 'K ap chaje…';
+  try{ await loadLeaflet(); }
+  catch(e){
+    $('#map-ph').innerHTML = '<div><p>Kat la pa ka chaje — verifye koneksyon w.</p></div>';
+    return;
+  }
+  map = L.map('map', { zoomControl:true, attributionControl:true })
+        .setView([MV.city.lat, MV.city.lng], MV.city.zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+  map.on('click', function(e){
+    setPoint(pinTarget, { lat:e.latlng.lat, lng:e.latlng.lng }, null);
+  });
+  $('#map-ph').style.display = 'none';
+  $('#pin-ab').style.display = 'flex';
+  $('#geo').style.display = 'grid';
+  $('#map-hint').style.display = '';
+  mapReady = true;
+  setTimeout(function(){ map.invalidateSize(); }, 200);
+  if(A) drawPoint('a'); if(B) drawPoint('b');
+}
+$('#map-load').addEventListener('click', openMap);
+$$('#pin-ab button').forEach(function(b){
+  b.addEventListener('click', function(){
+    $$('#pin-ab button').forEach(function(o){ o.classList.remove('on'); });
+    b.classList.add('on'); pinTarget = b.getAttribute('data-p');
+    $('#map-hint').textContent = 'Tape sou kat la pou mete pwen ' + pinTarget.toUpperCase();
+  });
+});
+$('#geo').addEventListener('click', function(){
+  if(!navigator.geolocation){ toast('Telefòn ou pa bay pozisyon an'); return; }
+  toast('N ap chèche kote w ye…');
+  navigator.geolocation.getCurrentPosition(function(p){
+    setPoint('a', { lat:p.coords.latitude, lng:p.coords.longitude }, null);
+    if(map) map.setView([p.coords.latitude, p.coords.longitude], 16);
+    reverse(p.coords.latitude, p.coords.longitude, 'a');
+  }, function(){ toast('Nou pa ka jwenn pozisyon w'); }, { enableHighAccuracy:true, timeout:9000 });
+});
+function drawPoint(which){
+  if(!mapReady) return;
+  var p = which === 'a' ? A : B;
+  if(!p) return;
+  if(mk[which]) map.removeLayer(mk[which]);
+  mk[which] = L.marker([p.lat, p.lng], { icon:pinIcon(which) }).addTo(map);
+}
+function setPoint(which, pos, label){
+  if(which === 'a'){ A = pos; if(label) $('#in-a').value = label; }
+  else { B = pos; if(label) $('#in-b').value = label; }
+  drawPoint(which);
+  if(!label) reverse(pos.lat, pos.lng, which);
+  if(A && B){
+    if(which === 'a' || which === 'b'){
+      $$('#pin-ab button').forEach(function(o,i){ o.classList.toggle('on', i === (which==='a'?1:0)); });
+      pinTarget = which === 'a' ? 'b' : 'a';
+    }
+    routeAB();
+  } else price();
+}
+
+/* ── Nominatim : adrès → koòdone, epi lenvès ── */
+var geoCache = {};
+async function search(q, which){
+  q = (q||'').trim();
+  if(q.length < 3){ $('#sug-'+which).classList.remove('on'); return; }
+  var box = $('#ad-'+which); box.classList.add('busy');
+  var key = q.toLowerCase();
+  try{
+    var list = geoCache[key];
+    if(!list){
+      var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=fr'
+        + '&countrycodes=ht&q=' + encodeURIComponent(q);
+      var r = await fetch(url, { headers:{ 'Accept':'application/json' } });
+      list = await r.json();
+      geoCache[key] = list;
+    }
+    var sug = $('#sug-'+which);
+    if(!list.length){ sug.classList.remove('on'); box.classList.remove('busy'); return; }
+    sug.innerHTML = list.map(function(x,i){
+      return '<button type="button" data-i="'+i+'">' + esc(x.display_name) + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(sug.children, function(b){
+      b.addEventListener('click', function(){
+        var x = list[parseInt(b.getAttribute('data-i'),10)];
+        setPoint(which, { lat:parseFloat(x.lat), lng:parseFloat(x.lon) }, x.display_name.split(',').slice(0,3).join(','));
+        sug.classList.remove('on');
+        if(mapReady && map) map.setView([parseFloat(x.lat), parseFloat(x.lon)], 15);
+      });
+    });
+    sug.classList.add('on');
+  }catch(e){ $('#sug-'+which).classList.remove('on'); }
+  box.classList.remove('busy');
+}
+async function reverse(lat, lng, which){
+  try{
+    var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&accept-language=fr&lat='
+      + lat + '&lon=' + lng);
+    var x = await r.json();
+    if(x && x.display_name){
+      var short = x.display_name.split(',').slice(0,3).join(',');
+      $('#in-' + which).value = short;
+    }
+  }catch(e){}
+}
+['a','b'].forEach(function(w){
+  var inp = $('#in-' + w);
+  inp.addEventListener('input', function(){
+    clearTimeout(inp._t);
+    inp._t = setTimeout(function(){ search(inp.value, w); }, 700);
+  });
+  inp.addEventListener('blur', function(){
+    setTimeout(function(){ $('#sug-'+w).classList.remove('on'); }, 200);
+  });
+});
+
+/* ── OSRM : vre wout, vre distans, vre dire ── */
+async function routeAB(){
+  if(!A || !B) return;
+  price();
+  try{
+    var u = 'https://router.project-osrm.org/route/v1/driving/'
+      + A.lng + ',' + A.lat + ';' + B.lng + ',' + B.lat
+      + '?overview=full&geometries=geojson';
+    var r = await fetch(u);
+    var j = await r.json();
+    if(j.code === 'Ok' && j.routes && j.routes[0]){
+      route = { km: j.routes[0].distance/1000, min: j.routes[0].duration/60, geo: j.routes[0].geometry };
+      if(mapReady && map){
+        if(line) map.removeLayer(line);
+        line = L.geoJSON(route.geo, { style:{ color:'#D4AF37', weight:4, opacity:.85 } }).addTo(map);
+        map.fitBounds(line.getBounds(), { padding:[40,40] });
+      }
+    } else throw new Error('no route');
+  }catch(e){
+    /* Si sèvè wout la pa reponn, nou kalkile distans dirèk la ak yon maj */
+    var d = km(A,B) * 1.35;
+    route = { km:d, min: d/22*60, geo:null, approx:true };
+  }
+  price();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   10. FÒM KOUS LA (moun / objè / timoun) AK PRI A
+   ══════════════════════════════════════════════════════════════ */
+var CAR_SVG = {
+  moto:'<path d="M5.5 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM18.5 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M5.5 15h4l3-5h4l1.5 5M9 10h4"/>',
+  konpak:'<path d="M4 16h16M5.5 16v1.4M18.5 16v1.4"/><path d="M4 16v-3l1.6-3.6A2 2 0 0 1 7.4 8.2h9.2a2 2 0 0 1 1.8 1.2L20 13v3"/><path d="M5 13h14"/>',
+  van:'<path d="M3 16h18M5 16v1.4M19 16v1.4"/><path d="M3 16V8.6a1.4 1.4 0 0 1 1.4-1.4h12.2a2 2 0 0 1 1.7 1l2.2 3.4V16"/><path d="M3 11.4h15.5"/>'
+};
+function buildRideCard(){
+  var c = $('#ride-card');
+  if(rideMode === 'person'){
+    c.innerHTML =
+      '<div class="fld"><label>Ki machin</label><div class="cars" id="cars"></div></div>'
+      + '<div class="two">'
+      + '<div class="fld"><label for="r-name">Non ou</label><input type="text" id="r-name" placeholder="Non ak siyati"></div>'
+      + '<div class="fld"><label for="r-tel">Telefòn</label><input type="tel" id="r-tel" placeholder="+509 …"></div>'
+      + '</div>'
+      + '<div class="fld" style="margin-bottom:0"><label for="r-note">Nòt pou chofè a</label>'
+      + '<textarea id="r-note" placeholder="Valiz, kantite moun, yon repè…"></textarea></div>';
+    buildCars();
+  } else if(rideMode === 'object'){
+    c.innerHTML =
+      '<div class="warn">Chofè a pran objè a nan pwen <b>A</b> epi li remèt li nan pwen <b>B</b>. '
+      + 'Moun ki resevwa a ap bezwen yon <b>kòd remèt</b> n ap ba ou.</div>'
+      + '<div class="fld"><label>Gwosè objè a</label><div class="cars" id="sizes"></div></div>'
+      + '<div class="fld"><label for="o-what">Kisa li ye</label>'
+      + '<input type="text" id="o-what" placeholder="Egzanp : yon òdinatè pòtatif nan yon sak"></div>'
+      + '<div class="two">'
+      + '<div class="fld"><label for="o-val">Valè deklare (fakiltatif)</label><input type="number" id="o-val" placeholder="HTG" min="0"></div>'
+      + '<div class="fld"><label for="o-weight">Pwa apeprè</label><input type="text" id="o-weight" placeholder="Egzanp : 4 kg"></div>'
+      + '</div>'
+      + '<div class="two">'
+      + '<div class="fld"><label for="o-rn">Non moun k ap resevwa</label><input type="text" id="o-rn" placeholder="Non ak siyati"></div>'
+      + '<div class="fld"><label for="o-rt">Telefòn li</label><input type="tel" id="o-rt" placeholder="+509 …"></div>'
+      + '</div>'
+      + '<div class="two">'
+      + '<div class="fld"><label for="r-name">Non ou</label><input type="text" id="r-name" placeholder="Non ak siyati"></div>'
+      + '<div class="fld"><label for="r-tel">Telefòn ou</label><input type="tel" id="r-tel" placeholder="+509 …"></div>'
+      + '</div>'
+      + '<div class="fld" style="margin-bottom:0"><label for="r-note">Enstriksyon patikilye</label>'
+      + '<textarea id="r-note" placeholder="Frajil, pa vire l, rele anvan ou rive…"></textarea></div>';
+    buildSizes();
+  } else {
+    c.innerHTML =
+      '<div class="warn">Sèvis sa a fèt sèlman ak <b>chofè ki abilite</b>. '
+      + 'Yon kòd remèt bay moun ki depoze a : san kòd sa, timoun nan pa remèt.</div>'
+      + '<div class="two">'
+      + '<div class="fld"><label for="c-name">Non timoun nan</label><input type="text" id="c-name" placeholder="Non ak siyati"></div>'
+      + '<div class="fld"><label for="c-age">Laj</label><input type="number" id="c-age" placeholder="Egzanp : 9" min="1" max="17"></div>'
+      + '</div>'
+      + '<div class="two">'
+      + '<div class="fld"><label for="r-name">Moun ki depoze</label><input type="text" id="r-name" placeholder="Non ak siyati"></div>'
+      + '<div class="fld"><label for="r-tel">Telefòn li</label><input type="tel" id="r-tel" placeholder="+509 …"></div>'
+      + '</div>'
+      + '<div class="two">'
+      + '<div class="fld"><label for="c-rn">Moun ki resevwa</label><input type="text" id="c-rn" placeholder="Non ak siyati"></div>'
+      + '<div class="fld"><label for="c-rt">Telefòn li</label><input type="tel" id="c-rt" placeholder="+509 …"></div>'
+      + '</div>'
+      + '<div class="fld" style="margin-bottom:0"><label for="r-note">Enstriksyon</label>'
+      + '<textarea id="r-note" placeholder="Lekòl la, moun ki gen dwa pran l, alèji…"></textarea></div>';
+  }
+  if(window._me){
+    if($('#r-name') && !$('#r-name').value) $('#r-name').value = window._me.displayName || '';
   }
 }
-function buildKinds(){
-  $('#kinds').innerHTML = Object.keys(TAXI.kinds).map(function(k){
-    var K = TAXI.kinds[k];
-    return '<button class="kind' + (k===kind?' on':'') + '" data-k="'+k+'" type="button">'
-      + '<svg viewBox="0 0 24 24">' + KIND_SVG[k] + '</svg>'
-      + '<b>' + esc(K.n) + '</b><span>' + esc(K.d) + '</span></button>';
+function buildCars(){
+  var box = $('#cars'); if(!box) return;
+  box.innerHTML = MV.ride.vehicles.map(function(v){
+    return '<button class="car' + (v.id===vehicle?' on':'') + '" data-v="'+esc(v.id)+'" type="button">'
+      + '<svg viewBox="0 0 24 24">' + (CAR_SVG[v.id] || CAR_SVG.konpak) + '</svg>'
+      + '<span class="n"><b>' + esc(v.n) + '</b><span>' + esc(v.d) + '</span></span>'
+      + '<span class="p" data-vp="'+esc(v.id)+'">—</span></button>';
   }).join('');
-  $$('#kinds .kind').forEach(function(b){
+  $$('#cars .car').forEach(function(b){
     b.addEventListener('click', function(){
-      $$('#kinds .kind').forEach(function(o){ o.classList.remove('on'); });
-      b.classList.add('on'); kind = b.getAttribute('data-k');
-      $('#note-lab').textContent = kind === 'manje' ? 'Kisa nou dwe achte, epi ki kote'
-        : kind === 'pake' ? 'Kisa ki nan pake a' : 'Nòt pou chofè a';
-      compute();
+      $$('#cars .car').forEach(function(o){ o.classList.remove('on'); });
+      b.classList.add('on'); vehicle = b.getAttribute('data-v'); price();
     });
   });
 }
-function buildZones(){
-  var opts = TAXI.zones.map(function(z,i){
-    return '<option value="'+esc(z.id)+'">'+esc(z.n)+'</option>';
+var objSize = 'ti';
+function buildSizes(){
+  var box = $('#sizes'); if(!box) return;
+  box.innerHTML = MV.object.sizes.map(function(s){
+    return '<button class="car' + (s.id===objSize?' on':'') + '" data-o="'+esc(s.id)+'" type="button">'
+      + '<svg viewBox="0 0 24 24"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5v-7Z"/><path d="m4 8.5 8 4.5 8-4.5M12 13v7"/></svg>'
+      + '<span class="n"><b>' + esc(s.n) + '</b><span>' + esc(s.d) + '</span></span>'
+      + '<span class="p">' + (s.fee ? '+' + fmt(s.fee) : '—') + '</span></button>';
   }).join('');
-  var f = $('#f-from'), t = $('#f-to');
-  var fv = f.value, tv = t.value;
-  f.innerHTML = opts; t.innerHTML = opts;
-  f.value = fv || TAXI.zones[0].id;
-  t.value = tv || (TAXI.zones[1] ? TAXI.zones[1].id : TAXI.zones[0].id);
+  $$('#sizes .car').forEach(function(b){
+    b.addEventListener('click', function(){
+      $$('#sizes .car').forEach(function(o){ o.classList.remove('on'); });
+      b.classList.add('on'); objSize = b.getAttribute('data-o'); price();
+    });
+  });
 }
-function zone(id){
-  for(var i=0;i<TAXI.zones.length;i++) if(TAXI.zones[i].id === id) return TAXI.zones[i];
-  return TAXI.zones[0];
+function vehOf(id){
+  for(var i=0;i<MV.ride.vehicles.length;i++) if(MV.ride.vehicles[i].id === id) return MV.ride.vehicles[i];
+  return MV.ride.vehicles[0];
 }
-
-/* ══ 7. PRI ═══════════════════════════════════════════════════ */
+function sizeOf(id){
+  for(var i=0;i<MV.object.sizes.length;i++) if(MV.object.sizes[i].id === id) return MV.object.sizes[i];
+  return MV.object.sizes[0];
+}
+function fareFor(vId){
+  var R = MV.ride, d = route ? route.km : 0, t = route ? route.min : 0;
+  var f;
+  if(rideMode === 'object'){
+    var O = MV.object;
+    f = O.base + O.perKm * d + sizeOf(objSize).fee;
+    var val = parseFloat(($('#o-val') && $('#o-val').value) || 0);
+    if(val > 0) f += val * O.insureRate;
+  } else {
+    f = R.base + R.perKm * d + R.perMin * t;
+    f *= vehOf(vId || vehicle).mult;
+    if(rideMode === 'child') f += MV.child.fee;
+  }
+  if(isNight()) f *= R.night;
+  return Math.max(R.minFare, Math.round(f));
+}
 var lastSum = 0;
 function countTo(el, to){
   var from = lastSum;
   if(CALM || from === to){ el.textContent = fmt(to); lastSum = to; return; }
   var t0 = performance.now();
-  (function step(t){
-    var k = Math.min((t - t0) / 520, 1);
-    el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - k, 3)));
-    if(k < 1) requestAnimationFrame(step); else lastSum = to;
+  (function s(t){
+    var k = Math.min((t-t0)/480, 1);
+    el.textContent = fmt(from + (to-from) * (1 - Math.pow(1-k,3)));
+    if(k < 1) requestAnimationFrame(s); else lastSum = to;
   })(t0);
 }
-function compute(){
-  var a = zone($('#f-from').value), b = zone($('#f-to').value);
-  var steps = Math.abs((a.t||0) - (b.t||0));
-  var same  = a.id === b.id;
-  var K = TAXI.kinds[kind] || TAXI.kinds.taksi;
-  var lines = [];
-
-  var fare = TAXI.base + steps * TAXI.step;
-  lines.push({ k: same ? 'Kous andedan ' + a.n : a.n + ' → ' + b.n, v: fmt(fare) + ' HTG' });
-
-  if(K.fee){ fare += K.fee; lines.push({ k:'Sèvis ' + K.n, v:'+' + fmt(K.fee) + ' HTG' }); }
-
-  var h = haitiHour(), isNight = (h >= CONFIG.closeH || h < CONFIG.openH);
-  if(isNight && TAXI.night > 1){
-    var extra = Math.round(fare * (TAXI.night - 1));
-    fare += extra;
-    lines.push({ k:'Tarif nwit (' + CONFIG.closeH + 'h → ' + CONFIG.openH + 'h)', v:'+' + fmt(extra) + ' HTG' });
+function price(){
+  var has = !!(A && B && route);
+  $('#trip').style.display = has ? 'flex' : 'none';
+  if(!has){
+    $('#sum').textContent = '—'; lastSum = 0;
+    $('#sum-alt').textContent = '';
+    $('#lines').innerHTML = '<div class="t-l"><span>Mete pwen A ak pwen B</span><span>—</span></div>';
+    $('#t-count').textContent = 'Pwen A → Pwen B';
+    return;
   }
-  if(fare < TAXI.minFare){
-    lines.push({ k:'Minimòm kous', v:fmt(TAXI.minFare) + ' HTG' });
-    fare = TAXI.minFare;
-  }
+  var d = route.km, t = route.min, f = fareFor();
+  $('#t-km').textContent  = d.toFixed(1) + ' km' + (route.approx ? ' ~' : '');
+  $('#t-min').textContent = Math.round(t) + ' min';
+  var eta = MV.ride.etaMin + Math.round(Math.random() * (MV.ride.etaMax - MV.ride.etaMin));
+  $('#t-eta').textContent = '≈ ' + eta + ' min';
+  $('#t-count').textContent = d.toFixed(1) + ' km';
 
-  countTo($('#sum'), fare);
-  $('#sum-alt').textContent = '≈ ' + (fare/RATES.usd).toFixed(2) + ' USD · ' + fmt(fare/RATES.dop) + ' RD$';
-  $('#lines').innerHTML = lines.map(function(l){
-    return '<div class="t-l"><span>' + esc(l.k) + '</span><span>' + esc(l.v) + '</span></div>';
+  var L = [];
+  if(rideMode === 'object'){
+    L.push({ k:'Pran ak livre', v:fmt(MV.object.base + MV.object.perKm * d) + ' HTG' });
+    var S = sizeOf(objSize);
+    if(S.fee) L.push({ k:'Gwosè : ' + S.n, v:'+' + fmt(S.fee) + ' HTG' });
+    var val = parseFloat(($('#o-val') && $('#o-val').value) || 0);
+    if(val > 0) L.push({ k:'Garanti sou ' + fmt(val) + ' HTG', v:'+' + fmt(val*MV.object.insureRate) + ' HTG' });
+  } else {
+    L.push({ k:'Kous ' + d.toFixed(1) + ' km · ' + Math.round(t) + ' min', v:fmt(MV.ride.base + MV.ride.perKm*d + MV.ride.perMin*t) + ' HTG' });
+    var V = vehOf(vehicle);
+    if(V.mult !== 1) L.push({ k:'Machin : ' + V.n, v:(V.mult>1?'+':'−') + Math.abs(Math.round((V.mult-1)*100)) + ' %' });
+    if(rideMode === 'child') L.push({ k:'Akonpayman timoun', v:'+' + fmt(MV.child.fee) + ' HTG' });
+  }
+  if(isNight()) L.push({ k:'Tarif nwit (22h → 6h)', v:'+' + Math.round((MV.ride.night-1)*100) + ' %' });
+  L.push({ k:'Total', v:fmt(f) + ' HTG', tot:true });
+
+  countTo($('#sum'), f);
+  $('#sum-alt').textContent = '≈ ' + (f/RATES.usd).toFixed(2) + ' USD · ' + fmt(f/RATES.dop) + ' RD$';
+  $('#lines').innerHTML = L.map(function(l){
+    return '<div class="t-l' + (l.tot?' tot':'') + '"><span>' + esc(l.k) + '</span><span>' + esc(l.v) + '</span></div>';
   }).join('');
-  window._fare = fare;
-}
-$('#f-from').addEventListener('change', compute);
-$('#f-to').addEventListener('change', compute);
-$('#swap').addEventListener('click', function(){
-  var f = $('#f-from'), t = $('#f-to'), v = f.value;
-  f.value = t.value; t.value = v;
-  var fa = $('#f-fromA'), ta = $('#f-toA'), av = fa.value;
-  fa.value = ta.value; ta.value = av;
-  compute();
-});
-$$('#when .chip').forEach(function(b){
-  b.addEventListener('click', function(){
-    $$('#when .chip').forEach(function(o){ o.classList.remove('on'); });
-    b.classList.add('on'); whenType = b.getAttribute('data-w');
-    $('#when-box').style.display = whenType === 'later' ? '' : 'none';
+  $$('[data-vp]').forEach(function(el){
+    el.textContent = fmt(fareFor(el.getAttribute('data-vp')));
   });
+  window._fare = f;
+}
+
+/* ══ 11. VOYE KOUS LA ═════════════════════════════════════════ */
+function code6(){ return String(Math.floor(100000 + Math.random()*900000)); }
+
+$('#ride-go').addEventListener('click', async function(){
+  if(!A || !B || !route){ toast('Mete pwen A ak pwen B anvan'); return; }
+  var name = (($('#r-name')||{}).value || '').trim();
+  var tel  = (($('#r-tel') ||{}).value || '').trim();
+  var note = (($('#r-note')||{}).value || '').trim();
+  if(!name){ toast('Ekri non ou'); return; }
+  if(!tel){ toast('Nou bezwen yon nimewo pou rele w'); return; }
+
+  var extra = {}, drop = null;
+  if(rideMode === 'object'){
+    var what = (($('#o-what')||{}).value||'').trim();
+    if(!what){ toast('Di nou kisa objè a ye'); return; }
+    drop = code6();
+    extra = { object_what:what, object_size:objSize,
+      object_weight:(($('#o-weight')||{}).value||'').trim() || null,
+      object_value:parseFloat(($('#o-val')||{}).value||0) || null,
+      recipient_name:(($('#o-rn')||{}).value||'').trim() || null,
+      recipient_phone:(($('#o-rt')||{}).value||'').trim() || null };
+  }
+  if(rideMode === 'child'){
+    var cn = (($('#c-name')||{}).value||'').trim();
+    if(!cn){ toast('Ekri non timoun nan'); return; }
+    drop = code6();
+    extra = { child_name:cn, child_age:parseInt(($('#c-age')||{}).value||0,10) || null,
+      recipient_name:(($('#c-rn')||{}).value||'').trim() || null,
+      recipient_phone:(($('#c-rt')||{}).value||'').trim() || null };
+  }
+
+  var btn = this; btn.disabled = true;
+  var saved = false, row = Object.assign({
+    kind:'taksi', ride_mode:rideMode, vehicle:rideMode==='person'?vehicle:null,
+    from_addr:$('#in-a').value || null, to_addr:$('#in-b').value || null,
+    from_lat:A.lat, from_lng:A.lng, to_lat:B.lat, to_lng:B.lng,
+    distance_km:+route.km.toFixed(2), duration_min:Math.round(route.min),
+    client_name:name, client_phone:tel,
+    client_email:(window._me && window._me.email) || null,
+    client_uid:(window._me && window._me.uid) || null,
+    notes:note || null, price_estimated:window._fare || 0,
+    drop_code:drop, status:'requested'
+  }, extra);
+
+  if(sb){
+    try{ var r = await sb.from('rides').insert(row); if(!r.error) saved = true; }
+    catch(e){}
+  }
+  btn.disabled = false;
+
+  var label = rideMode === 'person' ? 'Kous — ' + vehOf(vehicle).n
+            : rideMode === 'object' ? 'Voye yon objè' : 'Transpò timoun';
+  var m = 'Bonjou Zetwal Move !\n\n' + label + '\n'
+    + 'Depi : ' + ($('#in-a').value || (A.lat.toFixed(5)+','+A.lng.toFixed(5))) + '\n'
+    + 'Ale : '  + ($('#in-b').value || (B.lat.toFixed(5)+','+B.lng.toFixed(5))) + '\n'
+    + 'Distans : ' + route.km.toFixed(1) + ' km · ' + Math.round(route.min) + ' min\n'
+    + 'Non : ' + name + '\nTelefòn : ' + tel + '\n'
+    + (extra.object_what ? 'Objè : ' + extra.object_what + '\n' : '')
+    + (extra.child_name ? 'Timoun : ' + extra.child_name + '\n' : '')
+    + (extra.recipient_name ? 'Resevwa : ' + extra.recipient_name + ' ' + (extra.recipient_phone||'') + '\n' : '')
+    + (note ? 'Nòt : ' + note + '\n' : '')
+    + (drop ? 'Kòd remèt : ' + drop + '\n' : '')
+    + '\nESTIMASYON : ' + fmt(window._fare) + ' HTG\n\nMèsi !';
+  window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
+  toast(saved ? 'Kous ou a anrejistre' : 'Mesaj la ale sou WhatsApp');
+  if(saved && window._me) loadMine();
 });
 
-/* ══ 8. VOYE KOUS LA ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   12. MACHE A — restoran ak magazen, tout soti nan baz la
+   ══════════════════════════════════════════════════════════════ */
+var loaded = { manje:false, pake:false };
+var ICON_V = '<svg viewBox="0 0 24 24"><path d="M4 9.5 12 5l8 4.5v9L12 23l-8-4.5v-9Z"/><path d="m4 9.5 8 4.5 8-4.5"/></svg>';
+var mState = { manje:{ q:'', cat:'', sort:'smart' }, pake:{ q:'', cat:'', sort:'smart' } };
+
+async function loadMarket(kind){
+  var body = $('#' + (kind==='manje'?'m':'p') + '-body');
+  if(loaded[kind]){ renderMarket(kind); return; }
+  body.innerHTML = '<div class="shelf">' + Array(4).join('0').split('0').map(function(){
+    return '<div class="sk"><div class="b" style="aspect-ratio:16/9"></div>'
+      + '<div style="padding:15px;display:flex;flex-direction:column;gap:9px">'
+      + '<div class="b" style="height:14px;width:70%;border-radius:3px"></div>'
+      + '<div class="b" style="height:10px;width:90%;border-radius:3px"></div></div></div>';
+  }).join('') + '</div>';
+  if(!sb){ loaded[kind] = true; renderMarket(kind); return; }
+  try{
+    var v = await sb.from('partners').select('*').eq('kind', kind).eq('active', true).order('name');
+    var ids = (v.data||[]).map(function(x){ return x.id; });
+    var it = { data:[] };
+    if(ids.length) it = await sb.from('partner_items').select('*').in('partner_id', ids).order('position');
+    venues = (venues||[]).filter(function(x){ return x.kind !== kind; }).concat(v.data||[]);
+    items  = (items||[]).filter(function(x){ return ids.indexOf(x.partner_id) < 0; }).concat(it.data||[]);
+  }catch(e){ }
+  loaded[kind] = true;
+  renderMarket(kind);
+}
+function venueOpen(v){
+  if(v.is_open === false) return false;
+  if(!v.open_from || !v.open_to) return true;
+  var h = hh();
+  return h >= v.open_from && h < v.open_to;
+}
+function distOf(v){
+  if(!A || !v.lat || !v.lng) return null;
+  return km(A, { lat:v.lat, lng:v.lng });
+}
+function deliveryFee(v){
+  var d = distOf(v);
+  var base = (v.delivery_fee != null ? v.delivery_fee : MV.deliv.base);
+  return Math.round(base + (d != null ? MV.deliv.perKm * d : 0));
+}
+function etaOf(v){
+  var d = distOf(v);
+  var prep = v.prep_minutes || 20;
+  return Math.round(prep + (d != null ? d * 3.2 : 8));
+}
+function renderMarket(kind){
+  var S = mState[kind], pre = kind==='manje'?'m':'p';
+  var vs = venues.filter(function(v){ return v.kind === kind; });
+  var its = items.filter(function(x){
+    return vs.some(function(v){ return v.id === x.partner_id; });
+  });
+  /* kategori yo soti nan atik yo */
+  var cats = {};
+  its.forEach(function(x){ if(x.category) cats[x.category] = (cats[x.category]||0)+1; });
+  var catList = Object.keys(cats).sort();
+  $('#'+pre+'-cats').innerHTML = '<button class="pill2' + (S.cat===''?' on':'') + '" data-c="">Tout</button>'
+    + catList.map(function(c){
+        return '<button class="pill2' + (S.cat===c?' on':'') + '" data-c="'+esc(c)+'">'+esc(c)+' · '+cats[c]+'</button>';
+      }).join('');
+  $$('#'+pre+'-cats .pill2').forEach(function(b){
+    b.addEventListener('click', function(){ S.cat = b.getAttribute('data-c'); renderMarket(kind); });
+  });
+
+  var body = $('#'+pre+'-body');
+  if(!vs.length){
+    body.innerHTML = '<div class="empty">' + ICON_V
+      + '<h3>' + (kind==='manje' ? 'Pa gen restoran ankò' : 'Pa gen magazen ankò') + '</h3>'
+      + '<p>Patnè yo ajoute depi Konsòl la. Depi premye a antre, l ap parèt isit la ak plat ak pwodwi li yo.</p></div>';
+    $('#'+pre+'-res').textContent = '';
+    $('#'+pre+'-count').textContent = '0';
+    return;
+  }
+
+  var q = S.q.toLowerCase().trim();
+  if(q){
+    /* Rechèch : nou montre chak atik ki matche, ak restoran li ye a */
+    var hits = its.filter(function(x){
+      if(S.cat && x.category !== S.cat) return false;
+      return (x.name||'').toLowerCase().indexOf(q) >= 0
+          || (x.description||'').toLowerCase().indexOf(q) >= 0
+          || (x.category||'').toLowerCase().indexOf(q) >= 0;
+    }).map(function(x){
+      var v = vs.filter(function(y){ return y.id === x.partner_id; })[0] || {};
+      return { x:x, v:v, price:+x.price||0, eta:etaOf(v), dist:distOf(v), open:venueOpen(v) };
+    });
+    hits.sort(function(a,b){
+      if(S.sort === 'price') return a.price - b.price;
+      if(S.sort === 'time')  return a.eta - b.eta;
+      if(S.sort === 'dist')  return (a.dist==null?99:a.dist) - (b.dist==null?99:b.dist);
+      return (b.open - a.open) || (a.eta - b.eta) || (a.price - b.price);
+    });
+    $('#'+pre+'-res').innerHTML = '<b>' + hits.length + '</b> rezilta pou « ' + esc(S.q) + ' »';
+    $('#'+pre+'-count').textContent = hits.length;
+    body.innerHTML = hits.length ? hits.map(hitCard).join('')
+      : '<div class="empty">' + ICON_V + '<h3>Nou pa jwenn anyen</h3><p>Eseye yon lòt mo, oswa gade tout patnè yo.</p></div>';
+    wireHits(kind);
+    return;
+  }
+
+  var list = vs.map(function(v){
+    return { v:v, eta:etaOf(v), dist:distOf(v), open:venueOpen(v),
+             n: its.filter(function(x){ return x.partner_id === v.id && (!S.cat || x.category === S.cat); }).length };
+  }).filter(function(o){ return !S.cat || o.n > 0; });
+  list.sort(function(a,b){
+    if(S.sort === 'time') return a.eta - b.eta;
+    if(S.sort === 'dist') return (a.dist==null?99:a.dist) - (b.dist==null?99:b.dist);
+    return (b.open - a.open) || (a.eta - b.eta);
+  });
+  $('#'+pre+'-res').innerHTML = '<b>' + list.length + '</b> ' + (kind==='manje'?'restoran':'magazen') + (S.cat?' · '+esc(S.cat):'');
+  $('#'+pre+'-count').textContent = list.length;
+  body.innerHTML = '<div class="shelf">' + list.map(venueCard).join('') + '</div>';
+  $$('#'+pre+'-body .vc').forEach(function(el){
+    el.addEventListener('click', function(){ openVenue(el.getAttribute('data-v'), kind); });
+  });
+}
+function venueCard(o){
+  var v = o.v;
+  return '<article class="vc" data-v="'+esc(v.id)+'">'
+    + '<div class="vc-im">' + (v.cover_url ? '<img src="'+esc(v.cover_url)+'" alt="" loading="lazy">' : ICON_V)
+      + '<span class="vc-st ' + (o.open?'st-open':'st-shut') + '">' + (o.open?'Ouvri':'Fèmen') + '</span></div>'
+    + '<div class="vc-b"><h3 class="vc-n">' + esc(v.name||'') + '</h3>'
+    + (v.description ? '<p class="vc-d">'+esc(v.description)+'</p>' : '')
+    + '<div class="vc-m"><span><b>' + o.eta + ' min</b></span>'
+      + (o.dist != null ? '<span class="dot"></span><span>' + o.dist.toFixed(1) + ' km</span>' : '')
+      + '<span class="dot"></span><span>Livrezon <b>' + fmt(deliveryFee(v)) + '</b></span>'
+      + (o.n ? '<span class="dot"></span><span>' + o.n + ' atik</span>' : '')
+    + '</div></div></article>';
+}
+function hitCard(h){
+  var x = h.x, v = h.v, can = h.open && x.available !== false;
+  return '<div class="hit' + (can?'':' off') + '" data-x="'+esc(x.id)+'">'
+    + '<div class="hit-im">' + (x.image_url ? '<img src="'+esc(x.image_url)+'" alt="" loading="lazy">' : ICON_V) + '</div>'
+    + '<div class="hit-b"><div class="hit-n">' + esc(x.name||'') + '</div>'
+    + '<div class="hit-v"><b>' + esc(v.name||'') + '</b>' + (h.open?'':' · fèmen kounye a') + '</div>'
+    + (x.description ? '<div class="hit-v">'+esc(x.description)+'</div>' : '')
+    + '<div class="hit-m"><span>' + h.eta + ' min</span>'
+      + (h.dist != null ? '<span>' + h.dist.toFixed(1) + ' km</span>' : '')
+      + '<span>Livrezon ' + fmt(deliveryFee(v)) + '</span>'
+      + (x.available === false ? '<span style="color:var(--bad)">Pa disponib</span>' : '')
+    + '</div></div>'
+    + '<div class="hit-p"><span class="pr">' + fmt(x.price) + '</span>'
+    + '<button class="add" data-add="'+esc(x.id)+'"' + (can?'':' disabled') + '>Ajoute</button></div></div>';
+}
+function wireHits(kind){
+  $$('[data-add]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      addToCart(b.getAttribute('data-add'), kind);
+    });
+  });
+}
+['m','p'].forEach(function(pre){
+  var kind = pre === 'm' ? 'manje' : 'pake';
+  $('#'+pre+'-q').addEventListener('input', function(){
+    clearTimeout(this._t); var val = this.value;
+    this._t = setTimeout(function(){ mState[kind].q = val; renderMarket(kind); }, 260);
+  });
+  $('#'+pre+'-sort').addEventListener('change', function(){ mState[kind].sort = this.value; renderMarket(kind); });
+});
+
+/* ══ 13. FICH YON PATNÈ ═══════════════════════════════════════ */
+var openedVenue = null;
+function openVenue(id, kind){
+  var v = venues.filter(function(x){ return x.id === id; })[0];
+  if(!v) return;
+  openedVenue = v;
+  var its = items.filter(function(x){ return x.partner_id === id; });
+  var open = venueOpen(v);
+  var cats = {};
+  its.forEach(function(x){ if(x.category) cats[x.category] = 1; });
+  var pre = kind === 'manje' ? 'm' : 'p';
+  var body = $('#'+pre+'-body');
+  body.innerHTML =
+    '<button class="btn btn-o" id="back-v" style="margin-bottom:18px">← Tout '
+      + (kind==='manje'?'restoran':'magazen') + ' yo</button>'
+    + '<div class="card" style="margin-bottom:18px">'
+      + '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">'
+      + '<div style="width:74px;height:74px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.04);display:grid;place-items:center;flex-shrink:0">'
+        + (v.logo_url || v.cover_url ? '<img src="'+esc(v.logo_url||v.cover_url)+'" alt="" style="width:100%;height:100%;object-fit:cover">' : ICON_V) + '</div>'
+      + '<div style="flex:1;min-width:180px">'
+        + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px">'
+        + '<h3 style="font-family:var(--serif);font-size:1.5rem;font-weight:600">' + esc(v.name||'') + '</h3>'
+        + '<span class="vc-st ' + (open?'st-open':'st-shut') + '" style="position:static">' + (open?'Ouvri':'Fèmen') + '</span></div>'
+        + (v.description ? '<p style="font-size:.78rem;color:var(--ink-3);line-height:1.6">'+esc(v.description)+'</p>' : '')
+        + '<div class="vc-m" style="margin-top:9px"><span><b>' + etaOf(v) + ' min</b></span>'
+        + (distOf(v) != null ? '<span class="dot"></span><span>' + distOf(v).toFixed(1) + ' km</span>' : '')
+        + '<span class="dot"></span><span>Livrezon <b>' + fmt(deliveryFee(v)) + ' HTG</b></span>'
+        + (v.address ? '<span class="dot"></span><span>' + esc(v.address) + '</span>' : '')
+        + '</div></div></div></div>'
+    + (open ? '' : '<div class="warn">Patnè sa a <b>fèmen</b> kounye a. Ou ka gade meni an, men ou p ap ka kòmande.</div>')
+    + (its.length ? Object.keys(cats).sort().concat(cats['']===undefined?[]:[]).map(function(c){
+        var group = its.filter(function(x){ return (x.category||'') === c; });
+        if(!group.length) return '';
+        return '<h4 style="font-family:var(--serif);font-size:1.15rem;font-weight:600;margin:22px 0 12px">'+esc(c)+'</h4>'
+          + group.map(function(x){
+              return hitCard({ x:x, v:v, price:+x.price||0, eta:etaOf(v), dist:distOf(v), open:open });
+            }).join('');
+      }).join('')
+      + (function(){
+          var noCat = its.filter(function(x){ return !x.category; });
+          if(!noCat.length) return '';
+          return '<h4 style="font-family:var(--serif);font-size:1.15rem;font-weight:600;margin:22px 0 12px">Lòt</h4>'
+            + noCat.map(function(x){ return hitCard({ x:x, v:v, price:+x.price||0, eta:etaOf(v), dist:distOf(v), open:open }); }).join('');
+        })()
+      : '<div class="empty">' + ICON_V + '<h3>Meni an poko ranpli</h3><p>Patnè sa a poko ajoute atik li yo nan Konsòl la.</p></div>');
+  $('#back-v').addEventListener('click', function(){ openedVenue = null; renderMarket(kind); });
+  wireHits(kind);
+  var y = body.getBoundingClientRect().top + scrollY - 90;
+  scrollTo({ top:y, behavior: CALM ? 'auto' : 'smooth' });
+}
+
+/* ══ 14. PANYE A ══════════════════════════════════════════════ */
+function addToCart(itemId, kind){
+  var x = items.filter(function(y){ return y.id === itemId; })[0];
+  if(!x) return;
+  var v = venues.filter(function(y){ return y.id === x.partner_id; })[0];
+  if(!v || !venueOpen(v)){ toast('Patnè sa a fèmen kounye a'); return; }
+  if(x.available === false){ toast('Atik sa a pa disponib'); return; }
+  if(cartVenue && cartVenue !== v.id){
+    if(!confirm('Panye ou a gen atik yon lòt patnè. Vide l epi kòmanse ak ' + v.name + ' ?')) return;
+    cart = [];
+  }
+  cartVenue = v.id;
+  var line = cart.filter(function(l){ return l.id === x.id; })[0];
+  if(line) line.q++;
+  else cart.push({ id:x.id, name:x.name, price:+x.price||0, q:1 });
+  toast(x.name + ' nan panye a');
+  paintCart();
+}
+function cartTotals(){
+  var sub = 0, n = 0;
+  cart.forEach(function(l){ sub += l.price * l.q; n += l.q; });
+  var v = venues.filter(function(y){ return y.id === cartVenue; })[0];
+  var deliv = v ? deliveryFee(v) : 0;
+  var fee = Math.round(sub * (MV.fees.service || 0));
+  return { n:n, sub:sub, deliv:deliv, fee:fee, total:sub + deliv + fee, v:v };
+}
+function paintCart(){
+  var t = cartTotals();
+  var bar = $('#cartbar');
+  bar.classList.toggle('on', t.n > 0 && (svc === 'manje' || svc === 'pake'));
+  /* nou reekri tout bwat la, kidonk pa gen anyen apre pou mete ajou */
+  $('#cart-txt').innerHTML = t.n + ' atik' + (t.v ? ' · ' + esc(t.v.name) : '')
+    + '<b>' + fmt(t.total) + ' HTG</b>';
+  $('#cart-sub').textContent = t.n ? t.n + ' atik · ' + fmt(t.total) + ' HTG' : 'Vid';
+  $('#cart-title').textContent = t.v ? t.v.name : 'Panye ou a';
+  var body = $('#cart-body');
+  if(!cart.length){
+    body.innerHTML = '<div class="nulle">' + ICON_V + 'Panye ou vid.<br>Chwazi yon atik pou kòmanse.</div>';
+    $('#cart-foot').style.display = 'none';
+    return;
+  }
+  body.innerHTML = cart.map(function(l,i){
+    return '<div class="ci"><div><div class="ci-n">' + esc(l.name) + '</div>'
+      + '<div class="ci-v">' + fmt(l.price) + ' × ' + l.q + ' = ' + fmt(l.price*l.q) + ' HTG</div></div>'
+      + '<div class="ci-c"><button class="qb" data-m="'+i+'">−</button><span class="qn">'+l.q+'</span>'
+      + '<button class="qb" data-p="'+i+'">+</button></div></div>';
+  }).join('')
+  + '<div class="fld" style="margin-top:18px"><label for="k-addr">Kote pou nou livre</label>'
+  + '<input type="text" id="k-addr" placeholder="Adrès ou — kay, repè" value="' + esc($('#in-a').value||'') + '"></div>'
+  + '<div class="two">'
+  + '<div class="fld"><label for="k-name">Non ou</label><input type="text" id="k-name" placeholder="Non ak siyati" value="'
+    + esc((window._me && window._me.displayName) || '') + '"></div>'
+  + '<div class="fld"><label for="k-tel">Telefòn</label><input type="tel" id="k-tel" placeholder="+509 …"></div></div>'
+  + '<div class="fld"><label for="k-note">Nòt</label><textarea id="k-note" placeholder="San pwav, ba l madanm nan…"></textarea></div>';
+  $$('#cart-body [data-m]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var i = +b.getAttribute('data-m');
+      cart[i].q--; if(cart[i].q <= 0) cart.splice(i,1);
+      if(!cart.length) cartVenue = null;
+      paintCart();
+    });
+  });
+  $$('#cart-body [data-p]').forEach(function(b){
+    b.addEventListener('click', function(){ cart[+b.getAttribute('data-p')].q++; paintCart(); });
+  });
+  $('#cart-sum').innerHTML =
+     '<div class="t-l"><span>Atik yo</span><span>' + fmt(t.sub) + ' HTG</span></div>'
+   + (t.fee ? '<div class="t-l"><span>Frè sèvis</span><span>' + fmt(t.fee) + ' HTG</span></div>' : '')
+   + '<div class="t-l"><span>Livrezon' + (distOf(t.v||{}) != null ? ' · ' + distOf(t.v).toFixed(1) + ' km' : '') + '</span><span>' + fmt(t.deliv) + ' HTG</span></div>'
+   + '<div class="t-l tot"><span>Total</span><span>' + fmt(t.total) + ' HTG</span></div>';
+  $('#cart-foot').style.display = '';
+}
+$('#cart-open').addEventListener('click', function(){
+  $('#cart').classList.add('open'); $('#veil').classList.add('open');
+  $('#cart').setAttribute('aria-hidden','false'); paintCart();
+});
+$('#cart-x').addEventListener('click', function(){
+  $('#cart').classList.remove('open'); $('#veil').classList.remove('open');
+  $('#cart').setAttribute('aria-hidden','true');
+});
+$('#cart-clr').addEventListener('click', function(){
+  cart = []; cartVenue = null; paintCart(); toast('Panye a vid');
+});
+$('#cart-go').addEventListener('click', async function(){
+  var t = cartTotals();
+  if(!t.n || !t.v) return;
+  var name = (($('#k-name')||{}).value||'').trim();
+  var tel  = (($('#k-tel') ||{}).value||'').trim();
+  var addr = (($('#k-addr')||{}).value||'').trim();
+  var note = (($('#k-note')||{}).value||'').trim();
+  if(!name){ toast('Ekri non ou'); return; }
+  if(!tel){  toast('Nou bezwen yon nimewo'); return; }
+  if(!addr){ toast('Ki kote pou nou livre ?'); return; }
+
+  var btn = this; btn.disabled = true;
+  var saved = false;
+  var row = {
+    kind: svc, partner_id: t.v.id, partner_name: t.v.name,
+    items: cart, subtotal: t.sub, service_fee: t.fee, delivery_fee: t.deliv, total: t.total,
+    client_name:name, client_phone:tel,
+    client_email:(window._me && window._me.email) || null,
+    client_uid:(window._me && window._me.uid) || null,
+    address: addr, lat: A ? A.lat : null, lng: A ? A.lng : null,
+    notes: note || null, status:'requested'
+  };
+  if(sb){
+    try{ var r = await sb.from('move_orders').insert(row); if(!r.error) saved = true; }catch(e){}
+  }
+  btn.disabled = false;
+  var m = 'Bonjou Zetwal Move !\n\nKòmand ' + (svc === 'manje' ? 'manje' : 'pake') + '\n'
+    + 'Patnè : ' + t.v.name + '\n\n'
+    + cart.map(function(l){ return '• ' + l.name + ' × ' + l.q + ' = ' + fmt(l.price*l.q) + ' HTG'; }).join('\n')
+    + '\n\nAtik : ' + fmt(t.sub) + ' HTG\nLivrezon : ' + fmt(t.deliv) + ' HTG\nTOTAL : ' + fmt(t.total) + ' HTG\n\n'
+    + 'Non : ' + name + '\nTelefòn : ' + tel + '\nAdrès : ' + addr
+    + (note ? '\nNòt : ' + note : '') + '\n\nMèsi !';
+  window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
+  toast(saved ? 'Kòmand ou a anrejistre' : 'Kòmand la ale sou WhatsApp');
+  cart = []; cartVenue = null; paintCart();
+  $('#cart').classList.remove('open'); $('#veil').classList.remove('open');
+  if(saved && window._me) loadMine();
+});
+
+/* ══ 15. KÒMAND MWEN YO ═══════════════════════════════════════ */
 var STATUS = {
   requested:{ t:'Ap tann',    s:'color:var(--warn);border-color:rgba(255,184,77,.3);background:rgba(255,184,77,.08)' },
   accepted :{ t:'Aksepte',    s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
   on_way   :{ t:'Sou wout',   s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
-  picked   :{ t:'Ou nan wout',s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
+  picked   :{ t:'Nan men l',  s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
   done     :{ t:'Fini',       s:'color:var(--gold);border-color:var(--g-24);background:var(--g-08)' },
   cancelled:{ t:'Anile',      s:'color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)' }
 };
 var FLOW = ['requested','accepted','on_way','picked','done'];
+var MODE_N = { person:'Kous', object:'Objè', child:'Timoun' };
 
-$('#send').addEventListener('click', async function(){
-  var a = zone($('#f-from').value), b = zone($('#f-to').value);
-  var name = ($('#f-name').value || '').trim();
-  var tel  = ($('#f-tel').value  || '').trim();
-  var fa   = ($('#f-fromA').value|| '').trim();
-  var ta   = ($('#f-toA').value  || '').trim();
-  var note = ($('#f-note').value || '').trim();
-  var when = whenType === 'later' ? ($('#f-when').value || '') : '';
-
-  if(!name){ toast('Ekri non ou anvan'); $('#f-name').focus(); return; }
-  if(!tel){  toast('Nou bezwen yon nimewo pou rele w'); $('#f-tel').focus(); return; }
-  if(whenType === 'later' && !when){ toast('Chwazi ki lè'); $('#f-when').focus(); return; }
-
-  var btn = this; btn.disabled = true;
-  var K = TAXI.kinds[kind] || TAXI.kinds.taksi;
-  var saved = false;
-
-  if(sb){
-    try{
-      var row = {
-        kind: kind, from_zone: a.n, to_zone: b.n,
-        from_addr: fa || null, to_addr: ta || null,
-        client_name: name, client_phone: tel,
-        client_email: (window._me && window._me.email) || null,
-        client_uid:   (window._me && window._me.uid)   || null,
-        when_type: whenType, when_at: when || null,
-        notes: note || null, price_estimated: window._fare || 0,
-        status: 'requested'
-      };
-      var r = await sb.from('rides').insert(row);
-      if(!r.error) saved = true;
-    }catch(e){}
-  }
-  btn.disabled = false;
-
-  var m = 'Bonjou Taksi Zetwal !\n\n'
-    + 'Sèvis : ' + K.n + '\n'
-    + 'Depi : ' + a.n + (fa ? ' — ' + fa : '') + '\n'
-    + 'Ale : '  + b.n + (ta ? ' — ' + ta : '') + '\n'
-    + 'Kilè : ' + (whenType === 'later' ? when : 'kounye a') + '\n'
-    + 'Non : ' + name + '\nTelefòn : ' + tel + '\n'
-    + (note ? 'Nòt : ' + note + '\n' : '')
-    + '\nESTIMASYON : ' + fmt(window._fare || 0) + ' HTG\n\nMèsi !';
-  window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
-
-  toast(saved ? 'Kous ou a anrejistre — n ap rele w' : 'Mesaj la ale sou WhatsApp');
-  if(saved && window._me) loadMyRides(window._me.email);
-});
-
-/* ══ 9. KOUS MWEN YO ══════════════════════════════════════════ */
-async function loadMyRides(email){
-  if(!sb || !email) return;
+async function loadMine(){
+  var mail = window._me && window._me.email;
+  if(!sb || !mail) return;
   try{
-    var r = await sb.from('rides')
-      .select('id,kind,from_zone,to_zone,status,price_estimated,created_at,driver_name,driver_phone,admin_note')
-      .eq('client_email', email).order('created_at',{ascending:false}).limit(40);
-    if(r.error) throw r.error;
-    myRides = r.data || [];
+    var a = await sb.from('rides').select('*').eq('client_email', mail)
+      .order('created_at',{ascending:false}).limit(30);
+    myRides = a.data || [];
   }catch(e){ myRides = []; }
+  try{
+    var b = await sb.from('move_orders').select('*').eq('client_email', mail)
+      .order('created_at',{ascending:false}).limit(30);
+    myOrders = b.data || [];
+  }catch(e){ myOrders = []; }
 
+  var all = allMine();
   var seen = {};
   try{ seen = JSON.parse(localStorage.getItem(LS_SEEN) || '{}'); }catch(e){}
-  var news = myRides.filter(function(o){ return o.status !== 'requested' && seen[o.id] !== o.status; });
+  var news = all.filter(function(o){ return o.status !== 'requested' && seen[o.id] !== o.status; });
   $('#nbadge').classList.toggle('on', news.length > 0);
-
-  var active = myRides.filter(function(o){ return ['requested','accepted','on_way','picked'].indexOf(o.status) >= 0; }).length;
-  $('#a-rides').textContent  = 'Kous mwen yo' + (myRides.length ? ' (' + myRides.length + ')' : '');
+  var act = all.filter(function(o){ return FLOW.indexOf(o.status) >= 0 && o.status !== 'done'; }).length;
+  $('#a-rides').textContent  = 'Kòmand mwen yo' + (all.length ? ' (' + all.length + ')' : '');
   $('#dr-rides').textContent = $('#a-rides').textContent;
-  $('#rides-sub').textContent = myRides.length ? myRides.length + ' kous · ' + active + ' an kou' : 'Ou poko gen kous';
-  var today = myRides.filter(function(o){
-    return o.created_at && new Date(o.created_at).toDateString() === new Date().toDateString();
-  }).length;
-  $('#live-today').textContent = today || '—';
-  renderRides();
+  $('#rides-sub').textContent = all.length ? all.length + ' kòmand · ' + act + ' an kou' : 'Ou poko gen kòmand';
+  renderMine();
 }
-function renderRides(){
+function allMine(){
+  var r = myRides.map(function(o){ return Object.assign({ _t:'ride' }, o); });
+  var m = myOrders.map(function(o){ return Object.assign({ _t:'order' }, o); });
+  return r.concat(m).sort(function(a,b){
+    return new Date(b.created_at||0) - new Date(a.created_at||0);
+  });
+}
+function renderMine(){
   var box = $('#rides-list'); if(!box) return;
   if(!window._me){
-    box.innerHTML = '<div class="nulle"><svg viewBox="0 0 24 24"><path d="M4.4 17v-3.4l1.8-4.2A2 2 0 0 1 8 8.2h8a2 2 0 0 1 1.8 1.2l1.8 4.2V17"/><path d="M5 17h14"/></svg>'
-      + 'Konekte pou w swiv kous ou yo.</div>';
+    box.innerHTML = '<div class="nulle">' + ICON_V + 'Konekte pou w swiv kòmand ou yo.</div>';
     return;
   }
-  if(!myRides.length){
-    box.innerHTML = '<div class="nulle"><svg viewBox="0 0 24 24"><path d="M4.4 17v-3.4l1.8-4.2A2 2 0 0 1 8 8.2h8a2 2 0 0 1 1.8 1.2l1.8 4.2V17"/><path d="M5 17h14"/></svg>'
-      + 'Ou poko mande okenn kous.</div>';
+  var all = allMine();
+  if(!all.length){
+    box.innerHTML = '<div class="nulle">' + ICON_V + 'Ou poko fè okenn kòmand.</div>';
     return;
   }
-  box.innerHTML = myRides.map(function(o){
+  box.innerHTML = all.map(function(o){
     var S = STATUS[o.status] || STATUS.requested;
-    var K = TAXI.kinds[o.kind] || { n:o.kind };
     var pos = FLOW.indexOf(o.status);
     var track = '';
     if(o.status !== 'cancelled'){
@@ -1383,30 +2539,42 @@ function renderRides(){
       }
       track = '<div class="rc-track">' + track + '</div>';
     }
+    var title, sub, price;
+    if(o._t === 'ride'){
+      title = (MODE_N[o.ride_mode] || 'Kous') + ' · ' + (o.from_addr || '—').split(',')[0]
+            + ' → ' + (o.to_addr || '—').split(',')[0];
+      sub = (o.distance_km ? o.distance_km + ' km' : '—');
+      price = o.price_estimated;
+    } else {
+      title = (o.kind === 'manje' ? 'Manje' : 'Pake') + ' · ' + (o.partner_name || '');
+      sub = (o.items && o.items.length ? o.items.length + ' atik' : '—');
+      price = o.total;
+    }
     var msg = o.admin_note ? '<div class="rc-m">' + esc(o.admin_note) + '</div>'
       : (o.driver_name ? '<div class="rc-m">Chofè : <b>' + esc(o.driver_name) + '</b>'
          + (o.driver_phone ? ' · ' + esc(o.driver_phone) : '') + '</div>' : '');
+    var code = o.drop_code && o.status !== 'done' && o.status !== 'cancelled'
+      ? '<div class="rc-code"><b>' + esc(o.drop_code) + '</b>'
+        + '<small>Kòd remèt — bay li sèlman lè ou resevwa</small></div>' : '';
     return '<div class="rc ' + esc(o.status) + '">'
-      + '<div class="rc-h"><div class="rc-n">' + esc(K.n) + ' · ' + esc(o.from_zone||'') + ' → ' + esc(o.to_zone||'') + '</div>'
-        + '<span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
+      + '<div class="rc-h"><div class="rc-n">' + esc(title) + '</div>'
+      + '<span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
       + '<div class="rc-g">'
-        + '<div><div class="rc-k">Pri</div><div class="rc-v" style="color:var(--gold)">' + fmt(o.price_estimated) + ' HTG</div></div>'
-        + '<div><div class="rc-k">Dat</div><div class="rc-v">'
-          + (o.created_at ? new Date(o.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—')
-          + '</div></div>'
-      + '</div>' + track + msg + '</div>';
+        + '<div><div class="rc-k">Pri</div><div class="rc-v" style="color:var(--gold)">' + fmt(price) + ' HTG</div></div>'
+        + '<div><div class="rc-k">' + (o._t === 'ride' ? 'Distans' : 'Atik') + '</div><div class="rc-v">' + esc(sub) + '</div></div>'
+      + '</div>' + track + msg + code + '</div>';
   }).join('');
 }
 function ridesOpen(){
   var seen = {};
-  myRides.forEach(function(o){ seen[o.id] = o.status; });
+  allMine().forEach(function(o){ seen[o.id] = o.status; });
   try{ localStorage.setItem(LS_SEEN, JSON.stringify(seen)); }catch(e){}
   $('#nbadge').classList.remove('on');
   $('#rides').classList.add('open'); $('#veil').classList.add('open');
   $('#rides').setAttribute('aria-hidden','false');
   acct.classList.remove('open');
   drawer.classList.remove('open'); burger.classList.remove('x'); document.body.classList.remove('lock');
-  renderRides();
+  renderMine();
 }
 function ridesClose(){
   $('#rides').classList.remove('open'); $('#veil').classList.remove('open');
@@ -1415,20 +2583,23 @@ function ridesClose(){
 $('#a-rides').addEventListener('click', ridesOpen);
 $('#dr-rides').addEventListener('click', ridesOpen);
 $('#rides-x').addEventListener('click', ridesClose);
-$('#veil').addEventListener('click', ridesClose);
-addEventListener('keydown', function(e){ if(e.key === 'Escape') ridesClose(); });
-
-/* Tan reyèl : lè yon chofè pran kous la, kliyan an wè l tousuit */
+$('#veil').addEventListener('click', function(){
+  ridesClose();
+  $('#cart').classList.remove('open'); $('#cart').setAttribute('aria-hidden','true');
+});
+addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  ridesClose(); $('#cart').classList.remove('open');
+});
 try{
   if(sb && sb.channel){
-    sb.channel('rides-live')
-      .on('postgres_changes', { event:'*', schema:'public', table:'rides' }, function(){
-        if(window._me) loadMyRides(window._me.email);
-      })
+    sb.channel('move-live')
+      .on('postgres_changes', { event:'*', schema:'public', table:'rides' }, function(){ if(window._me) loadMine(); })
+      .on('postgres_changes', { event:'*', schema:'public', table:'move_orders' }, function(){ if(window._me) loadMine(); })
       .subscribe();
   }
 }catch(e){}
-setInterval(function(){ if(!document.hidden && window._me) loadMyRides(window._me.email); }, 45000);
+setInterval(function(){ if(!document.hidden && window._me) loadMine(); }, 50000);
 /* ══ DEMANN PWEN — kòd konfimasyon kliyan an ══════════════════ */
 var PQ = { row:null, sub:null };
 function pqShow(r){
@@ -1629,7 +2800,7 @@ if(auth) auth.onAuthStateChanged(async function(user){
   pqWatch(null);
   if(!user){
     $('#a-rides').style.display='none'; $('#dr-rides').style.display='none';
-    $('#nbadge').classList.remove('on'); myRides = [];
+    $('#nbadge').classList.remove('on'); myRides = []; myOrders = [];
     $('#login-btn').style.display=''; $('#who-btn').style.display='none';
     $('#dr-login').style.display=''; $('#dr-who').style.display='none';
     $('#dr-out').style.display='none'; $('#dr-admin').style.display='none';
@@ -1662,82 +2833,74 @@ if(auth) auth.onAuthStateChanged(async function(user){
   $('#a-st').textContent = status; $('#dr-st').textContent = status;
   pqWatch(user);
   $('#a-rides').style.display=''; $('#dr-rides').style.display='';
-  if(!$('#f-name').value) $('#f-name').value = name;
-  if(!$('#f-tel').value && user.phoneNumber) $('#f-tel').value = user.phoneNumber;
-  loadMyRides(user.email);
+  if($('#r-name') && !$('#r-name').value) $('#r-name').value = name;
+  loadMine();
 });
 
 
-/* ══ 10. ZETWAL KI VWAYAJE SOU WOUT LA ════════════════════════ */
-(function(){
-  var road = document.getElementById('road'), car = document.getElementById('car');
-  if(!road || !car || CALM) return;
-  var len = road.getTotalLength();
-  road.style.setProperty('--l', len);
-  var t0 = null, DUR = 7000, START = 2600;
-  function step(t){
-    if(!t0) t0 = t;
-    var e = t - t0;
-    if(e > START){
-      var k = ((e - START) % DUR) / DUR;
-      var p = road.getPointAtLength(k * len);
-      var q = road.getPointAtLength(Math.min(len, k * len + 6));
-      var ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
-      car.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ') rotate(' + ang.toFixed(1) + ')');
-      car.setAttribute('opacity', k < .04 ? (k/.04).toFixed(2) : k > .96 ? ((1-k)/.04).toFixed(2) : '1');
-    }
-    requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-})();
 
-/* ══ 11. ASISTAN TAKSI ════════════════════════════════════════ */
+/* ══ 16. ASISTAN MOVE ═════════════════════════════════════════ */
 var KB = [
-  { k:['pri','konbe','koute','tarif','kous la koute'],
+  { k:['sevis','sèvis','ki sa nou fe','kisa','plateform','move'],
+    a:function(){ return "Zetwal Move gen <b>twa sèvis</b> nan yon sèl kote :\n\n"
+      + "• <b>Taksi</b> — yon moun, yon objè, oswa yon timoun ki bezwen akonpayman.\n"
+      + "• <b>Manje</b> — restoran patnè nou yo, plat pa plat.\n"
+      + "• <b>Pake</b> — magazen patnè nou yo, ak livrezon.\n\n"
+      + "Klike sou youn nan twa kat yo anwo a."; } },
+
+  { k:['pri','konbe','koute','tarif','kalkile'],
+    a:function(){ return "Pou yon kous, pri a kalkile sou <b>vre distans</b> lan ak <b>vre tan</b> an :\n\n"
+      + "• Depa : " + fmt(MV.ride.base) + " HTG\n• Chak kilomèt : " + fmt(MV.ride.perKm) + " HTG\n"
+      + "• Chak minit : " + fmt(MV.ride.perMin) + " HTG\n• Minimòm : " + fmt(MV.ride.minFare) + " HTG\n"
+      + "• Nwit (22h → 6h) : +" + Math.round((MV.ride.night-1)*100) + " %\n\n"
+      + "Mete pwen A ak pwen B epi pri a parèt tousuit, anvan ou voye anyen."; } },
+
+  { k:['objè','obje','voye','pake pou moun','livre yon bagay','kolis'],
+    a:function(){ return "Wi. Chwazi <b>Yon objè</b> nan Taksi a.\n\nOu mete kote pou pran l, kote pou livre l, sa li ye, gwosè l, epi moun k ap resevwa a.\n\nNou ba ou yon <b>kòd remèt</b> : chofè a p ap kite objè a san moun nan pa bay kòd la."; } },
+
+  { k:['timoun','pitit','lekol','lekòl','akonpayman'],
+    a:function(){ return "Sèvis timoun nan fèt <b>sèlman ak chofè ki abilite</b>.\n\nOu bay non timoun nan, laj li, moun ki depoze a ak moun ki resevwa a. Yon <b>kòd remèt</b> bay moun ki depoze a — san kòd sa, timoun nan pa remèt.\n\nPou nenpòt kesyon sou sa, rele nou dirèk."; } },
+
+  { k:['restoran','manje','plat','meni','ki restoran'],
     a:function(){
-      return "Pri a depann de zòn ou pati a ak zòn ou prale a :\n\n"
-        + "• Depa : <b>" + fmt(TAXI.base) + " HTG</b>\n"
-        + "• Chak zòn ki separe : <b>+" + fmt(TAXI.step) + " HTG</b>\n"
-        + "• Livrezon manje : <b>+" + fmt(TAXI.kinds.manje.fee) + " HTG</b> · pake : <b>+" + fmt(TAXI.kinds.pake.fee) + " HTG</b>\n"
-        + "• Nwit (apre " + CONFIG.closeH + "h) : <b>+" + Math.round((TAXI.night-1)*100) + "%</b>\n\n"
-        + "Chwazi de zòn nan fòm nan epi pri a parèt tousuit — anvan ou voye anyen."; } },
+      var v = venues.filter(function(x){ return x.kind === 'manje'; });
+      if(!v.length) return "Restoran patnè yo poko antre nan sistèm nan. Depi premye a ajoute, l ap parèt isit la ak tout meni li.";
+      return "Gen <b>" + v.length + " restoran</b> patnè :\n\n" + v.slice(0,8).map(function(x){
+        return '• ' + x.name + (venueOpen(x) ? '' : ' (fèmen kounye a)'); }).join('\n')
+        + "\n\nChèche yon plat dirèk nan bar rechèch la : n ap montre w tout restoran ki gen li, ak pri ak tan."; } },
 
-  { k:['zon','zòn','kote','kouvri','ale','ki kote nou ale'],
-    a:function(){ return "Nou kouvri <b>" + TAXI.zones.length + " zòn</b> :\n\n"
-        + TAXI.zones.map(function(z){ return '• ' + z.n; }).join('\n')
-        + "\n\nSi zòn ou an pa nan lis la, ekri nou sou WhatsApp : n ap wè sa nou ka fè."; } },
-
-  { k:['manje','livrezon','livre','pake','kolis','achte pou mwen'],
-    a:function(){ return "Twa sèvis :\n\n• <b>Taksi</b> — yon kous pou ou.\n• <b>Manje</b> — nou al chèche manje w epi nou pote l ba ou.\n• <b>Pake</b> — yon bagay pou livre yon lòt kote.\n\nPou manje ak pake, ekri sa nou dwe chèche nan nòt la."; } },
-
-  { k:['kilè','lè','ore','orè','fenmen','ouvri','nwit'],
+  { k:['magazen','pwodwi','achte','boutik','pake'],
     a:function(){
-      if(STORE.open) return "Sèvis la <b>ouvri</b> kounye a. Orè nou : " + CONFIG.openH + "h rive " + CONFIG.closeH + "h.\n\nApre " + CONFIG.closeH + "h, tarif nwit lan aplike.";
-      var h = haitiHour(); var left = h < CONFIG.openH ? CONFIG.openH - h : (24 - h) + CONFIG.openH;
-      return "Sèvis la <b>fèmen</b> — n ap louvri nan <b>" + left + "h</b>.\n\nOu ka toujou mande yon kous : n ap rele w lè nou louvri."; } },
+      var v = venues.filter(function(x){ return x.kind === 'pake'; });
+      if(!v.length) return "Magazen patnè yo poko antre nan sistèm nan.";
+      return "Gen <b>" + v.length + " magazen</b> patnè. Chèche yon pwodwi nan bar rechèch la epi konpare pri, distans ak tan livrezon."; } },
 
-  { k:['kijan','mande','komande','kòmande','fe','etap'],
-    a:function(){ return "Kat etap :\n\n<b>1.</b> Chwazi sèvis la, kote w ye ak kote w prale.\n<b>2.</b> Pri a parèt — ou voye demann lan sou WhatsApp.\n<b>3.</b> Yon chofè pran kous la epi nou rele w.\n<b>4.</b> Ou peye sou plas, kach oswa ak pwen ou yo."; } },
+  { k:['livrezon','frè livrezon','konbe livrezon'],
+    a:function(){ return "Livrezon an : <b>" + fmt(MV.deliv.base) + " HTG</b> pou kòmanse, plis <b>"
+      + fmt(MV.deliv.perKm) + " HTG</b> chak kilomèt ant patnè a ak ou.\n\nPri a parèt sou chak kat, anvan ou chwazi."; } },
 
-  { k:['swiv','eta','kous mwen','kote chofe','rive','tann'],
+  { k:['kat','map','adres','adrès','kote m ye','jps','gps'],
+    a:function(){ return "Klike <b>Louvri kat la</b> nan seksyon Taksi a. Apre sa ou ka :\n\n• tape sou kat la pou mete pwen A oswa B\n• tape yon adrès nan bwat la\n• klike sou wonn nan anwo adwat pou pran pozisyon w\n\nKat la chaje sèlman lè w mande l, pou paj la rete rapid."; } },
+
+  { k:['swiv','eta','kote kous','tann','kòmand mwen'],
     a:function(){
-      if(!window._me) return "Konekte pou w wè kous ou yo epi swiv yo an dirèk.";
-      if(!myRides.length) return "Ou poko gen kous. Lè w mande youn, w ap wè eta l isit la.";
-      var a = myRides.filter(function(o){ return ['requested','accepted','on_way','picked'].indexOf(o.status) >= 0; });
-      if(!a.length) return "Ou gen <b>" + myRides.length + " kous</b> nan istwa w, men pa gen youn k ap fèt kounye a.";
-      var s = STATUS[a[0].status];
-      return "Kous ou a : <b>" + s.t + "</b> — " + a[0].from_zone + " → " + a[0].to_zone + ".\n\nKlike sou « Kous mwen yo » anwo adwat la pou tout detay yo."; } },
+      if(!window._me) return "Konekte pou w swiv kòmand ou yo an dirèk.";
+      var all = allMine();
+      if(!all.length) return "Ou poko gen kòmand. Lè w fè youn, w ap wè eta l isit la.";
+      var a = all.filter(function(o){ return o.status !== 'done' && o.status !== 'cancelled'; });
+      if(!a.length) return "Ou gen <b>" + all.length + "</b> kòmand nan istwa w, men pa gen youn k ap fèt kounye a.";
+      return "Kòmand ou a : <b>" + (STATUS[a[0].status]||STATUS.requested).t + "</b>.\n\nKlike « Kòmand mwen yo » anwo adwat pou tout detay yo."; } },
 
   { k:['peye','peman','kach','pwen','kredi'],
-    a:function(){ return "Ou peye <b>sou plas</b>, kach oswa ak <b>pwen Zetwal</b> ou yo.\n\nPri a se sa nou te di a nan estimasyon an — chofè a konfime l anvan li pati, epi li pa chanje."; } },
+    a:function(){ return "Ou peye <b>sou plas</b>, kach oswa ak <b>pwen Zetwal</b> ou yo.\n\nPeman an liy poko disponib — l ap vini."; } },
 
-  { k:['kontak','whatsapp','telefon','rele','telegram','ijans'],
-    a:function(){ return "• <b>WhatsApp</b> : +7 996 110 35 06\n• <b>Telegram</b> : @MikeNestor14\n• <b>Baz nou</b> : 5, 3ème Imp, Ruelle Yamoul\n\nPou yon ijans, rele dirèk — se pi rapid."; } },
+  { k:['patne','patnè','vin patne','restoran mwen','magazen mwen','enskri'],
+    a:function(){ return "Ou gen yon restoran oswa yon magazen ? Ekri nou sou WhatsApp.\n\nNou mete w nan sistèm nan ak meni w, foto w, orè w, epi ou parèt nan rechèch kliyan yo."; } },
 
-  { k:['anbyans','bouton','efe','nej','lapli','etwal','bibit'],
-    a:function(){ return "Bouton anba adwat la chanje anbyans paj la : <b>Etwal</b>, <b>Bibit</b>, <b>Nèj</b>, <b>Lapli</b>, oswa <b>Anyen</b>."; } }
+  { k:['kontak','whatsapp','telefon','rele','telegram'],
+    a:function(){ return "• <b>WhatsApp</b> : +7 996 110 35 06\n• <b>Telegram</b> : @MikeNestor14\n• <b>Baz nou</b> : 5, 3ème Imp, Ruelle Yamoul"; } }
 ];
-var SUGG = ["Konbe yon kous koute ?","Ki zòn nou kouvri ?","Kijan pou m mande ?","Kote kous mwen an ye ?"];
+var SUGG = ["Konbe yon kous koute ?","Kijan pou m voye yon objè ?","Ki restoran nou genyen ?","Kote kòmand mwen an ye ?"];
 
 function norm(t){ return (t||'').toLowerCase().normalize('NFD')
   .replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' '); }
@@ -1755,7 +2918,7 @@ function answer(q){
     if(sc > bs){ bs = sc; best = e; }
   });
   if(best && bs >= 0.25) return best.a();
-  return "Padon — mwen konnen sèlman sa ki gen rapò ak Taksi Zetwal, kidonk mwen p ap eseye reponn sa.\n\nMen sa mwen ka esplike w :\n• Konbe yon kous koute\n• Ki zòn nou kouvri\n• Kijan pou w mande\n• Kote kous ou a ye";
+  return "Padon — mwen konnen sèlman sa ki gen rapò ak Zetwal Move, kidonk mwen p ap eseye reponn sa.\n\nMen sa mwen ka esplike w :\n• Konbe yon kous koute\n• Kijan pou w voye yon objè\n• Ki restoran ak magazen nou genyen\n• Kote kòmand ou a ye";
 }
 (function(){
   var pan = $('#panel'), veil = $('#veil'), body = $('#p-body'), chips = $('#p-chips'), inp = $('#p-in');
@@ -1774,7 +2937,7 @@ function answer(q){
     pan.classList.add('open'); veil.classList.add('open'); pan.setAttribute('aria-hidden','false');
     if(!started){
       started = true;
-      bubble("Bonjou ! Mwen se asistan Taksi Zetwal la. Mwen ka di w konbe yon kous koute, ki zòn nou kouvri, ak kote kous ou a ye.\n\nKisa ou vle konnen ?", 'ai');
+      bubble("Bonjou ! Mwen se asistan Zetwal Move. Twa sèvis : <b>Taksi</b>, <b>Manje</b>, <b>Pake</b>.\n\nKisa ou vle konnen ?", 'ai');
       SUGG.forEach(function(q){
         var b = document.createElement('button'); b.type = 'button'; b.textContent = q;
         b.addEventListener('click', function(){ ask(q); }); chips.appendChild(b);
@@ -1790,8 +2953,8 @@ function answer(q){
   addEventListener('keydown', function(e){ if(e.key === 'Escape') shut(); });
 })();
 
-/* ══ 12. DEPA ═════════════════════════════════════════════════ */
-buildKinds(); buildZones(); compute(); paintService();
+/* ══ 17. DEPA ═════════════════════════════════════════════════ */
+buildRideCard(); price(); paintCart();
 loadConfig();
 setInterval(function(){ if(!document.hidden) loadConfig(); }, 300000);
 
