@@ -10,7 +10,11 @@
   "orientation": "portrait",
   "background_color": "#050505",
   "theme_color": "#050505",
-  "categories": ["shopping", "games", "lifestyle"],
+  "categories": [
+    "shopping",
+    "games",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "/logo-192.png",
@@ -36,19 +40,45 @@
       "name": "Lavri Zetwal",
       "short_name": "Lavri",
       "url": "/lavri.html",
-      "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/logo-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Taksi Zetwal",
+      "short_name": "Taksi",
+      "url": "/taxi.html",
+      "icons": [
+        {
+          "src": "/logo-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Shop Zetwal",
       "short_name": "Shop",
       "url": "/shop.html",
-      "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/logo-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Jwèt Zetwal",
       "short_name": "Jwèt",
       "url": "/games.html",
-      "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/logo-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
