@@ -11,6 +11,7 @@ const SHELL = [
   '/',
   '/index.html',
   '/lavri.html',
+  '/taxi.html',
   '/shop.html',
   '/games.html',
   '/mall.html',
