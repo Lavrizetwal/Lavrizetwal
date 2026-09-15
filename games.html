@@ -7,6 +7,11 @@
 <title>ZETWAL JWÈT — Jwe, genyen pwen</title>
 <meta name="description" content="Zetwal Games : nèf jwèt, pwen reyèl, klasman an dirèk.">
 <link rel="icon" type="image/png" href="logo.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/logo-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Zetwal">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -509,6 +514,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <ul class="menu">
       <li><a href="index.html">Akèy</a></li>
       <li><a href="lavri.html">Lavri</a></li>
+      <li><a href="taxi.html">Taksi</a></li>
       <li><a href="shop.html">Shop</a></li>
       <li><a href="mall.html">Mall</a></li>
       <li><a href="games.html" class="on" aria-current="page">Jwèt</a></li>
@@ -540,6 +546,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <div id="drawer">
   <a class="dl" href="index.html">Akèy</a>
   <a class="dl" href="lavri.html">Lavri</a>
+  <a class="dl" href="taxi.html">Taksi</a>
   <a class="dl" href="shop.html">Shop</a>
   <a class="dl" href="mall.html">Mall</a>
   <a class="dl" href="games.html">Jwèt</a>
@@ -1577,6 +1584,14 @@ function answer(q){
 lockHub();
 
 })();
+</script>
+<script>
+/* Aplikasyon an : sit la enstale sou ekran dakèy telefòn nan. */
+if('serviceWorker' in navigator){
+  addEventListener('load', function(){
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
