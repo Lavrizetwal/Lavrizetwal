@@ -313,6 +313,41 @@ h1,h2,h3,h4{line-height:1.2;font-weight:600;letter-spacing:-.01em}
 .field select option{background:#151515;color:#fff}
 input[type=checkbox]{accent-color:var(--gold);width:16px;height:16px;cursor:pointer;flex:none}
 
+/* ── Move : types, galerie, ajout rapide ── */
+.tagbox{display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding:9px 10px;border-radius:var(--r-sm);
+  border:1px solid var(--line);background:var(--bg-deep);min-height:46px}
+.tagbox .tg{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:99px;
+  border:1px solid var(--line-gold);background:var(--gold-a08);color:var(--gold);font-size:.7rem}
+.tagbox .tg button{border:0;background:none;color:inherit;cursor:pointer;font-size:.85rem;line-height:1;opacity:.6}
+.tagbox .tg button:hover{opacity:1}
+.tagbox input{flex:1;min-width:130px;border:0;background:none;color:var(--text);font-family:inherit;
+  font-size:.82rem;outline:none;padding:4px}
+.tagsug{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.tagsug button{padding:5px 11px;border-radius:99px;border:1px dashed var(--line);background:none;
+  color:var(--muted);font-family:inherit;font-size:.68rem;cursor:pointer}
+.tagsug button:hover{border-color:var(--line-gold);color:var(--gold)}
+
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.gal .ph{position:relative;aspect-ratio:4/3;border-radius:var(--r-sm);overflow:hidden;
+  border:1px solid var(--line);background:var(--bg-deep)}
+.gal .ph img{width:100%;height:100%;object-fit:cover}
+.gal .ph.cover{border-color:var(--gold)}
+.gal .ph .bar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:1px}
+.gal .ph .bar button{flex:1;padding:6px 2px;border:0;cursor:pointer;background:rgba(5,5,5,.86);
+  color:var(--muted);font-family:inherit;font-size:.56rem;letter-spacing:.6px;text-transform:uppercase}
+.gal .ph .bar button:hover{color:var(--gold)}
+.gal .ph .flag{position:absolute;top:6px;left:6px;padding:3px 8px;border-radius:99px;
+  background:rgba(212,175,55,.9);color:#0A0A0A;font-size:.55rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.gal .add{aspect-ratio:4/3;border-radius:var(--r-sm);border:1px dashed var(--line);background:none;
+  cursor:pointer;color:var(--muted);display:grid;place-items:center;gap:6px;font-family:inherit;font-size:.66rem}
+.gal .add:hover{border-color:var(--line-gold);color:var(--gold)}
+
+.quickadd{display:grid;grid-template-columns:2fr 1fr 1.2fr auto;gap:8px;align-items:end;
+  padding:14px;border-radius:var(--r-md);border:1px dashed var(--line-gold);background:var(--gold-a08);
+  margin-bottom:var(--s4)}
+.quickadd .field{margin:0}
+@media(max-width:760px){ .quickadd{grid-template-columns:1fr 1fr} .quickadd .field:first-child{grid-column:span 2} }
+
 /* ── Move : courses, commandes, partenaires ── */
 .mv{border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s5);margin-bottom:var(--s4);
   background:var(--surface);border-left:3px solid var(--line)}
@@ -2973,13 +3008,52 @@ async function uploadSiteImage(file,prefix,maxW){
 const MEDIA_PAGES={global:'Partout sur le site',akey:"Page d'accueil",lavri:'Page Lavri',
   shop:'Page Shop',mall:'Page Mall',jwet:'Page Jwèt'};
 
+/* Les emplacements connus du site. La console les affiche même si la
+   ligne n'existe pas encore en base : elle la crée au premier envoi.
+   Ajouter un visuel à une page ne demande donc plus aucun SQL. */
+const KNOWN_SLOTS=[
+  {slot:'global.logo',       label:'Logo — toutes les pages',        page:'global', position:1},
+  {slot:'home.hero',         label:'Fond du titre — accueil',        page:'akèy',   position:10},
+  {slot:'home.card.komand',  label:'Carte Kòmand — accueil',         page:'akèy',   position:15},
+  {slot:'home.card.lavri',   label:'Carte Lavri — accueil',          page:'akèy',   position:20},
+  {slot:'home.card.shop',    label:'Carte Shop — accueil',           page:'akèy',   position:30},
+  {slot:'home.card.mall',    label:'Carte Mall — accueil',           page:'akèy',   position:40},
+  {slot:'home.card.jwet',    label:'Carte Jwèt — accueil',           page:'akèy',   position:50},
+  {slot:'home.quote',        label:'Portrait — citation du jour',    page:'akèy',   position:60},
+  {slot:'lavri.hero',        label:'Fond du titre — Lavri',          page:'lavri',  position:10},
+  {slot:'lavri.plan.petit',  label:'Carte tarif — Le Petit',         page:'lavri',  position:20},
+  {slot:'lavri.plan.malin',  label:'Carte tarif — Le Malin',         page:'lavri',  position:30},
+  {slot:'lavri.plan.geant',  label:'Carte tarif — Le Géant',         page:'lavri',  position:40},
+  {slot:'lavri.machines',    label:'Bandeau — section machines',     page:'lavri',  position:50},
+  {slot:'shop.hero',         label:'Fond du titre — Shop',           page:'shop',   position:10},
+  {slot:'taxi.hero',         label:'Fond du titre — Kòmand',         page:'kòmand', position:10},
+  {slot:'mall.hero',         label:'Fond du titre — Mall',           page:'mall',   position:10},
+  {slot:'jwet.hero',         label:'Fond du titre — Jwèt',           page:'jwèt',   position:10}
+];
+function slotMeta(slot){
+  const k=KNOWN_SLOTS.find(x=>x.slot===slot);
+  const r=(mediaRows||[]).find(x=>x.slot===slot);
+  return k || r || {slot:slot,label:slot,page:'autre'};
+}
+function slotLabel(slot){ return slotMeta(slot).label || slot; }
+function slotPage(slot){ return slotMeta(slot).page || 'autre'; }
+function mergeSlots(rows){
+  const byId={};
+  (rows||[]).forEach(r=>{ byId[r.slot]=r; });
+  KNOWN_SLOTS.forEach(k=>{
+    if(byId[k.slot]) byId[k.slot]=Object.assign({},k,byId[k.slot]);
+    else byId[k.slot]=Object.assign({url:null,alt:null},k);
+  });
+  return Object.values(byId).sort((a,b)=>
+    (a.page||'').localeCompare(b.page||'') || (a.position||0)-(b.position||0));
+}
 async function loadMedia(){
   const c=document.getElementById('media-grid'); if(!c) return;
   if(!mediaRows.length) c.innerHTML='<div class="mgrid">'+skeletonCards(6)+'</div>';
   try{
     const {data,error}=await db.from('site_media').select('*').order('page').order('position');
     if(error) throw error;
-    mediaRows=data||[]; renderMedia();
+    mediaRows=mergeSlots(data); renderMedia();
   }catch(e){
     c.innerHTML=errorState('Emplacements indisponibles',
       "La table site_media n'existe pas encore. Exécutez zetwal-images.sql dans Supabase, puis actualisez.",
@@ -3025,7 +3099,7 @@ window.uploadMedia=async(slot,input)=>{
   if(card) card.classList.add('busy');
   try{
     const up=await uploadSiteImage(file,'site/'+slot.replace(/[^a-z0-9]+/gi,'-'));
-    const {error}=await db.from('site_media').update({url:up.url,updated_at:new Date().toISOString()}).eq('slot',slot);
+    const {error}=await db.from('site_media').upsert({url:up.url,updated_at:new Date().toISOString(), slot:slot, label:slotLabel(slot), page:slotPage(slot)}, {onConflict:'slot'});
     if(error) throw error;
     const row=mediaRows.find(r=>r.slot===slot); if(row) row.url=up.url;
     renderMedia();
@@ -3037,7 +3111,7 @@ window.uploadMedia=async(slot,input)=>{
 };
 window.clearMedia=async(slot)=>{
   try{
-    const {error}=await db.from('site_media').update({url:null,updated_at:new Date().toISOString()}).eq('slot',slot);
+    const {error}=await db.from('site_media').upsert({url:null,updated_at:new Date().toISOString(), slot:slot, label:slotLabel(slot), page:slotPage(slot)}, {onConflict:'slot'});
     if(error) throw error;
     const row=mediaRows.find(r=>r.slot===slot); if(row) row.url=null;
     renderMedia();
@@ -3046,7 +3120,7 @@ window.clearMedia=async(slot)=>{
 };
 window.saveMediaAlt=async(slot,val)=>{
   try{
-    await db.from('site_media').update({alt:(val||'').trim(),updated_at:new Date().toISOString()}).eq('slot',slot);
+    await db.from('site_media').upsert({alt:(val||'').trim(),updated_at:new Date().toISOString(), slot:slot, label:slotLabel(slot), page:slotPage(slot)}, {onConflict:'slot'});
     const row=mediaRows.find(r=>r.slot===slot); if(row) row.alt=(val||'').trim();
     toast('Texte alternatif enregistré','success');
   }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
@@ -3553,7 +3627,9 @@ function renderPartners(){
         ? '<img src="'+escH(v.cover_url||v.logo_url)+'" alt="">'
         : '<span data-icon="'+(v.kind==='manje'?'drop':'box')+'" data-size="sm"></span>')+'</div>'
       +'<div class="pn-n"><b>'+escH(v.name||'Sans nom')+'</b>'
-        +'<span>'+(v.kind==='manje'?'Restaurant':'Magasin')+(v.address?' · '+escH(v.address):'')+'</span></div>'
+        +'<span>'+(v.kind==='manje'?'Restaurant':'Magasin')+(v.address?' · '+escH(v.address):'')
+        +(Array.isArray(v.tags)&&v.tags.length?' · '+escH(v.tags.slice(0,4).join(', ')):'')
+        +' · '+n+' article'+(n>1?'s':'')+'</span></div>'
       +'<div class="pn-tags">'
         +'<span class="chip" style="color:'+(open?'var(--ok)':'var(--bad)')+'">'+(open?'Ouvert':'Fermé')+'</span>'
         +(v.active===false?'<span class="chip" style="color:var(--muted)">Masqué</span>':'')
@@ -3579,7 +3655,8 @@ window.editPartner=async(id)=>{
      '<div class="form-grid">'
     +'<div class="field"><label for="f-kind">Type</label><select id="f-kind" class="input">'
       +'<option value="manje"'+(v.kind==='manje'?' selected':'')+'>Restaurant — apparaît dans Nourriture</option>'
-      +'<option value="pake"'+(v.kind==='pake'?' selected':'')+'>Magasin — apparaît dans Paquets</option></select></div>'
+      +'<option value="pake"'+(v.kind==='pake'?' selected':'')+'>Magasin — apparaît dans Paquets</option></select>'
+      +'<div class="hint">Change les suggestions de types en dessous.</div></div>'
     +'<div class="field"><label for="f-name">Nom</label><input type="text" id="f-name" class="input" value="'+escH(v.name||'')+'" placeholder="Chez Marcelle"></div>'
     +'<div class="field span2"><label for="f-desc">Description courte</label><input type="text" id="f-desc" class="input" value="'+escH(v.description||'')+'" placeholder="Manje kreyòl chak jou, bon pri"></div>'
     +'<div class="field span2"><label for="f-addr">Adresse</label><input type="text" id="f-addr" class="input" value="'+escH(v.address||'')+'" placeholder="Delmas 33, en face de la pharmacie"></div>'
@@ -3597,34 +3674,84 @@ window.editPartner=async(id)=>{
       +'<label class="chip" style="cursor:pointer"><input type="checkbox" id="f-open" '+(v.is_open!==false?'checked':'')+'> Ouvert maintenant</label>'
       +'<label class="chip" style="cursor:pointer"><input type="checkbox" id="f-act" '+(v.active!==false?'checked':'')+'> Visible sur le site</label>'
     +'</div>'
-    +'<div class="field"><label>Photo de couverture</label>'
-      +'<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">'
-      +'<div class="pn-im" style="width:110px;height:70px" id="f-prev">'
-        +(v.cover_url?'<img src="'+escH(v.cover_url)+'" alt="">':'<span data-icon="camera" data-size="sm"></span>')+'</div>'
-      +'<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'f-file\').click()">'+icon('camera','sm')+' Choisir une photo</button>'
-      +(v.cover_url?'<button class="btn btn-quiet btn-sm" onclick="pnClearImg()">Retirer</button>':'')
-      +'<input type="file" id="f-file" accept="image/*" hidden onchange="pnPickImg(this)">'
-      +'</div></div>'
+    +'<div class="field"><label>'+(v.kind==='pake'?'Ce que vend ce magasin':'Types de cuisine')+'</label>'
+      +'<div class="tagbox" id="f-tags"></div>'
+      +'<div class="tagsug" id="f-tagsug"></div>'
+      +'<div class="hint">Un restaurant peut en avoir plusieurs : burger, griyo, lalo, fritay… Tapez et faites Entrée. Le client pourra filtrer dessus.</div></div>'
+    +'<div class="field"><label>Photos — la première est la couverture</label>'
+      +'<div class="gal" id="f-gal"></div>'
+      +'<input type="file" id="f-file" accept="image/*" multiple hidden onchange="pnPickImg(this)">'
+      +'<div class="hint">Vous pouvez en choisir plusieurs d\'un coup. Elles sont compressées avant l\'envoi.</div></div>'
     +'<button class="btn btn-gold btn-block" style="margin-top:var(--s5)" onclick="savePartner()">'+icon('check','sm')+' Enregistrer</button>'
     +(id?'<button class="btn btn-quiet btn-block" style="margin-top:8px" onclick="deletePartner()">Supprimer ce partenaire</button>':'');
+  const ks=document.getElementById('f-kind');
+  if(ks) ks.addEventListener('change', renderTags);
+  pnTags = Array.isArray(v.tags) ? v.tags.slice() : (v.tags ? JSON.parse(v.tags||'[]') : []);
+  pnGal  = Array.isArray(v.gallery) ? v.gallery.slice() : (v.gallery ? JSON.parse(v.gallery||'[]') : []);
+  if(v.cover_url && !pnGal.includes(v.cover_url)) pnGal.unshift(v.cover_url);
+  renderTags(); renderGal();
   paintIcons();
   if(id){ await loadItems(id); document.getElementById('pt-items-card').style.display=''; }
 };
-window.pnPickImg=async(inp)=>{
-  const f=inp.files&&inp.files[0]; if(!f) return;
-  try{
-    toast('Compression…','info');
-    const url=await uploadSiteImage(f,'partners',1200);
-    pnCur.cover_url=url;
-    document.getElementById('f-prev').innerHTML='<img src="'+escH(url)+'" alt="">';
-    toast('Photo prête — pensez à enregistrer','success');
-  }catch(e){ toast('Envoi impossible : '+rlsHint(e),'error'); }
-  inp.value='';
+
+/* ── Types de cuisine / de commerce ── */
+let pnTags=[], pnGal=[];
+const TAG_SUG={
+  manje:['Kreyòl','Fritay','Griyo','Lalo','Diri','Poul','Pwason','Burger','Pizza','Sandwich',
+         'Bwason','Ji fre','Desè','Vejetaryen','Fastfood','Bekann'],
+  pake :['Konstriksyon','Kenkayri','Rad','Soulye','Elektwonik','Telefòn','Founiti biwo','Bote',
+         'Famasi','Manje sèk','Bwason','Kay ak jaden','Otomobil','Jwèt']
 };
-window.pnClearImg=()=>{
-  pnCur.cover_url=null;
-  document.getElementById('f-prev').innerHTML='<span data-icon="camera" data-size="sm"></span>';
-  paintIcons(); toast('Photo retirée — enregistrez pour valider','info');
+function renderTags(){
+  const box=document.getElementById('f-tags'); if(!box) return;
+  box.innerHTML = pnTags.map((t,i)=>
+    '<span class="tg">'+escH(t)+'<button type="button" onclick="pnTagDel('+i+')" aria-label="Retirer">×</button></span>').join('')
+    + '<input type="text" id="f-taginput" placeholder="'+(pnTags.length?'Ajouter…':'Tapez un type et faites Entrée')+'">';
+  const inp=document.getElementById('f-taginput');
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===','){ e.preventDefault(); pnTagAdd(inp.value); }
+    if(e.key==='Backspace' && !inp.value && pnTags.length) pnTagDel(pnTags.length-1);
+  });
+  const kind=(document.getElementById('f-kind')||{}).value||'manje';
+  const sug=(TAG_SUG[kind]||[]).filter(t=>!pnTags.includes(t)).slice(0,12);
+  document.getElementById('f-tagsug').innerHTML = sug.map(t=>
+    '<button type="button" onclick="pnTagAdd(\''+escH(t)+'\')">+ '+escH(t)+'</button>').join('');
+}
+window.pnTagAdd=(t)=>{
+  t=(t||'').trim().replace(/,$/,'');
+  if(!t) return;
+  if(!pnTags.some(x=>x.toLowerCase()===t.toLowerCase())) pnTags.push(t);
+  renderTags();
+  const i=document.getElementById('f-taginput'); if(i) i.focus();
+};
+window.pnTagDel=(i)=>{ pnTags.splice(i,1); renderTags(); };
+
+/* ── Galerie photos ── */
+function renderGal(){
+  const box=document.getElementById('f-gal'); if(!box) return;
+  box.innerHTML = pnGal.map((u,i)=>
+    '<div class="ph'+(i===0?' cover':'')+'"><img src="'+escH(u)+'" alt="">'
+    +(i===0?'<span class="flag">Couverture</span>':'')
+    +'<span class="bar">'
+      +(i===0?'':'<button type="button" onclick="pnGalCover('+i+')">Couverture</button>')
+      +'<button type="button" onclick="pnGalDel('+i+')">Retirer</button>'
+    +'</span></div>').join('')
+  + '<button type="button" class="add" onclick="document.getElementById(\'f-file\').click()">'
+    + icon('camera','sm') + '<span>Ajouter</span></button>';
+  paintIcons();
+}
+window.pnGalCover=(i)=>{ const u=pnGal.splice(i,1)[0]; pnGal.unshift(u); renderGal(); };
+window.pnGalDel=(i)=>{ pnGal.splice(i,1); renderGal(); };
+window.pnPickImg=async(inp)=>{
+  const files=Array.prototype.slice.call(inp.files||[]); if(!files.length) return;
+  inp.value='';
+  toast(files.length>1?('Compression de '+files.length+' photos…'):'Compression…','info');
+  let ok=0;
+  for(const f of files){
+    try{ pnGal.push(await uploadSiteImage(f,'partners',1200)); ok++; renderGal(); }
+    catch(e){ toast('Envoi impossible : '+rlsHint(e),'error'); break; }
+  }
+  if(ok) toast(ok+' photo'+(ok>1?'s prêtes':' prête')+' — pensez à enregistrer','success');
 };
 window.savePartner=async()=>{
   const g=id=>document.getElementById(id);
@@ -3640,7 +3767,7 @@ window.savePartner=async()=>{
     delivery_fee:g('f-dfee').value===''?null:parseFloat(g('f-dfee').value),
     position:parseInt(g('f-pos').value,10)||0,
     is_open:g('f-open').checked, active:g('f-act').checked,
-    cover_url:pnCur.cover_url||null
+    tags:pnTags, gallery:pnGal, cover_url:pnGal[0]||null
   };
   if(!row.name){ toast('Donnez un nom au partenaire','error'); return; }
   try{
@@ -3685,15 +3812,56 @@ async function loadItems(pid){
       'loadItems(\''+pid+'\')', e.message);
   }
 }
+function quickBar(){
+  const cats=[...new Set(pnItems.filter(i=>i.partner_id===pnCur.id).map(i=>i.category).filter(Boolean))];
+  const sug=cats.length?cats:(pnCur.kind==='manje'
+    ? ['Plat prensipal','Akonpayman','Bwason','Desè']
+    : ['Pwodwi','Akseswa','Pyès']);
+  return '<div class="quickadd">'
+    +'<div class="field"><label for="q-name">Nom de l\'article</label>'
+      +'<input type="text" id="q-name" class="input" placeholder="'
+      +(pnCur.kind==='manje'?'Diri ak legim lalo':'Sak siman 42.5 kg')+'" onkeydown="if(event.key===\'Enter\')quickAdd()"></div>'
+    +'<div class="field"><label for="q-price">Prix</label>'
+      +'<input type="number" id="q-price" class="input" placeholder="500" min="0" onkeydown="if(event.key===\'Enter\')quickAdd()"></div>'
+    +'<div class="field"><label for="q-cat">Catégorie</label>'
+      +'<input type="text" id="q-cat" class="input" list="q-cats" placeholder="'+escH(sug[0])+'" onkeydown="if(event.key===\'Enter\')quickAdd()">'
+      +'<datalist id="q-cats">'+sug.map(c=>'<option value="'+escH(c)+'">').join('')+'</datalist></div>'
+    +'<button class="btn btn-gold btn-sm" onclick="quickAdd()">'+icon('plus','sm')+' Ajouter</button>'
+    +'</div>'
+    +'<p class="card-sub" style="margin:-8px 0 var(--s4)">Tapez, faites Entrée, recommencez : le champ se vide et garde la catégorie. Les photos et descriptions s\'ajoutent ensuite avec « Modifier ».</p>';
+}
+window.quickAdd=async()=>{
+  if(!pnCur||!pnCur.id){ toast('Enregistrez le partenaire d\'abord','error'); return; }
+  const n=document.getElementById('q-name'), p=document.getElementById('q-price'), c=document.getElementById('q-cat');
+  const name=(n.value||'').trim();
+  if(!name){ n.focus(); return; }
+  const row={ partner_id:pnCur.id, name:name, price:parseFloat(p.value)||0,
+    category:(c.value||'').trim()||null, available:true,
+    position:pnItems.filter(i=>i.partner_id===pnCur.id).length+1 };
+  try{
+    const {data,error}=await db.from('partner_items').insert(row).select();
+    if(error) throw error;
+    pnItems.push((data&&data[0])||row);
+    renderItems();
+    const nn=document.getElementById('q-name'), pp=document.getElementById('q-price'), cc=document.getElementById('q-cat');
+    if(nn) nn.value=''; if(pp) pp.value='';
+    if(cc) cc.value=row.category||'';          /* la catégorie reste, on enchaîne */
+    if(nn) nn.focus();
+    toast(name+' ajouté','success');
+  }catch(e){ toast('Ajout impossible : '+rlsHint(e),'error'); }
+};
 function renderItems(){
   const box=document.getElementById('pn-items'); if(!box||!pnCur) return;
   const list=pnItems.filter(x=>x.partner_id===pnCur.id);
   if(!list.length){
-    box.innerHTML=emptyState('box','Aucun article',
-      "Tant que ce partenaire n'a pas d'article, il n'apparaît pas dans la recherche des clients.");
+    box.innerHTML=quickBar()+emptyState('box','Aucun article pour l\'instant',
+      "Servez-vous de la ligne ci-dessus pour saisir tout le menu d'un coup.");
     paintIcons(); return;
   }
-  box.innerHTML=list.map(x=>
+  box.innerHTML=quickBar()
+    +'<div class="hint" style="margin-bottom:var(--s3)">'+list.length+' article'+(list.length>1?'s':'')
+    +' · '+[...new Set(list.map(x=>x.category).filter(Boolean))].length+' catégorie(s)</div>'
+    +list.map(x=>
     '<div class="it'+(x.available===false?' off':'')+'">'
     +'<div class="it-im">'+(x.image_url?'<img src="'+escH(x.image_url)+'" alt="">':'<span data-icon="box" data-size="sm"></span>')+'</div>'
     +'<div class="it-n"><b>'+escH(x.name||'')+'</b><span>'+escH(x.category||'Sans catégorie')
