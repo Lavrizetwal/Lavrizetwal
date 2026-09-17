@@ -789,6 +789,107 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .vgal img{height:140px;width:auto;border-radius:9px;border:1px solid var(--line);object-fit:cover;flex-shrink:0}
 @media(max-width:560px){ .vgal img{height:104px} }
 
+/* ══ VIN PATNÈ — apèl la, fenèt la, papye yo ══════════════════ */
+.join{margin-top:40px;padding:26px 24px;border-radius:12px;display:flex;align-items:center;gap:22px;
+  flex-wrap:wrap;border:1px dashed var(--g-24);background:rgba(212,175,55,.045)}
+.join .ic{width:52px;height:52px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+  border:1px solid var(--g-24);background:var(--g-08)}
+.join .ic svg{width:24px;height:24px;stroke:var(--sc,var(--gold));stroke-width:1.3;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.join .tx{flex:1;min-width:230px}
+.join .tx b{display:block;font-family:var(--serif);font-size:1.22rem;font-weight:600;margin-bottom:5px}
+.join .tx span{display:block;font-size:.76rem;color:var(--ink-3);line-height:1.65}
+@media(max-width:560px){ .join{padding:22px 18px;gap:16px} .join .btn{width:100%} }
+
+.jmask{position:fixed;inset:0;z-index:1016;display:grid;place-items:center;padding:18px;
+  background:rgba(3,3,3,.88);backdrop-filter:blur(8px);opacity:0;visibility:hidden;
+  transition:opacity var(--med),visibility var(--med)}
+.jmask.open{opacity:1;visibility:visible}
+.jbox{width:100%;max-width:640px;max-height:92svh;overflow-y:auto;border-radius:14px;padding:32px 30px 26px;
+  position:relative;background:linear-gradient(165deg,#111,#0A0A0A);border:1px solid var(--g-14);
+  box-shadow:0 40px 100px rgba(0,0,0,.75);transform:translateY(16px);transition:transform var(--med)}
+.jmask.open .jbox{transform:none}
+.jbox::-webkit-scrollbar{width:3px}
+.jbox::-webkit-scrollbar-thumb{background:var(--g-24);border-radius:2px}
+.jbox h3{font-family:var(--serif);font-size:1.75rem;font-weight:600;margin-bottom:7px;padding-right:40px}
+.jbox .lead{font-size:.8rem;color:var(--ink-3);line-height:1.7;margin-bottom:22px}
+.jsec{font-size:.55rem;letter-spacing:2.2px;text-transform:uppercase;color:var(--gold);
+  margin:24px 0 14px;padding-top:18px;border-top:1px solid var(--line)}
+.jgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+@media(max-width:560px){ .jgrid{grid-template-columns:1fr} }
+
+.ptline{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--line);background:rgba(255,255,255,.028);margin-bottom:6px}
+.ptline.on{border-color:var(--gold);background:var(--g-08)}
+.ptline .bx{width:19px;height:19px;border-radius:5px;border:1px solid var(--g-24);flex-shrink:0;
+  display:grid;place-items:center;margin-top:1px}
+.ptline.on .bx{background:var(--gold)}
+.ptline .bx svg{width:11px;height:11px;stroke:#0A0A0A;stroke-width:2.6;fill:none;opacity:0}
+.ptline.on .bx svg{opacity:1}
+.ptline .tx{flex:1;font-size:.76rem;line-height:1.6;color:var(--ink-2)}
+.ptline .tx b{color:var(--gold)}
+
+/* Espas chofè / patnè */
+.sp-tabs{display:flex;gap:5px;padding:4px;border-radius:99px;background:rgba(255,255,255,.04);margin-bottom:16px}
+.sp-tabs button{flex:1;padding:9px 4px;border:0;border-radius:99px;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:.58rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink-3)}
+.sp-tabs button.on{background:var(--gold);color:#0A0A0A}
+.jb{padding:14px 15px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.028);
+  margin-bottom:11px;border-left:3px solid var(--warn)}
+.jb.mine{border-left-color:var(--ok)}
+.jb-t{font-size:.84rem;font-weight:600;line-height:1.35;margin-bottom:4px}
+.jb-s{font-size:.68rem;color:var(--ink-4);line-height:1.5}
+.jb-p{font-family:var(--serif);font-size:1.25rem;font-weight:700;color:var(--gold);margin:8px 0}
+.jb-b{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.jb-b .btn{flex:1;min-width:110px;padding:10px 12px;font-size:.58rem}
+.it2{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;margin-bottom:9px;
+  border:1px solid var(--line);background:rgba(255,255,255,.025)}
+.it2 .im{width:42px;height:42px;border-radius:7px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.04);
+  display:grid;place-items:center}
+.it2 .im img{width:100%;height:100%;object-fit:cover}
+.it2 .nm{flex:1;min-width:0}
+.it2 .nm b{display:block;font-size:.8rem;font-weight:600}
+.it2 .nm span{display:block;font-size:.64rem;color:var(--ink-4);margin-top:2px}
+.it2 .pr{font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--gold);white-space:nowrap}
+.st2{font-size:.52rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;
+  border-radius:99px;border:1px solid;white-space:nowrap}
+.st2.pending{color:var(--warn);border-color:rgba(255,184,77,.32);background:rgba(255,184,77,.1)}
+.st2.approved{color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.1)}
+.st2.rejected{color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.1)}
+
+.tagbox{display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding:9px 10px;border-radius:8px;
+  border:1px solid var(--line);background:rgba(255,255,255,.035);min-height:46px}
+.tagbox .tg{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:99px;
+  border:1px solid var(--g-24);background:var(--g-08);color:var(--gold);font-size:.7rem}
+.tagbox .tg button{border:0;background:none;color:inherit;cursor:pointer;font-size:.85rem;line-height:1;opacity:.6}
+.tagbox .tg button:hover{opacity:1}
+.tagbox input{flex:1;min-width:130px;border:0;background:none;color:var(--ink);font-family:var(--sans);
+  font-size:.82rem;outline:none;padding:4px}
+.tagsug{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.tagsug button{padding:5px 11px;border-radius:99px;border:1px dashed var(--line);background:none;
+  color:var(--ink-4);font-family:var(--sans);font-size:.66rem;cursor:pointer}
+.tagsug button:hover{border-color:var(--g-24);color:var(--gold)}
+
+.docs{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.doc{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;cursor:pointer;padding:0;
+  border:1px dashed var(--line);background:rgba(255,255,255,.028);color:var(--ink);
+  font-family:var(--sans);display:grid;place-items:center;transition:border-color var(--fast)}
+.doc:hover{border-color:var(--g-24)}
+.doc .up{display:grid;place-items:center;gap:7px;padding:12px;text-align:center}
+.doc .up svg{width:20px;height:20px;stroke:var(--gold);stroke-width:1.4;fill:none;stroke-linecap:round}
+.doc .up b{font-size:.7rem;font-weight:600}
+.doc .up span{font-size:.6rem;color:var(--ink-4);line-height:1.4}
+.doc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.doc.on{border-style:solid;border-color:var(--ok)}
+.doc.on .up{position:absolute;left:0;right:0;bottom:0;padding:7px 8px;background:rgba(5,5,5,.88);
+  gap:2px;z-index:2}
+.doc.on .up svg{display:none}
+.doc.on .up b{color:var(--ok);font-size:.64rem}
+.doc.on .up span{display:none}
+.doc .busy{position:absolute;inset:0;z-index:3;display:grid;place-items:center;background:rgba(5,5,5,.72)}
+.doc .busy i{width:20px;height:20px;border-radius:50%;border:2px solid var(--g-24);
+  border-top-color:var(--gold);animation:spin 1s linear infinite;display:block}
+
 .srch{position:relative;margin-bottom:16px}
 .srch svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:15px;height:15px;
   stroke:var(--ink-4);stroke-width:1.6;fill:none;pointer-events:none}
@@ -951,6 +1052,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
         </div>
         <div class="row"><span class="k">Statit</span><span class="v" id="a-st">Itilizatè</span></div>
         <div class="row"><span class="k">Pwen ou genyen</span><span class="v gold" id="a-pt">0.0</span></div>
+        <button class="pill" id="a-space" type="button" style="display:none">Espas mwen</button>
         <button class="pill" id="a-rides" type="button">Kòmand mwen yo</button>
         <a href="admin.html" class="pill full" id="a-admin" style="display:none">Aksè Administrasyon</a>
         <button class="pill" id="a-out" type="button">Dekonekte</button>
@@ -973,6 +1075,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       <div><div class="nm" id="dr-nm">—</div>
         <div class="sub"><span id="dr-st">Itilizatè</span> · <span id="dr-pt">0.0</span> pwen</div></div>
     </div>
+    <button class="pill" id="dr-space" type="button" style="display:none">Espas mwen</button>
     <button class="pill" id="dr-rides" type="button" style="display:none">Kòmand mwen yo</button>
     <button class="pill full" id="dr-login" type="button">Konekte</button>
     <a href="admin.html" class="pill full" id="dr-admin" style="display:none">Aksè Administrasyon</a>
@@ -1079,6 +1182,13 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
         </div>
       </div>
     </div>
+
+    <div class="join" id="join-driver" style="--sc:#F0D98A">
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M5.5 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM18.5 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M5.5 15h4l3-5h4l1.5 5M9 10h4"/></svg></span>
+      <span class="tx"><b>Vin livrè ak nou</b>
+        <span>Ou gen yon moto oswa yon machin ? Enskri w, voye papye w yo, epi kòmanse pran kous.</span></span>
+      <button class="btn btn-g" data-join="driver">Vin livrè</button>
+    </div>
   </div>
 </section>
 
@@ -1108,6 +1218,13 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       </select>
     </div>
     <div id="m-body"></div>
+
+    <div class="join" style="--sc:#FF8A5B">
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M5.5 4v6a2.5 2.5 0 0 0 5 0V4M8 4v6M8 12.5V20"/><path d="M17 4c-1.6 1.2-2.4 3-2.4 5.2 0 1.8.8 2.8 2.4 2.8s2.4-1 2.4-2.8C19.4 7 18.6 5.2 17 4Z"/><path d="M17 12v8"/></svg></span>
+      <span class="tx"><b>Enskri restoran ou</b>
+        <span>Mete meni w sou Zetwal. Kliyan yo jwenn plat ou yo nan rechèch la, epi nou livre pou ou.</span></span>
+      <button class="btn btn-g" data-join="manje">Enskri restoran mwen</button>
+    </div>
   </div>
 </section>
 
@@ -1136,6 +1253,13 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       </select>
     </div>
     <div id="p-body"></div>
+
+    <div class="join" style="--sc:#6FD8E8">
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5v-7Z"/><path d="m4 8.5 8 4.5 8-4.5M12 13v7"/></svg></span>
+      <span class="tx"><b>Enskri magazen ou</b>
+        <span>Vann pwodwi w yo sou Zetwal ak livrezon. Ou jere pri ak stòk ou, nou pote bagay la bay kliyan an.</span></span>
+      <button class="btn btn-g" data-join="pake">Enskri magazen mwen</button>
+    </div>
   </div>
 </section>
 
@@ -1174,6 +1298,19 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
   </div>
 </section>
 
+<!-- ══════════ VIN PATNÈ ══════════ -->
+<div class="jmask" id="jmask" role="dialog" aria-modal="true" aria-labelledby="j-ttl">
+  <div class="jbox">
+    <button class="p-x" id="j-x" type="button" aria-label="Fèmen" style="position:absolute;top:16px;right:16px">
+      <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h3 id="j-ttl">—</h3>
+    <p class="lead" id="j-lead">—</p>
+    <div id="j-body"></div>
+    <button class="btn btn-g" id="j-send" style="width:100%;margin-top:22px">Voye demann mwen</button>
+    <p class="hintline" id="j-note" style="text-align:center">Nou gade chak demann youn pa youn. N ap rele w.</p>
+  </div>
+</div>
+
 <!-- ══════════ PANYE ══════════ -->
 <div class="cartbar" id="cartbar">
   <span class="c" id="cart-txt">—<b id="cart-tot">0 HTG</b></span>
@@ -1191,6 +1328,14 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <button class="btn btn-wa" id="cart-go" style="width:100%;margin-top:12px">Konfime kòmand la</button>
     <button class="btn btn-o" id="cart-clr" style="width:100%;margin-top:8px">Vide panye a</button>
   </div>
+</aside>
+
+<aside class="side" id="space" aria-hidden="true">
+  <div class="side-h">
+    <div><div class="side-t" id="sp-t">Espas mwen</div><div class="side-s" id="sp-s">—</div></div>
+    <button class="p-x" id="sp-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="side-b" id="sp-body"></div>
 </aside>
 
 <aside class="side" id="rides" aria-hidden="true">
@@ -2167,7 +2312,8 @@ async function loadMarket(kind){
     var v = await sb.from('partners').select('*').eq('kind', kind).eq('active', true).order('name');
     var ids = (v.data||[]).map(function(x){ return x.id; });
     var it = { data:[] };
-    if(ids.length) it = await sb.from('partner_items').select('*').in('partner_id', ids).order('position');
+    if(ids.length) it = await sb.from('partner_items').select('*').in('partner_id', ids)
+      .eq('status','approved').order('position');
     venues = (venues||[]).filter(function(x){ return x.kind !== kind; }).concat(v.data||[]);
     items  = (items||[]).filter(function(x){ return ids.indexOf(x.partner_id) < 0; }).concat(it.data||[]);
   }catch(e){ }
@@ -2626,12 +2772,12 @@ $('#a-rides').addEventListener('click', ridesOpen);
 $('#dr-rides').addEventListener('click', ridesOpen);
 $('#rides-x').addEventListener('click', ridesClose);
 $('#veil').addEventListener('click', function(){
-  ridesClose();
+  spaceClose(); ridesClose();
   $('#cart').classList.remove('open'); $('#cart').setAttribute('aria-hidden','true');
 });
 addEventListener('keydown', function(e){
   if(e.key !== 'Escape') return;
-  ridesClose(); $('#cart').classList.remove('open');
+  spaceClose(); ridesClose(); $('#cart').classList.remove('open');
 });
 try{
   if(sb && sb.channel){
@@ -2642,6 +2788,7 @@ try{
   }
 }catch(e){}
 setInterval(function(){ if(!document.hidden && window._me) loadMine(); }, 50000);
+setInterval(function(){ if(!document.hidden && ROLE.driver) loadJobs(); }, 25000);
 /* ══ DEMANN PWEN — kòd konfimasyon kliyan an ══════════════════ */
 var PQ = { row:null, sub:null };
 function pqShow(r){
@@ -2842,6 +2989,8 @@ if(auth) auth.onAuthStateChanged(async function(user){
   pqWatch(null);
   if(!user){
     $('#a-rides').style.display='none'; $('#dr-rides').style.display='none';
+    $('#a-space').style.display='none'; $('#dr-space').style.display='none';
+    ROLE = { driver:null, partners:[] }; spPartner = null; spItems = []; jobsAll = [];
     $('#nbadge').classList.remove('on'); myRides = []; myOrders = [];
     $('#login-btn').style.display=''; $('#who-btn').style.display='none';
     $('#dr-login').style.display=''; $('#dr-who').style.display='none';
@@ -2875,11 +3024,239 @@ if(auth) auth.onAuthStateChanged(async function(user){
   $('#a-st').textContent = status; $('#dr-st').textContent = status;
   pqWatch(user);
   $('#a-rides').style.display=''; $('#dr-rides').style.display='';
+  loadRole().then(function(){ if(ROLE.driver) loadJobs(); if(spPartner) loadMyItems(); });
   if($('#r-name') && !$('#r-name').value) $('#r-name').value = name;
   loadMine();
 });
 
 
+
+/* ══════════════════════════════════════════════════════════════
+   15bis. ESPAS MWEN — chofè ak patnè ki aksepte
+   Yon administratè dwe aksepte ou anvan. Depi lè sa :
+    · chofè a wè kous ki disponib yo epi li pran yo
+    · patnè a pwopoze atik li yo, epi yo tann validasyon
+   ══════════════════════════════════════════════════════════════ */
+var ROLE = { driver:null, partners:[] }, spTab = 'jobs', spPartner = null, spItems = [];
+
+async function loadRole(){
+  ROLE = { driver:null, partners:[] };
+  var u = window._me;
+  if(!sb || !u){ paintRole(); return; }
+  var mail = (u.email || '').toLowerCase();
+  try{
+    var d = await sb.from('drivers').select('*').eq('active', true).limit(50);
+    ROLE.driver = (d.data || []).filter(function(x){
+      return (x.user_uid && x.user_uid === u.uid) || (x.email && x.email.toLowerCase() === mail);
+    })[0] || null;
+  }catch(e){}
+  try{
+    var p = await sb.from('partners').select('*').eq('active', true).limit(100);
+    ROLE.partners = (p.data || []).filter(function(x){
+      return (x.owner_uid && x.owner_uid === u.uid) || (x.owner_email && x.owner_email.toLowerCase() === mail);
+    });
+  }catch(e){}
+  spPartner = ROLE.partners[0] || null;
+  spTab = ROLE.driver ? 'jobs' : 'items';
+  paintRole();
+}
+function paintRole(){
+  var has = !!(ROLE.driver || ROLE.partners.length);
+  ['#a-space','#dr-space'].forEach(function(id){
+    var el = $(id); if(el) el.style.display = has ? '' : 'none';
+  });
+  if(!has) return;
+  var label = ROLE.driver && ROLE.partners.length ? 'Espas mwen'
+            : ROLE.driver ? 'Espas chofè' : 'Espas patnè';
+  $('#a-space').textContent = label; $('#dr-space').textContent = label;
+  $('#sp-t').textContent = label;
+  $('#sp-s').textContent = ROLE.driver
+    ? (ROLE.driver.vehicle_type || 'chofè') + ' · ' + (ROLE.driver.child_ok ? 'abilite timoun' : 'kous regilye')
+    : (spPartner ? spPartner.name : '');
+}
+function spaceOpen(){
+  $('#space').classList.add('open'); $('#veil').classList.add('open');
+  $('#space').setAttribute('aria-hidden','false');
+  acct.classList.remove('open');
+  drawer.classList.remove('open'); burger.classList.remove('x'); document.body.classList.remove('lock');
+  renderSpace();
+}
+function spaceClose(){
+  $('#space').classList.remove('open'); $('#veil').classList.remove('open');
+  $('#space').setAttribute('aria-hidden','true');
+}
+$('#a-space').addEventListener('click', spaceOpen);
+$('#dr-space').addEventListener('click', spaceOpen);
+$('#sp-x').addEventListener('click', spaceClose);
+
+function renderSpace(){
+  var box = $('#sp-body'); if(!box) return;
+  var tabs = '';
+  if(ROLE.driver && ROLE.partners.length){
+    tabs = '<div class="sp-tabs">'
+      + '<button class="' + (spTab==='jobs'?'on':'') + '" data-t="jobs">Kous yo</button>'
+      + '<button class="' + (spTab==='items'?'on':'') + '" data-t="items">Atik mwen yo</button></div>';
+  }
+  box.innerHTML = tabs + '<div id="sp-in"></div>';
+  $$('#sp-body .sp-tabs button').forEach(function(b){
+    b.addEventListener('click', function(){ spTab = b.getAttribute('data-t'); renderSpace(); });
+  });
+  if(spTab === 'jobs' && ROLE.driver) renderJobs();
+  else renderMyItems();
+}
+
+/* ── Chofè : kous ki disponib, epi kous pa m ── */
+var jobsAll = [];
+async function loadJobs(){
+  if(!sb || !ROLE.driver) return;
+  try{
+    var a = await sb.from('rides').select('*').order('created_at',{ascending:false}).limit(60);
+    var b = await sb.from('move_orders').select('*').order('created_at',{ascending:false}).limit(60);
+    jobsAll = (a.data||[]).map(function(x){ return Object.assign({_t:'ride'}, x); })
+      .concat((b.data||[]).map(function(x){ return Object.assign({_t:'order'}, x); }));
+  }catch(e){ jobsAll = []; }
+  if($('#space').classList.contains('open') && spTab === 'jobs') renderJobs();
+}
+function renderJobs(){
+  var box = $('#sp-in'); if(!box) return;
+  var uid = window._me && window._me.uid;
+  var mine = jobsAll.filter(function(o){
+    return o.driver_uid === uid && o.status !== 'done' && o.status !== 'cancelled';
+  });
+  var free = jobsAll.filter(function(o){ return o.status === 'requested' && !o.driver_uid; });
+
+  var html = '';
+  if(mine.length){
+    html += '<div class="side-s" style="margin-bottom:10px">Kous ou pran yo</div>'
+      + mine.map(function(o){ return jobCard(o, true); }).join('');
+  }
+  html += '<div class="side-s" style="margin:' + (mine.length?'18px':'0') + ' 0 10px">Kous ki disponib</div>';
+  html += free.length ? free.map(function(o){ return jobCard(o, false); }).join('')
+    : '<div class="nulle">' + ICON_V + 'Pa gen kous ki lib kounye a.<br>N ap avize w depi youn rive.</div>';
+  box.innerHTML = html;
+  $$('#sp-in [data-job]').forEach(function(b){
+    b.addEventListener('click', function(){
+      jobAct(b.getAttribute('data-job'), b.getAttribute('data-kind'), b.getAttribute('data-to'));
+    });
+  });
+}
+function jobCard(o, mine){
+  var title = o._t === 'ride'
+    ? (MODE_N[o.ride_mode] || 'Kous') + ' · ' + (o.from_addr||'—').split(',')[0] + ' → ' + (o.to_addr||'—').split(',')[0]
+    : (o.kind === 'manje' ? 'Manje' : 'Pake') + ' · ' + (o.partner_name||'') + ' → ' + (o.address||'—').split(',')[0];
+  var price = o._t === 'ride' ? o.price_estimated : o.total;
+  var sub = o._t === 'ride'
+    ? (o.distance_km ? o.distance_km + ' km · ' + (o.duration_min||'?') + ' min' : '—')
+    : ((o.items && o.items.length ? o.items.length + ' atik' : '') + ' · livrezon ' + fmt(o.delivery_fee));
+  var next = { requested:'accepted', accepted:'on_way', on_way:'picked', picked:'done' }[o.status];
+  var lab  = { accepted:'Mwen pran l', on_way:'Mwen sou wout', picked:'Mwen gen li', done:'Fini' }[next] || '';
+  var b = '';
+  if(next) b += '<button class="btn btn-g" data-job="' + esc(o.id) + '" data-kind="' + o._t
+    + '" data-to="' + next + '">' + lab + '</button>';
+  if(mine) b += '<a class="btn btn-o" href="tel:' + esc(o.client_phone||'') + '">Rele kliyan an</a>';
+  return '<div class="jb' + (mine?' mine':'') + '">'
+    + '<div class="jb-t">' + esc(title) + '</div>'
+    + '<div class="jb-s">' + esc(sub) + (o.client_name ? ' · ' + esc(o.client_name) : '') + '</div>'
+    + '<div class="jb-p">' + fmt(price) + ' HTG</div>'
+    + (o.notes ? '<div class="jb-s">« ' + esc(o.notes) + ' »</div>' : '')
+    + '<div class="jb-b">' + b + '</div></div>';
+}
+async function jobAct(id, kind, to){
+  if(!sb) return;
+  var t = kind === 'ride' ? 'rides' : 'move_orders';
+  var patch = { status: to, updated_at: new Date().toISOString() };
+  if(to === 'accepted'){
+    patch.driver_uid  = window._me.uid;
+    patch.driver_name = ROLE.driver.name || (window._me.displayName || '');
+    patch.driver_phone = ROLE.driver.phone || null;
+  }
+  try{
+    var r = await sb.from(t).update(patch).eq('id', id);
+    if(r.error) throw r.error;
+    var o = jobsAll.filter(function(x){ return x.id === id; })[0];
+    if(o) Object.assign(o, patch);
+    renderJobs();
+    toast(to === 'done' ? 'Kous fini — mèsi !' : 'Mizajou voye bay kliyan an');
+  }catch(e){ toast('Nou pa ka mete l ajou'); }
+}
+
+/* ── Patnè : atik mwen yo, ak sa k ap tann validasyon ── */
+async function loadMyItems(){
+  if(!sb || !spPartner) { spItems = []; return; }
+  try{
+    var r = await sb.from('partner_items').select('*').eq('partner_id', spPartner.id).order('position');
+    spItems = r.data || [];
+  }catch(e){ spItems = []; }
+  if($('#space').classList.contains('open') && spTab === 'items') renderMyItems();
+}
+function renderMyItems(){
+  var box = $('#sp-in'); if(!box) return;
+  if(!spPartner){
+    box.innerHTML = '<div class="nulle">' + ICON_V + 'Ou poko gen yon kote ki anrejistre.</div>';
+    return;
+  }
+  var pick = ROLE.partners.length > 1
+    ? '<div class="fld"><label>Ki kote</label><select id="sp-pk">'
+      + ROLE.partners.map(function(p){
+          return '<option value="' + esc(p.id) + '"' + (spPartner.id===p.id?' selected':'') + '>' + esc(p.name) + '</option>';
+        }).join('') + '</select></div>'
+    : '';
+  var pend = spItems.filter(function(x){ return x.status === 'pending'; }).length;
+  box.innerHTML = pick
+    + '<div class="warn" style="margin-bottom:14px">Sa ou ajoute la <b>pa parèt tousuit</b>. '
+      + 'Yon administratè gade l anvan, epi li mete l an liy.'
+      + (pend ? ' Ou gen <b>' + pend + '</b> k ap tann.' : '') + '</div>'
+    + '<div class="fld"><label for="sp-n">Non atik la</label><input type="text" id="sp-n" placeholder="'
+      + (spPartner.kind === 'manje' ? 'Diri ak legim lalo' : 'Sak siman 42.5 kg') + '"></div>'
+    + '<div class="two">'
+      + '<div class="fld"><label for="sp-p">Pri (HTG)</label><input type="number" id="sp-p" min="0" placeholder="500"></div>'
+      + '<div class="fld"><label for="sp-c">Kategori</label><input type="text" id="sp-c" list="sp-cats" placeholder="Plat prensipal">'
+      + '<datalist id="sp-cats">' + [...new Set(spItems.map(function(x){ return x.category; }).filter(Boolean))]
+          .map(function(c){ return '<option value="' + esc(c) + '">'; }).join('') + '</datalist></div>'
+    + '</div>'
+    + '<div class="fld"><label for="sp-d">Ti deskripsyon</label><input type="text" id="sp-d" placeholder="Ak vyann bèf"></div>'
+    + '<button class="btn btn-g" id="sp-add" style="width:100%">Pwopoze atik sa</button>'
+    + '<div class="side-s" style="margin:20px 0 10px">' + spItems.length + ' atik</div>'
+    + (spItems.length ? spItems.map(function(x){
+        return '<div class="it2"><div class="im">'
+          + (x.image_url ? '<img src="' + esc(x.image_url) + '" alt="">' : ICON_V) + '</div>'
+          + '<div class="nm"><b>' + esc(x.name||'') + '</b><span>' + esc(x.category||'—')
+          + (x.status === 'rejected' && x.admin_note ? ' · ' + esc(x.admin_note) : '') + '</span></div>'
+          + '<div class="pr">' + fmt(x.price) + '</div>'
+          + '<span class="st2 ' + esc(x.status||'approved') + '">'
+          + ({pending:'Ap tann', approved:'An liy', rejected:'Refize'}[x.status] || 'An liy') + '</span></div>';
+      }).join('')
+      : '<div class="nulle">' + ICON_V + 'Ou poko pwopoze anyen.</div>');
+
+  var pk = $('#sp-pk');
+  if(pk) pk.addEventListener('change', function(){
+    spPartner = ROLE.partners.filter(function(p){ return p.id === pk.value; })[0];
+    paintRole(); loadMyItems().then(renderMyItems);
+  });
+  $('#sp-add').addEventListener('click', addMyItem);
+}
+async function addMyItem(){
+  var n = ($('#sp-n').value||'').trim();
+  if(!n){ toast('Ekri non atik la'); return; }
+  var row = {
+    partner_id: spPartner.id, name: n,
+    price: parseFloat($('#sp-p').value) || 0,
+    category: ($('#sp-c').value||'').trim() || null,
+    description: ($('#sp-d').value||'').trim() || null,
+    available: true, status: 'pending',
+    submitted_by: (window._me && window._me.uid) || null,
+    position: spItems.length + 1
+  };
+  var btn = $('#sp-add'); btn.disabled = true;
+  try{
+    var r = await sb.from('partner_items').insert(row).select();
+    if(r.error) throw r.error;
+    spItems.push((r.data && r.data[0]) || row);
+    renderMyItems();
+    toast('Voye — yon administratè ap gade l');
+  }catch(e){ toast('Nou pa ka voye l kounye a'); }
+  btn.disabled = false;
+}
 
 /* ══ 16. ASISTAN MOVE ═════════════════════════════════════════ */
 var KB = [
@@ -2994,6 +3371,264 @@ function answer(q){
   inp.addEventListener('keydown', function(e){ if(e.key === 'Enter') ask(inp.value); });
   addEventListener('keydown', function(e){ if(e.key === 'Escape') shut(); });
 })();
+
+/* ══════════════════════════════════════════════════════════════
+   18. VIN PATNÈ — livrè, restoran, magazen
+   Demann lan ak papye yo ale dirèk nan Konsòl la.
+   ══════════════════════════════════════════════════════════════ */
+var JK = {
+  driver: {
+    t:'Vin livrè ak Zetwal',
+    d:'Ranpli fòm nan epi voye papye w yo. Yon administratè gade demann lan epi rele w. Ou pa kòmanse anvan nou apwouve w.',
+    docs:[
+      { k:'idantite', n:'Kat idantite',   h:'Rekto — CIN oswa paspò' },
+      { k:'lisans',   n:'Lisans kondwi',  h:'Ki valab' },
+      { k:'machin',   n:'Machin nan',     h:'Foto moto oswa machin lan' },
+      { k:'plak',     n:'Plak la',        h:'Yo dwe ka li nimewo a' },
+      { k:'foto',     n:'Foto w',         h:'Figi w byen klè' }
+    ]
+  },
+  manje: {
+    t:'Enskri restoran ou',
+    d:'Mete restoran ou sou Zetwal. Apre nou apwouve, n ap monte meni w epi ou parèt nan rechèch kliyan yo.',
+    docs:[
+      { k:'idantite', n:'Kat idantite',    h:'Moun ki responsab la' },
+      { k:'patant',   n:'Patant / papye',  h:'Si ou genyen youn' },
+      { k:'devan',    n:'Devan restoran',  h:'Kote kliyan wè a' },
+      { k:'kuizin',   n:'Kwizin nan',      h:'Kote yo prepare manje a' },
+      { k:'meni',     n:'Meni w',          h:'Yon foto ki li byen' }
+    ]
+  },
+  pake: {
+    t:'Enskri magazen ou',
+    d:'Vann sou Zetwal ak livrezon. Apre nou apwouve, n ap monte pwodwi w yo epi kliyan yo ka kòmande.',
+    docs:[
+      { k:'idantite', n:'Kat idantite',   h:'Moun ki responsab la' },
+      { k:'patant',   n:'Patant / papye', h:'Si ou genyen youn' },
+      { k:'devan',    n:'Devan magazen',  h:'Kote kliyan wè a' },
+      { k:'anndan',   n:'Anndan an',      h:'Kote pwodwi yo ye' }
+    ]
+  }
+};
+var jKind = 'driver', jDocs = {}, jTags = [];
+
+function jField(id, lab, ph, type, span){
+  return '<div class="fld' + (span?' span2':'') + '"' + (span?' style="grid-column:1/-1"':'') + '>'
+    + '<label for="' + id + '">' + esc(lab) + '</label>'
+    + '<input type="' + (type||'text') + '" id="' + id + '" placeholder="' + esc(ph||'') + '"></div>';
+}
+function openJoin(kind){
+  jKind = kind; jDocs = {}; jTags = [];
+  var K = JK[kind];
+  $('#j-ttl').textContent = K.t;
+  $('#j-lead').textContent = K.d;
+
+  var html = '<div class="jgrid">'
+    + jField('j-fn','Non',        'Non ou')
+    + jField('j-ln','Siyati',     'Siyati ou')
+    + jField('j-bd','Dat nesans', '', 'date')
+    + jField('j-id','Nimewo kat idantite', 'CIN / NIF')
+    + jField('j-tel','Telefòn',   '+509 …', 'tel')
+    + jField('j-mail','Imel',     'ou@egzanp.com', 'email')
+    + '</div>'
+    + jField('j-addr','Kote w rete', 'Adrès ou', 'text', true);
+
+  if(kind === 'driver'){
+    html += '<div class="jsec">Machin ou</div>'
+      + '<div class="jgrid">'
+      + '<div class="fld"><label for="j-vt">Ki kalite</label><select id="j-vt">'
+        + '<option value="moto">Moto</option><option value="konpak">Machin konpak</option>'
+        + '<option value="van">Van</option><option value="bisiklet">Bisiklèt</option></select></div>'
+      + jField('j-vm','Mak ak modèl', 'Egzanp : Bajaj Boxer')
+      + jField('j-vp','Nimewo plak',  'AA-12345')
+      + jField('j-lic','Nimewo lisans','Sou lisans kondwi w')
+      + '</div>'
+      + jField('j-exp','Konbe tan w ap kondwi', 'Egzanp : 4 an', 'text', true)
+      + '<label class="ptline" id="j-child" style="margin-top:4px">'
+        + '<span class="bx"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>'
+        + '<span class="tx">Mwen vle abilite pou <b>transpò timoun</b>.<br>'
+        + '<span style="font-size:.68rem;color:var(--ink-4)">Sa mande yon kontra, yon tès ak yon verifikasyon jidisyè anvan.</span></span></label>';
+  } else {
+    html += '<div class="jsec">' + (kind === 'manje' ? 'Restoran ou' : 'Magazen ou') + '</div>'
+      + jField('j-bn', kind === 'manje' ? 'Non restoran an' : 'Non magazen an', 'Egzanp : Chez Marcelle', 'text', true)
+      + jField('j-bd2','Yon fraz sou li', kind === 'manje' ? 'Manje kreyòl chak jou, bon pri' : 'Kenkayri ak zouti', 'text', true)
+      + jField('j-ba','Adrès la', 'Ri, nimewo, repè', 'text', true)
+      + '<div class="fld" style="grid-column:1/-1"><label>'
+        + (kind === 'manje' ? 'Ki kalite manje ou fè' : 'Kisa ou vann') + '</label>'
+        + '<div class="tagbox" id="j-tags"></div><div class="tagsug" id="j-tagsug"></div></div>'
+      + '<div class="jgrid">'
+      + jField('j-of','Ou louvri a ki lè', '7', 'number')
+      + jField('j-ot','Ou fèmen a ki lè',  '21', 'number')
+      + '</div>';
+  }
+
+  html += '<div class="jsec">Papye ak foto</div>'
+    + '<div class="docs">' + K.docs.map(function(d){
+        return '<button type="button" class="doc" id="doc-' + d.k + '" onclick="jPick(\'' + d.k + '\')">'
+          + '<span class="up"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3.4A1.6 1.6 0 0 0 5.6 21h12.8a1.6 1.6 0 0 0 1.6-1.6V16"/></svg>'
+          + '<b>' + esc(d.n) + '</b><span>' + esc(d.h) + '</span></span></button>';
+      }).join('') + '</div>'
+    + '<input type="file" id="j-file" accept="image/*" hidden onchange="jUpload(this)">'
+    + '<p class="hintline">Foto yo konprese anvan yo ale. Yo rete prive : se sèlman administratè Zetwal ki wè yo.</p>';
+
+  $('#j-body').innerHTML = html;
+  if(kind !== 'driver') renderJTags();
+  var cb = $('#j-child');
+  if(cb) cb.addEventListener('click', function(){ cb.classList.toggle('on'); });
+  if(window._me){
+    if($('#j-mail')) $('#j-mail').value = window._me.email || '';
+    var n = (window._me.displayName || '').split(' ');
+    if($('#j-fn') && n[0]) $('#j-fn').value = n[0];
+    if($('#j-ln') && n[1]) $('#j-ln').value = n.slice(1).join(' ');
+  }
+  $('#jmask').classList.add('open'); document.body.classList.add('lock');
+}
+var JTAG_SUG = {
+  manje:['Kreyòl','Fritay','Griyo','Lalo','Diri','Poul','Pwason','Burger','Pizza','Sandwich','Bwason','Ji fre','Desè'],
+  pake :['Konstriksyon','Kenkayri','Rad','Soulye','Elektwonik','Telefòn','Founiti biwo','Bote','Famasi','Manje sèk']
+};
+function renderJTags(){
+  var box = $('#j-tags'); if(!box) return;
+  box.innerHTML = jTags.map(function(t,i){
+    return '<span class="tg">' + esc(t) + '<button type="button" onclick="jTagDel(' + i + ')">×</button></span>';
+  }).join('') + '<input type="text" id="j-taginput" placeholder="' + (jTags.length ? 'Ajoute…' : 'Tape epi fè Enter') + '">';
+  var inp = $('#j-taginput');
+  inp.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ','){ e.preventDefault(); jTagAdd(inp.value); }
+    if(e.key === 'Backspace' && !inp.value && jTags.length) jTagDel(jTags.length-1);
+  });
+  var sug = (JTAG_SUG[jKind]||[]).filter(function(t){ return jTags.indexOf(t) < 0; }).slice(0,10);
+  $('#j-tagsug').innerHTML = sug.map(function(t){
+    return '<button type="button" onclick="jTagAdd(\'' + esc(t) + '\')">+ ' + esc(t) + '</button>';
+  }).join('');
+}
+window.jTagAdd = function(t){
+  t = (t||'').trim().replace(/,$/,'');
+  if(t && jTags.indexOf(t) < 0) jTags.push(t);
+  renderJTags();
+  var i = $('#j-taginput'); if(i) i.focus();
+};
+window.jTagDel = function(i){ jTags.splice(i,1); renderJTags(); };
+
+var jTarget = null;
+window.jPick = function(k){ jTarget = k; $('#j-file').click(); };
+window.jUpload = async function(inp){
+  var f = inp.files && inp.files[0]; inp.value = '';
+  if(!f || !jTarget) return;
+  var el = $('#doc-' + jTarget);
+  el.classList.remove('ok');
+  el.querySelector('b').textContent = 'K ap voye…';
+  var local = URL.createObjectURL(f);         /* aperçu local : le fichier est privé */
+  try{
+    var path = await uploadDoc(f);
+    jDocs[jTarget] = path;
+    var meta = JK[jKind].docs.filter(function(d){ return d.k === jTarget; })[0];
+    el.classList.add('on');
+    el.innerHTML = '<img src="' + local + '" alt="">'
+      + '<span class="up"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>'
+      + '<b>' + esc(meta.n) + '</b><span>Voye ✓ — tape pou chanje</span></span>';
+    el.onclick = function(){ jPick(meta.k); };
+  }catch(e){
+    URL.revokeObjectURL(local);
+    el.querySelector('b').textContent = 'Pa pase — eseye ankò';
+    toast('Nou pa ka voye foto a');
+  }
+};
+/* Konpresyon nan navigatè a, menm jan ak Konsòl la */
+function compressDoc(file, maxW){
+  return new Promise(function(res, rej){
+    var img = new Image(), url = URL.createObjectURL(file);
+    img.onload = function(){
+      var s = Math.min(1, (maxW||1400) / img.width);
+      var c = document.createElement('canvas');
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(function(b){ b ? res(b) : rej(new Error('blob')); }, 'image/webp', 0.82);
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('image')); };
+    img.src = url;
+  });
+}
+async function uploadDoc(file){
+  if(!sb) throw new Error('offline');
+  var blob = await compressDoc(file, 1400);
+  /* Bucket PRIVÉ : yon kat idantite pa dwe li pa adrès li.
+     Se sèlman administratè a ki ka louvri l, ak yon lyen ki ekspire. */
+  var path = 'aplikasyon/' + Date.now() + '-' + Math.random().toString(36).slice(2,8) + '.webp';
+  var up = await sb.storage.from('partner-docs').upload(path, blob, { contentType:'image/webp', upsert:false });
+  if(up.error) throw up.error;
+  return path;
+}
+
+$$('[data-join]').forEach(function(b){
+  b.addEventListener('click', function(){ openJoin(b.getAttribute('data-join')); });
+});
+$('#j-x').addEventListener('click', function(){
+  $('#jmask').classList.remove('open'); document.body.classList.remove('lock');
+});
+$('#jmask').addEventListener('click', function(e){
+  if(e.target === this){ this.classList.remove('open'); document.body.classList.remove('lock'); }
+});
+
+$('#j-send').addEventListener('click', async function(){
+  var g = function(id){ var e = $('#'+id); return e ? (e.value||'').trim() : ''; };
+  if(!g('j-fn') || !g('j-ln')){ toast('Ekri non ak siyati w'); return; }
+  if(!g('j-tel')){ toast('Nou bezwen yon nimewo pou rele w'); return; }
+  if(jKind !== 'driver' && !g('j-bn')){ toast('Ki non kote a ?'); return; }
+  if(jKind === 'driver' && !jDocs.lisans){ toast('Voye foto lisans kondwi w'); return; }
+  if(!jDocs.idantite){ toast('Voye foto kat idantite w'); return; }
+
+  var btn = this; btn.disabled = true; btn.textContent = 'N ap voye…';
+  var K = JK[jKind];
+  var docs = Object.keys(jDocs).map(function(k){
+    var m = K.docs.filter(function(d){ return d.k === k; })[0];
+    return { k: k, label: m ? m.n : k, path: jDocs[k] };
+  });
+  var row = {
+    kind: jKind, status:'pending',
+    first_name:g('j-fn'), last_name:g('j-ln'),
+    birth_date:g('j-bd') || null, id_number:g('j-id') || null,
+    phone:g('j-tel'), email:g('j-mail') || (window._me && window._me.email) || null,
+    address:g('j-addr') || null, user_uid:(window._me && window._me.uid) || null,
+    docs: docs
+  };
+  if(jKind === 'driver'){
+    row.vehicle_type = g('j-vt') || 'moto';
+    row.vehicle_make = g('j-vm') || null;
+    row.vehicle_plate = g('j-vp') || null;
+    row.license_no = g('j-lic') || null;
+    row.experience = g('j-exp') || null;
+    row.child_ok = $('#j-child') ? $('#j-child').classList.contains('on') : false;
+  } else {
+    row.biz_name = g('j-bn'); row.biz_desc = g('j-bd2') || null;
+    row.biz_address = g('j-ba') || null; row.biz_tags = jTags;
+    row.biz_open_from = g('j-of') ? parseInt(g('j-of'),10) : null;
+    row.biz_open_to   = g('j-ot') ? parseInt(g('j-ot'),10) : null;
+  }
+  var saved = false;
+  if(sb){
+    try{ var r = await sb.from('applications').insert(row); if(!r.error) saved = true; }catch(e){}
+  }
+  btn.disabled = false; btn.textContent = 'Voye demann mwen';
+
+  var m = 'Bonjou Zetwal !\n\n'
+    + (jKind === 'driver' ? 'Mwen vle vin livrè.' : jKind === 'manje'
+       ? 'Mwen vle enskri restoran mwen : ' + g('j-bn') : 'Mwen vle enskri magazen mwen : ' + g('j-bn')) + '\n\n'
+    + 'Non : ' + g('j-fn') + ' ' + g('j-ln') + '\nTelefòn : ' + g('j-tel')
+    + (g('j-mail') ? '\nImel : ' + g('j-mail') : '')
+    + (jKind === 'driver' ? '\nMachin : ' + g('j-vt') + (g('j-vp') ? ' · ' + g('j-vp') : '') : '')
+    + '\nPapye voye : ' + docs.length + '\n\nMèsi !';
+  window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
+
+  if(saved){
+    $('#j-body').innerHTML = '<div class="warn" style="border-color:rgba(0,224,138,.3);'
+      + 'background:rgba(0,224,138,.07);color:#7BE8BC">Demann ou <b>rive</b>. '
+      + 'Yon administratè ap gade papye w yo epi rele w nan nimewo ou ba nou an.</div>';
+    $('#j-send').style.display = 'none';
+  }
+  toast(saved ? 'Demann ou anrejistre' : 'Demann lan ale sou WhatsApp');
+});
 
 /* ══ 17. DEPA ═════════════════════════════════════════════════ */
 buildRideCard(); price(); paintCart();
