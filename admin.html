@@ -313,6 +313,15 @@ h1,h2,h3,h4{line-height:1.2;font-weight:600;letter-spacing:-.01em}
 .field select option{background:#151515;color:#fff}
 input[type=checkbox]{accent-color:var(--gold);width:16px;height:16px;cursor:pointer;flex:none}
 
+.apdocs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:var(--s4)}
+.apdoc{cursor:pointer}
+.apdoc .ph{aspect-ratio:4/3;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--line);
+  background:var(--bg-deep);display:grid;place-items:center}
+.apdoc .ph img{width:100%;height:100%;object-fit:cover}
+.apdoc .ph .ld{font-size:.62rem;color:var(--muted)}
+.apdoc .nm{display:block;font-size:.62rem;color:var(--muted);margin-top:5px;text-align:center}
+.apdoc:hover .ph{border-color:var(--line-gold)}
+
 /* ── Move : types, galerie, ajout rapide ── */
 .tagbox{display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding:9px 10px;border-radius:var(--r-sm);
   border:1px solid var(--line);background:var(--bg-deep);min-height:46px}
@@ -399,6 +408,7 @@ input[type=checkbox]{accent-color:var(--gold);width:16px;height:16px;cursor:poin
 .it-n span{display:block;font-size:.7rem;color:var(--muted);margin-top:2px}
 .it-p{font-family:var(--display);font-size:1.05rem;font-weight:700;color:var(--gold);white-space:nowrap}
 .it.off{opacity:.55}
+.it.wait{border-color:rgba(255,184,77,.34);background:rgba(255,184,77,.05)}
 
 /* Grille de formulaire */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 var(--s4)}
@@ -1301,6 +1311,33 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </section>
 
+    <!-- ═════ MOVE — DEMANDES ═════ -->
+    <section class="panel" id="tab-apply">
+      <div class="card">
+        <div class="card-head">
+          <h3><span data-icon="user"></span> Candidatures</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadApps()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button>
+        </div>
+        <p class="card-sub">Les personnes qui veulent devenir livreur, ou inscrire leur restaurant ou leur magasin, arrivent ici avec leurs pièces. Accepter un commerce crée sa fiche automatiquement — il ne reste qu'à saisir ses articles.</p>
+        <div class="toolbar">
+          <input type="text" id="ap-q" class="input" placeholder="Chercher un nom, un téléphone…" oninput="renderApps()">
+          <select id="ap-f" class="input" onchange="renderApps()">
+            <option value="pending">En attente</option>
+            <option value="approved">Acceptées</option>
+            <option value="rejected">Refusées</option>
+            <option value="all">Toutes</option>
+          </select>
+          <select id="ap-k" class="input" onchange="renderApps()">
+            <option value="">Tous les métiers</option>
+            <option value="driver">Livreurs</option>
+            <option value="manje">Restaurants</option>
+            <option value="pake">Magasins</option>
+          </select>
+        </div>
+        <div id="ap-body"></div>
+      </div>
+    </section>
+
     <!-- ═════ MOVE — PARTENAIRES ═════ -->
     <section class="panel" id="tab-partners">
       <div class="card" id="pt-list-card">
@@ -1783,6 +1820,7 @@ const NAV=[
   ]},
   {g:'Move', items:[
     {id:'move',label:'Courses & commandes',icon:'orders'},
+    {id:'apply',label:'Demandes reçues',icon:'user'},
     {id:'partners',label:'Partenaires',icon:'box'},
     {id:'moveprice',label:'Tarifs Move',icon:'coins'}
   ]},
@@ -1808,6 +1846,7 @@ const TAB_META={
   calculator:{t:'Calculatrice',s:'Marges et revenus'},
   machines:{t:'Machines',s:'État des machines de la laverie'},
   move:{t:'Courses & commandes',s:'Taxi, nourriture et paquets'},
+  apply:{t:'Demandes reçues',s:'Livreurs, restaurants et magasins'},
   partners:{t:'Partenaires',s:'Restaurants, magasins et leurs articles'},
   moveprice:{t:'Tarifs Move',s:'Course, livraison, objets, enfants'},
   points:{t:'Points clients',s:'Ajouter ou retirer des points'},
@@ -1873,6 +1912,7 @@ window.switchTab = (name)=>{
   if(name==='media')         loadMedia();
   if(name==='machines')      loadMachinesAdmin();
   if(name==='move')          loadMove();
+  if(name==='apply')         loadApps();
   if(name==='partners')      loadPartners();
   if(name==='moveprice')     loadMovePrice();
   if(name==='points')        initPoints();
@@ -3748,7 +3788,11 @@ window.pnPickImg=async(inp)=>{
   toast(files.length>1?('Compression de '+files.length+' photos…'):'Compression…','info');
   let ok=0;
   for(const f of files){
-    try{ const up=await uploadSiteImage(f,'partners',1200); pnGal.push(up.url); ok++; renderGal(); }
+    try{
+      const up = await uploadSiteImage(f,'partners',1200);
+      pnGal.push(up.url);            /* uploadSiteImage renvoie {url,size} */
+      ok++; renderGal();
+    }
     catch(e){ toast('Envoi impossible : '+rlsHint(e),'error'); break; }
   }
   if(ok) toast(ok+' photo'+(ok>1?'s prêtes':' prête')+' — pensez à enregistrer','success');
@@ -3836,7 +3880,7 @@ window.quickAdd=async()=>{
   const name=(n.value||'').trim();
   if(!name){ n.focus(); return; }
   const row={ partner_id:pnCur.id, name:name, price:parseFloat(p.value)||0,
-    category:(c.value||'').trim()||null, available:true,
+    category:(c.value||'').trim()||null, available:true, status:'approved',
     position:pnItems.filter(i=>i.partner_id===pnCur.id).length+1 };
   try{
     const {data,error}=await db.from('partner_items').insert(row).select();
@@ -3858,18 +3902,28 @@ function renderItems(){
       "Servez-vous de la ligne ci-dessus pour saisir tout le menu d'un coup.");
     paintIcons(); return;
   }
+  const wait=list.filter(x=>x.status==='pending').length;
   box.innerHTML=quickBar()
+    +(wait?'<div class="preq" style="margin-bottom:var(--s4)"><div class="preq-h">'
+      +'<div><div class="preq-w">'+wait+' article'+(wait>1?'s proposés':' proposé')+' par le partenaire</div>'
+      +'<div class="preq-e">Ils restent invisibles pour les clients tant que vous ne les avez pas validés.</div></div></div></div>':'')
     +'<div class="hint" style="margin-bottom:var(--s3)">'+list.length+' article'+(list.length>1?'s':'')
     +' · '+[...new Set(list.map(x=>x.category).filter(Boolean))].length+' catégorie(s)</div>'
     +list.map(x=>
-    '<div class="it'+(x.available===false?' off':'')+'">'
+    '<div class="it'+(x.available===false?' off':'')+(x.status==='pending'?' wait':'')+'">'
     +'<div class="it-im">'+(x.image_url?'<img src="'+escH(x.image_url)+'" alt="">':'<span data-icon="box" data-size="sm"></span>')+'</div>'
     +'<div class="it-n"><b>'+escH(x.name||'')+'</b><span>'+escH(x.category||'Sans catégorie')
-      +(x.description?' · '+escH(x.description):'')+'</span></div>'
+      +(x.description?' · '+escH(x.description):'')
+      +(x.status==='pending'?' · <span style="color:var(--warn)">en attente de validation</span>':'')
+      +(x.status==='rejected'?' · <span style="color:var(--bad)">refusé'+(x.admin_note?' : '+escH(x.admin_note):'')+'</span>':'')
+      +'</span></div>'
     +'<div class="it-p">'+fmtHTG(x.price)+'</div>'
     +'<div class="mv-b">'
-      +'<button class="btn btn-quiet btn-sm" onclick="toggleItem(\''+escH(x.id)+'\')">'
-        +(x.available===false?'Remettre':'Épuisé')+'</button>'
+      +(x.status!=='approved'
+        ? '<button class="btn btn-gold btn-sm" onclick="approveItem(\''+escH(x.id)+'\')">'+icon('check','sm')+' Publier</button>'
+          +(x.status==='pending'?'<button class="btn btn-quiet btn-sm" onclick="rejectItem(\''+escH(x.id)+'\')">Refuser</button>':'')
+        : '<button class="btn btn-quiet btn-sm" onclick="toggleItem(\''+escH(x.id)+'\')">'
+          +(x.available===false?'Remettre':'Épuisé')+'</button>')
       +'<button class="btn btn-ghost btn-sm" onclick="editItem(\''+escH(x.id)+'\')">Modifier</button>'
       +'<button class="btn btn-quiet btn-sm" onclick="delItem(\''+escH(x.id)+'\')">'+icon('trash','sm')+'</button>'
     +'</div></div>').join('');
@@ -3883,6 +3937,16 @@ async function itemPatch(id,patch){
     renderItems(); return true;
   }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); return false; }
 }
+window.approveItem=async(id)=>{
+  const ok=await itemPatch(id,{status:'approved',admin_note:null,reviewed_at:new Date().toISOString()});
+  if(ok) toast('Article publié — les clients le voient maintenant','success');
+};
+window.rejectItem=async(id)=>{
+  const why=prompt('Motif du refus (le partenaire le lira) :','Pri a pa klè.');
+  if(why===null) return;
+  const ok=await itemPatch(id,{status:'rejected',admin_note:(why||'').trim()||null,reviewed_at:new Date().toISOString()});
+  if(ok) toast('Article refusé, motif envoyé','success');
+};
 window.toggleItem=async(id)=>{
   const r=pnItems.find(x=>x.id===id); if(!r) return;
   const ok=await itemPatch(id,{available:r.available===false});
@@ -3936,8 +4000,9 @@ window.itemPickImg=async(inp)=>{
   try{
     toast('Compression…','info');
     const up=await uploadSiteImage(f,'items',900);
-    window._itemImg=up.url;
-    document.getElementById('i-prev').innerHTML='<img src="'+escH(up.url)+'" alt="">';
+    const url=up.url;                /* uploadSiteImage renvoie {url,size} */
+    window._itemImg=url;
+    document.getElementById('i-prev').innerHTML='<img src="'+escH(url)+'" alt="">';
     toast('Photo prête','success');
   }catch(e){ toast('Envoi impossible : '+rlsHint(e),'error'); }
   inp.value='';
@@ -3950,7 +4015,8 @@ window.saveItem=async(id)=>{
     category:(g('i-cat').value||'').trim()||null,
     description:(g('i-desc').value||'').trim()||null,
     position:parseInt(g('i-pos').value,10)||0,
-    available:g('i-av').checked, image_url:window._itemImg||null
+    available:g('i-av').checked, image_url:window._itemImg||null,
+    status:'approved'
   };
   if(!row.name){ toast('Donnez un nom à l\'article','error'); return; }
   try{
@@ -4068,6 +4134,171 @@ window.saveMovePrice=async()=>{
   }catch(e){ toast('Enregistrement impossible : '+rlsHint(e),'error'); }
 };
 window.loadMovePrice=loadMovePrice;
+
+/* ════════════════════════════════════════════════════════════
+   §12octies — DEMANDES : LIVREURS, RESTAURANTS, MAGASINS
+   Les pièces d'identité vivent dans un bucket privé. On ne les
+   affiche jamais par leur adresse : on demande un lien signé qui
+   expire au bout d'une heure.
+   ════════════════════════════════════════════════════════════ */
+let apRows=[];
+const AP_KIND={ driver:'Livreur', manje:'Restaurant', pake:'Magasin' };
+const AP_ST={ pending:{t:'En attente',c:'var(--warn)'}, approved:{t:'Acceptée',c:'var(--ok)'},
+              rejected:{t:'Refusée',c:'var(--bad)'} };
+
+async function loadApps(){
+  const box=document.getElementById('ap-body'); if(!box) return;
+  if(!apRows.length) box.innerHTML=skeletonCards(2);
+  try{
+    const {data,error}=await db.from('applications').select('*').order('created_at',{ascending:false}).limit(150);
+    if(error) throw error;
+    apRows=data||[]; renderApps();
+  }catch(e){
+    box.innerHTML=errorState('Demandes indisponibles',
+      "La table applications n'existe pas encore. Exécutez zetwal-aplikasyon.sql dans Supabase.",
+      'loadApps()', e.message);
+  }
+}
+function renderApps(){
+  const box=document.getElementById('ap-body'); if(!box) return;
+  const q=(document.getElementById('ap-q').value||'').toLowerCase().trim();
+  const f=document.getElementById('ap-f').value;
+  const k=document.getElementById('ap-k').value;
+  let list=apRows.filter(a=>(f==='all'||a.status===f) && (!k||a.kind===k)
+    && (!q||JSON.stringify(a).toLowerCase().includes(q)));
+  if(!list.length){
+    box.innerHTML=emptyState('check','Aucune demande',
+      f==='pending'?"Rien à examiner pour le moment.":"Aucune demande dans cette catégorie.");
+    paintIcons(); return;
+  }
+  box.innerHTML=list.map(apCard).join('');
+  paintIcons();
+  list.forEach(a=>signDocs(a));
+}
+function apCard(a){
+  const S=AP_ST[a.status]||AP_ST.pending;
+  const nom=[a.first_name,a.last_name].filter(Boolean).join(' ')||'Sans nom';
+  const tel=a.phone?'<a href="tel:'+escH(a.phone)+'">'+escH(a.phone)+'</a>'
+    +' · <a href="https://wa.me/'+escH((a.phone||'').replace(/[^0-9]/g,''))+'" target="_blank">WhatsApp</a>':'—';
+  let cells=[
+    ['Métier', AP_KIND[a.kind]||a.kind],
+    ['Téléphone', tel],
+    ['E-mail', escH(a.email||'—')],
+    ['Né(e) le', a.birth_date?new Date(a.birth_date).toLocaleDateString('fr-FR'):'—'],
+    ['Pièce n°', escH(a.id_number||'—')],
+    ['Adresse', escH(a.address||'—')]
+  ];
+  if(a.kind==='driver'){
+    cells.push(['Véhicule', escH([a.vehicle_type,a.vehicle_make].filter(Boolean).join(' · ')||'—')]);
+    cells.push(['Plaque', escH(a.vehicle_plate||'—')]);
+    cells.push(['Permis n°', escH(a.license_no||'—')]);
+    if(a.experience) cells.push(['Expérience', escH(a.experience)]);
+  }else{
+    cells.push(['Commerce', escH(a.biz_name||'—')]);
+    cells.push(['Adresse du commerce', escH(a.biz_address||'—')]);
+    const tg=Array.isArray(a.biz_tags)?a.biz_tags:[];
+    if(tg.length) cells.push(['Propose', escH(tg.join(', '))]);
+    if(a.biz_open_from!=null) cells.push(['Horaires', a.biz_open_from+'h → '+(a.biz_open_to??'?')+'h']);
+  }
+  const docs=Array.isArray(a.docs)?a.docs:[];
+  const docHtml=docs.length
+    ? '<div class="apdocs" id="apd-'+escH(a.id)+'">'+docs.map((d,i)=>
+        '<div class="apdoc" data-p="'+escH(d.path||d.url||'')+'">'
+        +'<div class="ph"><span class="ld">…</span></div>'
+        +'<span class="nm">'+escH(d.label||d.k||('Pièce '+(i+1)))+'</span></div>').join('')+'</div>'
+    : '<div class="mv-items">Aucune pièce envoyée.</div>';
+
+  const child=a.child_ok?'<div class="mv-code" style="border-color:rgba(255,184,77,.4);background:rgba(255,184,77,.08)">'
+    +'<b style="color:var(--warn);letter-spacing:0;font-size:.82rem;padding:0">Demande le transport d\'enfants</b>'
+    +'<small>À n\'accorder qu\'après contrat signé, casier vérifié et test passé — la case reste décochée tant que vous ne l\'activez pas vous-même.</small></div>':'';
+
+  let acts='';
+  if(a.status==='pending') acts=
+     '<button class="btn btn-gold btn-sm" onclick="apApprove(\''+escH(a.id)+'\')">'+icon('check','sm')+' Accepter</button>'
+    +'<button class="btn btn-quiet btn-sm" onclick="apReject(\''+escH(a.id)+'\')">Refuser</button>';
+  else if(a.status==='approved' && a.partner_id) acts=
+     '<button class="btn btn-ghost btn-sm" onclick="switchTab(\'partners\');setTimeout(()=>editPartner(\''+escH(a.partner_id)+'\'),400)">Ouvrir la fiche</button>';
+
+  return '<div class="mv '+escH(a.status)+'">'
+    +'<div class="mv-h"><div><div class="mv-t">'+escH(nom)+'</div>'
+      +'<div class="mv-s">'+(a.created_at?new Date(a.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'')
+      +' · <span style="color:'+S.c+'">'+S.t+'</span></div></div>'
+      +'<div class="chip">'+(AP_KIND[a.kind]||a.kind)+'</div></div>'
+    +'<div class="mv-g">'+cells.map(c=>'<div class="mv-c"><div class="mv-k">'+c[0]+'</div><div class="mv-v">'+c[1]+'</div></div>').join('')+'</div>'
+    +child+docHtml
+    +(a.admin_note?'<div class="mv-items">Motif : '+escH(a.admin_note)+'</div>':'')
+    +'<div class="mv-b">'+acts+'</div></div>';
+}
+/* Chaque pièce reçoit un lien signé, valable une heure. */
+async function signDocs(a){
+  const host=document.getElementById('apd-'+a.id); if(!host) return;
+  const tiles=host.querySelectorAll('.apdoc');
+  for(const t of tiles){
+    const path=t.getAttribute('data-p'); if(!path) continue;
+    if(/^https?:/i.test(path)){          /* ancienne pièce, déjà publique */
+      t.querySelector('.ph').innerHTML='<img src="'+escH(path)+'" alt="">';
+      t.onclick=()=>window.open(path,'_blank');
+      continue;
+    }
+    try{
+      const {data,error}=await db.storage.from('partner-docs').createSignedUrl(path,3600);
+      if(error||!data) throw error||new Error('no url');
+      t.querySelector('.ph').innerHTML='<img src="'+escH(data.signedUrl)+'" alt="">';
+      t.onclick=()=>window.open(data.signedUrl,'_blank');
+    }catch(e){
+      t.querySelector('.ph').innerHTML='<span class="ld">illisible</span>';
+    }
+  }
+}
+window.apApprove=async(id)=>{
+  const a=apRows.find(x=>x.id===id); if(!a) return;
+  try{
+    let partnerId=null;
+    if(a.kind==='driver'){
+      const {error}=await db.from('drivers').insert({
+        name:[a.first_name,a.last_name].filter(Boolean).join(' '),
+        phone:a.phone||null, email:a.email||null, user_uid:a.user_uid||null,
+        vehicle_type:a.vehicle_type||null, vehicle_plate:a.vehicle_plate||null,
+        zone:a.zone||null, child_ok:false, active:true, application_id:a.id
+      });
+      if(error) throw error;
+      toast('Livreur accepté. Le transport d\'enfants reste à activer à la main.','success');
+    }else{
+      const {data,error}=await db.from('partners').insert({
+        kind:a.kind, name:a.biz_name||[a.first_name,a.last_name].filter(Boolean).join(' '),
+        description:a.biz_desc||null, address:a.biz_address||a.address||null,
+        lat:a.biz_lat||null, lng:a.biz_lng||null, phone:a.phone||null,
+        tags:Array.isArray(a.biz_tags)?a.biz_tags:[], gallery:[],
+        open_from:a.biz_open_from??null, open_to:a.biz_open_to??null,
+        prep_minutes:20, is_open:true, active:true,
+        owner_email:a.email||null, owner_uid:a.user_uid||null
+      }).select();
+      if(error) throw error;
+      partnerId=(data&&data[0])?data[0].id:null;
+      pnRows=[]; loadPartners();
+      toast('Commerce créé — saisissez ses articles pour qu\'il apparaisse','success');
+    }
+    const {error:e2}=await db.from('applications').update({
+      status:'approved', partner_id:partnerId, reviewed_at:new Date().toISOString()
+    }).eq('id',id);
+    if(e2) throw e2;
+    Object.assign(a,{status:'approved',partner_id:partnerId});
+    renderApps();
+  }catch(e){ toast('Acceptation impossible : '+rlsHint(e),'error'); }
+};
+window.apReject=async(id)=>{
+  const why=prompt('Motif du refus (pour votre suivi) :','Papye yo pa klè.');
+  if(why===null) return;
+  try{
+    const {error}=await db.from('applications').update({
+      status:'rejected', admin_note:(why||'').trim()||null, reviewed_at:new Date().toISOString()
+    }).eq('id',id);
+    if(error) throw error;
+    const a=apRows.find(x=>x.id===id); if(a) Object.assign(a,{status:'rejected',admin_note:why});
+    renderApps(); toast('Demande refusée','success');
+  }catch(e){ toast('Refus impossible : '+rlsHint(e),'error'); }
+};
+window.loadApps=loadApps; window.renderApps=renderApps;
 
 function renderNotifList(list){
   const c=document.getElementById('notif-list'); if(!c) return;
@@ -4570,7 +4801,7 @@ const TEMP_TABS=[
   {id:'sales',label:'Ventes'},{id:'orders',label:'Commandes'},{id:'notifications',label:'Notifications'},
   {id:'scan',label:'Scanner'},{id:'wash',label:'Fiche de lavage'},{id:'history',label:'Fiches enregistrées'},
   {id:'analytics',label:'Analytics'},{id:'calculator',label:'Calculatrice'},
-  {id:'machines',label:'Machines'},{id:'move',label:'Courses & commandes'},
+  {id:'machines',label:'Machines'},{id:'move',label:'Courses & commandes'},{id:'apply',label:'Demandes reçues'},
   {id:'partners',label:'Partenaires'},{id:'moveprice',label:'Tarifs Move'},{id:'points',label:'Points clients'},
   {id:'media',label:'Images du site'},{id:'settings',label:'Paramètres'}
 ];
