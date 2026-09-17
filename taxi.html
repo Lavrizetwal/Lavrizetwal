@@ -780,6 +780,15 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .hit .add:disabled{opacity:.4;cursor:not-allowed;border-color:var(--line);color:var(--ink-4);background:none}
 .hit.off{opacity:.55}
 
+.vtags{display:flex;gap:6px;flex-wrap:wrap;margin:-2px 0 2px}
+.vtags span{padding:3px 9px;border-radius:99px;border:1px solid var(--line);
+  font-size:.56rem;letter-spacing:.9px;text-transform:uppercase;color:var(--ink-3)}
+.vgal{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;
+  scrollbar-width:none;-ms-overflow-style:none}
+.vgal::-webkit-scrollbar{display:none}
+.vgal img{height:140px;width:auto;border-radius:9px;border:1px solid var(--line);object-fit:cover;flex-shrink:0}
+@media(max-width:560px){ .vgal img{height:104px} }
+
 .srch{position:relative;margin-bottom:16px}
 .srch svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:15px;height:15px;
   stroke:var(--ink-4);stroke-width:1.6;fill:none;pointer-events:none}
@@ -2191,11 +2200,22 @@ function renderMarket(kind){
   var its = items.filter(function(x){
     return vs.some(function(v){ return v.id === x.partner_id; });
   });
-  /* kategori yo soti nan atik yo */
+  /* Filt yo : tip kwizin patnè yo, epi kategori atik yo */
+  var tags = {};
+  vs.forEach(function(v){
+    (Array.isArray(v.tags)?v.tags:[]).forEach(function(t){ tags[t] = (tags[t]||0)+1; });
+  });
   var cats = {};
   its.forEach(function(x){ if(x.category) cats[x.category] = (cats[x.category]||0)+1; });
-  var catList = Object.keys(cats).sort();
+  var tagList = Object.keys(tags).sort();
+  /* Si yon kategori atik gen menm non ak yon tip kwizin, nou pa montre l de fwa. */
+  var lower = tagList.map(function(t){ return t.toLowerCase(); });
+  var catList = Object.keys(cats).sort().filter(function(c){ return lower.indexOf(c.toLowerCase()) < 0; });
   $('#'+pre+'-cats').innerHTML = '<button class="pill2' + (S.cat===''?' on':'') + '" data-c="">Tout</button>'
+    + tagList.map(function(t){
+        return '<button class="pill2' + (S.cat==='tag:'+t?' on':'') + '" data-c="tag:'+esc(t)+'">'
+          + esc(t) + ' · ' + tags[t] + '</button>';
+      }).join('')
     + catList.map(function(c){
         return '<button class="pill2' + (S.cat===c?' on':'') + '" data-c="'+esc(c)+'">'+esc(c)+' · '+cats[c]+'</button>';
       }).join('');
@@ -2216,11 +2236,19 @@ function renderMarket(kind){
   var q = S.q.toLowerCase().trim();
   if(q){
     /* Rechèch : nou montre chak atik ki matche, ak restoran li ye a */
+    var tagF = S.cat.indexOf('tag:') === 0 ? S.cat.slice(4) : null;
     var hits = its.filter(function(x){
-      if(S.cat && x.category !== S.cat) return false;
+      if(S.cat && !tagF && x.category !== S.cat) return false;
+      if(tagF){
+        var vv = vs.filter(function(y){ return y.id === x.partner_id; })[0];
+        if(!vv || !(Array.isArray(vv.tags) && vv.tags.indexOf(tagF) >= 0)) return false;
+      }
+      var vn = (vs.filter(function(y){ return y.id === x.partner_id; })[0] || {});
       return (x.name||'').toLowerCase().indexOf(q) >= 0
           || (x.description||'').toLowerCase().indexOf(q) >= 0
-          || (x.category||'').toLowerCase().indexOf(q) >= 0;
+          || (x.category||'').toLowerCase().indexOf(q) >= 0
+          || (vn.name||'').toLowerCase().indexOf(q) >= 0
+          || (Array.isArray(vn.tags) && vn.tags.join(' ').toLowerCase().indexOf(q) >= 0);
     }).map(function(x){
       var v = vs.filter(function(y){ return y.id === x.partner_id; })[0] || {};
       return { x:x, v:v, price:+x.price||0, eta:etaOf(v), dist:distOf(v), open:venueOpen(v) };
@@ -2239,16 +2267,21 @@ function renderMarket(kind){
     return;
   }
 
-  var list = vs.map(function(v){
+  var tagSel = S.cat.indexOf('tag:') === 0 ? S.cat.slice(4) : null;
+  var list = vs.filter(function(v){
+    return !tagSel || (Array.isArray(v.tags) && v.tags.indexOf(tagSel) >= 0);
+  }).map(function(v){
     return { v:v, eta:etaOf(v), dist:distOf(v), open:venueOpen(v),
-             n: its.filter(function(x){ return x.partner_id === v.id && (!S.cat || x.category === S.cat); }).length };
-  }).filter(function(o){ return !S.cat || o.n > 0; });
+             n: its.filter(function(x){ return x.partner_id === v.id
+                  && (!S.cat || tagSel || x.category === S.cat); }).length };
+  }).filter(function(o){ return !S.cat || tagSel || o.n > 0; });
   list.sort(function(a,b){
     if(S.sort === 'time') return a.eta - b.eta;
     if(S.sort === 'dist') return (a.dist==null?99:a.dist) - (b.dist==null?99:b.dist);
     return (b.open - a.open) || (a.eta - b.eta);
   });
-  $('#'+pre+'-res').innerHTML = '<b>' + list.length + '</b> ' + (kind==='manje'?'restoran':'magazen') + (S.cat?' · '+esc(S.cat):'');
+  $('#'+pre+'-res').innerHTML = '<b>' + list.length + '</b> ' + (kind==='manje'?'restoran':'magazen')
+    + (S.cat ? ' · ' + esc(tagSel || S.cat) : '');
   $('#'+pre+'-count').textContent = list.length;
   body.innerHTML = '<div class="shelf">' + list.map(venueCard).join('') + '</div>';
   $$('#'+pre+'-body .vc').forEach(function(el){
@@ -2261,6 +2294,9 @@ function venueCard(o){
     + '<div class="vc-im">' + (v.cover_url ? '<img src="'+esc(v.cover_url)+'" alt="" loading="lazy">' : ICON_V)
       + '<span class="vc-st ' + (o.open?'st-open':'st-shut') + '">' + (o.open?'Ouvri':'Fèmen') + '</span></div>'
     + '<div class="vc-b"><h3 class="vc-n">' + esc(v.name||'') + '</h3>'
+    + (Array.isArray(v.tags) && v.tags.length
+        ? '<div class="vtags">' + v.tags.slice(0,4).map(function(t){
+            return '<span>' + esc(t) + '</span>'; }).join('') + '</div>' : '')
     + (v.description ? '<p class="vc-d">'+esc(v.description)+'</p>' : '')
     + '<div class="vc-m"><span><b>' + o.eta + ' min</b></span>'
       + (o.dist != null ? '<span class="dot"></span><span>' + o.dist.toFixed(1) + ' km</span>' : '')
@@ -2329,6 +2365,12 @@ function openVenue(id, kind){
         + '<span class="dot"></span><span>Livrezon <b>' + fmt(deliveryFee(v)) + ' HTG</b></span>'
         + (v.address ? '<span class="dot"></span><span>' + esc(v.address) + '</span>' : '')
         + '</div></div></div></div>'
+    + (function(){
+        var g = Array.isArray(v.gallery) ? v.gallery : [];
+        if(!g.length) return '';
+        return '<div class="vgal">' + g.map(function(u){
+          return '<img src="' + esc(u) + '" alt="" loading="lazy">'; }).join('') + '</div>';
+      })()
     + (open ? '' : '<div class="warn">Patnè sa a <b>fèmen</b> kounye a. Ou ka gade meni an, men ou p ap ka kòmande.</div>')
     + (its.length ? Object.keys(cats).sort().concat(cats['']===undefined?[]:[]).map(function(c){
         var group = its.filter(function(x){ return (x.category||'') === c; });
