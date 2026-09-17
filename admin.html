@@ -312,6 +312,59 @@ h1,h2,h3,h4{line-height:1.2;font-weight:600;letter-spacing:-.01em}
   background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px}
 .field select option{background:#151515;color:#fff}
 input[type=checkbox]{accent-color:var(--gold);width:16px;height:16px;cursor:pointer;flex:none}
+
+/* ── Move : courses, commandes, partenaires ── */
+.mv{border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s5);margin-bottom:var(--s4);
+  background:var(--surface);border-left:3px solid var(--line)}
+.mv.requested{border-left-color:var(--warn)}
+.mv.accepted,.mv.on_way,.mv.picked{border-left-color:var(--ok)}
+.mv.done{border-left-color:var(--gold)}
+.mv.cancelled{border-left-color:var(--bad)}
+.mv-h{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:var(--s4)}
+.mv-t{font-size:.95rem;font-weight:600;line-height:1.35}
+.mv-s{font-size:.72rem;color:var(--muted);margin-top:3px}
+.mv-p{font-family:var(--display);font-size:1.7rem;font-weight:700;color:var(--gold);line-height:1;white-space:nowrap}
+.mv-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--s3);margin-bottom:var(--s4)}
+.mv-c{padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--bg-deep)}
+.mv-k{font-size:.52rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.mv-v{font-size:.8rem;font-weight:600;word-break:break-word}
+.mv-v a{color:var(--gold)}
+.mv-items{margin:0 0 var(--s4);padding:12px 14px;border-radius:var(--r-sm);
+  border:1px dashed var(--line);background:var(--bg-deep);font-size:.78rem;line-height:1.8}
+.mv-code{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:var(--r-sm);
+  border:1px dashed var(--line-gold);background:var(--gold-a08);margin-bottom:var(--s4)}
+.mv-code b{font-family:var(--mono);font-size:1.15rem;letter-spacing:.3em;color:var(--gold);padding-left:.3em}
+.mv-code small{font-size:.68rem;color:var(--muted)}
+.mv-b{display:flex;gap:8px;flex-wrap:wrap}
+.mv-flow{display:flex;align-items:center;gap:0;margin-bottom:var(--s4)}
+.mv-flow i{flex:1;height:2px;background:rgba(255,255,255,.08)}
+.mv-flow i.on{background:var(--ok)}
+.mv-flow b{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.14);flex-shrink:0}
+.mv-flow b.on{background:var(--ok)}
+
+.pn{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--r-md);
+  border:1px solid var(--line);background:var(--surface);margin-bottom:var(--s3);cursor:pointer;
+  transition:border-color var(--fast)}
+.pn:hover{border-color:var(--line-gold)}
+.pn-im{width:52px;height:52px;border-radius:var(--r-sm);overflow:hidden;flex-shrink:0;
+  background:var(--bg-deep);display:grid;place-items:center}
+.pn-im img{width:100%;height:100%;object-fit:cover}
+.pn-im span{color:var(--muted)}
+.pn-n{flex:1;min-width:0}
+.pn-n b{display:block;font-size:.9rem;font-weight:600}
+.pn-n span{display:block;font-size:.72rem;color:var(--muted);margin-top:2px}
+.pn-tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.it{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r-sm);
+  border:1px solid var(--line);background:var(--bg-deep);margin-bottom:8px}
+.it-im{width:44px;height:44px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--surface);
+  display:grid;place-items:center}
+.it-im img{width:100%;height:100%;object-fit:cover}
+.it-n{flex:1;min-width:0}
+.it-n b{display:block;font-size:.84rem;font-weight:600}
+.it-n span{display:block;font-size:.7rem;color:var(--muted);margin-top:2px}
+.it-p{font-family:var(--display);font-size:1.05rem;font-weight:700;color:var(--gold);white-space:nowrap}
+.it.off{opacity:.55}
+
 /* Grille de formulaire */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 var(--s4)}
 .form-grid .span2{grid-column:1 / -1}
@@ -1187,6 +1240,81 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </section>
 
+    <!-- ═════ MOVE — COURSES & COMMANDES ═════ -->
+    <section class="panel" id="tab-move">
+      <div class="card">
+        <div class="card-head">
+          <h3><span data-icon="orders"></span> À traiter</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadMove()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button>
+        </div>
+        <p class="card-sub">Les demandes arrivent ici dès que le client valide. Acceptez, nommez le chauffeur, puis faites avancer la course jusqu'à la livraison.</p>
+        <div class="toolbar">
+          <input type="text" id="mv-q" class="input" placeholder="Filtrer par nom, téléphone, adresse…" oninput="renderMove()">
+          <select id="mv-f" class="input" onchange="renderMove()">
+            <option value="live">En cours</option>
+            <option value="requested">En attente seulement</option>
+            <option value="all">Tout l'historique</option>
+          </select>
+          <select id="mv-k" class="input" onchange="renderMove()">
+            <option value="">Tous les services</option>
+            <option value="ride">Taxi</option>
+            <option value="manje">Nourriture</option>
+            <option value="pake">Paquets</option>
+          </select>
+        </div>
+        <div id="mv-body"></div>
+      </div>
+    </section>
+
+    <!-- ═════ MOVE — PARTENAIRES ═════ -->
+    <section class="panel" id="tab-partners">
+      <div class="card" id="pt-list-card">
+        <div class="card-head">
+          <h3><span data-icon="box"></span> Restaurants et magasins</h3>
+          <button class="btn btn-gold btn-sm" onclick="editPartner(null)"><span data-icon="plus" data-size="sm"></span> Nouveau partenaire</button>
+        </div>
+        <p class="card-sub">Tout ce qui s'affiche sur la page Move vient d'ici. Un partenaire sans article reste invisible pour le client.</p>
+        <div class="toolbar">
+          <input type="text" id="pn-q" class="input" placeholder="Chercher un partenaire…" oninput="renderPartners()">
+          <select id="pn-k" class="input" onchange="renderPartners()">
+            <option value="">Les deux</option>
+            <option value="manje">Restaurants</option>
+            <option value="pake">Magasins</option>
+          </select>
+        </div>
+        <div id="pn-body"></div>
+      </div>
+
+      <div class="card" id="pt-edit-card" style="display:none">
+        <div class="card-head">
+          <h3><span data-icon="tag"></span> <span id="pn-title">Partenaire</span></h3>
+          <button class="btn btn-ghost btn-sm" onclick="closePartner()">Retour à la liste</button>
+        </div>
+        <div id="pn-form"></div>
+      </div>
+
+      <div class="card" id="pt-items-card" style="display:none">
+        <div class="card-head">
+          <h3><span data-icon="box"></span> Articles</h3>
+          <button class="btn btn-gold btn-sm" onclick="newItem()"><span data-icon="plus" data-size="sm"></span> Ajouter un article</button>
+        </div>
+        <p class="card-sub">Un article indisponible reste visible mais ne peut plus être commandé — c'est le cas du plat épuisé alors que le restaurant est ouvert.</p>
+        <div id="pn-items"></div>
+      </div>
+    </section>
+
+    <!-- ═════ MOVE — TARIFS ═════ -->
+    <section class="panel" id="tab-moveprice">
+      <div class="card">
+        <div class="card-head">
+          <h3><span data-icon="coins"></span> Tarifs de la plateforme</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadMovePrice()"><span data-icon="refresh" data-size="sm"></span> Recharger</button>
+        </div>
+        <p class="card-sub">Ces montants alimentent directement la page Move. Le prix d'une course se calcule sur la distance et la durée réelles du trajet.</p>
+        <div id="mp-form"></div>
+      </div>
+    </section>
+
     <!-- ═════ IMAGES DU SITE ═════ -->
     <section class="panel" id="tab-media">
       <div class="card">
@@ -1618,6 +1746,11 @@ const NAV=[
     {id:'wash',label:'Nouvelle fiche',icon:'drop'},
     {id:'history',label:'Fiches enregistrées',icon:'history'}
   ]},
+  {g:'Move', items:[
+    {id:'move',label:'Courses & commandes',icon:'orders'},
+    {id:'partners',label:'Partenaires',icon:'box'},
+    {id:'moveprice',label:'Tarifs Move',icon:'coins'}
+  ]},
   {g:'Réglages', items:[
     {id:'points',label:'Points clients',icon:'trophy'},
     {id:'media',label:'Images du site',icon:'image'},
@@ -1639,6 +1772,9 @@ const TAB_META={
   analytics:{t:'Analytics',s:'Tendances et répartitions'},
   calculator:{t:'Calculatrice',s:'Marges et revenus'},
   machines:{t:'Machines',s:'État des machines de la laverie'},
+  move:{t:'Courses & commandes',s:'Taxi, nourriture et paquets'},
+  partners:{t:'Partenaires',s:'Restaurants, magasins et leurs articles'},
+  moveprice:{t:'Tarifs Move',s:'Course, livraison, objets, enfants'},
   points:{t:'Points clients',s:'Ajouter ou retirer des points'},
   media:{t:'Images du site',s:'Visuels des pages publiques'},
   settings:{t:'Paramètres',s:'Magasin, taux et citations'},
@@ -1701,6 +1837,9 @@ window.switchTab = (name)=>{
   if(name==='settings')      initSettings();
   if(name==='media')         loadMedia();
   if(name==='machines')      loadMachinesAdmin();
+  if(name==='move')          loadMove();
+  if(name==='partners')      loadPartners();
+  if(name==='moveprice')     loadMovePrice();
   if(name==='points')        initPoints();
   if(name==='wash')          initWashTarifs();
   if(name==='add')           initColorPicker();
@@ -3200,6 +3339,568 @@ window.cancelPointRequest=async(id)=>{
 window.loadPointRequests=loadPointRequests;
 window.initPoints=initPoints;
 
+/* ════════════════════════════════════════════════════════════
+   §12quinquies — MOVE : COURSES, COMMANDES, PARTENAIRES
+   ════════════════════════════════════════════════════════════ */
+let mvRides=[], mvOrders=[], mvTimer=null;
+function fmtHTG(n){ return fmtP(n||0)+' HTG'; }
+const MV_FLOW=['requested','accepted','on_way','picked','done'];
+const MV_ST={
+  requested:{t:'En attente', c:'var(--warn)'},
+  accepted :{t:'Acceptée',   c:'var(--ok)'},
+  on_way   :{t:'En route',   c:'var(--ok)'},
+  picked   :{t:'Récupérée',  c:'var(--ok)'},
+  done     :{t:'Terminée',   c:'var(--gold)'},
+  cancelled:{t:'Annulée',    c:'var(--bad)'}
+};
+const MV_MODE={ person:'Course · personne', object:'Transport d\'objet', child:'Transport d\'enfant' };
+
+async function loadMove(){
+  const box=document.getElementById('mv-body'); if(!box) return;
+  if(!mvRides.length && !mvOrders.length) box.innerHTML=skeletonCards(3);
+  try{
+    const [a,b]=await Promise.all([
+      db.from('rides').select('*').order('created_at',{ascending:false}).limit(120),
+      db.from('move_orders').select('*').order('created_at',{ascending:false}).limit(120)
+    ]);
+    if(a.error) throw a.error;
+    mvRides  = a.data||[];
+    mvOrders = b.error ? [] : (b.data||[]);
+    renderMove();
+    if(!mvTimer) mvTimer=setInterval(()=>{ if(currentTab==='move' && !document.hidden) loadMove(); },30000);
+  }catch(e){
+    box.innerHTML=errorState('Move indisponible',
+      "Les tables rides et move_orders n'existent pas encore. Exécutez zetwal-move.sql dans Supabase.",
+      'loadMove()', e.message);
+  }
+}
+function mvAll(){
+  return mvRides.map(r=>({...r,_t:'ride'})).concat(mvOrders.map(o=>({...o,_t:'order'})))
+    .sort((x,y)=>new Date(y.created_at||0)-new Date(x.created_at||0));
+}
+function renderMove(){
+  const box=document.getElementById('mv-body'); if(!box) return;
+  const q=(document.getElementById('mv-q').value||'').toLowerCase().trim();
+  const f=document.getElementById('mv-f').value;
+  const k=document.getElementById('mv-k').value;
+  let list=mvAll();
+  if(f==='live')      list=list.filter(o=>['requested','accepted','on_way','picked'].includes(o.status));
+  if(f==='requested') list=list.filter(o=>o.status==='requested');
+  if(k==='ride')  list=list.filter(o=>o._t==='ride');
+  if(k==='manje') list=list.filter(o=>o._t==='order'&&o.kind==='manje');
+  if(k==='pake')  list=list.filter(o=>o._t==='order'&&o.kind==='pake');
+  if(q) list=list.filter(o=>JSON.stringify(o).toLowerCase().includes(q));
+
+  if(!list.length){
+    box.innerHTML=emptyState('check','Rien à traiter',
+      f==='all'?"Aucune course ni commande pour l'instant.":"Tout est traité. Les nouvelles demandes apparaîtront ici toutes les 30 secondes.");
+    paintIcons(); return;
+  }
+  box.innerHTML=list.map(mvCard).join('');
+  paintIcons();
+}
+function mvCard(o){
+  const S=MV_ST[o.status]||MV_ST.requested;
+  const pos=MV_FLOW.indexOf(o.status);
+  let flow='';
+  if(o.status!=='cancelled'){
+    for(let i=0;i<MV_FLOW.length;i++){
+      flow+='<b class="'+(i<=pos?'on':'')+'"></b>';
+      if(i<MV_FLOW.length-1) flow+='<i class="'+(i<pos?'on':'')+'"></i>';
+    }
+    flow='<div class="mv-flow">'+flow+'</div>';
+  }
+  const tel=o.client_phone?'<a href="tel:'+escH(o.client_phone)+'">'+escH(o.client_phone)+'</a>':'—';
+  const wa =o.client_phone?'<a href="https://wa.me/'+escH((o.client_phone||'').replace(/[^0-9]/g,''))+'" target="_blank">WhatsApp</a>':'';
+  let title,cells=[],items='',price;
+
+  if(o._t==='ride'){
+    title=(MV_MODE[o.ride_mode]||'Course')+(o.vehicle?' · '+escH(o.vehicle):'');
+    price=o.price_estimated;
+    cells=[
+      ['Départ',  escH(o.from_addr||'—')],
+      ['Arrivée', escH(o.to_addr||'—')],
+      ['Distance',(o.distance_km?o.distance_km+' km · '+(o.duration_min||'?')+' min':'—')],
+      ['Client',  escH(o.client_name||'—')],
+      ['Téléphone', tel+(wa?' · '+wa:'')]
+    ];
+    if(o.object_what) cells.push(['Objet', escH(o.object_what)+(o.object_size?' · '+escH(o.object_size):'')]);
+    if(o.object_value) cells.push(['Valeur déclarée', fmtHTG(o.object_value)]);
+    if(o.child_name) cells.push(['Enfant', escH(o.child_name)+(o.child_age?' · '+o.child_age+' ans':'')]);
+    if(o.recipient_name) cells.push(['Destinataire', escH(o.recipient_name)+(o.recipient_phone?' · '+escH(o.recipient_phone):'')]);
+  }else{
+    title=(o.kind==='manje'?'Nourriture':'Paquets')+' · '+escH(o.partner_name||'');
+    price=o.total;
+    cells=[
+      ['Livrer à', escH(o.address||'—')],
+      ['Client',   escH(o.client_name||'—')],
+      ['Téléphone', tel+(wa?' · '+wa:'')],
+      ['Articles', fmtHTG(o.subtotal)],
+      ['Livraison', fmtHTG(o.delivery_fee)]
+    ];
+    const list=Array.isArray(o.items)?o.items:[];
+    if(list.length) items='<div class="mv-items">'+list.map(l=>
+      '• '+escH(l.name||'')+' × '+(l.q||1)+' — '+fmtHTG((l.price||0)*(l.q||1))).join('<br>')+'</div>';
+  }
+  if(o.notes) cells.push(['Note du client', escH(o.notes)]);
+  if(o.driver_name) cells.push(['Chauffeur', escH(o.driver_name)+(o.driver_phone?' · '+escH(o.driver_phone):'')]);
+
+  const code=o.drop_code?'<div class="mv-code"><b>'+escH(o.drop_code)+'</b>'
+    +'<small>Code de remise — le chauffeur ne livre pas sans lui</small></div>':'';
+
+  const id=escH(o.id), t=o._t;
+  let acts='';
+  if(o.status==='requested') acts=
+      '<button class="btn btn-gold btn-sm" onclick="mvAccept(\''+t+'\',\''+id+'\')">'+icon('check','sm')+' Accepter</button>'
+     +'<button class="btn btn-quiet btn-sm" onclick="mvCancel(\''+t+'\',\''+id+'\')">Refuser</button>';
+  else if(o.status==='accepted') acts=
+      '<button class="btn btn-ghost btn-sm" onclick="mvStep(\''+t+'\',\''+id+'\',\'on_way\')">En route</button>'
+     +'<button class="btn btn-quiet btn-sm" onclick="mvCancel(\''+t+'\',\''+id+'\')">Annuler</button>';
+  else if(o.status==='on_way') acts=
+      '<button class="btn btn-ghost btn-sm" onclick="mvStep(\''+t+'\',\''+id+'\',\'picked\')">Récupéré</button>'
+     +'<button class="btn btn-quiet btn-sm" onclick="mvCancel(\''+t+'\',\''+id+'\')">Annuler</button>';
+  else if(o.status==='picked') acts=
+      '<button class="btn btn-gold btn-sm" onclick="mvStep(\''+t+'\',\''+id+'\',\'done\')">'+icon('check','sm')+' Terminer</button>';
+  if(o.status!=='done' && o.status!=='cancelled')
+    acts+='<button class="btn btn-quiet btn-sm" onclick="mvNote(\''+t+'\',\''+id+'\')">Message au client</button>';
+
+  return '<div class="mv '+escH(o.status)+'">'
+    +'<div class="mv-h"><div><div class="mv-t">'+title+'</div>'
+      +'<div class="mv-s">'+(o.created_at?new Date(o.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'')
+      +' · <span style="color:'+S.c+'">'+S.t+'</span></div></div>'
+      +'<div class="mv-p">'+fmtHTG(price)+'</div></div>'
+    +flow
+    +'<div class="mv-g">'+cells.map(c=>'<div class="mv-c"><div class="mv-k">'+c[0]+'</div><div class="mv-v">'+c[1]+'</div></div>').join('')+'</div>'
+    +items+code
+    +(o.admin_note?'<div class="mv-items">Message envoyé : '+escH(o.admin_note)+'</div>':'')
+    +'<div class="mv-b">'+acts+'</div></div>';
+}
+function mvTable(t){ return t==='ride'?'rides':'move_orders'; }
+async function mvPatch(t,id,patch){
+  try{
+    const {error}=await db.from(mvTable(t)).update(patch).eq('id',id);
+    if(error) throw error;
+    const arr = t==='ride'?mvRides:mvOrders;
+    const row = arr.find(x=>x.id===id); if(row) Object.assign(row,patch);
+    renderMove();
+    return true;
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); return false; }
+}
+window.mvAccept=async(t,id)=>{
+  const n=prompt('Nom du chauffeur qui prend cette course :'); if(n===null) return;
+  const p=prompt('Son téléphone (facultatif) :','');
+  const ok=await mvPatch(t,id,{status:'accepted',driver_name:(n||'').trim()||null,driver_phone:(p||'').trim()||null});
+  if(ok) toast('Course acceptée — le client le voit tout de suite','success');
+};
+window.mvStep=async(t,id,st)=>{
+  const ok=await mvPatch(t,id,{status:st});
+  if(ok) toast(MV_ST[st].t,'success');
+};
+window.mvCancel=async(t,id)=>{
+  const why=prompt('Motif (le client le lira) :','Pa gen chofè disponib nan lè sa.');
+  if(why===null) return;
+  const ok=await mvPatch(t,id,{status:'cancelled',admin_note:(why||'').trim()||null});
+  if(ok) toast('Annulée, motif envoyé','success');
+};
+window.mvNote=async(t,id)=>{
+  const m=prompt('Message à afficher au client :');
+  if(m===null) return;
+  const ok=await mvPatch(t,id,{admin_note:(m||'').trim()||null});
+  if(ok) toast('Message envoyé','success');
+};
+window.loadMove=loadMove; window.renderMove=renderMove;
+
+/* ════════════════════════════════════════════════════════════
+   §12sexies — PARTENAIRES ET LEURS ARTICLES
+   ════════════════════════════════════════════════════════════ */
+let pnRows=[], pnItems=[], pnCur=null;
+
+async function loadPartners(){
+  const box=document.getElementById('pn-body'); if(!box) return;
+  if(!pnRows.length) box.innerHTML=skeletonCards(3);
+  try{
+    const {data,error}=await db.from('partners').select('*').order('kind').order('position').order('name');
+    if(error) throw error;
+    pnRows=data||[];
+    renderPartners();
+  }catch(e){
+    box.innerHTML=errorState('Partenaires indisponibles',
+      "La table partners n'existe pas encore. Exécutez zetwal-move.sql dans Supabase.",
+      'loadPartners()', e.message);
+  }
+}
+function pnOpenNow(v){
+  if(v.is_open===false) return false;
+  if(v.open_from==null || v.open_to==null) return true;
+  const h=new Date().getHours();
+  return h>=v.open_from && h<v.open_to;
+}
+function renderPartners(){
+  const box=document.getElementById('pn-body'); if(!box) return;
+  const q=(document.getElementById('pn-q').value||'').toLowerCase().trim();
+  const k=document.getElementById('pn-k').value;
+  let list=pnRows.filter(v=>(!k||v.kind===k) && (!q||(v.name||'').toLowerCase().includes(q)||(v.address||'').toLowerCase().includes(q)));
+  if(!list.length){
+    box.innerHTML=emptyState('box','Aucun partenaire',
+      "Ajoutez un restaurant ou un magasin : il apparaîtra sur la page Move dès qu'il aura au moins un article.");
+    paintIcons(); return;
+  }
+  box.innerHTML=list.map(v=>{
+    const n=pnItems.filter(x=>x.partner_id===v.id).length;
+    const open=pnOpenNow(v);
+    return '<div class="pn" onclick="editPartner(\''+escH(v.id)+'\')">'
+      +'<div class="pn-im">'+(v.cover_url||v.logo_url
+        ? '<img src="'+escH(v.cover_url||v.logo_url)+'" alt="">'
+        : '<span data-icon="'+(v.kind==='manje'?'drop':'box')+'" data-size="sm"></span>')+'</div>'
+      +'<div class="pn-n"><b>'+escH(v.name||'Sans nom')+'</b>'
+        +'<span>'+(v.kind==='manje'?'Restaurant':'Magasin')+(v.address?' · '+escH(v.address):'')+'</span></div>'
+      +'<div class="pn-tags">'
+        +'<span class="chip" style="color:'+(open?'var(--ok)':'var(--bad)')+'">'+(open?'Ouvert':'Fermé')+'</span>'
+        +(v.active===false?'<span class="chip" style="color:var(--muted)">Masqué</span>':'')
+        +'<span class="chip">'+v.prep_minutes+' min</span>'
+      +'</div></div>';
+  }).join('');
+  paintIcons();
+}
+window.closePartner=()=>{
+  pnCur=null;
+  document.getElementById('pt-list-card').style.display='';
+  document.getElementById('pt-edit-card').style.display='none';
+  document.getElementById('pt-items-card').style.display='none';
+  loadPartners();
+};
+window.editPartner=async(id)=>{
+  pnCur = id ? pnRows.find(x=>x.id===id) : { kind:'manje', name:'', prep_minutes:20, is_open:true, active:true };
+  document.getElementById('pt-list-card').style.display='none';
+  document.getElementById('pt-edit-card').style.display='';
+  document.getElementById('pn-title').textContent = id ? (pnCur.name||'Partenaire') : 'Nouveau partenaire';
+  const v=pnCur;
+  document.getElementById('pn-form').innerHTML=
+     '<div class="form-grid">'
+    +'<div class="field"><label for="f-kind">Type</label><select id="f-kind" class="input">'
+      +'<option value="manje"'+(v.kind==='manje'?' selected':'')+'>Restaurant — apparaît dans Nourriture</option>'
+      +'<option value="pake"'+(v.kind==='pake'?' selected':'')+'>Magasin — apparaît dans Paquets</option></select></div>'
+    +'<div class="field"><label for="f-name">Nom</label><input type="text" id="f-name" class="input" value="'+escH(v.name||'')+'" placeholder="Chez Marcelle"></div>'
+    +'<div class="field span2"><label for="f-desc">Description courte</label><input type="text" id="f-desc" class="input" value="'+escH(v.description||'')+'" placeholder="Manje kreyòl chak jou, bon pri"></div>'
+    +'<div class="field span2"><label for="f-addr">Adresse</label><input type="text" id="f-addr" class="input" value="'+escH(v.address||'')+'" placeholder="Delmas 33, en face de la pharmacie"></div>'
+    +'<div class="field"><label for="f-lat">Latitude</label><input type="number" step="0.000001" id="f-lat" class="input" value="'+(v.lat??'')+'" placeholder="18.545"></div>'
+    +'<div class="field"><label for="f-lng">Longitude</label><input type="number" step="0.000001" id="f-lng" class="input" value="'+(v.lng??'')+'" placeholder="-72.330"></div>'
+    +'<div class="field span2"><div class="hint">La position sert à calculer la distance et les frais de livraison. Ouvrez la fiche du lieu sur Google Maps ou OpenStreetMap, faites un clic droit, et copiez les deux nombres.</div></div>'
+    +'<div class="field"><label for="f-phone">Téléphone</label><input type="tel" id="f-phone" class="input" value="'+escH(v.phone||'')+'" placeholder="+509 …"></div>'
+    +'<div class="field"><label for="f-prep">Préparation (minutes)</label><input type="number" id="f-prep" class="input" value="'+(v.prep_minutes??20)+'" min="1"></div>'
+    +'<div class="field"><label for="f-from">Ouvre à (heure)</label><input type="number" id="f-from" class="input" value="'+(v.open_from??'')+'" min="0" max="23" placeholder="7"></div>'
+    +'<div class="field"><label for="f-to">Ferme à (heure)</label><input type="number" id="f-to" class="input" value="'+(v.open_to??'')+'" min="0" max="23" placeholder="21"></div>'
+    +'<div class="field"><label for="f-dfee">Frais de livraison de base</label><input type="number" id="f-dfee" class="input" value="'+(v.delivery_fee??'')+'" placeholder="Vide = tarif global"></div>'
+    +'<div class="field"><label for="f-pos">Ordre d\'affichage</label><input type="number" id="f-pos" class="input" value="'+(v.position??0)+'"></div>'
+    +'</div>'
+    +'<div class="quick-row" style="margin:var(--s4) 0">'
+      +'<label class="chip" style="cursor:pointer"><input type="checkbox" id="f-open" '+(v.is_open!==false?'checked':'')+'> Ouvert maintenant</label>'
+      +'<label class="chip" style="cursor:pointer"><input type="checkbox" id="f-act" '+(v.active!==false?'checked':'')+'> Visible sur le site</label>'
+    +'</div>'
+    +'<div class="field"><label>Photo de couverture</label>'
+      +'<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">'
+      +'<div class="pn-im" style="width:110px;height:70px" id="f-prev">'
+        +(v.cover_url?'<img src="'+escH(v.cover_url)+'" alt="">':'<span data-icon="camera" data-size="sm"></span>')+'</div>'
+      +'<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'f-file\').click()">'+icon('camera','sm')+' Choisir une photo</button>'
+      +(v.cover_url?'<button class="btn btn-quiet btn-sm" onclick="pnClearImg()">Retirer</button>':'')
+      +'<input type="file" id="f-file" accept="image/*" hidden onchange="pnPickImg(this)">'
+      +'</div></div>'
+    +'<button class="btn btn-gold btn-block" style="margin-top:var(--s5)" onclick="savePartner()">'+icon('check','sm')+' Enregistrer</button>'
+    +(id?'<button class="btn btn-quiet btn-block" style="margin-top:8px" onclick="deletePartner()">Supprimer ce partenaire</button>':'');
+  paintIcons();
+  if(id){ await loadItems(id); document.getElementById('pt-items-card').style.display=''; }
+};
+window.pnPickImg=async(inp)=>{
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  try{
+    toast('Compression…','info');
+    const url=await uploadSiteImage(f,'partners',1200);
+    pnCur.cover_url=url;
+    document.getElementById('f-prev').innerHTML='<img src="'+escH(url)+'" alt="">';
+    toast('Photo prête — pensez à enregistrer','success');
+  }catch(e){ toast('Envoi impossible : '+rlsHint(e),'error'); }
+  inp.value='';
+};
+window.pnClearImg=()=>{
+  pnCur.cover_url=null;
+  document.getElementById('f-prev').innerHTML='<span data-icon="camera" data-size="sm"></span>';
+  paintIcons(); toast('Photo retirée — enregistrez pour valider','info');
+};
+window.savePartner=async()=>{
+  const g=id=>document.getElementById(id);
+  const row={
+    kind:g('f-kind').value, name:(g('f-name').value||'').trim(),
+    description:(g('f-desc').value||'').trim()||null,
+    address:(g('f-addr').value||'').trim()||null,
+    lat:parseFloat(g('f-lat').value)||null, lng:parseFloat(g('f-lng').value)||null,
+    phone:(g('f-phone').value||'').trim()||null,
+    prep_minutes:parseInt(g('f-prep').value,10)||20,
+    open_from:g('f-from').value===''?null:parseInt(g('f-from').value,10),
+    open_to:g('f-to').value===''?null:parseInt(g('f-to').value,10),
+    delivery_fee:g('f-dfee').value===''?null:parseFloat(g('f-dfee').value),
+    position:parseInt(g('f-pos').value,10)||0,
+    is_open:g('f-open').checked, active:g('f-act').checked,
+    cover_url:pnCur.cover_url||null
+  };
+  if(!row.name){ toast('Donnez un nom au partenaire','error'); return; }
+  try{
+    if(pnCur.id){
+      const {error}=await db.from('partners').update(row).eq('id',pnCur.id);
+      if(error) throw error;
+      Object.assign(pnCur,row);
+      toast('Partenaire mis à jour','success');
+    }else{
+      const {data,error}=await db.from('partners').insert(row).select();
+      if(error) throw error;
+      pnCur=(data&&data[0])||row;
+      pnRows.push(pnCur);
+      toast('Partenaire créé — ajoutez ses articles','success');
+      document.getElementById('pt-items-card').style.display='';
+      await loadItems(pnCur.id);
+      document.getElementById('pn-title').textContent=pnCur.name;
+    }
+  }catch(e){ toast('Enregistrement impossible : '+rlsHint(e),'error'); }
+};
+window.deletePartner=async()=>{
+  if(!pnCur||!pnCur.id) return;
+  if(!confirm('Supprimer '+pnCur.name+' et tous ses articles ? Cette action est définitive.')) return;
+  try{
+    const {error}=await db.from('partners').delete().eq('id',pnCur.id);
+    if(error) throw error;
+    pnRows=pnRows.filter(x=>x.id!==pnCur.id);
+    toast('Partenaire supprimé','success');
+    closePartner();
+  }catch(e){ toast('Suppression impossible : '+rlsHint(e),'error'); }
+};
+
+/* ── Articles ── */
+async function loadItems(pid){
+  try{
+    const {data,error}=await db.from('partner_items').select('*').eq('partner_id',pid).order('position');
+    if(error) throw error;
+    pnItems=pnItems.filter(x=>x.partner_id!==pid).concat(data||[]);
+    renderItems();
+  }catch(e){
+    document.getElementById('pn-items').innerHTML=errorState('Articles indisponibles','',
+      'loadItems(\''+pid+'\')', e.message);
+  }
+}
+function renderItems(){
+  const box=document.getElementById('pn-items'); if(!box||!pnCur) return;
+  const list=pnItems.filter(x=>x.partner_id===pnCur.id);
+  if(!list.length){
+    box.innerHTML=emptyState('box','Aucun article',
+      "Tant que ce partenaire n'a pas d'article, il n'apparaît pas dans la recherche des clients.");
+    paintIcons(); return;
+  }
+  box.innerHTML=list.map(x=>
+    '<div class="it'+(x.available===false?' off':'')+'">'
+    +'<div class="it-im">'+(x.image_url?'<img src="'+escH(x.image_url)+'" alt="">':'<span data-icon="box" data-size="sm"></span>')+'</div>'
+    +'<div class="it-n"><b>'+escH(x.name||'')+'</b><span>'+escH(x.category||'Sans catégorie')
+      +(x.description?' · '+escH(x.description):'')+'</span></div>'
+    +'<div class="it-p">'+fmtHTG(x.price)+'</div>'
+    +'<div class="mv-b">'
+      +'<button class="btn btn-quiet btn-sm" onclick="toggleItem(\''+escH(x.id)+'\')">'
+        +(x.available===false?'Remettre':'Épuisé')+'</button>'
+      +'<button class="btn btn-ghost btn-sm" onclick="editItem(\''+escH(x.id)+'\')">Modifier</button>'
+      +'<button class="btn btn-quiet btn-sm" onclick="delItem(\''+escH(x.id)+'\')">'+icon('trash','sm')+'</button>'
+    +'</div></div>').join('');
+  paintIcons();
+}
+async function itemPatch(id,patch){
+  try{
+    const {error}=await db.from('partner_items').update(patch).eq('id',id);
+    if(error) throw error;
+    const r=pnItems.find(x=>x.id===id); if(r) Object.assign(r,patch);
+    renderItems(); return true;
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); return false; }
+}
+window.toggleItem=async(id)=>{
+  const r=pnItems.find(x=>x.id===id); if(!r) return;
+  const ok=await itemPatch(id,{available:r.available===false});
+  if(ok) toast(r.available===false?'Marqué épuisé':'Remis en vente','success');
+};
+window.delItem=async(id)=>{
+  const r=pnItems.find(x=>x.id===id); if(!r) return;
+  if(!confirm('Supprimer « '+r.name+' » ?')) return;
+  try{
+    const {error}=await db.from('partner_items').delete().eq('id',id);
+    if(error) throw error;
+    pnItems=pnItems.filter(x=>x.id!==id); renderItems();
+    toast('Article supprimé','success');
+  }catch(e){ toast('Suppression impossible : '+rlsHint(e),'error'); }
+};
+window.newItem=()=>itemForm(null);
+window.editItem=(id)=>itemForm(pnItems.find(x=>x.id===id));
+function itemForm(x){
+  if(!pnCur||!pnCur.id){ toast('Enregistrez le partenaire d\'abord','error'); return; }
+  const cur=x||{ name:'', price:0, available:true, position:(pnItems.filter(i=>i.partner_id===pnCur.id).length+1) };
+  const cats=[...new Set(pnItems.filter(i=>i.partner_id===pnCur.id).map(i=>i.category).filter(Boolean))];
+  const box=document.getElementById('pn-items');
+  box.innerHTML=
+     '<div class="form-grid">'
+    +'<div class="field"><label for="i-name">Nom</label><input type="text" id="i-name" class="input" value="'+escH(cur.name||'')+'" placeholder="Diri ak legim lalo"></div>'
+    +'<div class="field"><label for="i-price">Prix (HTG)</label><input type="number" id="i-price" class="input" value="'+(cur.price??0)+'" min="0"></div>'
+    +'<div class="field"><label for="i-cat">Catégorie</label><input type="text" id="i-cat" class="input" list="i-cats" value="'+escH(cur.category||'')+'" placeholder="Plat prensipal, Bwason…">'
+      +'<datalist id="i-cats">'+cats.map(c=>'<option value="'+escH(c)+'">').join('')+'</datalist>'
+      +'<div class="hint">Les catégories se créent toutes seules : tapez-en une nouvelle et elle apparaîtra comme filtre chez le client.</div></div>'
+    +'<div class="field"><label for="i-pos">Ordre</label><input type="number" id="i-pos" class="input" value="'+(cur.position??0)+'"></div>'
+    +'<div class="field span2"><label for="i-desc">Description</label><input type="text" id="i-desc" class="input" value="'+escH(cur.description||'')+'" placeholder="Ak vyann bèf"></div>'
+    +'</div>'
+    +'<div class="quick-row" style="margin:var(--s4) 0">'
+      +'<label class="chip" style="cursor:pointer"><input type="checkbox" id="i-av" '+(cur.available!==false?'checked':'')+'> Disponible</label>'
+    +'</div>'
+    +'<div class="field"><label>Photo</label><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">'
+      +'<div class="it-im" style="width:70px;height:70px" id="i-prev">'
+        +(cur.image_url?'<img src="'+escH(cur.image_url)+'" alt="">':'<span data-icon="camera" data-size="sm"></span>')+'</div>'
+      +'<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'i-file\').click()">'+icon('camera','sm')+' Choisir</button>'
+      +'<input type="file" id="i-file" accept="image/*" hidden onchange="itemPickImg(this)">'
+    +'</div></div>'
+    +'<div class="mv-b" style="margin-top:var(--s5)">'
+      +'<button class="btn btn-gold btn-sm" onclick="saveItem(\''+escH(cur.id||'')+'\')">'+icon('check','sm')+' Enregistrer</button>'
+      +'<button class="btn btn-quiet btn-sm" onclick="renderItems()">Annuler</button>'
+    +'</div>';
+  window._itemImg=cur.image_url||null;
+  paintIcons();
+}
+window.itemPickImg=async(inp)=>{
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  try{
+    toast('Compression…','info');
+    const url=await uploadSiteImage(f,'items',900);
+    window._itemImg=url;
+    document.getElementById('i-prev').innerHTML='<img src="'+escH(url)+'" alt="">';
+    toast('Photo prête','success');
+  }catch(e){ toast('Envoi impossible : '+rlsHint(e),'error'); }
+  inp.value='';
+};
+window.saveItem=async(id)=>{
+  const g=i=>document.getElementById(i);
+  const row={
+    partner_id:pnCur.id, name:(g('i-name').value||'').trim(),
+    price:parseFloat(g('i-price').value)||0,
+    category:(g('i-cat').value||'').trim()||null,
+    description:(g('i-desc').value||'').trim()||null,
+    position:parseInt(g('i-pos').value,10)||0,
+    available:g('i-av').checked, image_url:window._itemImg||null
+  };
+  if(!row.name){ toast('Donnez un nom à l\'article','error'); return; }
+  try{
+    if(id){
+      const {error}=await db.from('partner_items').update(row).eq('id',id);
+      if(error) throw error;
+      const r=pnItems.find(x=>x.id===id); if(r) Object.assign(r,row);
+      toast('Article mis à jour','success');
+    }else{
+      const {data,error}=await db.from('partner_items').insert(row).select();
+      if(error) throw error;
+      pnItems.push((data&&data[0])||row);
+      toast('Article ajouté','success');
+    }
+    renderItems();
+  }catch(e){ toast('Enregistrement impossible : '+rlsHint(e),'error'); }
+};
+window.loadPartners=loadPartners; window.renderPartners=renderPartners; window.loadItems=loadItems;
+window.renderItems=renderItems;
+
+/* ════════════════════════════════════════════════════════════
+   §12septies — TARIFS MOVE
+   ════════════════════════════════════════════════════════════ */
+let mpCfg=null;
+const MP_DEF={ ride:{base:150,perKm:55,perMin:6,minFare:250,night:1.25,etaMin:6,etaMax:18,
+    vehicles:[{id:'moto',n:'Moto',d:'1 moun · pi rapid',mult:0.72},
+              {id:'konpak',n:'Konpak',d:'3 moun · konfòtab',mult:1},
+              {id:'van',n:'Van',d:'6 moun · bagay volimen',mult:1.45}]},
+  object:{base:120,perKm:38,insureRate:0.02,sizes:[
+    {id:'ti',n:'Ti pake',d:'Anba 3 kg',fee:0},
+    {id:'mwayen',n:'Mwayen',d:'3 a 15 kg',fee:150},
+    {id:'gwo',n:'Gwo',d:'Plis pase 15 kg',fee:350}]},
+  child:{fee:250}, deliv:{base:100,perKm:35}, fees:{service:0},
+  city:{lat:18.5392,lng:-72.3364,zoom:13} };
+
+async function loadMovePrice(){
+  const box=document.getElementById('mp-form'); if(!box) return;
+  box.innerHTML=skeletonCards(1);
+  try{
+    const {data}=await db.from('site_settings').select('value').eq('key','move_config').single();
+    mpCfg = data && data.value ? JSON.parse(data.value) : null;
+  }catch(e){ mpCfg=null; }
+  if(!mpCfg) mpCfg=JSON.parse(JSON.stringify(MP_DEF));
+  ['ride','object','child','deliv','fees','city'].forEach(k=>{ mpCfg[k]=Object.assign({},MP_DEF[k],mpCfg[k]||{}); });
+  renderMovePrice();
+}
+function renderMovePrice(){
+  const c=mpCfg;
+  document.getElementById('mp-form').innerHTML=
+     '<h4 style="font-size:.8rem;font-weight:600;margin-bottom:var(--s4)">Course</h4>'
+    +'<div class="form-grid">'
+    +'<div class="field"><label for="c-base">Prise en charge (HTG)</label><input type="number" id="c-base" class="input" value="'+c.ride.base+'"></div>'
+    +'<div class="field"><label for="c-km">Par kilomètre</label><input type="number" id="c-km" class="input" value="'+c.ride.perKm+'"></div>'
+    +'<div class="field"><label for="c-min">Par minute</label><input type="number" id="c-min" class="input" value="'+c.ride.perMin+'"></div>'
+    +'<div class="field"><label for="c-fl">Course minimum</label><input type="number" id="c-fl" class="input" value="'+c.ride.minFare+'"></div>'
+    +'<div class="field"><label for="c-night">Majoration de nuit</label><input type="number" step="0.05" id="c-night" class="input" value="'+c.ride.night+'">'
+      +'<div class="hint">1.25 = +25 % entre 22 h et 6 h</div></div>'
+    +'<div class="field"><label for="c-eta">Attente annoncée (min)</label><input type="text" id="c-eta" class="input" value="'+c.ride.etaMin+'-'+c.ride.etaMax+'"></div>'
+    +'</div>'
+    +'<h4 style="font-size:.8rem;font-weight:600;margin:var(--s6) 0 var(--s4)">Véhicules</h4>'
+    +'<div id="mp-veh">'+(c.ride.vehicles||[]).map((v,i)=>
+        '<div class="it"><div class="it-n"><b>'+escH(v.n)+'</b><span>'+escH(v.d||'')+'</span></div>'
+        +'<div class="field" style="margin:0;width:120px"><input type="number" step="0.01" class="input" data-veh="'+i+'" value="'+v.mult+'"></div>'
+        +'<div class="it-p" style="font-size:.7rem;color:var(--muted)">× tarif</div></div>').join('')+'</div>'
+    +'<h4 style="font-size:.8rem;font-weight:600;margin:var(--s6) 0 var(--s4)">Transport d\'objet</h4>'
+    +'<div class="form-grid">'
+    +'<div class="field"><label for="o-base">Prise en charge</label><input type="number" id="o-base" class="input" value="'+c.object.base+'"></div>'
+    +'<div class="field"><label for="o-km">Par kilomètre</label><input type="number" id="o-km" class="input" value="'+c.object.perKm+'"></div>'
+    +'<div class="field"><label for="o-ins">Garantie sur valeur déclarée</label><input type="number" step="0.005" id="o-ins" class="input" value="'+c.object.insureRate+'">'
+      +'<div class="hint">0.02 = 2 % de la valeur annoncée par le client</div></div>'
+    +'<div class="field"><label for="ch-fee">Accompagnement enfant</label><input type="number" id="ch-fee" class="input" value="'+c.child.fee+'"></div>'
+    +'</div>'
+    +'<div id="mp-siz">'+(c.object.sizes||[]).map((v,i)=>
+        '<div class="it"><div class="it-n"><b>'+escH(v.n)+'</b><span>'+escH(v.d||'')+'</span></div>'
+        +'<div class="field" style="margin:0;width:120px"><input type="number" class="input" data-siz="'+i+'" value="'+v.fee+'"></div>'
+        +'<div class="it-p" style="font-size:.7rem;color:var(--muted)">HTG</div></div>').join('')+'</div>'
+    +'<h4 style="font-size:.8rem;font-weight:600;margin:var(--s6) 0 var(--s4)">Livraison — nourriture et paquets</h4>'
+    +'<div class="form-grid">'
+    +'<div class="field"><label for="d-base">Frais de base</label><input type="number" id="d-base" class="input" value="'+c.deliv.base+'"></div>'
+    +'<div class="field"><label for="d-km">Par kilomètre</label><input type="number" id="d-km" class="input" value="'+c.deliv.perKm+'"></div>'
+    +'<div class="field"><label for="s-fee">Frais de service (part du total)</label><input type="number" step="0.01" id="s-fee" class="input" value="'+(c.fees.service||0)+'">'
+      +'<div class="hint">0.05 = 5 %. Laissez 0 pour ne rien prélever.</div></div>'
+    +'<div class="field"><label for="c-lat">Centre de la carte</label><input type="text" id="c-lat" class="input" value="'+c.city.lat+', '+c.city.lng+'"></div>'
+    +'</div>'
+    +'<button class="btn btn-gold btn-block" style="margin-top:var(--s5)" onclick="saveMovePrice()">'+icon('check','sm')+' Enregistrer les tarifs</button>';
+  paintIcons();
+}
+window.saveMovePrice=async()=>{
+  const g=id=>document.getElementById(id), num=id=>parseFloat(g(id).value)||0;
+  const c=mpCfg;
+  c.ride.base=num('c-base'); c.ride.perKm=num('c-km'); c.ride.perMin=num('c-min');
+  c.ride.minFare=num('c-fl'); c.ride.night=parseFloat(g('c-night').value)||1;
+  const eta=(g('c-eta').value||'').split('-');
+  c.ride.etaMin=parseInt(eta[0],10)||6; c.ride.etaMax=parseInt(eta[1],10)||18;
+  document.querySelectorAll('[data-veh]').forEach(el=>{
+    const i=+el.getAttribute('data-veh');
+    if(c.ride.vehicles[i]) c.ride.vehicles[i].mult=parseFloat(el.value)||1;
+  });
+  c.object.base=num('o-base'); c.object.perKm=num('o-km');
+  c.object.insureRate=parseFloat(g('o-ins').value)||0;
+  document.querySelectorAll('[data-siz]').forEach(el=>{
+    const i=+el.getAttribute('data-siz');
+    if(c.object.sizes[i]) c.object.sizes[i].fee=parseFloat(el.value)||0;
+  });
+  c.child.fee=num('ch-fee');
+  c.deliv.base=num('d-base'); c.deliv.perKm=num('d-km');
+  c.fees.service=parseFloat(g('s-fee').value)||0;
+  const ll=(g('c-lat').value||'').split(',');
+  if(ll.length===2){ c.city.lat=parseFloat(ll[0])||c.city.lat; c.city.lng=parseFloat(ll[1])||c.city.lng; }
+  try{
+    const {error}=await db.from('site_settings').upsert(
+      {key:'move_config',value:JSON.stringify(c),updated_at:new Date().toISOString()},{onConflict:'key'});
+    if(error) throw error;
+    toast('Tarifs enregistrés — la page Move les prend tout de suite','success');
+  }catch(e){ toast('Enregistrement impossible : '+rlsHint(e),'error'); }
+};
+window.loadMovePrice=loadMovePrice;
+
 function renderNotifList(list){
   const c=document.getElementById('notif-list'); if(!c) return;
   if(!list.length){
@@ -3701,7 +4402,8 @@ const TEMP_TABS=[
   {id:'sales',label:'Ventes'},{id:'orders',label:'Commandes'},{id:'notifications',label:'Notifications'},
   {id:'scan',label:'Scanner'},{id:'wash',label:'Fiche de lavage'},{id:'history',label:'Fiches enregistrées'},
   {id:'analytics',label:'Analytics'},{id:'calculator',label:'Calculatrice'},
-  {id:'machines',label:'Machines'},{id:'points',label:'Points clients'},
+  {id:'machines',label:'Machines'},{id:'move',label:'Courses & commandes'},
+  {id:'partners',label:'Partenaires'},{id:'moveprice',label:'Tarifs Move'},{id:'points',label:'Points clients'},
   {id:'media',label:'Images du site'},{id:'settings',label:'Paramètres'}
 ];
 function applyTempAccessRestrictions(perms){
