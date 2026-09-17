@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
-<title>ZETWAL MOVE — Taksi, Manje, Pake</title>
-<meta name="description" content="Zetwal Move : yon kous, yon manje, yon pake. Tout vil la konekte.">
+<title>ZETWAL KÒMAND — Taksi, Manje, Pake</title>
+<meta name="description" content="Zetwal Kòmand : yon kous, yon manje, yon pake. Tout vil la konekte.">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/logo-192.png">
@@ -909,7 +909,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <canvas id="roads" aria-hidden="true"></canvas>
 <canvas id="sky" aria-hidden="true"></canvas>
 <div id="spot" aria-hidden="true"></div>
-<div id="ghost" aria-hidden="true"><b>MOVE</b></div>
+<div id="ghost" aria-hidden="true"><b>KÒMAND</b></div>
 <div id="grain" aria-hidden="true"></div>
 
 <nav class="nav" id="nav">
@@ -921,7 +921,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <ul class="menu">
       <li><a href="index.html">Akèy</a></li>
       <li><a href="lavri.html">Lavri</a></li>
-      <li><a href="taxi.html" class="on" aria-current="page">Move</a></li>
+      <li><a href="taxi.html" class="on" aria-current="page">Kòmand</a></li>
       <li><a href="shop.html">Shop</a></li>
       <li><a href="mall.html">Mall</a></li>
       <li><a href="games.html">Jwèt</a></li>
@@ -954,7 +954,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <div id="drawer">
   <a class="dl" href="index.html">Akèy</a>
   <a class="dl" href="lavri.html">Lavri</a>
-  <a class="dl" href="taxi.html">Move</a>
+  <a class="dl" href="taxi.html">Kòmand</a>
   <a class="dl" href="shop.html">Shop</a>
   <a class="dl" href="mall.html">Mall</a>
   <a class="dl" href="games.html">Jwèt</a>
@@ -976,7 +976,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <!-- ══════════ HERO ══════════ -->
 <header class="hero" id="hero">
   <p class="kick"><s></s><span data-split="ch">Tout vil la konekte</span><s></s></p>
-  <h1 class="big" data-split="ch" aria-label="ZETWAL MOVE">MOVE</h1>
+  <h1 class="big" data-split="ch" aria-label="ZETWAL KÒMAND">KÒMAND</h1>
   <div class="draw" style="--w:min(280px,58vw);margin:0 auto 18px"></div>
   <p class="tag" data-split="wd">Yon kous, yon manje, yon pake — menm kote</p>
 
@@ -1158,7 +1158,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       </div>
     </div>
     <footer>
-      <div class="fb">ZETWAL <em>MOVE</em></div>
+      <div class="fb">ZETWAL <em>KÒMAND</em></div>
       <small>© 2026 Zetwal Organisation — Tout dwa rezève</small>
       <button id="top" type="button"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg> Anwo</button>
     </footer>
@@ -1198,7 +1198,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <aside class="panel" id="panel" aria-hidden="true">
   <div class="p-head">
     <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg></span>
-    <div><div class="p-ttl">Asistan Move</div><div class="p-sub">Taksi · Manje · Pake</div></div>
+    <div><div class="p-ttl">Asistan Kòmand</div><div class="p-sub">Taksi · Manje · Pake</div></div>
     <button class="p-x" id="p-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="p-body" id="p-body"></div>
@@ -1210,7 +1210,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 </aside>
 
 <div class="dock">
-  <button class="dk" id="ai-btn" type="button" aria-label="Asistan Move">
+  <button class="dk" id="ai-btn" type="button" aria-label="Asistan Kòmand">
     <svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>
     <span class="dk-tip">Asistan</span>
   </button>
@@ -2121,7 +2121,7 @@ $('#ride-go').addEventListener('click', async function(){
 
   var label = rideMode === 'person' ? 'Kous — ' + vehOf(vehicle).n
             : rideMode === 'object' ? 'Voye yon objè' : 'Transpò timoun';
-  var m = 'Bonjou Zetwal Move !\n\n' + label + '\n'
+  var m = 'Bonjou Zetwal Kòmand !\n\n' + label + '\n'
     + 'Depi : ' + ($('#in-a').value || (A.lat.toFixed(5)+','+A.lng.toFixed(5))) + '\n'
     + 'Ale : '  + ($('#in-b').value || (B.lat.toFixed(5)+','+B.lng.toFixed(5))) + '\n'
     + 'Distans : ' + route.km.toFixed(1) + ' km · ' + Math.round(route.min) + ' min\n'
@@ -2460,7 +2460,7 @@ $('#cart-go').addEventListener('click', async function(){
     try{ var r = await sb.from('move_orders').insert(row); if(!r.error) saved = true; }catch(e){}
   }
   btn.disabled = false;
-  var m = 'Bonjou Zetwal Move !\n\nKòmand ' + (svc === 'manje' ? 'manje' : 'pake') + '\n'
+  var m = 'Bonjou Zetwal Kòmand !\n\nKòmand ' + (svc === 'manje' ? 'manje' : 'pake') + '\n'
     + 'Patnè : ' + t.v.name + '\n\n'
     + cart.map(function(l){ return '• ' + l.name + ' × ' + l.q + ' = ' + fmt(l.price*l.q) + ' HTG'; }).join('\n')
     + '\n\nAtik : ' + fmt(t.sub) + ' HTG\nLivrezon : ' + fmt(t.deliv) + ' HTG\nTOTAL : ' + fmt(t.total) + ' HTG\n\n'
@@ -2842,7 +2842,7 @@ if(auth) auth.onAuthStateChanged(async function(user){
 /* ══ 16. ASISTAN MOVE ═════════════════════════════════════════ */
 var KB = [
   { k:['sevis','sèvis','ki sa nou fe','kisa','plateform','move'],
-    a:function(){ return "Zetwal Move gen <b>twa sèvis</b> nan yon sèl kote :\n\n"
+    a:function(){ return "Zetwal Kòmand gen <b>twa sèvis</b> nan yon sèl kote :\n\n"
       + "• <b>Taksi</b> — yon moun, yon objè, oswa yon timoun ki bezwen akonpayman.\n"
       + "• <b>Manje</b> — restoran patnè nou yo, plat pa plat.\n"
       + "• <b>Pake</b> — magazen patnè nou yo, ak livrezon.\n\n"
@@ -2918,7 +2918,7 @@ function answer(q){
     if(sc > bs){ bs = sc; best = e; }
   });
   if(best && bs >= 0.25) return best.a();
-  return "Padon — mwen konnen sèlman sa ki gen rapò ak Zetwal Move, kidonk mwen p ap eseye reponn sa.\n\nMen sa mwen ka esplike w :\n• Konbe yon kous koute\n• Kijan pou w voye yon objè\n• Ki restoran ak magazen nou genyen\n• Kote kòmand ou a ye";
+  return "Padon — mwen konnen sèlman sa ki gen rapò ak Zetwal Kòmand, kidonk mwen p ap eseye reponn sa.\n\nMen sa mwen ka esplike w :\n• Konbe yon kous koute\n• Kijan pou w voye yon objè\n• Ki restoran ak magazen nou genyen\n• Kote kòmand ou a ye";
 }
 (function(){
   var pan = $('#panel'), veil = $('#veil'), body = $('#p-body'), chips = $('#p-chips'), inp = $('#p-in');
@@ -2937,7 +2937,7 @@ function answer(q){
     pan.classList.add('open'); veil.classList.add('open'); pan.setAttribute('aria-hidden','false');
     if(!started){
       started = true;
-      bubble("Bonjou ! Mwen se asistan Zetwal Move. Twa sèvis : <b>Taksi</b>, <b>Manje</b>, <b>Pake</b>.\n\nKisa ou vle konnen ?", 'ai');
+      bubble("Bonjou ! Mwen se asistan Zetwal Kòmand. Twa sèvis : <b>Taksi</b>, <b>Manje</b>, <b>Pake</b>.\n\nKisa ou vle konnen ?", 'ai');
       SUGG.forEach(function(q){
         var b = document.createElement('button'); b.type = 'button'; b.textContent = q;
         b.addEventListener('click', function(){ ask(q); }); chips.appendChild(b);
