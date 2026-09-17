@@ -759,6 +759,19 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 <!-- ══════════ KATALÒG ══════════ -->
 <main class="wrap">
   <div class="grid" id="grid"></div>
+
+  <section id="mk" style="display:none;padding:10px 0 90px">
+    <div class="head" style="margin-bottom:26px">
+      <div>
+        <div class="eyebrow up">Soti nan Kòmand</div>
+        <h2 class="h2" data-split="wd">Manje ak pwodwi patnè nou yo</h2>
+        <div class="draw" style="--w:110px;margin-top:14px"></div>
+      </div>
+      <div class="count up d2" id="mk-count">—</div>
+    </div>
+    <p class="res" style="margin-bottom:18px">Atik sa yo soti nan restoran ak magazen patnè yo. Klike sou youn epi w ap kòmande l sou paj <b>Kòmand</b>, ak livrezon.</p>
+    <div class="grid" id="mk-grid" style="padding:0"></div>
+  </section>
 </main>
 
 
@@ -1407,13 +1420,71 @@ function wireCards(){
 
 /* Bar filt */
 $('#q').addEventListener('input', function(){
-  F.q = this.value; $('#q-clr').classList.toggle('on', !!this.value); paint();
+  F.q = this.value; $('#q-clr').classList.toggle('on', !!this.value); paint(); renderMarketItems();
 });
 $('#q-clr').addEventListener('click', function(){
-  F.q=''; $('#q').value=''; this.classList.remove('on'); $('#q').focus(); paint();
+  F.q=''; $('#q').value=''; this.classList.remove('on'); $('#q').focus(); paint(); renderMarketItems();
 });
 $('#f-status').addEventListener('change', function(){ F.status=this.value; paint(); });
 $('#f-sort').addEventListener('change', function(){ F.sort=this.value; paint(); });
+
+/* ══ 8bis. ATIK PATNÈ YO (soti nan paj Kòmand) ════════════════ */
+var MKV = [], MKI = [];
+async function loadMarketItems(){
+  if(!sb) return;
+  try{
+    var v = await sb.from('partners').select('id,kind,name,is_open,open_from,open_to,cover_url,active')
+      .eq('active', true);
+    MKV = (v.data || []);
+    var ids = MKV.map(function(x){ return x.id; });
+    if(!ids.length) return;
+    var it = await sb.from('partner_items').select('*').in('partner_id', ids)
+      .eq('available', true).eq('status','approved').order('position').limit(120);
+    MKI = it.data || [];
+    renderMarketItems();
+  }catch(e){ /* tab yo poko egziste : seksyon an rete kache */ }
+}
+function mkOpen(v){
+  if(!v || v.is_open === false) return false;
+  if(v.open_from == null || v.open_to == null) return true;
+  var h = new Date().getHours();
+  return h >= v.open_from && h < v.open_to;
+}
+function renderMarketItems(){
+  var host = document.getElementById('mk'), g = document.getElementById('mk-grid');
+  if(!host || !g) return;
+  var q = (F.q || '').toLowerCase().trim();
+  var list = MKI.map(function(x){
+    var v = MKV.filter(function(y){ return y.id === x.partner_id; })[0];
+    return { x:x, v:v || {} };
+  }).filter(function(o){
+    if(!o.v.id) return false;
+    if(!q) return true;
+    return (o.x.name||'').toLowerCase().indexOf(q) >= 0
+        || (o.x.category||'').toLowerCase().indexOf(q) >= 0
+        || (o.v.name||'').toLowerCase().indexOf(q) >= 0;
+  });
+  if(!list.length){ host.style.display = 'none'; return; }
+  host.style.display = '';
+  document.getElementById('mk-count').textContent = list.length;
+  g.innerHTML = list.slice(0, 24).map(function(o){
+    var open = mkOpen(o.v);
+    return '<a class="pc in" href="taxi.html" style="text-decoration:none;color:inherit">'
+      + '<div class="pc-img">'
+        + (o.x.image_url ? '<img src="'+esc(o.x.image_url)+'" alt="'+esc(o.x.name||'')+'" loading="lazy">' : ICON_BOX)
+        + '<span class="pc-ref">' + (o.v.kind === 'manje' ? 'Manje' : 'Pake') + '</span>'
+        + '<span class="pc-st ' + (open ? 'st-ok' : 'st-out') + '">' + (open ? 'Ouvri' : 'Fèmen') + '</span>'
+      + '</div>'
+      + '<div class="pc-body">'
+        + '<div class="pc-cat">' + esc(o.v.name || '') + '</div>'
+        + '<h3 class="pc-name">' + esc(o.x.name || '') + '</h3>'
+        + '<div class="pc-price">' + fmt(o.x.price) + '<s>HTG</s></div>'
+        + (o.x.category ? '<div class="pc-meta"><span class="tagx">' + esc(o.x.category) + '</span></div>' : '')
+        + '<div class="pc-acts"><span class="mini" style="flex:1;justify-content:center">'
+          + 'Kòmande sou Kòmand</span></div>'
+      + '</div></a>';
+  }).join('');
+}
 
 /* ══ 9. FICH PWODWI ═══════════════════════════════════════════ */
 var openId = null;
@@ -2168,6 +2239,7 @@ function answer(q){
 /* ══ 13. DEPA ════════════════════════════════════════════════ */
 cartLoadLocal();
 loadProducts();
+loadMarketItems();
 setInterval(function(){ if(!document.hidden) loadSettings(); }, 300000);
 
 })();
