@@ -830,6 +830,28 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .ptline .tx b{color:var(--gold)}
 
 /* Espas chofè / patnè */
+.pfcard{padding:16px 17px;border-radius:11px;border:1px solid var(--line);
+  background:rgba(255,255,255,.028);margin-bottom:14px}
+.pfcard .k{font-size:.55rem;letter-spacing:1.7px;text-transform:uppercase;color:var(--ink-4);margin-bottom:6px}
+.pfcard .v{font-family:var(--serif);font-size:1.9rem;font-weight:700;color:var(--gold)}
+.pfcard .v s{font-family:var(--sans);font-size:.65rem;font-weight:600;color:var(--ink-3);text-decoration:none;margin-left:7px}
+.pfrole{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--g-24);background:var(--g-08);color:var(--gold);font-size:.62rem;
+  font-weight:700;letter-spacing:.6px;margin:4px 6px 0 0}
+.pftx{display:flex;align-items:flex-start;gap:12px;padding:12px 13px;border-radius:9px;margin-bottom:9px;
+  border-left:3px solid var(--line);background:rgba(255,255,255,.025)}
+.pftx.in{border-left-color:var(--ok)}
+.pftx.out{border-left-color:var(--gold)}
+.pftx .ic{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+  background:rgba(255,255,255,.05)}
+.pftx .ic svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
+.pftx.in .ic{color:var(--ok)}.pftx.out .ic{color:var(--gold)}
+.pftx .bd{flex:1;min-width:0}
+.pftx .bd b{display:block;font-size:.8rem}
+.pftx .bd span{display:block;font-size:.66rem;color:var(--ink-4);margin-top:2px}
+.pftx .am{font-family:var(--serif);font-weight:700;font-size:.95rem;white-space:nowrap}
+.pftx.in .am{color:var(--ok)}.pftx.out .am{color:var(--gold)}
+
 .sp-tabs{display:flex;gap:5px;padding:4px;border-radius:99px;background:rgba(255,255,255,.04);margin-bottom:16px}
 .sp-tabs button{flex:1;padding:9px 4px;border:0;border-radius:99px;background:none;cursor:pointer;
   font-family:var(--sans);font-size:.58rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink-3)}
@@ -889,7 +911,6 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .doc .busy{position:absolute;inset:0;z-index:3;display:grid;place-items:center;background:rgba(5,5,5,.72)}
 .doc .busy i{width:20px;height:20px;border-radius:50%;border:2px solid var(--g-24);
   border-top-color:var(--gold);animation:spin 1s linear infinite;display:block}
-.j-file-hidden{position:absolute;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
 
 .srch{position:relative;margin-bottom:16px}
 .srch svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:15px;height:15px;
@@ -1053,6 +1074,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
         </div>
         <div class="row"><span class="k">Statit</span><span class="v" id="a-st">Itilizatè</span></div>
         <div class="row"><span class="k">Pwen ou genyen</span><span class="v gold" id="a-pt">0.0</span></div>
+        <button class="pill" id="a-profile" type="button">Pwofil mwen</button>
         <button class="pill" id="a-space" type="button" style="display:none">Espas mwen</button>
         <button class="pill" id="a-rides" type="button">Kòmand mwen yo</button>
         <a href="admin.html" class="pill full" id="a-admin" style="display:none">Aksè Administrasyon</a>
@@ -1076,6 +1098,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       <div><div class="nm" id="dr-nm">—</div>
         <div class="sub"><span id="dr-st">Itilizatè</span> · <span id="dr-pt">0.0</span> pwen</div></div>
     </div>
+    <button class="pill" id="dr-profile" type="button" style="display:none">Pwofil mwen</button>
     <button class="pill" id="dr-space" type="button" style="display:none">Espas mwen</button>
     <button class="pill" id="dr-rides" type="button" style="display:none">Kòmand mwen yo</button>
     <button class="pill full" id="dr-login" type="button">Konekte</button>
@@ -1175,6 +1198,10 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
             <div><div class="k">Tann</div><div class="v" id="t-eta">—</div></div>
           </div>
           <div class="t-lines" id="lines"></div>
+          <label class="paypts" id="ride-paypts">
+            <input type="checkbox" id="ride-usepts">
+            <span>Peye ak pwen — <b class="pv">—</b></span>
+          </label>
           <button class="btn btn-wa" id="ride-go" style="width:100%;margin-top:16px">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1.1.1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.7-1.2-4.5-4-4.6-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.3 0 .5l-.3.5-.3.3c-.1.1-.2.3-.1.5.1.3.6 1.2 1.4 1.9 1 .9 1.8 1.2 2.1 1.3.2.1.4.1.5-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.1.1.6-.1 1.2Z"/></svg>
             Mande kous la
@@ -1329,6 +1356,14 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <button class="btn btn-wa" id="cart-go" style="width:100%;margin-top:12px">Konfime kòmand la</button>
     <button class="btn btn-o" id="cart-clr" style="width:100%;margin-top:8px">Vide panye a</button>
   </div>
+</aside>
+
+<aside class="side" id="profile" aria-hidden="true">
+  <div class="side-h">
+    <div><div class="side-t" id="pf-t">Pwofil mwen</div><div class="side-s" id="pf-s">—</div></div>
+    <button class="p-x" id="pf-x" type="button" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="side-b" id="pf-body"></div>
 </aside>
 
 <aside class="side" id="space" aria-hidden="true">
@@ -2222,10 +2257,28 @@ function price(){
     el.textContent = fmt(fareFor(el.getAttribute('data-vp')));
   });
   window._fare = f;
+  paintPayPts();
 }
 
 /* ══ 11. VOYE KOUS LA ═════════════════════════════════════════ */
 function code6(){ return String(Math.floor(100000 + Math.random()*900000)); }
+
+/* Debite pwen kliyan an anvan nou anrejistre kous/kòmand la.
+   Retounen true si sa mache, false si li pa gen ase pwen. */
+async function chargePoints(amount){
+  if(!fs || !window._me || amount <= 0) return false;
+  try{
+    var ok = await fs.runTransaction(async function(tx){
+      var ref = fs.collection('users').doc(window._me.uid);
+      var snap = await tx.get(ref);
+      var cur = Number((snap.exists ? snap.data().points : 0) || 0);
+      if(cur < amount) return false;
+      tx.update(ref, { points: firebase.firestore.FieldValue.increment(-amount) });
+      return true;
+    });
+    return ok;
+  }catch(e){ return false; }
+}
 
 $('#ride-go').addEventListener('click', async function(){
   if(!A || !B || !route){ toast('Mete pwen A ak pwen B anvan'); return; }
@@ -2255,9 +2308,16 @@ $('#ride-go').addEventListener('click', async function(){
       recipient_phone:(($('#c-rt')||{}).value||'').trim() || null };
   }
 
+  var usePts = $('#ride-usepts').checked;
+  var ptsNeeded = usePts ? +(window._fare / PTS_RATE).toFixed(2) : 0;
   var btn = this; btn.disabled = true;
+  if(usePts){
+    var okPts = await chargePoints(ptsNeeded);
+    if(!okPts){ toast('Ou pa gen ase pwen — dekoche pou peye kach'); btn.disabled=false; return; }
+  }
   var saved = false, row = Object.assign({
     kind:'taksi', ride_mode:rideMode, vehicle:rideMode==='person'?vehicle:null,
+    paid_with: usePts ? 'pwen' : 'cash', points_used: usePts ? ptsNeeded : null,
     from_addr:$('#in-a').value || null, to_addr:$('#in-b').value || null,
     from_lat:A.lat, from_lng:A.lng, to_lat:B.lat, to_lng:B.lng,
     distance_km:+route.km.toFixed(2), duration_min:Math.round(route.min),
@@ -2274,6 +2334,10 @@ $('#ride-go').addEventListener('click', async function(){
   }
   btn.disabled = false;
 
+  if(!saved && usePts){
+    /* nou pran pwen yo men anrejistreman an echwe : nou remèt yo */
+    await chargePoints(-ptsNeeded);
+  }
   var label = rideMode === 'person' ? 'Kous — ' + vehOf(vehicle).n
             : rideMode === 'object' ? 'Voye yon objè' : 'Transpò timoun';
   var m = 'Bonjou Zetwal Kòmand !\n\n' + label + '\n'
@@ -2286,10 +2350,11 @@ $('#ride-go').addEventListener('click', async function(){
     + (extra.recipient_name ? 'Resevwa : ' + extra.recipient_name + ' ' + (extra.recipient_phone||'') + '\n' : '')
     + (note ? 'Nòt : ' + note + '\n' : '')
     + (drop ? 'Kòd remèt : ' + drop + '\n' : '')
+    + (usePts ? '\nPEYE AK PWEN : ' + ptsNeeded.toFixed(1) + ' pwen ✓\n' : '')
     + '\nESTIMASYON : ' + fmt(window._fare) + ' HTG\n\nMèsi !';
   window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
-  toast(saved ? 'Kous ou a anrejistre' : 'Mesaj la ale sou WhatsApp');
-  if(saved && window._me) loadMine();
+  toast(saved ? (usePts ? 'Kous peye ak pwen — anrejistre' : 'Kous ou a anrejistre') : 'Mesaj la ale sou WhatsApp');
+  if(saved){ $('#ride-usepts').checked = false; if(window._me) loadMine(); }
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -2609,8 +2674,11 @@ function paintCart(){
      '<div class="t-l"><span>Atik yo</span><span>' + fmt(t.sub) + ' HTG</span></div>'
    + (t.fee ? '<div class="t-l"><span>Frè sèvis</span><span>' + fmt(t.fee) + ' HTG</span></div>' : '')
    + '<div class="t-l"><span>Livrezon' + (distOf(t.v||{}) != null ? ' · ' + distOf(t.v).toFixed(1) + ' km' : '') + '</span><span>' + fmt(t.deliv) + ' HTG</span></div>'
-   + '<div class="t-l tot"><span>Total</span><span>' + fmt(t.total) + ' HTG</span></div>';
+   + '<div class="t-l tot"><span>Total</span><span>' + fmt(t.total) + ' HTG</span></div>'
+   + '<label class="paypts" id="cart-paypts"><input type="checkbox" id="cart-usepts">'
+   + '<span>Peye ak pwen — <b class="pv">—</b></span></label>';
   $('#cart-foot').style.display = '';
+  paintPayPts();
 }
 $('#cart-open').addEventListener('click', function(){
   $('#cart').classList.add('open'); $('#veil').classList.add('open');
@@ -2634,10 +2702,17 @@ $('#cart-go').addEventListener('click', async function(){
   if(!tel){  toast('Nou bezwen yon nimewo'); return; }
   if(!addr){ toast('Ki kote pou nou livre ?'); return; }
 
+  var usePts = $('#cart-usepts').checked;
+  var ptsNeeded = usePts ? +(t.total / PTS_RATE).toFixed(2) : 0;
   var btn = this; btn.disabled = true;
+  if(usePts){
+    var okPts = await chargePoints(ptsNeeded);
+    if(!okPts){ toast('Ou pa gen ase pwen — dekoche pou peye kach'); btn.disabled=false; return; }
+  }
   var saved = false;
   var row = {
     kind: svc, partner_id: t.v.id, partner_name: t.v.name,
+    paid_with: usePts ? 'pwen' : 'cash', points_used: usePts ? ptsNeeded : null,
     items: cart, subtotal: t.sub, service_fee: t.fee, delivery_fee: t.deliv, total: t.total,
     client_name:name, client_phone:tel,
     client_email:(window._me && window._me.email) || null,
@@ -2648,15 +2723,17 @@ $('#cart-go').addEventListener('click', async function(){
   if(sb){
     try{ var r = await sb.from('move_orders').insert(row); if(!r.error) saved = true; }catch(e){}
   }
+  if(!saved && usePts) await chargePoints(-ptsNeeded);
   btn.disabled = false;
   var m = 'Bonjou Zetwal Kòmand !\n\nKòmand ' + (svc === 'manje' ? 'manje' : 'pake') + '\n'
     + 'Patnè : ' + t.v.name + '\n\n'
     + cart.map(function(l){ return '• ' + l.name + ' × ' + l.q + ' = ' + fmt(l.price*l.q) + ' HTG'; }).join('\n')
     + '\n\nAtik : ' + fmt(t.sub) + ' HTG\nLivrezon : ' + fmt(t.deliv) + ' HTG\nTOTAL : ' + fmt(t.total) + ' HTG\n\n'
     + 'Non : ' + name + '\nTelefòn : ' + tel + '\nAdrès : ' + addr
-    + (note ? '\nNòt : ' + note : '') + '\n\nMèsi !';
+    + (note ? '\nNòt : ' + note : '')
+    + (usePts ? '\nPEYE AK PWEN : ' + ptsNeeded.toFixed(1) + ' pwen ✓' : '') + '\n\nMèsi !';
   window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
-  toast(saved ? 'Kòmand ou a anrejistre' : 'Kòmand la ale sou WhatsApp');
+  toast(saved ? (usePts ? 'Kòmand peye ak pwen — anrejistre' : 'Kòmand ou a anrejistre') : 'Kòmand la ale sou WhatsApp');
   cart = []; cartVenue = null; paintCart();
   $('#cart').classList.remove('open'); $('#veil').classList.remove('open');
   if(saved && window._me) loadMine();
@@ -2773,12 +2850,12 @@ $('#a-rides').addEventListener('click', ridesOpen);
 $('#dr-rides').addEventListener('click', ridesOpen);
 $('#rides-x').addEventListener('click', ridesClose);
 $('#veil').addEventListener('click', function(){
-  spaceClose(); ridesClose();
+  profileClose(); spaceClose(); ridesClose();
   $('#cart').classList.remove('open'); $('#cart').setAttribute('aria-hidden','true');
 });
 addEventListener('keydown', function(e){
   if(e.key !== 'Escape') return;
-  spaceClose(); ridesClose(); $('#cart').classList.remove('open');
+  profileClose(); spaceClose(); ridesClose(); $('#cart').classList.remove('open');
 });
 try{
   if(sb && sb.channel){
@@ -2979,8 +3056,10 @@ function countPts(el, to){
   })(t0);
 }
 function setPoints(n){
+  window._pts = n;
   countPts($('#a-pt'), n); countPts($('#dr-pt'), n);
   $('#who-pt').innerHTML = n.toFixed(1) + '<s>pwen</s>';
+  paintPayPts();
 }
 function initial(s){ return (s || 'Z').trim().charAt(0).toUpperCase() || 'Z'; }
 
@@ -2993,8 +3072,10 @@ if(auth) auth.onAuthStateChanged(async function(user){
     $('#a-space').style.display='none'; $('#dr-space').style.display='none';
     ROLE = { driver:null, partners:[] }; spPartner = null; spItems = []; jobsAll = [];
     $('#nbadge').classList.remove('on'); myRides = []; myOrders = [];
+    profileClose();
     $('#login-btn').style.display=''; $('#who-btn').style.display='none';
     $('#dr-login').style.display=''; $('#dr-who').style.display='none';
+    $('#dr-profile').style.display='none';
     $('#dr-out').style.display='none'; $('#dr-admin').style.display='none';
     $('#a-admin').style.display='none'; acct.classList.remove('open');
     return;
@@ -3003,6 +3084,7 @@ if(auth) auth.onAuthStateChanged(async function(user){
   var first = String(name).split(' ')[0];
   $('#login-btn').style.display='none'; $('#who-btn').style.display='';
   $('#dr-login').style.display='none'; $('#dr-who').style.display='flex'; $('#dr-out').style.display='';
+  $('#dr-profile').style.display='';
   $('#who-nm').textContent=first; $('#who-av').textContent=initial(name);
   $('#a-av').textContent=initial(name); $('#dr-av').textContent=initial(name);
   $('#a-nm').textContent=name; $('#dr-nm').textContent=first;
@@ -3259,6 +3341,191 @@ async function addMyItem(){
   btn.disabled = false;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   15ter. PWOFIL MWEN — istwa, notifikasyon, voye pwen
+   Aksesib pou tout moun : kliyan, chofè, patnè.
+   ══════════════════════════════════════════════════════════════ */
+var pfTab = 'hist', PTS_RATE = 10;   /* 1 pwen = X HTG — soti nan move_points_rate */
+
+function profileOpen(){
+  $('#profile').classList.add('open'); $('#veil').classList.add('open');
+  $('#profile').setAttribute('aria-hidden','false');
+  acct.classList.remove('open');
+  drawer.classList.remove('open'); burger.classList.remove('x'); document.body.classList.remove('lock');
+  renderProfile();
+}
+function profileClose(){
+  $('#profile').classList.remove('open'); $('#veil').classList.remove('open');
+  $('#profile').setAttribute('aria-hidden','true');
+}
+$('#a-profile').addEventListener('click', profileOpen);
+$('#dr-profile').addEventListener('click', profileOpen);
+$('#pf-x').addEventListener('click', profileClose);
+
+function renderProfile(){
+  var u = window._me;
+  if(!u){ profileClose(); return; }
+  var roles = [];
+  if(ROLE.driver) roles.push('Chofè');
+  if(ROLE.partners.length) roles.push(ROLE.partners.length > 1 ? 'Patnè (' + ROLE.partners.length + ')' : 'Patnè');
+  $('#pf-t').textContent = u.displayName || u.email || 'Pwofil mwen';
+  $('#pf-s').textContent = u.email || '';
+
+  var tabs = '<div class="sp-tabs">'
+    + '<button class="' + (pfTab==='hist'?'on':'') + '" data-pt="hist">Istwa</button>'
+    + '<button class="' + (pfTab==='notif'?'on':'') + '" data-pt="notif">Notifikasyon</button>'
+    + '<button class="' + (pfTab==='send'?'on':'') + '" data-pt="send">Voye pwen</button></div>';
+
+  var head = '<div class="pfcard"><div class="k">Solid pwen ou</div>'
+    + '<div class="v">' + (window._pts||0).toFixed(1) + '<s>pwen</s></div></div>'
+    + (roles.length ? '<div style="margin-bottom:14px">' + roles.map(function(r){
+        return '<span class="pfrole">' + r + '</span>'; }).join('') + '</div>' : '');
+
+  $('#pf-body').innerHTML = head + tabs + '<div id="pf-in"></div>';
+  $$('#pf-body .sp-tabs button').forEach(function(b){
+    b.addEventListener('click', function(){ pfTab = b.getAttribute('data-pt'); renderProfile(); });
+  });
+  if(pfTab === 'hist') renderPfHistory();
+  else if(pfTab === 'notif') renderPfNotif();
+  else renderPfSend();
+}
+function renderPfHistory(){
+  var box = $('#pf-in'); if(!box) return;
+  var all = allMine();
+  box.innerHTML = all.length ? all.map(mineCardShort).join('')
+    : '<div class="nulle">' + ICON_V + 'Ou poko gen istwa sou Kòmand.</div>';
+}
+function mineCardShort(o){
+  var S = STATUS[o.status] || STATUS.requested;
+  var title, price;
+  if(o._t === 'ride'){ title = (MODE_N[o.ride_mode]||'Kous') + ' · ' + (o.from_addr||'—').split(',')[0]; price = o.price_estimated; }
+  else { title = (o.kind==='manje'?'Manje':'Pake') + ' · ' + (o.partner_name||''); price = o.total; }
+  return '<div class="rc ' + esc(o.status) + '"><div class="rc-h"><div class="rc-n">' + esc(title) + '</div>'
+    + '<span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
+    + '<div class="rc-g"><div><div class="rc-k">Pri</div><div class="rc-v" style="color:var(--gold)">' + fmt(price) + ' HTG</div></div>'
+    + '<div><div class="rc-k">Dat</div><div class="rc-v">' + (o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '—') + '</div></div></div></div>';
+}
+function renderPfNotif(){
+  var box = $('#pf-in'); if(!box) return;
+  var all = allMine().filter(function(o){ return o.status !== 'requested'; });
+  box.innerHTML = all.length ? all.map(function(o){
+    var S = STATUS[o.status] || STATUS.requested;
+    var title = o._t === 'ride' ? (MODE_N[o.ride_mode]||'Kous') : (o.kind==='manje'?'Manje':'Pake') + ' · ' + (o.partner_name||'');
+    return '<div class="pftx in"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>'
+      + '<div class="bd"><b>' + esc(title) + ' — ' + S.t + '</b>'
+      + '<span>' + (o.updated_at ? new Date(o.updated_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '') + '</span></div></div>';
+  }).join('') : '<div class="nulle">' + ICON_V + 'Pa gen nouvo mizajou.</div>';
+}
+/* ── Voye pwen bay yon lòt kliyan ── */
+async function findUserByEmail(mail){
+  mail = (mail||'').toLowerCase().trim();
+  if(!mail || !fs) return null;
+  var r = await fs.collection('users').where('email','==',mail).limit(1).get();
+  if(r.empty) return null;
+  var d = r.docs[0];
+  return { uid:d.id, email:mail, name:(d.data()||{}).name || mail };
+}
+function renderPfSend(){
+  var box = $('#pf-in'); if(!box) return;
+  box.innerHTML =
+     '<div class="fld"><label for="sd-mail">Imel moun w ap voye a</label>'
+     + '<input type="email" id="sd-mail" placeholder="egzanp@imel.com"></div>'
+     + '<div class="fld"><label for="sd-amt">Konbe pwen</label>'
+     + '<input type="number" id="sd-amt" min="1" step="0.1" placeholder="10"></div>'
+     + '<div class="fld"><label for="sd-note">Yon ti mo (fakiltatif)</label>'
+     + '<input type="text" id="sd-note" placeholder="Pou bòdwo lekòl la…"></div>'
+     + '<button class="btn btn-g" id="sd-go" style="width:100%">Voye pwen yo</button>'
+     + '<p class="hintline">Pwen yo soti sou kont ou tousuit, epi yo antre sou kont moun nan. Administratè a wè tout tranzaksyon.</p>'
+     + '<div class="side-s" style="margin:20px 0 10px">Dènye anvwa ou yo</div>'
+     + '<div id="sd-hist"><div class="nulle">' + ICON_V + 'K ap chaje…</div></div>';
+  $('#sd-go').addEventListener('click', sendPoints);
+  loadMyTransfers();
+}
+async function loadMyTransfers(){
+  var box = $('#sd-hist'); if(!box || !sb || !window._me) return;
+  try{
+    var uid = window._me.uid;
+    var r = await sb.from('point_transfers').select('*')
+      .or('from_uid.eq.' + uid + ',to_uid.eq.' + uid)
+      .order('created_at',{ascending:false}).limit(20);
+    var rows = r.data || [];
+    box.innerHTML = rows.length ? rows.map(function(t){
+      var out = t.from_uid === uid;
+      return '<div class="pftx ' + (out?'out':'in') + '"><div class="ic"><svg viewBox="0 0 24 24">'
+        + (out ? '<path d="M5 12h14M13 6l6 6-6 6"/>' : '<path d="M19 12H5M11 6l-6 6 6 6"/>') + '</svg></div>'
+        + '<div class="bd"><b>' + (out ? 'Voye bay ' + esc(t.to_name||t.to_email||'') : 'Resevwa nan men ' + esc(t.from_name||t.from_email||'')) + '</b>'
+        + '<span>' + new Date(t.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
+        + (t.note ? ' · ' + esc(t.note) : '') + '</span></div>'
+        + '<div class="am">' + (out?'−':'+') + t.amount.toFixed(1) + '</div></div>';
+    }).join('') : '<div class="nulle">' + ICON_V + 'Ou poko voye ni resevwa pwen.</div>';
+  }catch(e){ box.innerHTML = '<div class="nulle">Istwa a pa disponib kounye a.</div>'; }
+}
+async function sendPoints(){
+  var mail = ($('#sd-mail').value||'').trim();
+  var amt = parseFloat($('#sd-amt').value) || 0;
+  var note = ($('#sd-note').value||'').trim();
+  if(!mail){ toast('Ekri imel moun nan'); return; }
+  if(amt <= 0){ toast('Konbe pwen ou vle voye ?'); return; }
+  if(mail.toLowerCase() === (window._me.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
+  if(amt > (window._pts||0)){ toast('Ou pa gen ase pwen'); return; }
+
+  var btn = $('#sd-go'); btn.disabled = true; btn.textContent = 'K ap voye…';
+  try{
+    var dest = await findUserByEmail(mail);
+    if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
+
+    var meUid = window._me.uid, meName = window._me.displayName || window._me.email;
+    await fs.runTransaction(async function(tx){
+      var meRef = fs.collection('users').doc(meUid), himRef = fs.collection('users').doc(dest.uid);
+      var meSnap = await tx.get(meRef);
+      var cur = Number((meSnap.exists ? meSnap.data().points : 0) || 0);
+      if(cur < amt) throw new Error('pa ase');
+      tx.update(meRef, { points: firebase.firestore.FieldValue.increment(-amt) });
+      tx.set(himRef, { points: firebase.firestore.FieldValue.increment(amt) }, { merge:true });
+    });
+
+    if(sb){
+      try{
+        await sb.from('point_transfers').insert({
+          from_uid:meUid, from_name:meName, from_email:window._me.email||null,
+          to_uid:dest.uid, to_name:dest.name, to_email:dest.email, amount:amt, note:note||null
+        });
+      }catch(e){}
+    }
+    toast('Pwen voye bay ' + (dest.name||dest.email));
+    $('#sd-mail').value=''; $('#sd-amt').value=''; $('#sd-note').value='';
+    loadMyTransfers();
+  }catch(e){
+    toast('Nou pa ka voye pwen yo kounye a');
+  }
+  btn.disabled = false; btn.textContent = 'Voye pwen yo';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   15quater. PEYE AK PWEN — ranplase koòdinasyon peman sou WhatsApp
+   ══════════════════════════════════════════════════════════════ */
+async function loadPtsRate(){
+  if(!sb) return;
+  try{
+    var r = await sb.from('site_settings').select('value').eq('key','move_points_rate').single();
+    if(r.data && parseFloat(r.data.value) > 0) PTS_RATE = parseFloat(r.data.value);
+  }catch(e){}
+}
+function paintPayPts(){
+  ['#ride-paypts','#cart-paypts'].forEach(function(sel){
+    var box = $(sel); if(!box) return;
+    var fareEl = sel === '#ride-paypts' ? window._fare : (cartTotals ? cartTotals().total : 0);
+    var need = fareEl ? (fareEl / PTS_RATE) : 0;
+    var have = window._pts || 0;
+    var ok = window._me && need > 0 && have >= need;
+    box.querySelector('.pv').textContent = need ? need.toFixed(1) + ' pwen' : '—';
+    box.classList.toggle('bad', !ok && !!window._me && need > 0);
+    var cb = box.querySelector('input');
+    if(cb && !ok) cb.checked = false;
+    if(cb) cb.disabled = !ok;
+  });
+}
+
 /* ══ 16. ASISTAN MOVE ═════════════════════════════════════════ */
 var KB = [
   { k:['sevis','sèvis','ki sa nou fe','kisa','plateform','move'],
@@ -3465,22 +3732,14 @@ function openJoin(kind){
 
   html += '<div class="jsec">Papye ak foto</div>'
     + '<div class="docs">' + K.docs.map(function(d){
-        return '<button type="button" class="doc" id="doc-' + d.k + '" data-doc="' + esc(d.k) + '">'
+        return '<button type="button" class="doc" id="doc-' + d.k + '" onclick="jPick(\'' + d.k + '\')">'
           + '<span class="up"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3.4A1.6 1.6 0 0 0 5.6 21h12.8a1.6 1.6 0 0 0 1.6-1.6V16"/></svg>'
           + '<b>' + esc(d.n) + '</b><span>' + esc(d.h) + '</span></span></button>';
       }).join('') + '</div>'
-    + '<input type="file" id="j-file" accept="image/*" class="j-file-hidden">'
+    + '<input type="file" id="j-file" accept="image/*" hidden onchange="jUpload(this)">'
     + '<p class="hintline">Foto yo konprese anvan yo ale. Yo rete prive : se sèlman administratè Zetwal ki wè yo.</p>';
 
   $('#j-body').innerHTML = html;
-  /* Nou koute klik la nan JS olye de nan atribi onclick/onchange,
-     paske kèk navigatè bloke atribi sa yo (CSP). Epi fichye a pa
-     dwe gen atribi hidden paske kèk telefòn pa louvri seleksyon an. */
-  $$('#j-body .doc').forEach(function(b){
-    b.addEventListener('click', function(){ jPick(b.getAttribute('data-doc')); });
-  });
-  var fileInp = $('#j-file');
-  if(fileInp) fileInp.addEventListener('change', function(){ jUpload(this); });
   if(kind !== 'driver') renderJTags();
   var cb = $('#j-child');
   if(cb) cb.addEventListener('click', function(){ cb.classList.toggle('on'); });
@@ -3525,9 +3784,9 @@ window.jUpload = async function(inp){
   var f = inp.files && inp.files[0]; inp.value = '';
   if(!f || !jTarget) return;
   var el = $('#doc-' + jTarget);
-  el.classList.remove('ok');
-  el.querySelector('b').textContent = 'K ap voye…';
-  var local = URL.createObjectURL(f);         /* aperçu local : le fichier est privé */
+  el.classList.remove('on');
+  var bTag = el.querySelector('b'); if(bTag) bTag.textContent = 'K ap voye…';
+  var local = URL.createObjectURL(f);         /* aperçu local : le fichier rete prive */
   try{
     var path = await uploadDoc(f);
     jDocs[jTarget] = path;
@@ -3536,10 +3795,13 @@ window.jUpload = async function(inp){
     el.innerHTML = '<img src="' + local + '" alt="">'
       + '<span class="up"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>'
       + '<b>' + esc(meta.n) + '</b><span>Voye ✓ — tape pou chanje</span></span>';
+    el.onclick = function(){ jPick(meta.k); };
   }catch(e){
     URL.revokeObjectURL(local);
-    el.querySelector('b').textContent = 'Pa pase — eseye ankò';
-    toast('Nou pa ka voye foto a');
+    var bTag2 = el.querySelector('b'); if(bTag2) bTag2.textContent = 'Pa pase — tape pou eseye ankò';
+    /* Rezon ki pi kouran an : zetwal-espas.sql poko egzekite, kidonk
+       kòf privatè a (bucket « partner-docs ») pa egziste ankò. */
+    toast('Nou pa ka voye foto a. Si sa kontinye, verifye si zetwal-espas.sql pase nan Supabase.');
   }
 };
 /* Konpresyon nan navigatè a, menm jan ak Konsòl la */
@@ -3640,7 +3902,7 @@ $('#j-send').addEventListener('click', async function(){
 
 /* ══ 17. DEPA ═════════════════════════════════════════════════ */
 buildRideCard(); price(); paintCart();
-loadConfig();
+loadConfig(); loadPtsRate();
 setInterval(function(){ if(!document.hidden) loadConfig(); }, 300000);
 
 })();
