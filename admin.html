@@ -1311,6 +1311,19 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </section>
 
+    <!-- ═════ PWEN VOYE ═════ -->
+    <section class="panel" id="tab-transfers">
+      <div class="card">
+        <div class="card-head">
+          <h3><span data-icon="swap"></span> Points envoyés entre clients</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadTransfers()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button>
+        </div>
+        <p class="card-sub">La valeur reste dans Firestore ; cette liste est le registre, ici pour votre suivi et vos vérifications.</p>
+        <input type="text" id="tf-q" class="input" style="margin-bottom:var(--s4)" placeholder="Chercher un nom ou un e-mail…" oninput="renderTransfers()">
+        <div id="tf-body"></div>
+      </div>
+    </section>
+
     <!-- ═════ MOVE — DEMANDES ═════ -->
     <section class="panel" id="tab-apply">
       <div class="card">
@@ -1825,6 +1838,7 @@ const NAV=[
     {id:'moveprice',label:'Tarifs Move',icon:'coins'}
   ]},
   {g:'Réglages', items:[
+    {id:'transfers',label:'Pwen voye',icon:'swap'},
     {id:'points',label:'Points clients',icon:'trophy'},
     {id:'media',label:'Images du site',icon:'image'},
     {id:'settings',label:'Paramètres',icon:'settings'},
@@ -1846,6 +1860,7 @@ const TAB_META={
   calculator:{t:'Calculatrice',s:'Marges et revenus'},
   machines:{t:'Machines',s:'État des machines de la laverie'},
   move:{t:'Courses & commandes',s:'Taxi, nourriture et paquets'},
+  transfers:{t:'Pwen voye',s:'Points envoyés entre clients'},
   apply:{t:'Demandes reçues',s:'Livreurs, restaurants et magasins'},
   partners:{t:'Partenaires',s:'Restaurants, magasins et leurs articles'},
   moveprice:{t:'Tarifs Move',s:'Course, livraison, objets, enfants'},
@@ -1912,6 +1927,7 @@ window.switchTab = (name)=>{
   if(name==='media')         loadMedia();
   if(name==='machines')      loadMachinesAdmin();
   if(name==='move')          loadMove();
+  if(name==='transfers')     loadTransfers();
   if(name==='apply')         loadApps();
   if(name==='partners')      loadPartners();
   if(name==='moveprice')     loadMovePrice();
@@ -3528,6 +3544,9 @@ function mvCard(o){
   const wa =o.client_phone?'<a href="https://wa.me/'+escH((o.client_phone||'').replace(/[^0-9]/g,''))+'" target="_blank">WhatsApp</a>':'';
   let title,cells=[],items='',price;
 
+  const payLine = o.paid_with==='pwen'
+    ? ['Peye ak', (o.points_used||0)+' pwen']
+    : (o.paid_with==='cash' ? ['Peye ak','Kach'] : null);
   if(o._t==='ride'){
     title=(MV_MODE[o.ride_mode]||'Course')+(o.vehicle?' · '+escH(o.vehicle):'');
     price=o.price_estimated;
@@ -3556,6 +3575,7 @@ function mvCard(o){
     if(list.length) items='<div class="mv-items">'+list.map(l=>
       '• '+escH(l.name||'')+' × '+(l.q||1)+' — '+fmtHTG((l.price||0)*(l.q||1))).join('<br>')+'</div>';
   }
+  if(payLine) cells.push(payLine);
   if(o.notes) cells.push(['Note du client', escH(o.notes)]);
   if(o.driver_name) cells.push(['Chauffeur', escH(o.driver_name)+(o.driver_phone?' · '+escH(o.driver_phone):'')]);
 
@@ -4300,6 +4320,49 @@ window.apReject=async(id)=>{
 };
 window.loadApps=loadApps; window.renderApps=renderApps;
 
+/* ════════════════════════════════════════════════════════════
+   §12ennead — PWEN VOYE : registre des transferts entre clients
+   ════════════════════════════════════════════════════════════ */
+let tfRows=[];
+async function loadTransfers(){
+  const box=document.getElementById('tf-body'); if(!box) return;
+  if(!tfRows.length) box.innerHTML=skeletonCards(2);
+  try{
+    const {data,error}=await db.from('point_transfers').select('*').order('created_at',{ascending:false}).limit(200);
+    if(error) throw error;
+    tfRows=data||[]; renderTransfers();
+  }catch(e){
+    box.innerHTML=errorState('Registre indisponible',
+      "La table point_transfers n'existe pas encore. Exécutez zetwal-espas.sql dans Supabase.",
+      'loadTransfers()', e.message);
+  }
+}
+function renderTransfers(){
+  const box=document.getElementById('tf-body'); if(!box) return;
+  const q=(document.getElementById('tf-q').value||'').toLowerCase().trim();
+  const list=tfRows.filter(t=>!q||JSON.stringify(t).toLowerCase().includes(q));
+  if(!list.length){
+    box.innerHTML=emptyState('swap','Aucun transfert',"Personne n'a encore envoyé de points à un autre client.");
+    paintIcons(); return;
+  }
+  const total=list.reduce((s,t)=>s+(+t.amount||0),0);
+  box.innerHTML='<div class="hint" style="margin-bottom:var(--s3)">'+list.length+' transfert'+(list.length>1?'s':'')
+    +' · '+fmtP(total)+' pwen antou</div>'
+    +list.map(t=>
+      '<div class="mv"><div class="mv-h"><div><div class="mv-t">'
+      +escH(t.from_name||t.from_email||'—')+' → '+escH(t.to_name||t.to_email||'—')+'</div>'
+      +'<div class="mv-s">'+new Date(t.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</div></div>'
+      +'<div class="mv-p">'+fmtP(t.amount)+' pwen</div></div>'
+      +'<div class="mv-g">'
+        +'<div><div class="mv-k">De</div><div class="mv-v">'+escH(t.from_email||'—')+'</div></div>'
+        +'<div><div class="mv-k">Vers</div><div class="mv-v">'+escH(t.to_email||'—')+'</div></div>'
+      +'</div>'
+      +(t.note?'<div class="mv-items">'+escH(t.note)+'</div>':'')
+      +'</div>').join('');
+  paintIcons();
+}
+window.loadTransfers=loadTransfers; window.renderTransfers=renderTransfers;
+
 function renderNotifList(list){
   const c=document.getElementById('notif-list'); if(!c) return;
   if(!list.length){
@@ -4801,7 +4864,7 @@ const TEMP_TABS=[
   {id:'sales',label:'Ventes'},{id:'orders',label:'Commandes'},{id:'notifications',label:'Notifications'},
   {id:'scan',label:'Scanner'},{id:'wash',label:'Fiche de lavage'},{id:'history',label:'Fiches enregistrées'},
   {id:'analytics',label:'Analytics'},{id:'calculator',label:'Calculatrice'},
-  {id:'machines',label:'Machines'},{id:'move',label:'Courses & commandes'},{id:'apply',label:'Demandes reçues'},
+  {id:'machines',label:'Machines'},{id:'move',label:'Courses & commandes'},{id:'apply',label:'Demandes reçues'},{id:'transfers',label:'Pwen voye'},
   {id:'partners',label:'Partenaires'},{id:'moveprice',label:'Tarifs Move'},{id:'points',label:'Points clients'},
   {id:'media',label:'Images du site'},{id:'settings',label:'Paramètres'}
 ];
