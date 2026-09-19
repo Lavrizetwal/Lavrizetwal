@@ -1324,6 +1324,33 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </section>
 
+    <!-- ═════ PWOFIL & MESAJ (sekirite) ═════ -->
+    <section class="panel" id="tab-profils">
+      <div class="card">
+        <div class="card-head">
+          <h3><span data-icon="user"></span> Gade yon pwofil itilizatè</h3>
+        </div>
+        <p class="card-sub">Rezon sekirite : administratè yo ka konsilte enfo yon pwofil ak konvèsasyon li yo si sa nesesè.</p>
+        <div style="display:flex;gap:var(--s3)">
+          <input type="email" id="pf-search" class="input" placeholder="Imel itilizatè a…" style="flex:1">
+          <button class="btn btn-primary" onclick="searchProfile()"><span data-icon="search" data-size="sm"></span> Chèche</button>
+        </div>
+        <div id="pf-result" style="margin-top:var(--s4)"></div>
+      </div>
+    </section>
+
+    <!-- ═════ DEMANN PWEN ═════ -->
+    <section class="panel" id="tab-pointasks">
+      <div class="card">
+        <div class="card-head">
+          <h3><span data-icon="send"></span> Demann pwen ki soti nan kliyan</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadPointAsks()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button>
+        </div>
+        <p class="card-sub">Chak kliyan ka mande pwen depi pwofil li. Ou aksepte oswa refize — pwen yo antre sou kont li sèlman si w aksepte.</p>
+        <div id="pa-body"></div>
+      </div>
+    </section>
+
     <!-- ═════ MOVE — DEMANDES ═════ -->
     <section class="panel" id="tab-apply">
       <div class="card">
@@ -1838,7 +1865,9 @@ const NAV=[
     {id:'moveprice',label:'Tarifs Move',icon:'coins'}
   ]},
   {g:'Réglages', items:[
+    {id:'profils',label:'Pwofil & Mesaj',icon:'user'},
     {id:'transfers',label:'Pwen voye',icon:'swap'},
+    {id:'pointasks',label:'Demann pwen',icon:'send'},
     {id:'points',label:'Points clients',icon:'trophy'},
     {id:'media',label:'Images du site',icon:'image'},
     {id:'settings',label:'Paramètres',icon:'settings'},
@@ -1861,6 +1890,8 @@ const TAB_META={
   machines:{t:'Machines',s:'État des machines de la laverie'},
   move:{t:'Courses & commandes',s:'Taxi, nourriture et paquets'},
   transfers:{t:'Pwen voye',s:'Points envoyés entre clients'},
+  pointasks:{t:'Demann pwen',s:'Les clients demandent, vous décidez'},
+  profils:{t:'Pwofil & Mesaj',s:'Sécurité — consultation des profils et conversations'},
   apply:{t:'Demandes reçues',s:'Livreurs, restaurants et magasins'},
   partners:{t:'Partenaires',s:'Restaurants, magasins et leurs articles'},
   moveprice:{t:'Tarifs Move',s:'Course, livraison, objets, enfants'},
@@ -1928,6 +1959,8 @@ window.switchTab = (name)=>{
   if(name==='machines')      loadMachinesAdmin();
   if(name==='move')          loadMove();
   if(name==='transfers')     loadTransfers();
+  if(name==='pointasks')     loadPointAsks();
+  if(name==='profils')       initProfilSearch();
   if(name==='apply')         loadApps();
   if(name==='partners')      loadPartners();
   if(name==='moveprice')     loadMovePrice();
@@ -4362,6 +4395,148 @@ function renderTransfers(){
   paintIcons();
 }
 window.loadTransfers=loadTransfers; window.renderTransfers=renderTransfers;
+
+/* ════════════════════════════════════════════════════════════
+   §12dezyèm — DEMANN PWEN ki soti nan kliyan (point_asks)
+   Yon demann aksepte kreye yon point_requests klasik — menm
+   mekanis kòd-konfimasyon an kliyan an deja konnen.
+   ════════════════════════════════════════════════════════════ */
+let paRows=[];
+async function loadPointAsks(){
+  const box=document.getElementById('pa-body'); if(!box) return;
+  if(!paRows.length) box.innerHTML=skeletonCards(2);
+  try{
+    const {data,error}=await db.from('point_asks').select('*').order('created_at',{ascending:false}).limit(200);
+    if(error) throw error;
+    paRows=data||[]; renderPointAsks();
+  }catch(e){
+    box.innerHTML=errorState('Demann pa disponib',
+      "La table point_asks n'existe pas encore. Exécutez zetwal-swiv.sql dans Supabase.",
+      'loadPointAsks()', e.message);
+  }
+}
+function renderPointAsks(){
+  const box=document.getElementById('pa-body'); if(!box) return;
+  const pending=paRows.filter(r=>r.status==='pending');
+  const done=paRows.filter(r=>r.status!=='pending').slice(0,30);
+  if(!paRows.length){ box.innerHTML=emptyState('send','Aucune demande',"Personne n'a encore demandé de points depuis son profil."); paintIcons(); return; }
+  box.innerHTML =
+    (pending.length ? '<div class="hint" style="margin-bottom:var(--s3)">'+pending.length+' en attente</div>'
+      + pending.map(r=>
+        '<div class="mv"><div class="mv-h"><div><div class="mv-t">'+escH(r.name||r.email||'—')+'</div>'
+        +'<div class="mv-s">'+escH(r.email||'')+' · '+new Date(r.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+'</div></div>'
+        +'<div class="mv-p">'+fmtP(r.amount)+' pwen</div></div>'
+        +(r.reason?'<div class="mv-items">'+escH(r.reason)+'</div>':'')
+        +'<div class="mv-actions" style="margin-top:var(--s3);display:flex;gap:var(--s2)">'
+          +'<button class="btn btn-primary btn-sm" onclick="grantPointAsk(\''+r.id+'\')"><span data-icon="check" data-size="sm"></span> Aksepte</button>'
+          +'<button class="btn btn-ghost btn-sm" onclick="denyPointAsk(\''+r.id+'\')"><span data-icon="close" data-size="sm"></span> Refize</button>'
+        +'</div></div>').join('')
+      : '<div class="hint" style="margin-bottom:var(--s3)">Pa gen demann an atant.</div>')
+    + (done.length ? '<div class="card-sub" style="margin:var(--s4) 0 var(--s2)">Deja trete</div>'
+      + done.map(r=>
+        '<div class="mv" style="opacity:.65"><div class="mv-h"><div><div class="mv-t">'+escH(r.name||r.email||'—')+'</div>'
+        +'<div class="mv-s">'+(r.status==='granted'?'Aksepte':'Refize')+'</div></div>'
+        +'<div class="mv-p">'+fmtP(r.amount)+' pwen</div></div></div>').join('') : '');
+  paintIcons();
+}
+window.grantPointAsk=async(id)=>{
+  const r=paRows.find(x=>x.id===id); if(!r) return;
+  try{
+    const row={email:(r.email||'').toLowerCase(), delta:r.amount, reason:r.reason||'Demann kliyan an',
+      code:code6(), status:'pending', created_by:(currentUser&&currentUser.email)||'admin',
+      expires_at:new Date(Date.now()+30*60000).toISOString()};
+    const {error:e1}=await db.from('point_requests').insert(row);
+    if(e1) throw e1;
+    const {error:e2}=await db.from('point_asks').update({status:'granted',reviewed_at:new Date().toISOString()}).eq('id',id);
+    if(e2) throw e2;
+    toast('Aksepte — kliyan an ap wè yon kòd konfimasyon','success');
+    loadPointAsks();
+  }catch(e){ toast('Aksyon pa reyisi : '+rlsHint(e),'error'); }
+};
+window.denyPointAsk=async(id)=>{
+  try{
+    const {error}=await db.from('point_asks').update({status:'denied',reviewed_at:new Date().toISOString()}).eq('id',id);
+    if(error) throw error;
+    toast('Demann refize','success'); loadPointAsks();
+  }catch(e){ toast('Aksyon pa reyisi : '+rlsHint(e),'error'); }
+};
+
+/* ════════════════════════════════════════════════════════════
+   §12twazyèm — PWOFIL & MESAJ, konsiltasyon sekirite pou admin
+   ════════════════════════════════════════════════════════════ */
+function initProfilSearch(){
+  const box=document.getElementById('pf-result');
+  if(box && !box.dataset.wired){
+    box.dataset.wired='1';
+    document.getElementById('pf-search').addEventListener('keydown', e=>{ if(e.key==='Enter') searchProfile(); });
+  }
+}
+window.searchProfile=async()=>{
+  const mail=(document.getElementById('pf-search').value||'').trim().toLowerCase();
+  const box=document.getElementById('pf-result');
+  if(!mail){ toast('Ekri yon imel','error'); return; }
+  box.innerHTML=skeletonCards(1);
+  const fs=getStore();
+  if(!fs){ box.innerHTML=errorState('Firestore pa disponib','Nou pa ka konekte kounye a.','searchProfile()'); return; }
+  try{
+    const q=await fs.collection('users').where('email','==',mail).limit(1).get();
+    if(q.empty){ box.innerHTML=emptyState('user','Pa gen kont','Pa gen okenn kont Firestore ak imel sa a.'); paintIcons(); return; }
+    const uid=q.docs[0].id, d=q.docs[0].data()||{};
+    let roleTxt='Kliyan';
+    try{
+      const dr=await db.from('drivers').select('id').eq('email',mail).limit(1);
+      const pt=await db.from('partners').select('id').eq('owner_email',mail).limit(1);
+      const roles=[]; if(dr.data&&dr.data.length) roles.push('Chofè'); if(pt.data&&pt.data.length) roles.push('Patnè');
+      if(roles.length) roleTxt=roles.join(' · ');
+    }catch(e){}
+    box.innerHTML =
+      '<div class="mv"><div class="mv-h" style="align-items:center;gap:var(--s3)">'
+        +(d.photo_url?'<img src="'+escH(d.photo_url)+'" style="width:52px;height:52px;border-radius:50%;object-fit:cover">'
+          :'<div style="width:52px;height:52px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:700">'+escH((d.name||mail).charAt(0).toUpperCase())+'</div>')
+        +'<div><div class="mv-t">'+escH(d.name||'—')+'</div><div class="mv-s">'+escH(mail)+' · '+roleTxt+'</div></div>'
+        +'<div class="mv-p" style="margin-left:auto">'+fmtP(d.points||0)+' pwen</div></div>'
+        +(d.bio?'<div class="mv-items">'+escH(d.bio)+'</div>':'')
+        +(d.birthdate?'<div class="card-sub" style="margin-top:var(--s2)">Dat nesans : '+escH(d.birthdate)+'</div>':'')
+      +'</div>'
+      +'<div class="card-sub" style="margin:var(--s4) 0 var(--s2)">Konvèsasyon li yo</div>'
+      +'<div id="pf-convs">'+skeletonCards(1)+'</div>';
+    paintIcons();
+    loadProfileConvs(uid);
+  }catch(e){ box.innerHTML=errorState('Rechèch pa reyisi',e.message,'searchProfile()'); }
+};
+async function loadProfileConvs(uid){
+  const box=document.getElementById('pf-convs'); if(!box) return;
+  const fs=getStore(); if(!fs) return;
+  try{
+    const q=await fs.collection('conversations').where('participants','array-contains',uid).orderBy('lastAt','desc').limit(30).get();
+    if(q.docs.length===0){ box.innerHTML=emptyState('send','Pa gen konvèsasyon','Itilizatè sa a poko voye ni resevwa mesaj.'); paintIcons(); return; }
+    box.innerHTML=q.docs.map(doc=>{
+      const c=doc.data()||{}; const names=c.participantNames||{};
+      const other=(c.participants||[]).filter(x=>x!==uid)[0];
+      return '<div class="mv" style="cursor:pointer" onclick="openProfileConv(\''+doc.id+'\')">'
+        +'<div class="mv-h"><div><div class="mv-t">'+escH(names[other]||'—')+'</div>'
+        +'<div class="mv-s">'+(c.lastAt?new Date(c.lastAt.toDate?c.lastAt.toDate():c.lastAt).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'')+'</div></div></div>'
+        +'<div class="mv-items">'+escH(c.lastMessage||'')+'</div></div>';
+    }).join('');
+  }catch(e){ box.innerHTML=errorState('Konvèsasyon pa disponib',e.message,''); }
+}
+window.openProfileConv=async(convId)=>{
+  const fs=getStore(); if(!fs) return;
+  const box=document.getElementById('pf-convs'); if(!box) return;
+  box.innerHTML=skeletonCards(1);
+  try{
+    const doc=await fs.collection('conversations').doc(convId).get();
+    const c=doc.data()||{}; const names=c.participantNames||{};
+    const msgs=await fs.collection('conversations').doc(convId).collection('messages').orderBy('created_at','asc').limit(300).get();
+    box.innerHTML = '<button class="btn btn-ghost btn-sm" onclick="searchProfile()" style="margin-bottom:var(--s3)">← Tounen</button>'
+      + msgs.docs.map(m=>{
+        const d=m.data()||{}; const from=names[d.from]||d.from;
+        return '<div class="mv"><div class="mv-h"><div class="mv-t">'+escH(from)+'</div>'
+          +'<div class="mv-s">'+(d.created_at?new Date(d.created_at.toDate?d.created_at.toDate():d.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'')+'</div></div>'
+          +'<div class="mv-items">'+escH(d.text||d.link||'')+'</div></div>';
+      }).join('');
+  }catch(e){ box.innerHTML=errorState('Mesaj pa disponib',e.message,''); }
+};
 
 function renderNotifList(list){
   const c=document.getElementById('notif-list'); if(!c) return;
