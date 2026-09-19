@@ -3179,7 +3179,7 @@ async function seedUser(user, name){
        Nou konplete l la, san n al touche pwen li deja genyen. */
     var d = snap.data() || {};
     var patch = {};
-    if(!d.email && mail) patch.email = mail;
+    if(mail && d.email !== mail) patch.email = mail;   /* manke, oswa move ka (majiskil) */
     if(!d.name && (name || user.displayName)) patch.name = name || user.displayName;
     if(Object.keys(patch).length) await ref.set(patch, { merge:true });
   }catch(e){}
