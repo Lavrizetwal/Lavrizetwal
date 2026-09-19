@@ -1695,7 +1695,7 @@ var KB = [
   { k:['le','lè','ouvri','fenmen','ferme','ore','ouve','ouvè','orè','magazen'],
     a:function(){
       var t = $('#badge-t').textContent;
-      return t + ".\n\nOrè nòmal la se <b>8:00 nan maten rive 8:00 nan aswè</b>, sou lè Ayiti. Administratè a ka fòse magazen an ouvri oswa fèmen depi konsòl la."; } },
+      return t + ".\n\nOrè nòmal la se <b>8:00 nan maten rive 8:00 nan aswè</b>, sou lè Ayiti. Pafwa nou fèmen oswa ouvri an deyò lè sa — statit anwo a toujou di w laverite."; } },
 
   { k:['kontak','kontakte','whatsapp','telegram','telefon','nimewo','ekri','rele','adres','kote','ye'],
     a:function(){ return "Ou ka jwenn nou konsa :\n\n• <b>WhatsApp</b> : +7 996 110 35 06\n• <b>Telegram</b> : @MikeNestor14\n• <b>Adrès</b> : 5, 3ème Imp, Ruelle Yamoul\n\nSeksyon « Kontak » anba paj la gen tout lyen yo."; } },
@@ -1715,16 +1715,13 @@ var KB = [
   { k:['konekte','kont','login','enskri','pwen mwen','dekonekte','google'],
     a:function(){ return "Klike sou bouton <b>Konekte</b> anwo adwat la — sou telefòn li nan meni an.\n\nOu ka konekte ak <b>imel ak modpas</b>, oswa ak <b>Google</b>. Si w poko gen kont, chwazi « Kreye kont ».\n\nLè w konekte, <b>non w</b> ak <b>kantite pwen ou</b> parèt dirèkteman anwo adwat la."; } },
 
-  { k:['admin','administrasyon','administrate','konsol','konsòl','jere'],
-    a:function(){ return "Konsòl administrasyon an rezève pou administratè yo sèlman.\n\nSi ou se yon administratè, konekte ak imel ou : lyen <b>Aksè Administrasyon</b> an ap parèt nan kat kont lan, anwo adwat. Se depi la yo chanje statit magazen an ak sitasyon jou a."; } },
-
   { k:['sitasyon','sitasyon jodi','pawol','pawòl','quote','jodi'],
     a:function(){
-      if(QUOTE_NOW) return "Sitasyon jodi a se :\n\n<b>« " + QUOTE_NOW.text + " »</b>" + (QUOTE_NOW.author ? "\n— " + QUOTE_NOW.author : "") + "\n\nSe administratè a ki chwazi l chak semèn depi konsòl la.";
+      if(QUOTE_NOW) return "Sitasyon jodi a se :\n\n<b>« " + QUOTE_NOW.text + " »</b>" + (QUOTE_NOW.author ? "\n— " + QUOTE_NOW.author : "") + "\n\nNou chanje l chak semèn.";
       return "Sitasyon an ap chaje. Li parèt pi ba nan paj la, anba seksyon sèvis yo."; } },
 
   { k:['foto','imaj','photo','pic','ekran','vizyel'],
-    a:function(){ return "Tout imaj ki sou sit la soti nan konsòl administrasyon an, seksyon <b>Imaj</b>.\n\nChak kat sèvis ka gen pwòp foto pa l ki ranpli tout kat la, ak tèks la sou li. Si pa gen foto, anblèm dore a rete — sit la pa janm gen twou."; } },
+    a:function(){ return "Chak kat sèvis ka gen pwòp foto pa l ki ranpli tout kat la, ak tèks la sou li. Si pa gen foto, anblèm dore a rete — sit la pa janm gen twou."; } },
 
   { k:['anbyans','efe','nej','nèj','lapli','etwal','bouton','fon','animasyon'],
     a:function(){ return "Bouton anba adwat la chanje anbyans paj la : <b>Etwal</b>, <b>Nèj</b>, <b>Lapli</b>, oswa <b>Anyen</b>.\n\nKlike sou li otan fwa ou vle. Si telefòn ou mande mwens mouvman, nou koupe tout animasyon otomatikman."; } },
@@ -1811,5 +1808,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<script src="zetwal-profile.js"></script>
 </body>
 </html>
