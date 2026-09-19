@@ -170,6 +170,16 @@ a{color:inherit;text-decoration:none}
   transform:skewX(-22deg);transition:left 900ms cubic-bezier(.19,1,.22,1)}
 .btn-g:hover::after{left:160%}
 .btn-o{border-color:rgba(255,255,255,.18);color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.kind{position:relative;padding:14px 10px;border-radius:9px;cursor:pointer;text-align:center;
+  border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--ink);font-family:var(--sans);
+  transition:border-color .2s,background .2s}
+.kind:hover{border-color:rgba(212,175,55,.24)}
+.kind.on{border-color:var(--gold);background:rgba(212,175,55,.08)}
+.hintline{font-size:.66rem;color:var(--ink-4);line-height:1.6;margin-top:10px}
+.walink{display:block;width:100%;margin-top:9px;padding:9px;border:0;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:.62rem;color:var(--ink-4);text-decoration:underline;text-underline-offset:3px}
+.walink:hover{color:var(--gold)}
 .btn-o:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
 .btn-wa{background:#25D366;color:#04240f}
 .btn-wa:hover{background:#3ae57c;transform:translateY(-2px)}
@@ -827,15 +837,28 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
   </div>
   <div class="side-b" id="cart-body"></div>
   <div class="side-f" id="cart-foot" style="display:none">
+    <div class="two" id="ck-mode" style="margin-bottom:14px">
+      <button type="button" class="kind on" data-ckm="delivery">
+        <b style="display:block;font-size:.82rem;margin-bottom:2px">Livrezon</b>
+        <span style="font-size:.63rem;color:var(--ink-4)">Peye pwodwi a + livrezon</span></button>
+      <button type="button" class="kind" data-ckm="pickup">
+        <b style="display:block;font-size:.82rem;margin-bottom:2px">Vin chèche l</b>
+        <span style="font-size:.63rem;color:var(--ink-4)">Peye sèlman pwodwi a</span></button>
+    </div>
+    <div id="ck-addr-wrap" class="fld" style="margin-bottom:14px">
+      <label for="ck-addr">Kote pou nou livre</label>
+      <input type="text" id="ck-addr" placeholder="Adrès ou — kay, repè">
+    </div>
+    <p class="hintline" id="ck-pickup-note" style="display:none;margin-bottom:14px">Ou va vin chèche kòmand ou lakay nou — nou avize w lè li pare.</p>
+    <div class="fld" style="margin-bottom:14px"><label for="ck-name">Non ou</label><input type="text" id="ck-name" placeholder="Non ak siyati"></div>
+    <div class="fld" style="margin-bottom:14px"><label for="ck-tel">Telefòn</label><input type="text" id="ck-tel" placeholder="+509 …"></div>
     <div id="cart-sum"></div>
     <div class="ptline" id="pt-pay" style="display:none">
       <span class="bx"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
       <span class="tx" id="pt-pay-tx"></span>
     </div>
-    <button class="btn btn-wa" id="cart-go" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1.1.1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.7-1.2-4.5-4-4.6-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.3 0 .5l-.3.5-.3.3c-.1.1-.2.3-.1.5.1.3.6 1.2 1.4 1.9 1 .9 1.8 1.2 2.1 1.3.2.1.4.1.5-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.1.1.6-.1 1.2Z"/></svg>
-      Kòmande sou WhatsApp
-    </button>
+    <button class="btn btn-g" id="cart-go" type="button">Konfime kòmand la</button>
+    <button type="button" id="cart-wa" class="walink">Voye tou sou WhatsApp, si w vle yon moun konfime avè w</button>
     <button class="btn btn-o" id="cart-clr" type="button" style="margin-top:9px">Vide panye a</button>
   </div>
 </aside>
@@ -1542,7 +1565,8 @@ function openDetail(id){
     +'<div class="dqr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='
       +encodeURIComponent(url)+'" alt="QR" loading="lazy">'
       +'<div><div class="t">Kòd QR pwodwi a</div><div class="u">'+esc(url)+'</div>'
-      +'<button class="tagx gold" id="d-share" style="margin-top:9px;cursor:pointer;background:none">Pataje lyen an</button></div></div>'
+      +'<button class="tagx gold" id="d-share" style="margin-top:9px;cursor:pointer;background:none">Pataje lyen an</button>'
+      +'<button class="tagx gold" id="d-share-msg" style="margin-top:9px;margin-left:8px;cursor:pointer;background:none">Voye nan Mesaj</button></div></div>'
     +'<div class="dacts">'+acts+'</div>';
 
   var wa = $('#d-wa');
@@ -1563,6 +1587,12 @@ function openDetail(id){
       if(navigator.share) await navigator.share({ title:p.name, url:url });
       else { await navigator.clipboard.writeText(url); toast('Lyen an kopye'); }
     }catch(e){}
+  });
+  var shm = $('#d-share-msg');
+  if(shm) shm.addEventListener('click', function(){
+    if(!window._me){ toast('Konekte anvan pou w pataje'); return; }
+    if(!window.ZetwalProfile || !window.ZetwalProfile.shareLink){ toast('Mesaj poko disponib — eseye ankò nan yon ti moman'); return; }
+    window.ZetwalProfile.shareLink(url, p.name);
   });
 
   $('#dmask').classList.add('open'); document.body.classList.add('lock');
@@ -1598,10 +1628,46 @@ function cartChanged(id){
   if($('#cart').classList.contains('open')) renderCart();
   cartSave();
 }
+var ckMode = 'delivery';
+$$('#ck-mode [data-ckm]').forEach(function(b){
+  b.addEventListener('click', function(){
+    ckMode = b.getAttribute('data-ckm');
+    $$('#ck-mode [data-ckm]').forEach(function(x){ x.classList.toggle('on', x===b); });
+    $('#ck-addr-wrap').style.display = ckMode==='pickup' ? 'none' : '';
+    $('#ck-pickup-note').style.display = ckMode==='pickup' ? '' : 'none';
+    renderCart();
+  });
+});
+/* Peye pwen — vrè tranzaksyon Firestore, pa senpleman yon mansyon nan mesaj WhatsApp */
+async function chargePointsShop(amount){
+  if(!fs || !window._me || amount <= 0) return false;
+  try{
+    return await fs.runTransaction(async function(tx){
+      var ref = fs.collection('users').doc(window._me.uid);
+      var snap = await tx.get(ref);
+      var cur = Number((snap.exists ? snap.data().points : 0) || 0);
+      if(cur < amount) return false;
+      tx.update(ref, { points: firebase.firestore.FieldValue.increment(-amount) });
+      return true;
+    });
+  }catch(e){ return false; }
+}
+var SHOP_DELIVERY_FEE = 150, PTS_RATE_SHOP = 1;   /* 1 pwen = 1 HTG */
+async function loadShopSettings(){
+  if(!sb) return;
+  try{
+    var r = await sb.from('site_settings').select('key,value').in('key', ['shop_delivery_fee','move_points_rate']);
+    (r.data||[]).forEach(function(row){
+      if(row.key === 'shop_delivery_fee' && parseFloat(row.value) >= 0) SHOP_DELIVERY_FEE = parseFloat(row.value);
+      if(row.key === 'move_points_rate' && parseFloat(row.value) > 0) PTS_RATE_SHOP = parseFloat(row.value);
+    });
+  }catch(e){}
+}
 function cartTotals(){
   var n=0, t=0;
   CART.forEach(function(it){ n+=it.qty; t+=it.qty*(it.p.price||0); });
-  return { n:n, t:t };
+  var deliv = ckMode === 'pickup' ? 0 : SHOP_DELIVERY_FEE;
+  return { n:n, t:t, deliv:deliv, total:t+deliv };
 }
 function paintCartBtn(){
   var s = cartTotals();
@@ -1655,9 +1721,11 @@ function renderCart(){
   });
   $('#cart-sum').innerHTML =
      '<div class="sum"><span>Atik</span><span>'+s.n+'</span></div>'
-    +'<div class="sum"><span>An dola</span><span>≈ $'+usd(s.t)+'</span></div>'
-    +'<div class="sum"><span>An peso</span><span>'+dop(s.t)+' RD$</span></div>'
-    +'<div class="sum big"><span>Total</span><span>'+fmt(s.t)+' HTG</span></div>';
+    +'<div class="sum"><span>Sou-total</span><span>'+fmt(s.t)+' HTG</span></div>'
+    +(s.deliv ? '<div class="sum"><span>Livrezon</span><span>'+fmt(s.deliv)+' HTG</span></div>' : '')
+    +'<div class="sum"><span>An dola</span><span>≈ $'+usd(s.total)+'</span></div>'
+    +'<div class="sum"><span>An peso</span><span>'+dop(s.total)+' RD$</span></div>'
+    +'<div class="sum big"><span>Total</span><span>'+fmt(s.total)+' HTG</span></div>';
   foot.style.display='block';
   paintPointsLine();
 }
@@ -1665,14 +1733,18 @@ var usePoints = false;
 function paintPointsLine(){
   var line = $('#pt-pay'); if(!line) return;
   var s = cartTotals();
-  if(!POINT_RATE || !PTS || !s.t){ line.style.display='none'; usePoints=false; line.classList.remove('on'); return; }
-  var worth = PTS * POINT_RATE;
-  var used  = Math.min(worth, s.t);
+  if(!PTS_RATE_SHOP || !PTS || !s.total){ line.style.display='none'; usePoints=false; line.classList.remove('on'); return; }
+  var need = s.total / PTS_RATE_SHOP;
+  var ok = PTS >= need;
   line.style.display='flex';
-  $('#pt-pay-tx').innerHTML = 'Peye ak pwen mwen yo — ou gen <b>'+PTS.toFixed(1)+' pwen</b> ≈ <b>'
-    + fmt(worth)+' HTG</b>.<br>Sa kouvri <b>'+fmt(used)+' HTG</b> nan kòmand sa a.';
+  $('#pt-pay-tx').innerHTML = ok
+    ? 'Peye ak pwen mwen yo — sa a koute <b>'+need.toFixed(1)+' pwen</b> (ou gen '+PTS.toFixed(1)+')'
+    : 'Ou bezwen <b>'+need.toFixed(1)+' pwen</b> pou peye sa a — ou gen sèlman '+PTS.toFixed(1);
+  line.classList.toggle('dim', !ok);
+  if(!ok) usePoints = false;
 }
 $('#pt-pay').addEventListener('click', function(){
+  if(this.classList.contains('dim')) return;
   usePoints = !usePoints; this.classList.toggle('on', usePoints);
 });
 $('#cart-clr').addEventListener('click', function(){
@@ -1680,18 +1752,62 @@ $('#cart-clr').addEventListener('click', function(){
   CART.clear(); ids.forEach(paintCardCart);
   paintCartBtn(); renderCart(); cartSave(); toast('Panye a vid');
 });
-$('#cart-go').addEventListener('click', function(){
+$('#cart-go').addEventListener('click', async function(){
   var s = cartTotals(); if(!s.n) return;
+  if(!window._me){ toast('Konekte pou w kòmande'); return; }
+  var name = ($('#ck-name').value||'').trim();
+  var tel  = ($('#ck-tel').value||'').trim();
+  var addr = ckMode === 'pickup' ? '' : ($('#ck-addr').value||'').trim();
+  if(!name){ toast('Ekri non ou'); return; }
+  if(!tel){ toast('Nou bezwen yon nimewo'); return; }
+  if(ckMode !== 'pickup' && !addr){ toast('Ki kote pou nou livre ?'); return; }
+
+  var items = []; CART.forEach(function(it){ items.push({ id:it.p.id, name:it.p.name, price:it.p.price, q:it.qty }); });
+  var ptsNeeded = usePoints ? +(s.total / PTS_RATE_SHOP).toFixed(2) : 0;
+  var btn = this; btn.disabled = true; btn.textContent = 'K ap voye…';
+
+  if(usePoints){
+    var okPts = await chargePointsShop(ptsNeeded);
+    if(!okPts){ toast('Ou pa gen ase pwen — dekoche pou peye kach'); btn.disabled=false; btn.textContent='Konfime kòmand la'; return; }
+  }
+  var row = {
+    kind:'shop', partner_id:null, partner_name:'Zetwal Shop', order_mode: ckMode,
+    items: items, subtotal: s.t, service_fee: 0, delivery_fee: s.deliv, total: s.total,
+    paid_with: usePoints ? 'pwen' : 'cash', points_used: usePoints ? ptsNeeded : null,
+    address: addr || null, client_name: name, client_phone: tel,
+    client_email: window._me.email, client_uid: window._me.uid, status: 'requested'
+  };
+  var saved = false, savedRow = null;
+  if(sb){
+    try{ var r = await sb.from('move_orders').insert(row).select().single(); if(!r.error){ saved=true; savedRow=r.data; } }catch(e){}
+  }
+  btn.disabled = false; btn.textContent = 'Konfime kòmand la';
+
+  if(!saved){
+    if(usePoints) await chargePointsShop(-ptsNeeded);
+    toast('Nou pa ka voye kòmand la kounye a — eseye ankò');
+    return;
+  }
+
   var lines = [];
   CART.forEach(function(it){ lines.push('• '+it.p.name+' × '+it.qty+' = '+fmt(it.qty*(it.p.price||0))+' HTG  (#'+ref(it.p.id)+')'); });
-  var m = 'Bonjou ! Mwen vle pase yon kòmand :\n\n'+lines.join('\n')
-    +'\n\nTOTAL : '+fmt(s.t)+' HTG  (≈ $'+usd(s.t)+' · '+dop(s.t)+' RD$)';
-  if(usePoints && POINT_RATE && PTS){
-    m += '\n\nMwen ta renmen peye ak pwen mwen yo ('+PTS.toFixed(1)+' pwen ≈ '+fmt(PTS*POINT_RATE)+' HTG).';
-  }
-  if(window._me && window._me.email) m += '\n\nKont mwen : '+window._me.email;
-  m += '\n\nMèsi !';
-  window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(m),'_blank');
+  window._lastWaMsg = 'Bonjou ! Mwen vle pase yon kòmand :\n\n'+lines.join('\n')
+    +'\n\nMòd : '+(ckMode==='pickup'?'Vin chèche l':'Livrezon — '+addr)
+    +'\nNon : '+name+'\nTelefòn : '+tel
+    +'\n\nSOU-TOTAL : '+fmt(s.t)+' HTG'+(s.deliv?'\nLIVREZON : '+fmt(s.deliv)+' HTG':'')
+    +'\nTOTAL : '+fmt(s.total)+' HTG'
+    +(usePoints ? '\nPEYE AK PWEN : '+ptsNeeded.toFixed(1)+' pwen ✓' : '')
+    +'\n\nKont mwen : '+window._me.email+'\n\nMèsi !';
+
+  toast(usePoints ? 'Kòmand peye ak pwen — anrejistre' : 'Kòmand ou a anrejistre');
+  var clearedIds = []; CART.forEach(function(v,k){ clearedIds.push(k); });
+  CART.clear(); clearedIds.forEach(paintCardCart); paintCartBtn(); renderCart(); cartSave();
+  usePoints = false; ckMode = 'delivery';
+  if(savedRow) loadMyOrders(window._me.email);
+});
+$('#cart-wa').addEventListener('click', function(){
+  if(!window._lastWaMsg){ toast('Konfime kòmand ou anvan'); return; }
+  window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(window._lastWaMsg),'_blank');
 });
 
 /* Sovgade panye a : Supabase si konekte, sinon nan navigatè a */
@@ -1754,21 +1870,65 @@ function openOrder(id){
         +'<span class="q"><button class="qbtn" id="o-m">−</button><span class="qnum" id="o-q">1</span>'
         +'<button class="qbtn" id="o-p">+</button></span>'
         +'<span class="qsub" id="o-t">'+fmt(p.price)+' HTG</span></div></div>'
+      +'<div class="two" id="o-mode" style="margin-bottom:14px">'
+        +'<button type="button" class="kind on" data-om="delivery"><b style="display:block;font-size:.82rem;margin-bottom:2px">Livrezon</b>'
+        +'<span style="font-size:.63rem;color:var(--ink-4)">Peye pwodwi a + livrezon</span></button>'
+        +'<button type="button" class="kind" data-om="pickup"><b style="display:block;font-size:.82rem;margin-bottom:2px">Vin chèche l</b>'
+        +'<span style="font-size:.63rem;color:var(--ink-4)">Peye sèlman pwodwi a</span></button></div>'
+      +'<div class="fld" id="o-addr-wrap"><label for="o-addr">Kote pou nou livre</label><input type="text" id="o-addr" placeholder="Adrès ou — kay, repè"></div>'
+      +'<p class="hintline" id="o-pickup-note" style="display:none;margin-bottom:14px">Ou va vin chèche kòmand ou lakay nou — nou avize w lè li pare.</p>'
       +'<div class="fld"><label for="o-name">Non ou</label><input type="text" id="o-name" value="'
         +esc(window._me.displayName||'')+'" placeholder="Non ak siyati"></div>'
-      +'<div class="fld"><label for="o-tel">Telefòn (fakiltatif)</label><input type="text" id="o-tel" placeholder="+509 …"></div>'
+      +'<div class="fld"><label for="o-tel">Telefòn</label><input type="text" id="o-tel" placeholder="+509 …"></div>'
       +'<div class="fld"><label for="o-note">Nòt (koulè, tay, presizyon)</label><input type="text" id="o-note" placeholder="Sa w vle nou konnen"></div>'
-      +'<button class="btn btn-wa" id="o-send" style="width:100%">Konfime kòmand la</button>'
-      +'<p class="pq-help" style="margin:12px 0 0">Kòmand ou a anrejistre lakay nou epi WhatsApp ap louvri ak mesaj la deja ekri.</p>';
+      +'<div class="ptline" id="o-pt-pay" style="display:none">'
+        +'<span class="bx"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>'
+        +'<span class="tx" id="o-pt-pay-tx"></span></div>'
+      +'<button class="btn btn-g" id="o-send" style="width:100%">Konfime kòmand la</button>'
+      +'<button type="button" id="o-wa" class="walink">Voye tou sou WhatsApp, si w vle yon moun konfime avè w</button>';
+    var oMode = 'delivery', oUsePts = false;
+    $$('#o-mode [data-om]').forEach(function(b){
+      b.addEventListener('click', function(){
+        oMode = b.getAttribute('data-om');
+        $$('#o-mode [data-om]').forEach(function(x){ x.classList.toggle('on', x===b); });
+        $('#o-addr-wrap').style.display = oMode==='pickup' ? 'none' : '';
+        $('#o-pickup-note').style.display = oMode==='pickup' ? '' : 'none';
+        oPaint();
+      });
+    });
+    $('#o-pt-pay').addEventListener('click', function(){
+      if(this.classList.contains('dim')) return;
+      oUsePts = !oUsePts; this.classList.toggle('on', oUsePts);
+    });
+    window._oGetMode = function(){ return { mode:oMode, usePts:oUsePts }; };
     $('#o-m').addEventListener('click', function(){ oQty=Math.max(1,oQty-1); oPaint(); });
     $('#o-p').addEventListener('click', function(){ oQty=oQty+1; oPaint(); });
     $('#o-send').addEventListener('click', sendOrder);
+    $('#o-wa').addEventListener('click', function(){
+      if(!window._lastWaMsg){ toast('Konfime kòmand ou anvan'); return; }
+      window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(window._lastWaMsg),'_blank');
+    });
+    oPaint();
   }
   $('#omask').classList.add('open'); document.body.classList.add('lock');
 }
 function oPaint(){
   $('#o-q').textContent = oQty;
-  $('#o-t').textContent = fmt(oQty*(oProd.price||0))+' HTG';
+  var sub = oQty*(oProd.price||0);
+  var s = window._oGetMode ? window._oGetMode() : { mode:'delivery', usePts:false };
+  var deliv = s.mode==='pickup' ? 0 : SHOP_DELIVERY_FEE;
+  var total = sub + deliv;
+  $('#o-t').textContent = fmt(total)+' HTG'+(deliv?' (+'+fmt(deliv)+' livrezon)':'');
+  var line = $('#o-pt-pay');
+  if(line && PTS){
+    var need = total / PTS_RATE_SHOP;
+    var ok = PTS >= need;
+    line.style.display = 'flex';
+    line.classList.toggle('dim', !ok);
+    $('#o-pt-pay-tx').innerHTML = ok
+      ? 'Peye ak pwen mwen yo — sa a koute <b>'+need.toFixed(1)+' pwen</b> (ou gen '+PTS.toFixed(1)+')'
+      : 'Ou bezwen <b>'+need.toFixed(1)+' pwen</b> pou peye sa a — ou gen sèlman '+PTS.toFixed(1);
+  } else if(line){ line.style.display = 'none'; }
 }
 function closeOrder(){ $('#omask').classList.remove('open'); document.body.classList.remove('lock'); }
 $('#o-x').addEventListener('click', closeOrder);
@@ -1779,45 +1939,81 @@ async function sendOrder(){
   var name = ($('#o-name').value||'').trim();
   var tel  = ($('#o-tel').value||'').trim();
   var note = ($('#o-note').value||'').trim();
+  var s = window._oGetMode ? window._oGetMode() : { mode:'delivery', usePts:false };
+  var addr = s.mode === 'pickup' ? '' : ($('#o-addr').value||'').trim();
   if(!name){ toast('Ekri non ou anvan'); $('#o-name').focus(); return; }
+  if(!tel){ toast('Nou bezwen yon nimewo'); return; }
+  if(s.mode !== 'pickup' && !addr){ toast('Ki kote pou nou livre ?'); return; }
+
+  var sub = oQty*(oProd.price||0);
+  var deliv = s.mode === 'pickup' ? 0 : SHOP_DELIVERY_FEE;
+  var total = sub + deliv;
+  var ptsNeeded = s.usePts ? +(total / PTS_RATE_SHOP).toFixed(2) : 0;
   var btn = $('#o-send'); btn.disabled = true; btn.textContent = 'Ap voye…';
-  var total = oQty*(oProd.price||0);
+
+  if(s.usePts){
+    var okPts = await chargePointsShop(ptsNeeded);
+    if(!okPts){ toast('Ou pa gen ase pwen — dekoche pou peye kach'); btn.disabled=false; btn.textContent='Konfime kòmand la'; return; }
+  }
   var saved = false;
   if(sb){
     try{
-      var r = await sb.from('orders').insert({
-        product_id: oProd.id, product_name: oProd.name, quantity: oQty,
-        total_estimated: total, client_name: name, client_email: window._me.email,
-        client_phone: tel, status: 'pending'
+      var r = await sb.from('move_orders').insert({
+        kind:'shop', partner_id:null, partner_name:'Zetwal Shop', order_mode: s.mode,
+        items:[{ id:oProd.id, name:oProd.name, price:oProd.price, q:oQty }],
+        subtotal: sub, service_fee: 0, delivery_fee: deliv, total: total,
+        paid_with: s.usePts ? 'pwen' : 'cash', points_used: s.usePts ? ptsNeeded : null,
+        address: addr || null, client_name: name, client_phone: tel,
+        client_email: window._me.email, client_uid: window._me.uid, status: 'requested'
       });
       if(!r.error) saved = true;
     }catch(e){}
   }
   btn.disabled = false; btn.textContent = 'Konfime kòmand la';
+  if(!saved){
+    if(s.usePts) await chargePointsShop(-ptsNeeded);
+    toast('Nou pa ka voye kòmand la kounye a — eseye ankò');
+    return;
+  }
   closeOrder();
-  var m = 'Bonjou ! Mwen vle pase yon kòmand :\n\n'+oProd.name+'\nRef #'+ref(oProd.id)
-    +'\nKantite : '+oQty+'\nEstimasyon : '+fmt(total)+' HTG\n\nNon : '+name
-    +(tel?'\nTelefòn : '+tel:'')+(note?'\nNòt : '+note:'')+'\nImel : '+window._me.email+'\n\nMèsi !';
-  window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(m),'_blank');
-  toast(saved ? 'Kòmand ou a anrejistre' : 'Kòmand la voye sou WhatsApp');
-  if(saved) loadMyOrders(window._me.email);
+  window._lastWaMsg = 'Bonjou ! Mwen vle pase yon kòmand :\n\n'+oProd.name+'\nRef #'+ref(oProd.id)
+    +'\nKantite : '+oQty+'\nMòd : '+(s.mode==='pickup'?'Vin chèche l':'Livrezon — '+addr)
+    +'\nTotal : '+fmt(total)+' HTG'+(s.usePts?'\nPEYE AK PWEN : '+ptsNeeded.toFixed(1)+' pwen ✓':'')
+    +'\n\nNon : '+name+(tel?'\nTelefòn : '+tel:'')+(note?'\nNòt : '+note:'')+'\nImel : '+window._me.email+'\n\nMèsi !';
+  toast(s.usePts ? 'Kòmand peye ak pwen — anrejistre' : 'Kòmand ou a anrejistre');
+  loadMyOrders(window._me.email);
 }
 
 /* Kòmand mwen yo */
 async function loadMyOrders(email){
   if(!sb || !email) return;
+  var legacy = [], fresh = [];
   try{
     var r = await sb.from('orders')
       .select('id,product_name,quantity,total_estimated,status,created_at,admin_note')
       .eq('client_email', email).order('created_at',{ascending:false}).limit(60);
     if(r.error) throw r.error;
-    myOrders = r.data || [];
-  }catch(e){ myOrders = []; }
+    legacy = r.data || [];
+  }catch(e){}
+  try{
+    var r2 = await sb.from('move_orders').select('*')
+      .eq('client_email', email).eq('kind','shop').order('created_at',{ascending:false}).limit(60);
+    if(r2.error) throw r2.error;
+    fresh = (r2.data||[]).map(function(o){
+      var first = (o.items && o.items[0]) || {};
+      return Object.assign({}, o, {
+        product_name: (o.items||[]).map(function(it){ return it.name; }).join(', ') || first.name || 'Kòmand',
+        quantity: (o.items||[]).reduce(function(s,it){ return s+(it.q||1); },0) || 1,
+        total_estimated: o.total, _fresh: true
+      });
+    });
+  }catch(e){}
+  myOrders = fresh.concat(legacy).sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); });
   var seen = {};
   try{ seen = JSON.parse(localStorage.getItem(LS_SEEN)||'{}'); }catch(e){}
-  var news = myOrders.filter(function(o){ return o.status!=='pending' && seen[o.id]!==o.status; });
+  var news = myOrders.filter(function(o){ return o.status!=='pending' && o.status!=='requested' && seen[o.id]!==o.status; });
   $('#nbadge').classList.toggle('on', news.length>0);
-  var p = myOrders.filter(function(o){return o.status==='pending';}).length;
+  var p = myOrders.filter(function(o){return o.status==='pending'||o.status==='requested';}).length;
   $('#a-orders').textContent = 'Kòmand mwen yo' + (myOrders.length?' ('+myOrders.length+')':'');
   $('#dr-orders').textContent = $('#a-orders').textContent;
   $('#ord-sub').textContent = myOrders.length
@@ -1860,12 +2056,20 @@ function renderOrders(){
     return;
   }
   var L = { pending:{t:'Ap tann',c:'pending',s:'color:var(--warn);border-color:rgba(255,184,77,.3);background:rgba(255,184,77,.08)'},
+            requested:{t:'Ap tann',c:'pending',s:'color:var(--warn);border-color:rgba(255,184,77,.3);background:rgba(255,184,77,.08)'},
             accepted:{t:'Aksepte',c:'accepted',s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)'},
+            on_way:{t:'Sou wout',c:'accepted',s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)'},
+            arrived:{t:'Livrè rive',c:'accepted',s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)'},
+            picked:{t:'Nan men l',c:'accepted',s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)'},
+            done:{t:'Fini',c:'accepted',s:'color:var(--gold);border-color:var(--g-24);background:var(--g-08)'},
+            cancelled:{t:'Anile',c:'refused',s:'color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)'},
             refused:{t:'Refize',c:'refused',s:'color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)'} };
   box.innerHTML = list.map(function(o){
     var k = L[o.status] || L.pending;
     var msg = o.admin_note ? '<div class="oc-m '+k.c+'">'+esc(o.admin_note)+'</div>'
             : o.status==='accepted' ? '<div class="oc-m accepted">Kòmand ou a aksepte. N ap kontakte w.</div>' : '';
+    var canTrack = o._fresh && ['requested','accepted','on_way','arrived','picked'].indexOf(o.status) !== -1;
+    var track = canTrack ? '<a class="mini" style="margin-top:10px;display:inline-flex" href="taxi.html?swiv='+esc(o.id)+'&t=order" target="_blank">Swiv kòmand lan →</a>' : '';
     return '<div class="oc '+k.c+'">'
       +'<div class="oc-h"><div class="oc-n">'+esc(o.product_name||'')+'</div>'
         +'<span class="oc-b" style="'+k.s+'">'+k.t+'</span></div>'
@@ -1875,7 +2079,7 @@ function renderOrders(){
         +'<div><div class="oc-k">Dat</div><div class="oc-v">'
           +(o.created_at?new Date(o.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}):'—')+'</div></div>'
         +'<div><div class="oc-k">Referans</div><div class="oc-v">#'+ref(o.id)+'</div></div>'
-      +'</div>'+msg+'</div>';
+      +'</div>'+msg+track+'</div>';
   }).join('');
 }
 
@@ -2240,6 +2444,7 @@ function answer(q){
 cartLoadLocal();
 loadProducts();
 loadMarketItems();
+loadShopSettings();
 setInterval(function(){ if(!document.hidden) loadSettings(); }, 300000);
 
 })();
@@ -2252,5 +2457,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<script src="zetwal-profile.js"></script>
 </body>
 </html>
