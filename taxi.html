@@ -585,7 +585,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 
 /* ══ REZO WOUT LA (fon animé) ═════════════════════════════════ */
 #roads{position:fixed;inset:0;z-index:0;pointer-events:none}
-.sec,.hero,.contact,.nav,.dock,.panel,.side{position:relative;z-index:1}
+.sec,.hero,.contact,.nav,.dock{position:relative;z-index:1}
 
 /* ══ HERO ═════════════════════════════════════════════════════ */
 .hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
@@ -801,6 +801,47 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .join .tx span{display:block;font-size:.76rem;color:var(--ink-3);line-height:1.65}
 @media(max-width:560px){ .join{padding:22px 18px;gap:16px} .join .btn{width:100%} }
 
+.trk-back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--ink-3);
+  cursor:pointer;font-family:var(--sans);font-size:.68rem;padding:0 0 16px;letter-spacing:.3px}
+.trk-back:hover{color:var(--gold)}
+.trk-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.trk-t{font-family:var(--serif);font-size:1.05rem;font-weight:600;line-height:1.3}
+.trk-drv{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:10px;margin-bottom:14px;
+  border:1px solid var(--line);background:rgba(255,255,255,.028)}
+.trk-drv .av{width:38px;height:38px;border-radius:50%;background:var(--g-08);border:1px solid var(--g-24);
+  color:var(--gold);display:grid;place-items:center;font-weight:700;flex-shrink:0}
+.trk-drv b{display:block;font-size:.82rem}
+.trk-drv span{display:block;font-size:.68rem;color:var(--ink-4);margin-top:1px}
+.trk-drv .btn{margin-left:auto;padding:7px 14px;font-size:.6rem}
+.trk-pos{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:10px;margin-bottom:14px;
+  border:1px solid var(--g-24);background:var(--g-08);color:var(--gold)}
+.trk-pos svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;flex-shrink:0}
+.trk-pos div b{display:block;font-size:.78rem;color:var(--ink-1)}
+.trk-pos div span{display:block;font-size:.64rem;color:var(--ink-4);margin-top:1px}
+.trk-pos.dim{border-color:var(--line);background:rgba(255,255,255,.025);color:var(--ink-3)}
+.trk-steps{margin-bottom:14px}
+.trk-r{display:flex;align-items:center;gap:12px;padding:9px 0;position:relative}
+.trk-r::before{content:'';position:absolute;left:4px;top:-1px;bottom:-1px;width:1px;background:var(--line);z-index:0}
+.trk-r:first-child::before{top:50%}
+.trk-r:last-child::before{bottom:50%}
+.trk-r b{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.14);flex-shrink:0;z-index:1;position:relative}
+.trk-r span{flex:1;font-size:.76rem;color:var(--ink-3)}
+.trk-r i{font-style:normal;font-size:.64rem;color:var(--ink-4)}
+.trk-r.done b{background:var(--ok);box-shadow:0 0 8px rgba(0,224,138,.6)}
+.trk-r.done span{color:var(--ink-1)}
+.trk-r.now b{background:var(--gold);box-shadow:0 0 10px rgba(212,175,55,.7);width:11px;height:11px;margin:-1px}
+.trk-r.now span{color:var(--gold);font-weight:600}
+
+.paypts{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--g-24);background:var(--g-08);margin-top:14px;font-size:.76rem;color:var(--ink-2)}
+.paypts input{width:17px;height:17px;accent-color:var(--gold)}
+.paypts b{color:var(--gold)}
+.paypts.bad{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.06);color:var(--ink-3)}
+.paypts.bad b{color:var(--bad)}
+.walink{display:block;width:100%;margin-top:9px;padding:9px;border:0;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:.62rem;color:var(--ink-4);text-decoration:underline;text-underline-offset:3px}
+.walink:hover{color:var(--gold)}
+
 .jmask{position:fixed;inset:0;z-index:1016;display:grid;place-items:center;padding:18px;
   background:rgba(3,3,3,.88);backdrop-filter:blur(8px);opacity:0;visibility:hidden;
   transition:opacity var(--med),visibility var(--med)}
@@ -838,6 +879,12 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .pfrole{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
   border:1px solid var(--g-24);background:var(--g-08);color:var(--gold);font-size:.62rem;
   font-weight:700;letter-spacing:.6px;margin:4px 6px 0 0}
+.pf-av-row{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.pf-av-big{width:64px;height:64px;border-radius:50%;flex-shrink:0;overflow:hidden;background:var(--g-08);
+  border:1px solid var(--g-24);color:var(--gold);font-family:var(--serif);font-size:1.5rem;font-weight:700;
+  display:grid;place-items:center}
+.pf-av-big img{width:100%;height:100%;object-fit:cover}
+
 .pftx{display:flex;align-items:flex-start;gap:12px;padding:12px 13px;border-radius:9px;margin-bottom:9px;
   border-left:3px solid var(--line);background:rgba(255,255,255,.025)}
 .pftx.in{border-left-color:var(--ok)}
@@ -1202,11 +1249,12 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
             <input type="checkbox" id="ride-usepts">
             <span>Peye ak pwen — <b class="pv">—</b></span>
           </label>
-          <button class="btn btn-wa" id="ride-go" style="width:100%;margin-top:16px">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1.1.1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.7-1.2-4.5-4-4.6-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.3 0 .5l-.3.5-.3.3c-.1.1-.2.3-.1.5.1.3.6 1.2 1.4 1.9 1 .9 1.8 1.2 2.1 1.3.2.1.4.1.5-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.1.1.6-.1 1.2Z"/></svg>
+          <button class="btn btn-g" id="ride-go" style="width:100%;margin-top:16px">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8-8-2Z"/></svg>
             Mande kous la
           </button>
-          <p class="hintline" id="ride-note">Pri a se yon estimasyon. Chofè a konfime l anvan li pati.</p>
+          <p class="hintline" id="ride-note">Pri a se yon estimasyon. Chofè a konfime l anvan li pati. Pa gen WhatsApp — swiv kous la dirèkteman isit la.</p>
+          <button type="button" id="ride-wa" class="walink">Voye tou sou WhatsApp, si w vle yon moun konfime avè w</button>
         </div>
       </div>
     </div>
@@ -2328,19 +2376,22 @@ $('#ride-go').addEventListener('click', async function(){
     drop_code:drop, status:'requested'
   }, extra);
 
+  var savedRow = null;
   if(sb){
-    try{ var r = await sb.from('rides').insert(row); if(!r.error) saved = true; }
+    try{ var r = await sb.from('rides').insert(row).select().single(); if(!r.error){ saved = true; savedRow = r.data; } }
     catch(e){}
   }
   btn.disabled = false;
 
-  if(!saved && usePts){
-    /* nou pran pwen yo men anrejistreman an echwe : nou remèt yo */
-    await chargePoints(-ptsNeeded);
+  if(!saved){
+    if(usePts) await chargePoints(-ptsNeeded);   /* anrejistreman echwe : nou remèt pwen yo */
+    toast('Nou pa ka voye kous la kounye a — eseye ankò');
+    return;
   }
+
   var label = rideMode === 'person' ? 'Kous — ' + vehOf(vehicle).n
             : rideMode === 'object' ? 'Voye yon objè' : 'Transpò timoun';
-  var m = 'Bonjou Zetwal Kòmand !\n\n' + label + '\n'
+  window._lastWaMsg = 'Bonjou Zetwal Kòmand !\n\n' + label + '\n'
     + 'Depi : ' + ($('#in-a').value || (A.lat.toFixed(5)+','+A.lng.toFixed(5))) + '\n'
     + 'Ale : '  + ($('#in-b').value || (B.lat.toFixed(5)+','+B.lng.toFixed(5))) + '\n'
     + 'Distans : ' + route.km.toFixed(1) + ' km · ' + Math.round(route.min) + ' min\n'
@@ -2352,9 +2403,16 @@ $('#ride-go').addEventListener('click', async function(){
     + (drop ? 'Kòd remèt : ' + drop + '\n' : '')
     + (usePts ? '\nPEYE AK PWEN : ' + ptsNeeded.toFixed(1) + ' pwen ✓\n' : '')
     + '\nESTIMASYON : ' + fmt(window._fare) + ' HTG\n\nMèsi !';
-  window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
-  toast(saved ? (usePts ? 'Kous peye ak pwen — anrejistre' : 'Kous ou a anrejistre') : 'Mesaj la ale sou WhatsApp');
-  if(saved){ $('#ride-usepts').checked = false; if(window._me) loadMine(); }
+
+  toast(usePts ? 'Kous peye ak pwen — n ap chèche yon chofè' : 'Kous ou a anrejistre — n ap chèche yon chofè');
+  $('#ride-usepts').checked = false;
+  if(window._me) loadMine();
+  ridesOpen();
+  if(savedRow) trackOpen(Object.assign({ _t:'ride' }, savedRow));
+});
+$('#ride-wa').addEventListener('click', function(){
+  if(!window._lastWaMsg){ toast('Voye kous ou a anvan'); return; }
+  window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(window._lastWaMsg), '_blank');
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -2439,7 +2497,7 @@ function renderMarket(kind){
   if(!vs.length){
     body.innerHTML = '<div class="empty">' + ICON_V
       + '<h3>' + (kind==='manje' ? 'Pa gen restoran ankò' : 'Pa gen magazen ankò') + '</h3>'
-      + '<p>Patnè yo ajoute depi Konsòl la. Depi premye a antre, l ap parèt isit la ak plat ak pwodwi li yo.</p></div>';
+      + '<p>Nou ap ajoute patnè chak semèn. Depi premye a antre, l ap parèt isit la ak plat ak pwodwi li yo.</p></div>';
     $('#'+pre+'-res').textContent = '';
     $('#'+pre+'-count').textContent = '0';
     return;
@@ -2570,7 +2628,8 @@ function openVenue(id, kind){
       + '<div style="flex:1;min-width:180px">'
         + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px">'
         + '<h3 style="font-family:var(--serif);font-size:1.5rem;font-weight:600">' + esc(v.name||'') + '</h3>'
-        + '<span class="vc-st ' + (open?'st-open':'st-shut') + '" style="position:static">' + (open?'Ouvri':'Fèmen') + '</span></div>'
+        + '<span class="vc-st ' + (open?'st-open':'st-shut') + '" style="position:static">' + (open?'Ouvri':'Fèmen') + '</span>'
+        + '<button class="btn btn-o" id="share-v" style="padding:5px 13px;font-size:.6rem">Pataje</button></div>'
         + (v.description ? '<p style="font-size:.78rem;color:var(--ink-3);line-height:1.6">'+esc(v.description)+'</p>' : '')
         + '<div class="vc-m" style="margin-top:9px"><span><b>' + etaOf(v) + ' min</b></span>'
         + (distOf(v) != null ? '<span class="dot"></span><span>' + distOf(v).toFixed(1) + ' km</span>' : '')
@@ -2598,8 +2657,9 @@ function openVenue(id, kind){
           return '<h4 style="font-family:var(--serif);font-size:1.15rem;font-weight:600;margin:22px 0 12px">Lòt</h4>'
             + noCat.map(function(x){ return hitCard({ x:x, v:v, price:+x.price||0, eta:etaOf(v), dist:distOf(v), open:open }); }).join('');
         })()
-      : '<div class="empty">' + ICON_V + '<h3>Meni an poko ranpli</h3><p>Patnè sa a poko ajoute atik li yo nan Konsòl la.</p></div>');
+      : '<div class="empty">' + ICON_V + '<h3>Meni an poko ranpli</h3><p>Patnè sa a poko ajoute atik li yo.</p></div>');
   $('#back-v').addEventListener('click', function(){ openedVenue = null; renderMarket(kind); });
+  $('#share-v').addEventListener('click', function(){ shareVenue(v); });
   wireHits(kind);
   var y = body.getBoundingClientRect().top + scrollY - 90;
   scrollTo({ top:y, behavior: CALM ? 'auto' : 'smooth' });
@@ -2623,11 +2683,12 @@ function addToCart(itemId, kind){
   toast(x.name + ' nan panye a');
   paintCart();
 }
+var orderMode = 'delivery';   /* 'delivery' oswa 'pickup' — chwazi pa kliyan an nan panye a */
 function cartTotals(){
   var sub = 0, n = 0;
   cart.forEach(function(l){ sub += l.price * l.q; n += l.q; });
   var v = venues.filter(function(y){ return y.id === cartVenue; })[0];
-  var deliv = v ? deliveryFee(v) : 0;
+  var deliv = (orderMode === 'pickup') ? 0 : (v ? deliveryFee(v) : 0);
   var fee = Math.round(sub * (MV.fees.service || 0));
   return { n:n, sub:sub, deliv:deliv, fee:fee, total:sub + deliv + fee, v:v };
 }
@@ -2652,8 +2713,17 @@ function paintCart(){
       + '<div class="ci-c"><button class="qb" data-m="'+i+'">−</button><span class="qn">'+l.q+'</span>'
       + '<button class="qb" data-p="'+i+'">+</button></div></div>';
   }).join('')
-  + '<div class="fld" style="margin-top:18px"><label for="k-addr">Kote pou nou livre</label>'
-  + '<input type="text" id="k-addr" placeholder="Adrès ou — kay, repè" value="' + esc($('#in-a').value||'') + '"></div>'
+  + '<div class="two" style="margin-top:18px" id="k-mode">'
+  + '<button type="button" class="kind' + (orderMode==='delivery'?' on':'') + '" data-om="delivery">'
+    + '<b style="display:block;font-size:.82rem;margin-bottom:2px">Livrezon</b>'
+    + '<span style="font-size:.63rem;color:var(--ink-4)">Peye pwodwi a + livrezon</span></button>'
+  + '<button type="button" class="kind' + (orderMode==='pickup'?' on':'') + '" data-om="pickup">'
+    + '<b style="display:block;font-size:.82rem;margin-bottom:2px">Vin chèche l</b>'
+    + '<span style="font-size:.63rem;color:var(--ink-4)">Peye sèlman pwodwi a</span></button></div>'
+  + (orderMode === 'pickup'
+      ? '<p class="hintline" style="margin-top:10px">Ou va vin chèche kòmand ou lakay <b>' + esc(t.v ? t.v.name : 'patnè a') + '</b> — nou avize w lè li pare.</p>'
+      : '<div class="fld" style="margin-top:14px"><label for="k-addr">Kote pou nou livre</label>'
+        + '<input type="text" id="k-addr" placeholder="Adrès ou — kay, repè" value="' + esc($('#in-a').value||'') + '"></div>')
   + '<div class="two">'
   + '<div class="fld"><label for="k-name">Non ou</label><input type="text" id="k-name" placeholder="Non ak siyati" value="'
     + esc((window._me && window._me.displayName) || '') + '"></div>'
@@ -2669,6 +2739,9 @@ function paintCart(){
   });
   $$('#cart-body [data-p]').forEach(function(b){
     b.addEventListener('click', function(){ cart[+b.getAttribute('data-p')].q++; paintCart(); });
+  });
+  $$('#cart-body [data-om]').forEach(function(b){
+    b.addEventListener('click', function(){ orderMode = b.getAttribute('data-om'); paintCart(); });
   });
   $('#cart-sum').innerHTML =
      '<div class="t-l"><span>Atik yo</span><span>' + fmt(t.sub) + ' HTG</span></div>'
@@ -2696,11 +2769,11 @@ $('#cart-go').addEventListener('click', async function(){
   if(!t.n || !t.v) return;
   var name = (($('#k-name')||{}).value||'').trim();
   var tel  = (($('#k-tel') ||{}).value||'').trim();
-  var addr = (($('#k-addr')||{}).value||'').trim();
+  var addr = orderMode === 'pickup' ? '' : (($('#k-addr')||{}).value||'').trim();
   var note = (($('#k-note')||{}).value||'').trim();
   if(!name){ toast('Ekri non ou'); return; }
   if(!tel){  toast('Nou bezwen yon nimewo'); return; }
-  if(!addr){ toast('Ki kote pou nou livre ?'); return; }
+  if(orderMode !== 'pickup' && !addr){ toast('Ki kote pou nou livre ?'); return; }
 
   var usePts = $('#cart-usepts').checked;
   var ptsNeeded = usePts ? +(t.total / PTS_RATE).toFixed(2) : 0;
@@ -2713,6 +2786,7 @@ $('#cart-go').addEventListener('click', async function(){
   var row = {
     kind: svc, partner_id: t.v.id, partner_name: t.v.name,
     paid_with: usePts ? 'pwen' : 'cash', points_used: usePts ? ptsNeeded : null,
+    order_mode: orderMode,
     items: cart, subtotal: t.sub, service_fee: t.fee, delivery_fee: t.deliv, total: t.total,
     client_name:name, client_phone:tel,
     client_email:(window._me && window._me.email) || null,
@@ -2731,10 +2805,11 @@ $('#cart-go').addEventListener('click', async function(){
     + '\n\nAtik : ' + fmt(t.sub) + ' HTG\nLivrezon : ' + fmt(t.deliv) + ' HTG\nTOTAL : ' + fmt(t.total) + ' HTG\n\n'
     + 'Non : ' + name + '\nTelefòn : ' + tel + '\nAdrès : ' + addr
     + (note ? '\nNòt : ' + note : '')
-    + (usePts ? '\nPEYE AK PWEN : ' + ptsNeeded.toFixed(1) + ' pwen ✓' : '') + '\n\nMèsi !';
+    + '\nMòd : ' + (orderMode==='pickup' ? 'Vin chèche l' : 'Livrezon') + '\n'
+    + (usePts ? 'PEYE AK PWEN : ' + ptsNeeded.toFixed(1) + ' pwen ✓' : '') + '\n\nMèsi !';
   window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
   toast(saved ? (usePts ? 'Kòmand peye ak pwen — anrejistre' : 'Kòmand ou a anrejistre') : 'Kòmand la ale sou WhatsApp');
-  cart = []; cartVenue = null; paintCart();
+  cart = []; cartVenue = null; orderMode = 'delivery'; paintCart();
   $('#cart').classList.remove('open'); $('#veil').classList.remove('open');
   if(saved && window._me) loadMine();
 });
@@ -2744,12 +2819,18 @@ var STATUS = {
   requested:{ t:'Ap tann',    s:'color:var(--warn);border-color:rgba(255,184,77,.3);background:rgba(255,184,77,.08)' },
   accepted :{ t:'Aksepte',    s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
   on_way   :{ t:'Sou wout',   s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
-  picked   :{ t:'Nan men l',  s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
+  arrived  :{ t:'Chofè rive', s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
+  picked   :{ t:'Kòmanse',    s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
   done     :{ t:'Fini',       s:'color:var(--gold);border-color:var(--g-24);background:var(--g-08)' },
   cancelled:{ t:'Anile',      s:'color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)' }
 };
-var FLOW = ['requested','accepted','on_way','picked','done'];
+var FLOW = ['requested','accepted','on_way','arrived','picked','done'];
 var MODE_N = { person:'Kous', object:'Objè', child:'Timoun' };
+function haversine(lat1,lng1,lat2,lng2){
+  var R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
 
 async function loadMine(){
   var mail = window._me && window._me.email;
@@ -2764,6 +2845,7 @@ async function loadMine(){
       .order('created_at',{ascending:false}).limit(30);
     myOrders = b.data || [];
   }catch(e){ myOrders = []; }
+  await consumePenalties();
 
   var all = allMine();
   var seen = {};
@@ -2784,6 +2866,7 @@ function allMine(){
   });
 }
 function renderMine(){
+  if(trackId){ renderTrack(); return; }
   var box = $('#rides-list'); if(!box) return;
   if(!window._me){
     box.innerHTML = '<div class="nulle">' + ICON_V + 'Konekte pou w swiv kòmand ou yo.</div>';
@@ -2822,7 +2905,7 @@ function renderMine(){
     var code = o.drop_code && o.status !== 'done' && o.status !== 'cancelled'
       ? '<div class="rc-code"><b>' + esc(o.drop_code) + '</b>'
         + '<small>Kòd remèt — bay li sèlman lè ou resevwa</small></div>' : '';
-    return '<div class="rc ' + esc(o.status) + '">'
+    return '<div class="rc ' + esc(o.status) + '" data-open="' + esc(o.id+':'+o._t) + '">'
       + '<div class="rc-h"><div class="rc-n">' + esc(title) + '</div>'
       + '<span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
       + '<div class="rc-g">'
@@ -2830,7 +2913,99 @@ function renderMine(){
         + '<div><div class="rc-k">' + (o._t === 'ride' ? 'Distans' : 'Atik') + '</div><div class="rc-v">' + esc(sub) + '</div></div>'
       + '</div>' + track + msg + code + '</div>';
   }).join('');
+  $$('#rides-list .rc').forEach(function(el){
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', function(){ trackOpen(all.filter(function(x){ return (x.id+':'+x._t)===el.getAttribute('data-open'); })[0]); });
+  });
 }
+/* Yon kous kote chofè a te aksepte apre plis pase 3 min tann gen yon
+   penalite deja kalkile (kolòn wait_penalty, soti nan zetwal-swiv.sql).
+   Se ISIT, nan navigatè pwòp kliyan an, ke li retire nan Firestore —
+   jamè nan navigatè yon lòt moun. */
+async function consumePenalties(){
+  if(!window._me || !fs) return;
+  var due = allMine().filter(function(o){
+    return o.wait_penalty > 0 && !o.wait_penalty_applied && o._t === 'ride';
+  });
+  for(var i=0;i<due.length;i++){
+    var o = due[i];
+    var ok = await chargePoints(o.wait_penalty);
+    if(ok && sb){
+      try{ await sb.from('rides').update({ wait_penalty_applied:true }).eq('id', o.id); }catch(e){}
+      o.wait_penalty_applied = true;
+    }
+  }
+}
+
+/* ══ SWIV KOUS LA — chofè reponn? kote li ye? li rive? li kòmanse? li fini? ══ */
+var trackId = null;
+function trackOpen(o){
+  trackId = o.id + ':' + o._t;
+  renderTrack();
+}
+function trackClose(){ trackId = null; renderMine(); }
+function trackTpl(o){
+  var S = STATUS[o.status] || STATUS.requested;
+  var title = o._t === 'ride'
+    ? (MODE_N[o.ride_mode]||'Kous') + ' · ' + (o.from_addr||'—').split(',')[0] + ' → ' + (o.to_addr||'—').split(',')[0]
+    : (o.kind==='manje'?'Manje':'Pake') + ' · ' + (o.partner_name||'');
+  var steps = o._t === 'ride'
+    ? [['requested','Kous voye'],['accepted','Chofè reponn'],['on_way','Chofè sou wout'],
+       ['arrived','Chofè rive'],['picked','Kous kòmanse'],['done','Kous fini']]
+    : (o.order_mode === 'pickup'
+        ? [['requested','Kòmand voye'],['accepted','Patnè konfime'],['picked','Pare pou ranmase'],['done','Ranmase — fini']]
+        : [['requested','Kòmand voye'],['accepted','Patnè aksepte'],['on_way','Livrezon sou wout'],
+           ['arrived','Livrè rive'],['picked','Nan men l'],['done','Livrezon fini']]);
+  var pos = steps.map(function(st){ return st[0]; }).indexOf(o.status);
+  var tkey = { accepted:'accepted_at', on_way:'accepted_at', arrived:'arrived_at', picked:'started_at', done:'done_at' };
+  var rows = steps.map(function(st,i){
+    var done = i <= pos && o.status !== 'cancelled';
+    var t = tkey[st[0]] && o[tkey[st[0]]] ? new Date(o[tkey[st[0]]]).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})
+      : (st[0]==='requested' && o.created_at ? new Date(o.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '');
+    return '<div class="trk-r' + (done?' done':'') + (i===pos&&o.status!=='cancelled'?' now':'') + '">'
+      + '<b></b><span>' + st[1] + '</span>' + (t ? '<i>' + t + '</i>' : '') + '</div>';
+  }).join('');
+  var pos1 = null;
+  var needsDriver = o._t === 'ride' || o.order_mode !== 'pickup';
+  if(o.driver_lat && o.driver_updated_at && (Date.now() - new Date(o.driver_updated_at).getTime()) < 120000 && o.from_lat){
+    var d = haversine(o.driver_lat, o.driver_lng, o.from_lat, o.from_lng);
+    pos1 = '<div class="trk-pos">' + ICON_V + '<div><b>Chofè a ~' + d.toFixed(1) + ' km</b>'
+      + '<span>Pozisyon mete ajou ' + Math.max(1,Math.round((Date.now()-new Date(o.driver_updated_at).getTime())/1000)) + 's pase</span></div></div>';
+  } else if(needsDriver && (o.status === 'accepted' || o.status === 'on_way')){
+    pos1 = '<div class="trk-pos dim">' + ICON_V + '<div><b>N ap tann pozisyon chofè a</b><span>Li ka pran kèk segonn</span></div></div>';
+  }
+  var driver = o.driver_name ? '<div class="trk-drv"><div class="av">' + initial(o.driver_name) + '</div>'
+    + '<div><b>' + esc(o.driver_name) + '</b>' + (o.driver_phone ? '<span>' + esc(o.driver_phone) + '</span>' : '') + '</div>'
+    + (o.driver_phone ? '<a class="btn btn-o" href="tel:' + esc(o.driver_phone) + '">Rele</a>' : '') + '</div>' : '';
+  var wait = (o.status === 'requested')
+    ? '<p class="hintline" id="trk-wait" data-since="' + esc(o.created_at) + '">Ap tann yon chofè reponn…</p>' : '';
+  var pen = o.wait_penalty > 0
+    ? '<p class="hintline" style="color:var(--warn)">Tan tann lan te depase 3 min — ' + Number(o.wait_penalty).toFixed(1) + ' pwen penalite aplike.</p>' : '';
+  var code = o.drop_code && o.status !== 'done' && o.status !== 'cancelled'
+    ? '<div class="rc-code"><b>' + esc(o.drop_code) + '</b><small>Kòd remèt — bay li sèlman lè ou resevwa</small></div>' : '';
+  return '<button class="trk-back" id="trk-back" type="button">← Tounen nan lis la</button>'
+    + '<div class="trk-h"><div class="trk-t">' + esc(title) + '</div><span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
+    + driver + (pos1||'') + '<div class="trk-steps">' + rows + '</div>' + wait + pen + code;
+}
+function renderTrack(){
+  if(!trackId) return;
+  var o = allMine().filter(function(x){ return (x.id+':'+x._t) === trackId; })[0];
+  var box = $('#rides-list'); if(!box) return;
+  if(!o){ trackClose(); return; }
+  box.innerHTML = trackTpl(o);
+  var back = $('#trk-back'); if(back) back.addEventListener('click', trackClose);
+  var w = $('#trk-wait');
+  if(w && !w._t){
+    w._t = setInterval(function(){
+      if(!$('#trk-wait')){ clearInterval(w._t); return; }
+      var s = Math.floor((Date.now() - new Date(w.getAttribute('data-since')).getTime())/1000);
+      var m = Math.floor(s/60), sec = s%60;
+      w.textContent = 'Ap tann yon chofè reponn… ' + m + ':' + (sec<10?'0':'') + sec
+        + (s>180 ? ' — plis pase 3 min' : '');
+    }, 1000);
+  }
+}
+
 function ridesOpen(){
   var seen = {};
   allMine().forEach(function(o){ seen[o.id] = o.status; });
@@ -3092,7 +3267,10 @@ if(auth) auth.onAuthStateChanged(async function(user){
   await seedUser(user, name);
   if(fs){
     unsubPts = fs.collection('users').doc(user.uid).onSnapshot(function(doc){
-      setPoints(Number(doc.exists ? (doc.data().points || 0) : 0) || 0);
+      var d = doc.exists ? doc.data() : {};
+      setPoints(Number(d.points || 0) || 0);
+      window._profile = d;
+      if($('#profile').classList.contains('open') && pfTab === 'info') renderPfInfo();
     }, function(){ setPoints(0); });
   }
   var status = 'Itilizatè';
@@ -3206,7 +3384,7 @@ function renderJobs(){
   var mine = jobsAll.filter(function(o){
     return o.driver_uid === uid && o.status !== 'done' && o.status !== 'cancelled';
   });
-  var free = jobsAll.filter(function(o){ return o.status === 'requested' && !o.driver_uid; });
+  var free = jobsAll.filter(function(o){ return o.status === 'requested' && !o.driver_uid && o.order_mode !== 'pickup'; });
 
   var html = '';
   if(mine.length){
@@ -3231,8 +3409,13 @@ function jobCard(o, mine){
   var sub = o._t === 'ride'
     ? (o.distance_km ? o.distance_km + ' km · ' + (o.duration_min||'?') + ' min' : '—')
     : ((o.items && o.items.length ? o.items.length + ' atik' : '') + ' · livrezon ' + fmt(o.delivery_fee));
-  var next = { requested:'accepted', accepted:'on_way', on_way:'picked', picked:'done' }[o.status];
-  var lab  = { accepted:'Mwen pran l', on_way:'Mwen sou wout', picked:'Mwen gen li', done:'Fini' }[next] || '';
+  var next = { requested:'accepted', accepted:'on_way', on_way:'arrived', arrived:'picked', picked:'done' }[o.status];
+  var isPerson = o._t === 'ride' && o.ride_mode === 'person';
+  var lab = {
+    accepted:'Mwen pran l', on_way:'Mwen sou wout', arrived:'Mwen rive',
+    picked: isPerson ? 'Kous kòmanse' : 'Mwen gen li',
+    done:   isPerson ? 'Kous fini'    : 'Fini'
+  }[next] || '';
   var b = '';
   if(next) b += '<button class="btn btn-g" data-job="' + esc(o.id) + '" data-kind="' + o._t
     + '" data-to="' + next + '">' + lab + '</button>';
@@ -3244,23 +3427,58 @@ function jobCard(o, mine){
     + (o.notes ? '<div class="jb-s">« ' + esc(o.notes) + ' »</div>' : '')
     + '<div class="jb-b">' + b + '</div></div>';
 }
+var TS_COL = { accepted:'accepted_at', arrived:'arrived_at', picked:'started_at', done:'done_at' };
 async function jobAct(id, kind, to){
   if(!sb) return;
   var t = kind === 'ride' ? 'rides' : 'move_orders';
+  var o = jobsAll.filter(function(x){ return x.id === id; })[0];
   var patch = { status: to, updated_at: new Date().toISOString() };
+  if(TS_COL[to]) patch[TS_COL[to]] = patch.updated_at;
   if(to === 'accepted'){
     patch.driver_uid  = window._me.uid;
     patch.driver_name = ROLE.driver.name || (window._me.displayName || '');
     patch.driver_phone = ROLE.driver.phone || null;
+    /* Tan tann lan depase 3 min? Nou kalkile penalite a yon sèl fwa la a,
+       pito pase yon minitè k ap ekri chak 5 segonn (sa ta egzije telefòn
+       kliyan an rete louvri san rete, e li ta chaje baz done a pou gremesi). */
+    if(o && o.created_at){
+      var waitSec = Math.floor((Date.now() - new Date(o.created_at).getTime())/1000);
+      if(waitSec > 180){
+        var cap = kind === 'ride' ? (o.price_estimated||0)/PTS_RATE : (o.total||0)/PTS_RATE;
+        patch.wait_penalty = Math.min(Math.floor((waitSec-180)/5)*2, Math.round(cap*10)/10);
+      }
+    }
   }
   try{
     var r = await sb.from(t).update(patch).eq('id', id);
     if(r.error) throw r.error;
-    var o = jobsAll.filter(function(x){ return x.id === id; })[0];
     if(o) Object.assign(o, patch);
+    if(to === 'on_way') jobWatchStart(t, id);
+    if(to === 'arrived' || to === 'picked' || to === 'done') jobWatchStop();
+    if(to === 'done' && o && o.paid_with === 'pwen' && o.points_used > 0 && fs && window._me){
+      try{ await fs.collection('users').doc(window._me.uid).update({
+        points: firebase.firestore.FieldValue.increment(Number(o.points_used)) }); }catch(e){}
+    }
     renderJobs();
-    toast(to === 'done' ? 'Kous fini — mèsi !' : 'Mizajou voye bay kliyan an');
+    toast(to === 'done' ? 'Kous fini — pwen yo antre sou kont ou !' : 'Mizajou voye bay kliyan an');
   }catch(e){ toast('Nou pa ka mete l ajou'); }
+}
+/* Pozisyon chofè a, voye bay kliyan an pandan l ap woule vè li */
+var jobWatchId = null;
+function jobWatchStart(table, id){
+  jobWatchStop();
+  if(!navigator.geolocation || !sb) return;
+  var last = 0;
+  jobWatchId = navigator.geolocation.watchPosition(function(pos){
+    var now = Date.now(); if(now - last < 20000) return; last = now;
+    sb.from(table).update({
+      driver_lat: pos.coords.latitude, driver_lng: pos.coords.longitude,
+      driver_updated_at: new Date().toISOString()
+    }).eq('id', id).then(function(){}, function(){});
+  }, function(){}, { enableHighAccuracy:true, maximumAge:15000, timeout:20000 });
+}
+function jobWatchStop(){
+  if(jobWatchId !== null && navigator.geolocation){ navigator.geolocation.clearWatch(jobWatchId); jobWatchId = null; }
 }
 
 /* ── Patnè : atik mwen yo, ak sa k ap tann validasyon ── */
@@ -3372,22 +3590,124 @@ function renderProfile(){
   $('#pf-s').textContent = u.email || '';
 
   var tabs = '<div class="sp-tabs">'
+    + '<button class="' + (pfTab==='info'?'on':'') + '" data-pt="info">Enfo</button>'
     + '<button class="' + (pfTab==='hist'?'on':'') + '" data-pt="hist">Istwa</button>'
     + '<button class="' + (pfTab==='notif'?'on':'') + '" data-pt="notif">Notifikasyon</button>'
-    + '<button class="' + (pfTab==='send'?'on':'') + '" data-pt="send">Voye pwen</button></div>';
+    + '<button class="' + (pfTab==='send'?'on':'') + '" data-pt="send">Voye pwen</button>'
+    + '<button class="' + (pfTab==='ask'?'on':'') + '" data-pt="ask">Mande pwen</button></div>';
 
   var head = '<div class="pfcard"><div class="k">Solid pwen ou</div>'
     + '<div class="v">' + (window._pts||0).toFixed(1) + '<s>pwen</s></div></div>'
     + (roles.length ? '<div style="margin-bottom:14px">' + roles.map(function(r){
-        return '<span class="pfrole">' + r + '</span>'; }).join('') + '</div>' : '');
+        return '<span class="pfrole">' + r + '</span>'; }).join('') + '</div>' : '')
+    + '<button class="btn btn-o" id="pf-share" style="width:100%;margin-bottom:16px">Pataje pwofil mwen</button>';
 
   $('#pf-body').innerHTML = head + tabs + '<div id="pf-in"></div>';
   $$('#pf-body .sp-tabs button').forEach(function(b){
     b.addEventListener('click', function(){ pfTab = b.getAttribute('data-pt'); renderProfile(); });
   });
-  if(pfTab === 'hist') renderPfHistory();
+  $('#pf-share').addEventListener('click', function(){ shareProfile(u); });
+  if(pfTab === 'info') renderPfInfo();
+  else if(pfTab === 'hist') renderPfHistory();
   else if(pfTab === 'notif') renderPfNotif();
+  else if(pfTab === 'ask') renderPfAsk();
   else renderPfSend();
+}
+function shareProfile(u){
+  var url = location.origin + location.pathname.replace(/[^/]*$/, '') + 'taxi.html?moun=' + encodeURIComponent(u.uid);
+  if(navigator.share){ navigator.share({ title:'Pwofil mwen sou Zetwal', url:url }).catch(function(){}); return; }
+  if(navigator.clipboard){ navigator.clipboard.writeText(url).then(function(){ toast('Lyen pwofil la kopye'); }); }
+  else toast(url);
+}
+function shareVenue(v){
+  var url = location.origin + location.pathname + '?patne=' + encodeURIComponent(v.id);
+  var text = v.name + ' sou Zetwal Kòmand — gade meni an epi kòmande.';
+  if(navigator.share){ navigator.share({ title:v.name, text:text, url:url }).catch(function(){}); return; }
+  if(navigator.clipboard){ navigator.clipboard.writeText(url).then(function(){ toast('Lyen ' + v.name + ' kopye'); }); }
+  else toast(url);
+}
+/* Yon lyen pataje (?patne=... oswa ?moun=...) louvri deja sou bon bagay la */
+function openSharedFromURL(){
+  var qs = new URLSearchParams(location.search);
+  var pid = qs.get('patne');
+  if(pid){
+    loadMarket('manje'); loadMarket('pake');
+    var tryOpen = setInterval(function(){
+      var v = venues.filter(function(x){ return x.id === pid; })[0];
+      if(v){ clearInterval(tryOpen); openVenue(v.id, v.kind); }
+    }, 400);
+    setTimeout(function(){ clearInterval(tryOpen); }, 8000);
+  }
+  var mid = qs.get('moun');
+  if(mid && !window._me){
+    setTimeout(function(){ toast('Pwofil pataje — konekte pou w wè l epi voye pwen'); }, 600);
+  }
+}
+function renderPfInfo(){
+  var box = $('#pf-in'); if(!box) return;
+  var u = window._me, prof = window._profile || {};
+  box.innerHTML =
+      '<div class="pf-av-row"><div class="pf-av-big" id="pf-av-big">'
+        + (prof.photo_url ? '<img src="' + esc(prof.photo_url) + '" alt="">' : initial(u.displayName||u.email))
+      + '</div><label class="btn btn-o" style="cursor:pointer">Chanje foto<input type="file" id="pf-photo" accept="image/*" style="display:none"></label></div>'
+    + '<div class="fld"><label for="pf-name">Non</label><input type="text" id="pf-name" value="' + esc(u.displayName||'') + '"></div>'
+    + '<div class="fld"><label for="pf-bday">Dat nesans</label><input type="date" id="pf-bday" value="' + esc(prof.birthdate||'') + '"></div>'
+    + '<div class="fld"><label for="pf-bio">Byografi</label><textarea id="pf-bio" placeholder="Kèk mo sou ou…">' + esc(prof.bio||'') + '</textarea></div>'
+    + '<button class="btn btn-g" id="pf-save" style="width:100%">Anrejistre chanjman yo</button>'
+    + '<p class="hintline">Enfo sa yo parèt lè w pataje pwofil ou ak yon zanmi.</p>';
+  $('#pf-photo').addEventListener('change', pfUploadPhoto);
+  $('#pf-save').addEventListener('click', pfSaveInfo);
+}
+async function pfUploadPhoto(e){
+  var f = e.target.files && e.target.files[0]; if(!f || !sb || !window._me) return;
+  var box = $('#pf-av-big'); if(box) box.innerHTML = '<span class="spin"></span>';
+  try{
+    var path = window._me.uid + '/' + Date.now() + '.' + (f.name.split('.').pop()||'jpg');
+    var up = await sb.storage.from('avatars').upload(path, f, { upsert:true });
+    if(up.error) throw up.error;
+    var pub = sb.storage.from('avatars').getPublicUrl(path);
+    var url = pub.data.publicUrl;
+    await fs.collection('users').doc(window._me.uid).set({ photo_url:url }, { merge:true });
+    window._profile = Object.assign(window._profile||{}, { photo_url:url });
+    toast('Foto mete ajou'); renderPfInfo();
+  }catch(err){ toast('Nou pa ka voye foto a kounye a'); renderPfInfo(); }
+}
+async function pfSaveInfo(){
+  if(!fs || !window._me) return;
+  var name = ($('#pf-name').value||'').trim();
+  var bday = $('#pf-bday').value || null;
+  var bio  = ($('#pf-bio').value||'').trim();
+  var btn = $('#pf-save'); btn.disabled = true; btn.textContent = 'K ap anrejistre…';
+  try{
+    await fs.collection('users').doc(window._me.uid).set({ birthdate:bday, bio:bio }, { merge:true });
+    if(name && auth.currentUser) await auth.currentUser.updateProfile({ displayName:name });
+    window._profile = Object.assign(window._profile||{}, { birthdate:bday, bio:bio });
+    toast('Pwofil ou anrejistre');
+  }catch(e){ toast('Nou pa ka anrejistre kounye a'); }
+  btn.disabled = false; btn.textContent = 'Anrejistre chanjman yo';
+}
+function renderPfAsk(){
+  var box = $('#pf-in'); if(!box) return;
+  box.innerHTML =
+      '<div class="fld"><label for="ask-amt">Konbe pwen ou ta renmen</label>'
+      + '<input type="number" id="ask-amt" min="1" step="0.1" placeholder="20"></div>'
+    + '<div class="fld"><label for="ask-why">Poukisa</label>'
+      + '<textarea id="ask-why" placeholder="Yon ti mo pou administratè a konprann demann lan…"></textarea></div>'
+    + '<button class="btn btn-g" id="ask-go" style="width:100%">Voye demann lan</button>'
+    + '<p class="hintline">Yon administratè ap gade demann lan epi deside.</p>';
+  $('#ask-go').addEventListener('click', async function(){
+    var amt = parseFloat($('#ask-amt').value)||0, why = ($('#ask-why').value||'').trim();
+    if(amt <= 0){ toast('Konbe pwen ou ta renmen?'); return; }
+    var btn = this; btn.disabled = true;
+    try{
+      await sb.from('point_asks').insert({
+        uid:window._me.uid, name:window._me.displayName||window._me.email, email:window._me.email,
+        amount:amt, reason:why||null
+      });
+      toast('Demann voye — n ap gade l'); $('#ask-amt').value=''; $('#ask-why').value='';
+    }catch(e){ toast('Nou pa ka voye demann lan kounye a'); }
+    btn.disabled = false;
+  });
 }
 function renderPfHistory(){
   var box = $('#pf-in'); if(!box) return;
@@ -3642,7 +3962,7 @@ function answer(q){
 
 /* ══════════════════════════════════════════════════════════════
    18. VIN PATNÈ — livrè, restoran, magazen
-   Demann lan ak papye yo ale dirèk nan Konsòl la.
+   Demann lan ak papye yo ale dirèk bay ekip nou an.
    ══════════════════════════════════════════════════════════════ */
 var JK = {
   driver: {
@@ -3804,7 +4124,7 @@ window.jUpload = async function(inp){
     toast('Nou pa ka voye foto a. Si sa kontinye, verifye si zetwal-espas.sql pase nan Supabase.');
   }
 };
-/* Konpresyon nan navigatè a, menm jan ak Konsòl la */
+/* Konpresyon nan navigatè a, anvan voye */
 function compressDoc(file, maxW){
   return new Promise(function(res, rej){
     var img = new Image(), url = URL.createObjectURL(file);
@@ -3902,7 +4222,7 @@ $('#j-send').addEventListener('click', async function(){
 
 /* ══ 17. DEPA ═════════════════════════════════════════════════ */
 buildRideCard(); price(); paintCart();
-loadConfig(); loadPtsRate();
+loadConfig(); loadPtsRate(); openSharedFromURL();
 setInterval(function(){ if(!document.hidden) loadConfig(); }, 300000);
 
 })();
