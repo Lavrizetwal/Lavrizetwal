@@ -2629,7 +2629,8 @@ function openVenue(id, kind){
         + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px">'
         + '<h3 style="font-family:var(--serif);font-size:1.5rem;font-weight:600">' + esc(v.name||'') + '</h3>'
         + '<span class="vc-st ' + (open?'st-open':'st-shut') + '" style="position:static">' + (open?'Ouvri':'Fèmen') + '</span>'
-        + '<button class="btn btn-o" id="share-v" style="padding:5px 13px;font-size:.6rem">Pataje</button></div>'
+        + '<button class="btn btn-o" id="share-v" style="padding:5px 13px;font-size:.6rem">Pataje</button>'
+        + '<button class="btn btn-o" id="share-v-msg" style="padding:5px 13px;font-size:.6rem">Voye nan Mesaj</button></div>'
         + (v.description ? '<p style="font-size:.78rem;color:var(--ink-3);line-height:1.6">'+esc(v.description)+'</p>' : '')
         + '<div class="vc-m" style="margin-top:9px"><span><b>' + etaOf(v) + ' min</b></span>'
         + (distOf(v) != null ? '<span class="dot"></span><span>' + distOf(v).toFixed(1) + ' km</span>' : '')
@@ -2660,6 +2661,10 @@ function openVenue(id, kind){
       : '<div class="empty">' + ICON_V + '<h3>Meni an poko ranpli</h3><p>Patnè sa a poko ajoute atik li yo.</p></div>');
   $('#back-v').addEventListener('click', function(){ openedVenue = null; renderMarket(kind); });
   $('#share-v').addEventListener('click', function(){ shareVenue(v); });
+  $('#share-v-msg').addEventListener('click', function(){
+    if(!window._me){ toast('Konekte anvan pou w pataje'); return; }
+    shareToMessage(location.origin + location.pathname + '?patne=' + encodeURIComponent(v.id), v.name);
+  });
   wireHits(kind);
   var y = body.getBoundingClientRect().top + scrollY - 90;
   scrollTo({ top:y, behavior: CALM ? 'auto' : 'smooth' });
@@ -2815,6 +2820,7 @@ $('#cart-go').addEventListener('click', async function(){
 });
 
 /* ══ 15. KÒMAND MWEN YO ═══════════════════════════════════════ */
+function kindLabel(o){ return o.kind === 'manje' ? 'Manje' : (o.kind === 'shop' ? 'Acha Shop' : 'Pake'); }
 var STATUS = {
   requested:{ t:'Ap tann',    s:'color:var(--warn);border-color:rgba(255,184,77,.3);background:rgba(255,184,77,.08)' },
   accepted :{ t:'Aksepte',    s:'color:var(--ok);border-color:rgba(0,224,138,.3);background:rgba(0,224,138,.08)' },
@@ -2895,7 +2901,7 @@ function renderMine(){
       sub = (o.distance_km ? o.distance_km + ' km' : '—');
       price = o.price_estimated;
     } else {
-      title = (o.kind === 'manje' ? 'Manje' : 'Pake') + ' · ' + (o.partner_name || '');
+      title = kindLabel(o) + ' · ' + (o.partner_name||'');
       sub = (o.items && o.items.length ? o.items.length + ' atik' : '—');
       price = o.total;
     }
@@ -2948,7 +2954,7 @@ function trackTpl(o){
   var S = STATUS[o.status] || STATUS.requested;
   var title = o._t === 'ride'
     ? (MODE_N[o.ride_mode]||'Kous') + ' · ' + (o.from_addr||'—').split(',')[0] + ' → ' + (o.to_addr||'—').split(',')[0]
-    : (o.kind==='manje'?'Manje':'Pake') + ' · ' + (o.partner_name||'');
+    : kindLabel(o) + ' · ' + (o.partner_name||'');
   var steps = o._t === 'ride'
     ? [['requested','Kous voye'],['accepted','Chofè reponn'],['on_way','Chofè sou wout'],
        ['arrived','Chofè rive'],['picked','Kous kòmanse'],['done','Kous fini']]
@@ -3288,6 +3294,7 @@ if(auth) auth.onAuthStateChanged(async function(user){
   loadRole().then(function(){ if(ROLE.driver) loadJobs(); if(spPartner) loadMyItems(); });
   if($('#r-name') && !$('#r-name').value) $('#r-name').value = name;
   loadMine();
+  checkUserLinks();
 });
 
 
@@ -3404,7 +3411,7 @@ function renderJobs(){
 function jobCard(o, mine){
   var title = o._t === 'ride'
     ? (MODE_N[o.ride_mode] || 'Kous') + ' · ' + (o.from_addr||'—').split(',')[0] + ' → ' + (o.to_addr||'—').split(',')[0]
-    : (o.kind === 'manje' ? 'Manje' : 'Pake') + ' · ' + (o.partner_name||'') + ' → ' + (o.address||'—').split(',')[0];
+    : kindLabel(o) + ' · ' + (o.partner_name||'') + ' → ' + (o.address||'—').split(',')[0];
   var price = o._t === 'ride' ? o.price_estimated : o.total;
   var sub = o._t === 'ride'
     ? (o.distance_km ? o.distance_km + ' km · ' + (o.duration_min||'?') + ' min' : '—')
@@ -3563,7 +3570,7 @@ async function addMyItem(){
    15ter. PWOFIL MWEN — istwa, notifikasyon, voye pwen
    Aksesib pou tout moun : kliyan, chofè, patnè.
    ══════════════════════════════════════════════════════════════ */
-var pfTab = 'hist', PTS_RATE = 10;   /* 1 pwen = X HTG — soti nan move_points_rate */
+var pfTab = 'hist', PTS_RATE = 1;    /* 1 pwen = X HTG — soti nan move_points_rate. 1 pwen = 1 HTG. */
 
 function profileOpen(){
   $('#profile').classList.add('open'); $('#veil').classList.add('open');
@@ -3591,6 +3598,7 @@ function renderProfile(){
 
   var tabs = '<div class="sp-tabs">'
     + '<button class="' + (pfTab==='info'?'on':'') + '" data-pt="info">Enfo</button>'
+    + '<button class="' + (pfTab==='msg'?'on':'') + '" data-pt="msg">Mesaj</button>'
     + '<button class="' + (pfTab==='hist'?'on':'') + '" data-pt="hist">Istwa</button>'
     + '<button class="' + (pfTab==='notif'?'on':'') + '" data-pt="notif">Notifikasyon</button>'
     + '<button class="' + (pfTab==='send'?'on':'') + '" data-pt="send">Voye pwen</button>'
@@ -3608,6 +3616,7 @@ function renderProfile(){
   });
   $('#pf-share').addEventListener('click', function(){ shareProfile(u); });
   if(pfTab === 'info') renderPfInfo();
+  else if(pfTab === 'msg') renderMsgList();
   else if(pfTab === 'hist') renderPfHistory();
   else if(pfTab === 'notif') renderPfNotif();
   else if(pfTab === 'ask') renderPfAsk();
@@ -3638,9 +3647,24 @@ function openSharedFromURL(){
     }, 400);
     setTimeout(function(){ clearInterval(tryOpen); }, 8000);
   }
+  checkUserLinks();
+}
+/* Pati nan lyen pataje a ki bezwen itilizatè a konekte anvan
+   (?moun=uid, ?swiv=id) — rele ankò yon fwa koneksyon an rezoud. */
+function checkUserLinks(){
+  var qs = new URLSearchParams(location.search);
   var mid = qs.get('moun');
   if(mid && !window._me){
     setTimeout(function(){ toast('Pwofil pataje — konekte pou w wè l epi voye pwen'); }, 600);
+  }
+  var swiv = qs.get('swiv'), swivT = qs.get('t');
+  if(swiv && window._me){
+    var table = swivT === 'ride' ? 'rides' : 'move_orders';
+    sb.from(table).select('*').eq('id', swiv).single().then(function(r){
+      if(r.data){ ridesOpen(); trackOpen(Object.assign({ _t: swivT === 'ride' ? 'ride' : 'order' }, r.data)); }
+    }, function(){});
+  } else if(swiv && !window._me){
+    setTimeout(function(){ toast('Konekte pou w swiv kòmand ou a'); }, 600);
   }
 }
 function renderPfInfo(){
@@ -3709,6 +3733,136 @@ function renderPfAsk(){
     btn.disabled = false;
   });
 }
+
+/* ══════════════════════════════════════════════════════════════
+   MESAJ — konvèsasyon prive ant de itilizatè (Firestore).
+   Menm modèl ke zetwal-profile.js, adapte ak varyab paj sa a.
+   ══════════════════════════════════════════════════════════════ */
+function convId(uidA, uidB){ return [uidA, uidB].sort().join('_'); }
+var msgUnsub = null;
+async function loadConversations(){
+  if(!fs || !window._me) return [];
+  try{
+    var r = await fs.collection('conversations')
+      .where('participants', 'array-contains', window._me.uid)
+      .orderBy('lastAt', 'desc').limit(50).get();
+    return r.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); });
+  }catch(e){ return []; }
+}
+function otherOfConv(conv){
+  var uid = (conv.participants||[]).filter(function(x){ return x !== window._me.uid; })[0];
+  var names = conv.participantNames || {}, emails = conv.participantEmails || {};
+  return { uid:uid, name:names[uid] || emails[uid] || 'Itilizatè', email:emails[uid] || '' };
+}
+async function renderMsgList(){
+  var box = $('#pf-in'); if(!box) return;
+  box.innerHTML =
+      '<div class="fld"><label for="mg-mail">Kòmanse yon nouvo konvèsasyon (imel)</label>'
+      + '<div style="display:flex;gap:8px"><input type="email" id="mg-mail" placeholder="zanmi@imel.com" style="flex:1">'
+      + '<button class="btn btn-g" id="mg-start" style="width:auto;padding:0 16px">Kòmanse</button></div></div>'
+    + '<div class="side-s" style="margin:18px 0 10px">Konvèsasyon ou yo</div>'
+    + '<div id="mg-list" class="nulle">' + ICON_V + 'K ap chaje…</div>';
+  $('#mg-start').addEventListener('click', async function(){
+    var mail = ($('#mg-mail').value||'').trim();
+    if(!mail){ toast('Ekri imel zanmi w lan'); return; }
+    if(mail.toLowerCase() === (window._me.email||'').toLowerCase()){ toast('Ou pa ka voye tèt ou mesaj'); return; }
+    var dest = await findUserByEmail(mail);
+    if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); return; }
+    await openThreadMove(dest.uid, dest.name, dest.email);
+  });
+  var convs = await loadConversations();
+  var list = $('#mg-list'); if(!list) return;
+  list.innerHTML = convs.length ? convs.map(function(c){
+    var o = otherOfConv(c);
+    var unread = (c.unread && c.unread[window._me.uid]) || 0;
+    return '<div class="pftx' + (unread?' out':' in') + '" style="cursor:pointer" data-conv="' + esc(o.uid) + '|' + esc(o.name) + '|' + esc(o.email) + '">'
+      + '<div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
+      + '<div class="bd"><b>' + esc(o.name) + (unread ? ' · ' + unread + ' nouvo' : '') + '</b>'
+      + '<span>' + esc(c.lastMessage||'') + '</span></div></div>';
+  }).join('') : '<div class="nulle">' + ICON_V + 'Ou poko gen konvèsasyon. Ekri yon imel anwo pou kòmanse.</div>';
+  $$('#mg-list [data-conv]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var p = el.getAttribute('data-conv').split('|');
+      openThreadMove(p[0], p[1], p[2]);
+    });
+  });
+}
+async function openThreadMove(otherUid, otherName, otherEmail){
+  var cid = convId(window._me.uid, otherUid);
+  var box = $('#pf-in'); if(!box) return;
+  box.innerHTML =
+      '<button id="mg-back" type="button" style="border:0;background:none;color:var(--ink-3);'
+      + 'cursor:pointer;font-family:var(--sans);font-size:.68rem;padding:0 0 14px">← Tounen nan lis la</button>'
+    + '<div style="font-weight:600;font-size:.9rem;margin-bottom:12px">' + esc(otherName) + '</div>'
+    + '<div id="mg-thread" style="max-height:360px;overflow-y:auto;margin-bottom:14px"></div>'
+    + '<div style="display:flex;gap:8px"><input type="text" id="mg-input" placeholder="Ekri yon mesaj…" style="flex:1;padding:11px 13px;'
+      + 'border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--ink-1);font-family:var(--sans);font-size:.8rem">'
+    + '<button class="btn btn-g" id="mg-send" style="width:auto;padding:11px 16px">Voye</button></div>';
+  $('#mg-back').addEventListener('click', function(){ if(msgUnsub){ msgUnsub(); msgUnsub=null; } renderMsgList(); });
+  $('#mg-send').addEventListener('click', function(){ sendMessageMove(otherUid); });
+  $('#mg-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessageMove(otherUid); });
+
+  var ref = fs.collection('conversations').doc(cid);
+  var seed = { participants:[window._me.uid, otherUid], participantNames:{}, participantEmails:{} };
+  seed.participantNames[window._me.uid] = window._me.displayName || window._me.email;
+  seed.participantNames[otherUid] = otherName;
+  seed.participantEmails[window._me.uid] = window._me.email || '';
+  seed.participantEmails[otherUid] = otherEmail || '';
+  try{ await ref.set(seed, { merge:true }); }catch(e){}
+  try{ var u = {}; u[window._me.uid] = 0; await ref.set({ unread:u }, { merge:true }); }catch(e){}
+
+  if(msgUnsub) msgUnsub();
+  msgUnsub = ref.collection('messages').orderBy('created_at', 'asc').limit(200)
+    .onSnapshot(function(snap){
+      var thread = $('#mg-thread'); if(!thread) return;
+      var rows = []; snap.forEach(function(d){ rows.push(d.data()); });
+      thread.innerHTML = rows.length ? rows.map(function(m){
+        var mine = m.from === window._me.uid;
+        return '<div style="display:flex;justify-content:' + (mine?'flex-end':'flex-start') + ';margin-bottom:8px">'
+          + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;'
+          + (mine ? 'background:var(--gold);color:#0A0A0A' : 'background:rgba(255,255,255,.06);color:var(--ink-1)') + '">'
+          + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text||m.link) + '</a>' : esc(m.text||''))
+          + '</div></div>';
+      }).join('') : '<div class="nulle">' + ICON_V + 'Ekri premye mesaj la.</div>';
+      thread.scrollTop = thread.scrollHeight;
+    }, function(){});
+}
+async function sendMessageMove(otherUid){
+  var inp = $('#mg-input'); var text = (inp.value||'').trim();
+  if(!text) return;
+  inp.value = '';
+  var cid = convId(window._me.uid, otherUid);
+  var ref = fs.collection('conversations').doc(cid);
+  try{
+    await ref.collection('messages').add({ from:window._me.uid, text:text, created_at: firebase.firestore.FieldValue.serverTimestamp() });
+    var upd = { lastMessage:text, lastAt: firebase.firestore.FieldValue.serverTimestamp() };
+    upd['unread.' + otherUid] = firebase.firestore.FieldValue.increment(1);
+    await ref.set(upd, { merge:true });
+  }catch(e){ toast('Mesaj la pa pase — eseye ankò'); }
+}
+/* Pataje yon lyen (patnè, pwodwi) dirèkteman nan yon mesaj */
+function shareToMessage(url, label){
+  profileOpen(); pfTab = 'msg'; renderProfile();
+  setTimeout(function(){
+    var mail = prompt('Imel zanmi ou vle pataje ' + (label||'sa') + ' la avè l :');
+    if(!mail) return;
+    findUserByEmail(mail).then(function(dest){
+      if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); return; }
+      openThreadMove(dest.uid, dest.name, dest.email).then(function(){
+        setTimeout(function(){
+          var cid = convId(window._me.uid, dest.uid);
+          fs.collection('conversations').doc(cid).collection('messages').add({
+            from:window._me.uid, text:label||url, link:url, created_at: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          fs.collection('conversations').doc(cid).set({
+            lastMessage:'🔗 ' + (label||url), lastAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge:true });
+        }, 500);
+      });
+    });
+  }, 400);
+}
+
 function renderPfHistory(){
   var box = $('#pf-in'); if(!box) return;
   var all = allMine();
@@ -3719,7 +3873,7 @@ function mineCardShort(o){
   var S = STATUS[o.status] || STATUS.requested;
   var title, price;
   if(o._t === 'ride'){ title = (MODE_N[o.ride_mode]||'Kous') + ' · ' + (o.from_addr||'—').split(',')[0]; price = o.price_estimated; }
-  else { title = (o.kind==='manje'?'Manje':'Pake') + ' · ' + (o.partner_name||''); price = o.total; }
+  else { title = kindLabel(o) + ' · ' + (o.partner_name||''); price = o.total; }
   return '<div class="rc ' + esc(o.status) + '"><div class="rc-h"><div class="rc-n">' + esc(title) + '</div>'
     + '<span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
     + '<div class="rc-g"><div><div class="rc-k">Pri</div><div class="rc-v" style="color:var(--gold)">' + fmt(price) + ' HTG</div></div>'
@@ -3730,7 +3884,7 @@ function renderPfNotif(){
   var all = allMine().filter(function(o){ return o.status !== 'requested'; });
   box.innerHTML = all.length ? all.map(function(o){
     var S = STATUS[o.status] || STATUS.requested;
-    var title = o._t === 'ride' ? (MODE_N[o.ride_mode]||'Kous') : (o.kind==='manje'?'Manje':'Pake') + ' · ' + (o.partner_name||'');
+    var title = o._t === 'ride' ? (MODE_N[o.ride_mode]||'Kous') : kindLabel(o) + ' · ' + (o.partner_name||'');
     return '<div class="pftx in"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>'
       + '<div class="bd"><b>' + esc(title) + ' — ' + S.t + '</b>'
       + '<span>' + (o.updated_at ? new Date(o.updated_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '') + '</span></div></div>';
