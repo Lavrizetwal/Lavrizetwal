@@ -209,14 +209,15 @@
       var out = [];
       try{
         var a = await sb.from('rides').select('*').eq('client_email', mail).order('created_at',{ascending:false}).limit(25);
-        (a.data||[]).forEach(function(r){ out.push(Object.assign({_kind:'Kòmand'}, r,
+        (a.data||[]).forEach(function(r){ out.push(Object.assign({_kind:'Kòmand', _t:'ride'}, r,
           { _title:(r.ride_mode==='object'?'Objè':r.ride_mode==='child'?'Timoun':'Kous') + ' · ' + (r.from_addr||'—').split(',')[0],
-            _price:r.price_estimated })); });
+            _price:r.price_estimated, _track:['requested','accepted','on_way','arrived','picked'].indexOf(r.status)!==-1 })); });
       }catch(e){}
       try{
         var b = await sb.from('move_orders').select('*').eq('client_email', mail).order('created_at',{ascending:false}).limit(25);
-        (b.data||[]).forEach(function(r){ out.push(Object.assign({_kind:'Kòmand'}, r,
-          { _title:(r.kind==='manje'?'Manje':'Pake') + ' · ' + (r.partner_name||''), _price:r.total })); });
+        (b.data||[]).forEach(function(r){ out.push(Object.assign({_kind:'Kòmand', _t:'order'}, r,
+          { _title:(r.kind==='manje'?'Manje':r.kind==='shop'?'Acha Shop':'Pake') + ' · ' + (r.partner_name||''),
+            _price:r.total, _track:['requested','accepted','on_way','arrived','picked'].indexOf(r.status)!==-1 })); });
       }catch(e){}
       try{
         var c = await sb.from('orders').select('*').eq('client_email', mail).order('created_at',{ascending:false}).limit(25);
@@ -285,8 +286,8 @@
         + '<button class="zp-btn" id="zp-share" style="width:100%;margin-bottom:16px">Pataje pwofil mwen</button>';
 
       var tabs = '<div class="zptabs">'
-        + ['info','hist','notif','send','ask'].map(function(k){
-            var lab = {info:'Enfo',hist:'Istwa',notif:'Notifikasyon',send:'Voye pwen',ask:'Mande pwen'}[k];
+        + ['info','msg','hist','notif','send','ask'].map(function(k){
+            var lab = {info:'Enfo',msg:'Mesaj',hist:'Istwa',notif:'Notifikasyon',send:'Voye pwen',ask:'Mande pwen'}[k];
             return '<button class="' + (tab===k?'on':'') + '" data-t="' + k + '">' + lab + '</button>';
           }).join('') + '</div>';
 
@@ -297,6 +298,7 @@
       });
 
       if(tab === 'info') renderInfo();
+      else if(tab === 'msg') renderMsgList();
       else if(tab === 'hist') renderHist();
       else if(tab === 'notif') renderNotif();
       else if(tab === 'ask') renderAsk();
@@ -357,9 +359,11 @@
       box.innerHTML = histCache.map(function(o){
         var lab = STATUS_LABEL[o.status] || o.status;
         var sty = STATUS_STYLE[o.status] || STATUS_STYLE.requested;
+        var track = o._track ? '<a class="zp-btn" style="margin-top:10px;padding:7px 13px;font-size:.6rem" '
+          + 'href="taxi.html?swiv=' + esc(o.id) + '&t=' + (o._t==='ride'?'ride':'order') + '" target="_blank">Swiv →</a>' : '';
         return '<div class="zp-rc"><div class="zp-rc-h"><div class="zp-rc-n">' + esc(o._title) + '</div>'
           + '<span class="zp-rc-b" style="' + sty + '">' + esc(lab) + '</span></div>'
-          + '<div class="zp-rc-v">' + fmt(o._price) + ' HTG · ' + (o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '—') + '</div></div>';
+          + '<div class="zp-rc-v">' + fmt(o._price) + ' HTG · ' + (o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '—') + '</div>' + track + '</div>';
       }).join('');
     }
 
@@ -461,6 +465,145 @@
         btn.disabled = false;
       });
     }
+
+    /* ════════════════════════════════════════════════════════════
+       MESAJ — konvèsasyon prive ant de itilizatè, stoke nan Firestore.
+       Id konvèsasyon an se de uid triye + kole (menm rezilta pou
+       de moun yo, kèlkeswa kilès ki kòmanse l).
+       ════════════════════════════════════════════════════════════ */
+    function convId(uidA, uidB){ return [uidA, uidB].sort().join('_'); }
+    var msgUnsub = null, msgOpenId = null, convCache = null;
+
+    async function loadConversations(){
+      if(!fs || !currentUser) return [];
+      try{
+        var r = await fs.collection('conversations')
+          .where('participants', 'array-contains', currentUser.uid)
+          .orderBy('lastAt', 'desc').limit(50).get();
+        return r.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); });
+      }catch(e){ return []; }
+    }
+    function otherOf(conv){
+      var uid = (conv.participants||[]).filter(function(x){ return x !== currentUser.uid; })[0];
+      var names = conv.participantNames || {}, emails = conv.participantEmails || {};
+      return { uid:uid, name:names[uid] || emails[uid] || 'Itilizatè', email:emails[uid] || '' };
+    }
+    async function renderMsgList(){
+      var box = $('#zp-in'); if(!box) return;
+      box.innerHTML =
+          '<div class="zp-fld"><label for="mg-mail">Kòmanse yon nouvo konvèsasyon (imel)</label>'
+          + '<div style="display:flex;gap:8px"><input type="email" id="mg-mail" placeholder="zanmi@imel.com" style="flex:1">'
+          + '<button class="zp-btn" id="mg-start">Kòmanse</button></div></div>'
+        + '<div style="font-size:.58rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4);margin:18px 0 10px">Konvèsasyon ou yo</div>'
+        + '<div id="mg-list" class="zp-empty">K ap chaje…</div>';
+      $('#mg-start').addEventListener('click', async function(){
+        var mail = ($('#mg-mail').value||'').trim();
+        if(!mail){ toast('Ekri imel zanmi w lan'); return; }
+        if(mail.toLowerCase() === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye tèt ou mesaj'); return; }
+        var dest = await findUserByEmail(mail);
+        if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); return; }
+        await openThread(dest.uid, dest.name, dest.email);
+      });
+      var convs = await loadConversations();
+      convCache = convs;
+      var list = $('#mg-list'); if(!list) return;
+      list.innerHTML = convs.length ? convs.map(function(c){
+        var o = otherOf(c);
+        var unread = (c.unread && c.unread[currentUser.uid]) || 0;
+        return '<div class="zptx' + (unread?' out':'') + '" style="cursor:pointer" data-conv="' + esc(o.uid) + '|' + esc(o.name) + '|' + esc(o.email) + '">'
+          + '<div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
+          + '<div class="bd"><b>' + esc(o.name) + (unread ? ' · ' + unread + ' nouvo' : '') + '</b>'
+          + '<span>' + esc(c.lastMessage||'') + '</span></div></div>';
+      }).join('') : '<div class="zp-empty">Ou poko gen konvèsasyon. Ekri yon imel anwo pou kòmanse.</div>';
+      $$('#mg-list [data-conv]').forEach(function(el){
+        el.addEventListener('click', function(){
+          var p = el.getAttribute('data-conv').split('|');
+          openThread(p[0], p[1], p[2]);
+        });
+      });
+    }
+    async function openThread(otherUid, otherName, otherEmail){
+      msgOpenId = convId(currentUser.uid, otherUid);
+      var box = $('#zp-in'); if(!box) return;
+      box.innerHTML =
+          '<button class="trk-back" id="mg-back" type="button" style="border:0;background:none;color:var(--ink-3);'
+          + 'cursor:pointer;font-family:var(--sans);font-size:.68rem;padding:0 0 14px">← Tounen nan lis la</button>'
+        + '<div style="font-weight:600;font-size:.9rem;margin-bottom:12px">' + esc(otherName) + '</div>'
+        + '<div id="mg-thread" style="max-height:360px;overflow-y:auto;margin-bottom:14px"></div>'
+        + '<div style="display:flex;gap:8px"><input type="text" id="mg-input" placeholder="Ekri yon mesaj…" style="flex:1;padding:11px 13px;'
+          + 'border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--ink-1);font-family:var(--sans);font-size:.8rem">'
+        + '<button class="zp-btn go" id="mg-send" style="width:auto;padding:11px 16px">Voye</button></div>';
+      $('#mg-back').addEventListener('click', function(){ if(msgUnsub){ msgUnsub(); msgUnsub=null; } msgOpenId=null; renderMsgList(); });
+      $('#mg-send').addEventListener('click', function(){ sendMessage(otherUid, otherName, otherEmail); });
+      $('#mg-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(otherUid, otherName, otherEmail); });
+
+      var ref = fs.collection('conversations').doc(msgOpenId);
+      var seed = {};
+      seed['participants'] = [currentUser.uid, otherUid];
+      seed['participantNames'] = {}; seed['participantNames'][currentUser.uid] = currentUser.displayName || currentUser.email;
+      seed['participantNames'][otherUid] = otherName;
+      seed['participantEmails'] = {}; seed['participantEmails'][currentUser.uid] = currentUser.email || '';
+      seed['participantEmails'][otherUid] = otherEmail || '';
+      try{ await ref.set(seed, { merge:true }); }catch(e){}
+      try{
+        var upd = {}; upd['unread.' + currentUser.uid] = 0;
+        await ref.set({ unread: (function(){ var o={}; o[currentUser.uid]=0; return o; })() }, { merge:true });
+      }catch(e){}
+
+      if(msgUnsub) msgUnsub();
+      msgUnsub = ref.collection('messages').orderBy('created_at', 'asc').limit(200)
+        .onSnapshot(function(snap){
+          var thread = $('#mg-thread'); if(!thread) return;
+          var rows = []; snap.forEach(function(d){ rows.push(d.data()); });
+          thread.innerHTML = rows.length ? rows.map(function(m){
+            var mine = m.from === currentUser.uid;
+            return '<div style="display:flex;justify-content:' + (mine?'flex-end':'flex-start') + ';margin-bottom:8px">'
+              + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;'
+              + (mine ? 'background:var(--gold);color:#0A0A0A' : 'background:rgba(255,255,255,.06);color:var(--ink-1)') + '">'
+              + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text||m.link) + '</a>' : esc(m.text||''))
+              + '</div></div>';
+          }).join('') : '<div class="zp-empty">Ekri premye mesaj la.</div>';
+          thread.scrollTop = thread.scrollHeight;
+        }, function(){});
+    }
+    async function sendMessage(otherUid, otherName, otherEmail){
+      var inp = $('#mg-input'); var text = (inp.value||'').trim();
+      if(!text) return;
+      inp.value = '';
+      var cid = convId(currentUser.uid, otherUid);
+      var ref = fs.collection('conversations').doc(cid);
+      try{
+        await ref.collection('messages').add({ from:currentUser.uid, text:text, created_at: firebase.firestore.FieldValue.serverTimestamp() });
+        var upd = {};
+        upd.lastMessage = text; upd.lastAt = firebase.firestore.FieldValue.serverTimestamp();
+        upd['unread.' + otherUid] = firebase.firestore.FieldValue.increment(1);
+        await ref.set(upd, { merge:true });
+      }catch(e){ toast('Mesaj la pa pase — eseye ankò'); }
+    }
+    /* API piblik pou lòt paj yo (shop.html, move.html) pataje yon atik
+       dirèkteman nan yon mesaj — sèvi ak lyen an sèlman, san mete non yon
+       moun deja, itilizatè a chwazi zanmi an nan panno a. */
+    window.ZetwalProfile.shareLink = function(url, label){
+      open(); tab = 'msg'; render();
+      setTimeout(function(){
+        var mail = prompt('Imel zanmi ou vle pataje ' + (label||'sa') + ' la avè l :');
+        if(!mail) return;
+        findUserByEmail(mail).then(function(dest){
+          if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); return; }
+          openThread(dest.uid, dest.name, dest.email).then(function(){
+            setTimeout(function(){
+              var cid = convId(currentUser.uid, dest.uid);
+              fs.collection('conversations').doc(cid).collection('messages').add({
+                from:currentUser.uid, text:label||url, link:url, created_at: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              fs.collection('conversations').doc(cid).set({
+                lastMessage:'🔗 ' + (label||url), lastAt: firebase.firestore.FieldValue.serverTimestamp()
+              }, { merge:true });
+            }, 500);
+          });
+        });
+      }, 400);
+    };
 
     /* Yon lyen pataje (?moun=uid) — envite moun nan konekte pou l wè l */
     var qs = new URLSearchParams(location.search);
