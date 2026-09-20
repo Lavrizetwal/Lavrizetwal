@@ -4008,13 +4008,52 @@ function shareToMessage(url, label){
   }, 400);
 }
 
-function renderPfHistory(){
+/* Menm bagay ak allMine(), plis tranzaksyon pwen — sèlman pou onglè
+   Istwa/Notifikasyon nan pwofil la, jamè pou lis swiv kous yo. */
+async function allMineWithTransfers(){
+  var out = allMine().slice();
+  try{
+    var t = await loadMyTransfersRaw();
+    var uid = window._me.uid;
+    t.forEach(function(r){
+      var isOut = r.from_uid === uid;
+      out.push({
+        _t:'transfer', _out:isOut, status: isOut ? (r.to_uid ? 'done' : 'pending') : 'done',
+        created_at:r.created_at, updated_at:r.created_at,
+        title: isOut ? 'Pwen voye bay ' + (r.to_name||r.to_email||'') : 'Pwen resevwa nan men ' + (r.from_name||r.from_email||''),
+        amount:r.amount
+      });
+    });
+  }catch(e){}
+  out.sort(function(a,b){ return new Date(b.created_at||0) - new Date(a.created_at||0); });
+  return out;
+}
+async function loadMyTransfersRaw(){
+  if(!sb || !window._me) return [];
+  try{
+    var uid = window._me.uid;
+    var r = await sb.from('point_transfers').select('*')
+      .or('from_uid.eq.' + uid + ',to_uid.eq.' + uid)
+      .order('created_at',{ascending:false}).limit(20);
+    return r.data || [];
+  }catch(e){ return []; }
+}
+async function renderPfHistory(){
   var box = $('#pf-in'); if(!box) return;
-  var all = allMine();
+  box.innerHTML = '<div class="nulle">' + ICON_V + 'K ap chaje…</div>';
+  var all = await allMineWithTransfers();
   box.innerHTML = all.length ? all.map(mineCardShort).join('')
     : '<div class="nulle">' + ICON_V + 'Ou poko gen istwa sou Kòmand.</div>';
 }
 function mineCardShort(o){
+  if(o._t === 'transfer'){
+    var S2 = STATUS[o.status] || STATUS.requested;
+    var amt2 = (o._out?'−':'+') + Number(o.amount).toFixed(1) + ' pwen';
+    return '<div class="rc ' + esc(o.status) + '"><div class="rc-h"><div class="rc-n">' + esc(o.title) + '</div>'
+      + '<span class="rc-b" style="' + S2.s + '">' + S2.t + '</span></div>'
+      + '<div class="rc-g"><div><div class="rc-k">Kantite</div><div class="rc-v" style="color:var(--gold)">' + amt2 + '</div></div>'
+      + '<div><div class="rc-k">Dat</div><div class="rc-v">' + (o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '—') + '</div></div></div></div>';
+  }
   var S = STATUS[o.status] || STATUS.requested;
   var title, price;
   if(o._t === 'ride'){ title = (MODE_N[o.ride_mode]||'Kous') + ' · ' + (o.from_addr||'—').split(',')[0]; price = o.price_estimated; }
@@ -4024,10 +4063,18 @@ function mineCardShort(o){
     + '<div class="rc-g"><div><div class="rc-k">Pri</div><div class="rc-v" style="color:var(--gold)">' + fmt(price) + ' HTG</div></div>'
     + '<div><div class="rc-k">Dat</div><div class="rc-v">' + (o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '—') + '</div></div></div></div>';
 }
-function renderPfNotif(){
+async function renderPfNotif(){
   var box = $('#pf-in'); if(!box) return;
-  var all = allMine().filter(function(o){ return o.status !== 'requested'; });
-  box.innerHTML = all.length ? all.map(function(o){
+  box.innerHTML = '<div class="nulle">' + ICON_V + 'K ap chaje…</div>';
+  var all = await allMineWithTransfers();
+  var news = all.filter(function(o){ return o.status !== 'requested' && o.status !== 'pending'; });
+  box.innerHTML = news.length ? news.map(function(o){
+    if(o._t === 'transfer'){
+      var amt3 = ' (' + (o._out?'−':'+') + Number(o.amount).toFixed(1) + ' pwen)';
+      return '<div class="pftx ' + (o._out?'out':'in') + '"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>'
+        + '<div class="bd"><b>' + esc(o.title) + amt3 + '</b>'
+        + '<span>' + (o.updated_at ? new Date(o.updated_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '') + '</span></div></div>';
+    }
     var S = STATUS[o.status] || STATUS.requested;
     var title = o._t === 'ride' ? (MODE_N[o.ride_mode]||'Kous') : kindLabel(o) + ' · ' + (o.partner_name||'');
     return '<div class="pftx in"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>'
