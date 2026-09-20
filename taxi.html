@@ -885,6 +885,9 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
   display:grid;place-items:center}
 .pf-av-big img{width:100%;height:100%;object-fit:cover}
 
+.msdot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-bottom:3px}
+.msdot.grey{background:#8a8a8a}.msdot.yellow{background:#FFB84D}.msdot.blue{background:#4DA6FF}
+
 .pftx{display:flex;align-items:flex-start;gap:12px;padding:12px 13px;border-radius:9px;margin-bottom:9px;
   border-left:3px solid var(--line);background:rgba(255,255,255,.025)}
 .pftx.in{border-left-color:var(--ok)}
@@ -3184,6 +3187,49 @@ async function seedUser(user, name){
     if(Object.keys(patch).length) await ref.set(patch, { merge:true });
   }catch(e){}
 }
+/* Pwen ak mesaj ki te voye pou nou pandan nou pa t ko konekte — yo tann
+   nan Supabase, nou reklame yo tousuit isit la. */
+async function claimPending(user){
+  if(!sb || !fs || !user || !user.email) return;
+  var mail = user.email.toLowerCase();
+  try{
+    var pts = await sb.from('pending_points').select('*').eq('to_email', mail).eq('claimed', false);
+    var rows = pts.data || [];
+    for(var i=0;i<rows.length;i++){
+      var r = rows[i];
+      try{
+        await fs.collection('users').doc(user.uid).set(
+          { points: firebase.firestore.FieldValue.increment(Number(r.amount)) }, { merge:true });
+        await sb.from('pending_points').update({ claimed:true, claimed_at:new Date().toISOString() }).eq('id', r.id);
+      }catch(e){}
+    }
+    if(rows.length) toast(rows.length > 1
+      ? rows.length + ' anvwa pwen te ap tann ou — yo antre sou kont ou'
+      : 'Yon anvwa pwen te ap tann ou — li antre sou kont ou');
+  }catch(e){}
+  try{
+    var msgs = await sb.from('pending_messages').select('*').eq('to_email', mail).eq('claimed', false);
+    var mrows = msgs.data || [];
+    for(var j=0;j<mrows.length;j++){
+      var m = mrows[j];
+      try{
+        var cid = convId(user.uid, m.from_uid);
+        var ref = fs.collection('conversations').doc(cid);
+        var seed = { participants:[user.uid, m.from_uid], participantNames:{}, participantEmails:{} };
+        seed.participantNames[user.uid] = user.displayName || user.email;
+        seed.participantNames[m.from_uid] = m.from_name || m.from_email || 'Itilizatè';
+        seed.participantEmails[user.uid] = user.email || '';
+        seed.participantEmails[m.from_uid] = m.from_email || '';
+        await ref.set(seed, { merge:true });
+        await ref.collection('messages').add({ from:m.from_uid, text:m.text_||'', link:m.link||null, created_at:m.created_at });
+        var upd = { lastMessage:m.text_||('🔗 '+m.link), lastAt:m.created_at };
+        upd['unread.' + user.uid] = firebase.firestore.FieldValue.increment(1);
+        await ref.set(upd, { merge:true });
+        await sb.from('pending_messages').update({ claimed:true, claimed_at:new Date().toISOString() }).eq('id', m.id);
+      }catch(e){}
+    }
+  }catch(e){}
+}
 async function submitAuth(){
   if(!auth){ msg("Koneksyon endisponib pou kounye a."); return; }
   var mail = $('#m-mail').value.trim(), pass = $('#m-pass').value, name = $('#m-name').value.trim();
@@ -3282,6 +3328,7 @@ if(auth) auth.onAuthStateChanged(async function(user){
   $('#a-nm').textContent=name; $('#dr-nm').textContent=first;
   $('#a-ml').textContent=user.email || user.phoneNumber || '';
   await seedUser(user, name);
+  claimPending(user);
   if(fs){
     unsubPts = fs.collection('users').doc(user.uid).onSnapshot(function(doc){
       var d = doc.exists ? doc.data() : {};
@@ -3750,7 +3797,11 @@ function renderPfAsk(){
    Menm modèl ke zetwal-profile.js, adapte ak varyab paj sa a.
    ══════════════════════════════════════════════════════════════ */
 function convId(uidA, uidB){ return [uidA, uidB].sort().join('_'); }
-var msgUnsub = null;
+var msgUnsub = null, convUnsub2 = null, threadRows = [], threadReadUpTo = {};
+function stopThreadListeners(){
+  if(msgUnsub){ msgUnsub(); msgUnsub = null; }
+  if(convUnsub2){ convUnsub2(); convUnsub2 = null; }
+}
 async function loadConversations(){
   if(!fs || !window._me) return [];
   try{
@@ -3774,45 +3825,67 @@ async function renderMsgList(){
     + '<div class="side-s" style="margin:18px 0 10px">Konvèsasyon ou yo</div>'
     + '<div id="mg-list" class="nulle">' + ICON_V + 'K ap chaje…</div>';
   $('#mg-start').addEventListener('click', async function(){
-    var mail = ($('#mg-mail').value||'').trim();
+    var mail = ($('#mg-mail').value||'').trim().toLowerCase();
     if(!mail){ toast('Ekri imel zanmi w lan'); return; }
-    if(mail.toLowerCase() === (window._me.email||'').toLowerCase()){ toast('Ou pa ka voye tèt ou mesaj'); return; }
+    if(mail === (window._me.email||'').toLowerCase()){ toast('Ou pa ka voye tèt ou mesaj'); return; }
     var dest = await findUserByEmail(mail);
-    if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); return; }
-    await openThreadMove(dest.uid, dest.name, dest.email);
+    if(dest) await openThreadMove(dest.uid, dest.name, dest.email);
+    else await openThreadMove(null, mail, mail);
   });
   var convs = await loadConversations();
+  var pendingByEmail = {};
+  if(sb && window._me){
+    try{
+      var pp = await sb.from('pending_messages').select('*').eq('from_uid', window._me.uid).eq('claimed', false);
+      (pp.data||[]).forEach(function(r){
+        var k = r.to_email;
+        if(!pendingByEmail[k]) pendingByEmail[k] = { email:k, lastMessage:r.text_||('🔗 '+r.link), lastAt:r.created_at };
+        else if(new Date(r.created_at) > new Date(pendingByEmail[k].lastAt)){ pendingByEmail[k].lastMessage = r.text_||('🔗 '+r.link); pendingByEmail[k].lastAt = r.created_at; }
+      });
+    }catch(e){}
+  }
   var list = $('#mg-list'); if(!list) return;
-  list.innerHTML = convs.length ? convs.map(function(c){
+  var items = convs.map(function(c){
     var o = otherOfConv(c);
     var unread = (c.unread && c.unread[window._me.uid]) || 0;
     return '<div class="pftx' + (unread?' out':' in') + '" style="cursor:pointer" data-conv="' + esc(o.uid) + '|' + esc(o.name) + '|' + esc(o.email) + '">'
       + '<div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
       + '<div class="bd"><b>' + esc(o.name) + (unread ? ' · ' + unread + ' nouvo' : '') + '</b>'
       + '<span>' + esc(c.lastMessage||'') + '</span></div></div>';
-  }).join('') : '<div class="nulle">' + ICON_V + 'Ou poko gen konvèsasyon. Ekri yon imel anwo pou kòmanse.</div>';
+  });
+  Object.keys(pendingByEmail).forEach(function(k){
+    var p = pendingByEmail[k];
+    items.push('<div class="pftx in" style="cursor:pointer" data-conv="|' + esc(k) + '|' + esc(k) + '">'
+      + '<div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
+      + '<div class="bd"><b>' + esc(k) + '</b><span><span class="msdot grey" style="margin-right:5px"></span>' + esc(p.lastMessage) + '</span></div></div>');
+  });
+  list.innerHTML = items.length ? items.join('') : '<div class="nulle">' + ICON_V + 'Ou poko gen konvèsasyon. Ekri yon imel anwo pou kòmanse.</div>';
   $$('#mg-list [data-conv]').forEach(function(el){
     el.addEventListener('click', function(){
       var p = el.getAttribute('data-conv').split('|');
-      openThreadMove(p[0], p[1], p[2]);
+      openThreadMove(p[0]||null, p[1], p[2]);
     });
   });
 }
 async function openThreadMove(otherUid, otherName, otherEmail){
-  var cid = convId(window._me.uid, otherUid);
+  stopThreadListeners();
   var box = $('#pf-in'); if(!box) return;
   box.innerHTML =
       '<button id="mg-back" type="button" style="border:0;background:none;color:var(--ink-3);'
       + 'cursor:pointer;font-family:var(--sans);font-size:.68rem;padding:0 0 14px">← Tounen nan lis la</button>'
     + '<div style="font-weight:600;font-size:.9rem;margin-bottom:12px">' + esc(otherName) + '</div>'
+    + (otherUid ? '' : '<p class="hintline" style="margin-bottom:12px">' + esc(otherEmail) + ' poko gen kont sou Zetwal. Mesaj ou yo ap tann li konekte pou yo rive.</p>')
     + '<div id="mg-thread" style="max-height:360px;overflow-y:auto;margin-bottom:14px"></div>'
     + '<div style="display:flex;gap:8px"><input type="text" id="mg-input" placeholder="Ekri yon mesaj…" style="flex:1;padding:11px 13px;'
       + 'border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--ink-1);font-family:var(--sans);font-size:.8rem">'
     + '<button class="btn btn-g" id="mg-send" style="width:auto;padding:11px 16px">Voye</button></div>';
-  $('#mg-back').addEventListener('click', function(){ if(msgUnsub){ msgUnsub(); msgUnsub=null; } renderMsgList(); });
-  $('#mg-send').addEventListener('click', function(){ sendMessageMove(otherUid); });
-  $('#mg-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessageMove(otherUid); });
+  $('#mg-back').addEventListener('click', function(){ stopThreadListeners(); renderMsgList(); });
+  $('#mg-send').addEventListener('click', function(){ sendMessageMove(otherUid, otherEmail); });
+  $('#mg-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessageMove(otherUid, otherEmail); });
 
+  if(!otherUid){ renderPendingThreadMove(otherEmail); return; }
+
+  var cid = convId(window._me.uid, otherUid);
   var ref = fs.collection('conversations').doc(cid);
   var seed = { participants:[window._me.uid, otherUid], participantNames:{}, participantEmails:{} };
   seed.participantNames[window._me.uid] = window._me.displayName || window._me.email;
@@ -3820,36 +3893,96 @@ async function openThreadMove(otherUid, otherName, otherEmail){
   seed.participantEmails[window._me.uid] = window._me.email || '';
   seed.participantEmails[otherUid] = otherEmail || '';
   try{ await ref.set(seed, { merge:true }); }catch(e){}
-  try{ var u = {}; u[window._me.uid] = 0; await ref.set({ unread:u }, { merge:true }); }catch(e){}
+  try{
+    var u = {}; u[window._me.uid] = 0;
+    var ru = {}; ru[window._me.uid] = firebase.firestore.FieldValue.serverTimestamp();
+    await ref.set({ unread:u, readUpTo:ru }, { merge:true });
+  }catch(e){}
 
-  if(msgUnsub) msgUnsub();
+  threadRows = []; threadReadUpTo = {};
+  convUnsub2 = ref.onSnapshot(function(doc){
+    threadReadUpTo = (doc.exists && doc.data().readUpTo) || {};
+    paintThreadMove(otherUid);
+  });
   msgUnsub = ref.collection('messages').orderBy('created_at', 'asc').limit(200)
     .onSnapshot(function(snap){
-      var thread = $('#mg-thread'); if(!thread) return;
-      var rows = []; snap.forEach(function(d){ rows.push(d.data()); });
-      thread.innerHTML = rows.length ? rows.map(function(m){
-        var mine = m.from === window._me.uid;
-        return '<div style="display:flex;justify-content:' + (mine?'flex-end':'flex-start') + ';margin-bottom:8px">'
-          + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;'
-          + (mine ? 'background:var(--gold);color:#0A0A0A' : 'background:rgba(255,255,255,.06);color:var(--ink-1)') + '">'
-          + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text||m.link) + '</a>' : esc(m.text||''))
-          + '</div></div>';
-      }).join('') : '<div class="nulle">' + ICON_V + 'Ekri premye mesaj la.</div>';
-      thread.scrollTop = thread.scrollHeight;
+      threadRows = []; snap.forEach(function(d){ threadRows.push(d.data()); });
+      paintThreadMove(otherUid);
+      var ru2 = {}; ru2[window._me.uid] = firebase.firestore.FieldValue.serverTimestamp();
+      ref.set({ readUpTo:ru2 }, { merge:true }).catch(function(){});
     }, function(){});
 }
-async function sendMessageMove(otherUid){
+function toMillisMove(t){
+  if(!t) return 0;
+  if(t.toMillis) return t.toMillis();
+  if(t.seconds) return t.seconds*1000;
+  return new Date(t).getTime() || 0;
+}
+function paintThreadMove(otherUid){
+  var thread = $('#mg-thread'); if(!thread) return;
+  var otherRead = toMillisMove(threadReadUpTo[otherUid]);
+  thread.innerHTML = threadRows.length ? threadRows.map(function(m){
+    var mine = m.from === window._me.uid;
+    var dot = '';
+    if(mine){
+      var mt = toMillisMove(m.created_at);
+      var cls = (otherRead && otherRead >= mt) ? 'blue' : 'yellow';
+      dot = '<span class="msdot ' + cls + '" title="' + (cls==='blue'?'Li li':'Resevwa') + '"></span>';
+    }
+    return '<div style="display:flex;justify-content:' + (mine?'flex-end':'flex-start') + ';margin-bottom:8px;align-items:flex-end;gap:5px">'
+      + (mine ? dot : '')
+      + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;'
+      + (mine ? 'background:var(--gold);color:#0A0A0A' : 'background:rgba(255,255,255,.06);color:var(--ink-1)') + '">'
+      + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text||m.link) + '</a>' : esc(m.text||''))
+      + '</div></div>';
+  }).join('') : '<div class="nulle">' + ICON_V + 'Ekri premye mesaj la.</div>';
+  thread.scrollTop = thread.scrollHeight;
+}
+async function renderPendingThreadMove(otherEmail){
+  var thread = $('#mg-thread'); if(!thread) return;
+  thread.innerHTML = '<div class="nulle">' + ICON_V + 'K ap chaje…</div>';
+  var rows = [];
+  if(sb && window._me){
+    try{
+      var r = await sb.from('pending_messages').select('*')
+        .eq('from_uid', window._me.uid).eq('to_email', otherEmail).order('created_at',{ascending:true});
+      rows = r.data || [];
+    }catch(e){}
+  }
+  thread.innerHTML = rows.length ? rows.map(function(m){
+    return '<div style="display:flex;justify-content:flex-end;margin-bottom:8px;align-items:flex-end;gap:5px">'
+      + '<span class="msdot grey" title="Ap tann li konekte"></span>'
+      + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;background:var(--gold);color:#0A0A0A">'
+      + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text_||m.link) + '</a>' : esc(m.text_||''))
+      + '</div></div>';
+  }).join('') : '<div class="nulle">' + ICON_V + 'Ekri premye mesaj la — l ap tann ' + esc(otherEmail) + ' konekte.</div>';
+  thread.scrollTop = thread.scrollHeight;
+}
+async function deliverMessageMove(otherUid, otherEmail, text, link){
+  if(!otherUid){
+    if(sb){
+      try{ await sb.from('pending_messages').insert({
+        to_email: otherEmail, from_uid:window._me.uid,
+        from_name:window._me.displayName||window._me.email, from_email:window._me.email||null,
+        text_: text||null, link: link||null
+      }); }catch(e){}
+    }
+    return;
+  }
+  var cid = convId(window._me.uid, otherUid);
+  var ref = fs.collection('conversations').doc(cid);
+  await ref.collection('messages').add({ from:window._me.uid, text:text||null, link:link||null, created_at: firebase.firestore.FieldValue.serverTimestamp() });
+  var upd = { lastMessage: link ? '🔗 ' + (text||link) : text, lastAt: firebase.firestore.FieldValue.serverTimestamp() };
+  upd['unread.' + otherUid] = firebase.firestore.FieldValue.increment(1);
+  await ref.set(upd, { merge:true });
+}
+async function sendMessageMove(otherUid, otherEmail){
   var inp = $('#mg-input'); var text = (inp.value||'').trim();
   if(!text) return;
   inp.value = '';
-  var cid = convId(window._me.uid, otherUid);
-  var ref = fs.collection('conversations').doc(cid);
-  try{
-    await ref.collection('messages').add({ from:window._me.uid, text:text, created_at: firebase.firestore.FieldValue.serverTimestamp() });
-    var upd = { lastMessage:text, lastAt: firebase.firestore.FieldValue.serverTimestamp() };
-    upd['unread.' + otherUid] = firebase.firestore.FieldValue.increment(1);
-    await ref.set(upd, { merge:true });
-  }catch(e){ toast('Mesaj la pa pase — eseye ankò'); }
+  try{ await deliverMessageMove(otherUid, otherEmail, text, null); }
+  catch(e){ toast('Mesaj la pa pase — eseye ankò'); }
+  if(!otherUid) renderPendingThreadMove(otherEmail);
 }
 /* Pataje yon lyen (patnè, pwodwi) dirèkteman nan yon mesaj */
 function shareToMessage(url, label){
@@ -3857,18 +3990,15 @@ function shareToMessage(url, label){
   setTimeout(function(){
     var mail = prompt('Imel zanmi ou vle pataje ' + (label||'sa') + ' la avè l :');
     if(!mail) return;
+    mail = mail.trim().toLowerCase();
     findUserByEmail(mail).then(function(dest){
-      if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); return; }
-      openThreadMove(dest.uid, dest.name, dest.email).then(function(){
-        setTimeout(function(){
-          var cid = convId(window._me.uid, dest.uid);
-          fs.collection('conversations').doc(cid).collection('messages').add({
-            from:window._me.uid, text:label||url, link:url, created_at: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          fs.collection('conversations').doc(cid).set({
-            lastMessage:'🔗 ' + (label||url), lastAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge:true });
-        }, 500);
+      var uid = dest ? dest.uid : null;
+      var name = dest ? dest.name : mail;
+      var em = dest ? dest.email : mail;
+      openThreadMove(uid, name, em).then(function(){
+        deliverMessageMove(uid, em, label||url, url).then(function(){
+          if(!uid) renderPendingThreadMove(em);
+        });
       });
     });
   }, 400);
@@ -3936,48 +4066,51 @@ async function loadMyTransfers(){
     var rows = r.data || [];
     box.innerHTML = rows.length ? rows.map(function(t){
       var out = t.from_uid === uid;
+      var waiting = out && !t.to_uid;
       return '<div class="pftx ' + (out?'out':'in') + '"><div class="ic"><svg viewBox="0 0 24 24">'
         + (out ? '<path d="M5 12h14M13 6l6 6-6 6"/>' : '<path d="M19 12H5M11 6l-6 6 6 6"/>') + '</svg></div>'
         + '<div class="bd"><b>' + (out ? 'Voye bay ' + esc(t.to_name||t.to_email||'') : 'Resevwa nan men ' + esc(t.from_name||t.from_email||'')) + '</b>'
         + '<span>' + new Date(t.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
-        + (t.note ? ' · ' + esc(t.note) : '') + '</span></div>'
+        + (t.note ? ' · ' + esc(t.note) : '') + (waiting ? ' · ap tann ' + esc(t.to_email) + ' konekte' : '') + '</span></div>'
         + '<div class="am">' + (out?'−':'+') + t.amount.toFixed(1) + '</div></div>';
     }).join('') : '<div class="nulle">' + ICON_V + 'Ou poko voye ni resevwa pwen.</div>';
   }catch(e){ box.innerHTML = '<div class="nulle">Istwa a pa disponib kounye a.</div>'; }
 }
 async function sendPoints(){
-  var mail = ($('#sd-mail').value||'').trim();
+  var mail = ($('#sd-mail').value||'').trim().toLowerCase();
   var amt = parseFloat($('#sd-amt').value) || 0;
   var note = ($('#sd-note').value||'').trim();
   if(!mail){ toast('Ekri imel moun nan'); return; }
   if(amt <= 0){ toast('Konbe pwen ou vle voye ?'); return; }
-  if(mail.toLowerCase() === (window._me.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
+  if(mail === (window._me.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
   if(amt > (window._pts||0)){ toast('Ou pa gen ase pwen'); return; }
 
   var btn = $('#sd-go'); btn.disabled = true; btn.textContent = 'K ap voye…';
+  var meUid = window._me.uid, meName = window._me.displayName || window._me.email;
   try{
+    var ok = await chargePoints(amt);
+    if(!ok){ toast('Ou pa gen ase pwen'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
     var dest = await findUserByEmail(mail);
-    if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
-
-    var meUid = window._me.uid, meName = window._me.displayName || window._me.email;
-    await fs.runTransaction(async function(tx){
-      var meRef = fs.collection('users').doc(meUid), himRef = fs.collection('users').doc(dest.uid);
-      var meSnap = await tx.get(meRef);
-      var cur = Number((meSnap.exists ? meSnap.data().points : 0) || 0);
-      if(cur < amt) throw new Error('pa ase');
-      tx.update(meRef, { points: firebase.firestore.FieldValue.increment(-amt) });
-      tx.set(himRef, { points: firebase.firestore.FieldValue.increment(amt) }, { merge:true });
-    });
-
-    if(sb){
-      try{
-        await sb.from('point_transfers').insert({
+    if(dest){
+      await fs.collection('users').doc(dest.uid).set(
+        { points: firebase.firestore.FieldValue.increment(amt) }, { merge:true });
+      if(sb){ try{ await sb.from('point_transfers').insert({
+        from_uid:meUid, from_name:meName, from_email:window._me.email||null,
+        to_uid:dest.uid, to_name:dest.name, to_email:dest.email, amount:amt, note:note||null
+      }); }catch(e){} }
+      toast('Pwen voye bay ' + (dest.name||dest.email));
+    } else {
+      if(sb){
+        try{ await sb.from('pending_points').insert({
+          to_email:mail, amount:amt, from_uid:meUid, from_name:meName, from_email:window._me.email||null, note:note||null
+        }); }catch(e){}
+        try{ await sb.from('point_transfers').insert({
           from_uid:meUid, from_name:meName, from_email:window._me.email||null,
-          to_uid:dest.uid, to_name:dest.name, to_email:dest.email, amount:amt, note:note||null
-        });
-      }catch(e){}
+          to_uid:null, to_name:null, to_email:mail, amount:amt, note:note||null
+        }); }catch(e){}
+      }
+      toast('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte');
     }
-    toast('Pwen voye bay ' + (dest.name||dest.email));
     $('#sd-mail').value=''; $('#sd-amt').value=''; $('#sd-note').value='';
     loadMyTransfers();
   }catch(e){
