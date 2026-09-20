@@ -203,7 +203,13 @@
     var currentUser = window._me || null;
     if(currentUser) claimPending(currentUser);
     auth.onAuthStateChanged(function(user){
+      var switched = currentUser && user && currentUser.uid !== user.uid;
       currentUser = user || null;
+      if(!user || switched){
+        /* Chanje itilizatè (oswa dekonekte) nan menm paj la — jete kach
+           ansyen an, li pa dwe rete sou kont ki fèk konekte a. */
+        histCache = null; transferCache = null; convCache = null;
+      }
       if(panel.classList.contains('open')) render();
       if(user) claimPending(user);
     });
@@ -300,6 +306,19 @@
         var c = await sb.from('orders').select('*').eq('client_email', mail).order('created_at',{ascending:false}).limit(25);
         (c.data||[]).forEach(function(r){ out.push(Object.assign({_kind:'Shop'}, r,
           { status:r.status||'pending', _title:'Shop · ' + (r.product_name||''), _price:r.total_estimated })); });
+      }catch(e){}
+      try{
+        var t = await loadTransfers();
+        var uid = currentUser.uid;
+        t.forEach(function(r){
+          var out_ = r.from_uid === uid;
+          out.push(Object.assign({_kind:'Pwen', _t:'transfer'}, r, {
+            status: out_ ? (r.to_uid ? 'done' : 'pending') : 'done',
+            updated_at: r.created_at,
+            _title: out_ ? 'Pwen voye bay ' + (r.to_name||r.to_email||'') : 'Pwen resevwa nan men ' + (r.from_name||r.from_email||''),
+            _price: r.amount, _out: out_
+          }));
+        });
       }catch(e){}
       out.sort(function(x,y){ return new Date(y.created_at||0) - new Date(x.created_at||0); });
       return out;
@@ -438,9 +457,10 @@
         var sty = STATUS_STYLE[o.status] || STATUS_STYLE.requested;
         var track = o._track ? '<a class="zp-btn" style="margin-top:10px;padding:7px 13px;font-size:.6rem" '
           + 'href="taxi.html?swiv=' + esc(o.id) + '&t=' + (o._t==='ride'?'ride':'order') + '" target="_blank">Swiv →</a>' : '';
+        var amt = o._t === 'transfer' ? (o._out?'−':'+') + Number(o._price).toFixed(1) + ' pwen' : fmt(o._price) + ' HTG';
         return '<div class="zp-rc"><div class="zp-rc-h"><div class="zp-rc-n">' + esc(o._title) + '</div>'
           + '<span class="zp-rc-b" style="' + sty + '">' + esc(lab) + '</span></div>'
-          + '<div class="zp-rc-v">' + fmt(o._price) + ' HTG · ' + (o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '—') + '</div>' + track + '</div>';
+          + '<div class="zp-rc-v">' + amt + ' · ' + (o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '—') + '</div>' + track + '</div>';
       }).join('');
     }
 
@@ -452,8 +472,11 @@
       if(!news.length){ box.innerHTML = '<div class="zp-empty">Pa gen nouvo mizajou.</div>'; return; }
       box.innerHTML = news.map(function(o){
         var lab = STATUS_LABEL[o.status] || o.status;
-        return '<div class="zptx in"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>'
-          + '<div class="bd"><b>' + esc(o._title) + ' — ' + esc(lab) + '</b>'
+        var isTransfer = o._t === 'transfer';
+        var cls = isTransfer ? (o._out ? 'out' : 'in') : 'in';
+        var tail = isTransfer ? ' (' + (o._out?'−':'+') + Number(o._price).toFixed(1) + ' pwen)' : ' — ' + esc(lab);
+        return '<div class="zptx ' + cls + '"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>'
+          + '<div class="bd"><b>' + esc(o._title) + tail + '</b>'
           + '<span>' + (o.updated_at||o.created_at ? new Date(o.updated_at||o.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '') + '</span></div></div>';
       }).join('');
     }
