@@ -3805,10 +3805,14 @@ function stopThreadListeners(){
 async function loadConversations(){
   if(!fs || !window._me) return [];
   try{
+    /* San .orderBy() apre .where('participants','array-contains',...) —
+       konbinezon sa mande yon endèks konpoze nan Firestore. Nou triye
+       rezilta a nan navigatè a pito. */
     var r = await fs.collection('conversations')
-      .where('participants', 'array-contains', window._me.uid)
-      .orderBy('lastAt', 'desc').limit(50).get();
-    return r.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); });
+      .where('participants', 'array-contains', window._me.uid).limit(50).get();
+    var rows = r.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); });
+    rows.sort(function(a,b){ return toMillisMove(b.lastAt) - toMillisMove(a.lastAt); });
+    return rows;
   }catch(e){ return []; }
 }
 function otherOfConv(conv){
