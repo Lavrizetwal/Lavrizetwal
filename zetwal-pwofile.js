@@ -28,18 +28,43 @@
   };
 
   var sb = null, auth = null, fs = null;
+  var bootTries = 0;
+
+  function showBootError(reason){
+    if(document.getElementById('zp-bootfail')) return;
+    var box = document.createElement('div');
+    box.id = 'zp-bootfail';
+    box.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:99999;max-width:320px;'
+      + 'background:#3a1414;border:1px solid #a33;color:#ffd6d6;padding:10px 13px;border-radius:8px;'
+      + 'font:12px/1.5 sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.5)';
+    box.innerHTML = '<b>Pwofil pa chaje</b><br>' + reason
+      + '<br><span style="opacity:.75">Verifye si zetwal-profile.js mete sou sèvè a, bò kot paj sa a.</span>'
+      + '<span style="float:right;cursor:pointer;margin-left:8px;opacity:.7" onclick="this.parentNode.remove()">✕</span>';
+    document.body.appendChild(box);
+    console.warn('[ZetwalProfile] Pa reyisi lanse:', reason);
+  }
 
   function boot(){
-    if(!window.supabase || !window.firebase){ setTimeout(boot, 250); return; }
-    try{ sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }catch(e){ setTimeout(boot, 400); return; }
+    bootTries++;
+    if(!window.supabase || !window.firebase){
+      if(bootTries > 40){ showBootError('Supabase oswa Firebase pa chaje apre 10s (script CDN ka bloke).'); return; }
+      setTimeout(boot, 250); return;
+    }
+    try{ sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
+    catch(e){ if(bootTries > 40){ showBootError('Koneksyon Supabase echwe : ' + e.message); return; } setTimeout(boot, 400); return; }
     try{
       /* firebase.apps se yon rejis global — si paj la deja lanse Firebase,
          nou repran menm app lan olye de kreye yon dezyèm san rezon. */
       if(firebase.apps && firebase.apps.length === 0) firebase.initializeApp(FIREBASE_CONFIG);
       auth = firebase.auth(); fs = firebase.firestore();
-    }catch(e){ setTimeout(boot, 400); return; }
+    }catch(e){ if(bootTries > 40){ showBootError('Koneksyon Firebase echwe : ' + e.message); return; } setTimeout(boot, 400); return; }
     if(!window.$){ window.$ = function(s){ return document.querySelector(s); }; }
     if(!window.$$){ window.$$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); }; }
+    if(!document.getElementById('who-btn')){
+      if(bootTries > 40){ showBootError('Pa jwenn #who-btn nan paj sa a (meni kont lan).'); return; }
+      setTimeout(boot, 250); return;
+    }
+    console.log('[ZetwalProfile] Chaje ak siksè.');
     init();
   }
 
@@ -109,6 +134,8 @@
   + ".zp-hint{font-size:.63rem;color:var(--ink-4);line-height:1.6;margin-top:10px}"
   + ".zp-empty{text-align:center;padding:40px 16px;color:var(--ink-4);font-size:.76rem}"
   + ".zp-rc{padding:13px 14px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.025);margin-bottom:10px}"
+  + ".msdot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-bottom:3px}"
+  + ".msdot.grey{background:#8a8a8a}.msdot.yellow{background:#FFB84D}.msdot.blue{background:#4DA6FF}"
   + ".zp-rc-h{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px}"
   + ".zp-rc-n{font-size:.8rem;font-weight:600}"
   + ".zp-rc-b{font-size:.56rem;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:99px;white-space:nowrap}"
@@ -174,10 +201,60 @@
        paj (akèy, lavri) pa menm ekspoze l. Yon lòt «onAuthStateChanged»
        anplis pa gen danje, Firebase kite plizyè koute anmenmtan. */
     var currentUser = window._me || null;
+    if(currentUser) claimPending(currentUser);
     auth.onAuthStateChanged(function(user){
       currentUser = user || null;
       if(panel.classList.contains('open')) render();
+      if(user) claimPending(user);
     });
+
+    /* Pwen ak mesaj ki te voye pou nou pandan nou pa t ko konekte —
+       yo tann nan Supabase, nou reklame yo tousuit isit la. Sa pa
+       depann de Firestore ditou, imel la soti nan sesyon Firebase la
+       menm, kidonk pa gen kous ak korije imel paj la ap fè apa. */
+    async function claimPending(user){
+      if(!sb || !fs || !user || !user.email) return;
+      var mail = user.email.toLowerCase();
+      try{
+        var pts = await sb.from('pending_points').select('*').eq('to_email', mail).eq('claimed', false);
+        var rows = pts.data || [];
+        for(var i=0;i<rows.length;i++){
+          var r = rows[i];
+          try{
+            await fs.collection('users').doc(user.uid).set(
+              { points: firebase.firestore.FieldValue.increment(Number(r.amount)) }, { merge:true });
+            await sb.from('pending_points').update({ claimed:true, claimed_at:new Date().toISOString() }).eq('id', r.id);
+          }catch(e){}
+        }
+        if(rows.length) toast(rows.length > 1
+          ? rows.length + ' anvwa pwen te ap tann ou — yo antre sou kont ou'
+          : 'Yon anvwa pwen te ap tann ou — li antre sou kont ou');
+      }catch(e){}
+      try{
+        var msgs = await sb.from('pending_messages').select('*').eq('to_email', mail).eq('claimed', false);
+        var mrows = msgs.data || [];
+        for(var j=0;j<mrows.length;j++){
+          var m = mrows[j];
+          try{
+            var cid = convId(user.uid, m.from_uid);
+            var ref = fs.collection('conversations').doc(cid);
+            var seed = { participants:[user.uid, m.from_uid], participantNames:{}, participantEmails:{} };
+            seed.participantNames[user.uid] = user.displayName || user.email;
+            seed.participantNames[m.from_uid] = m.from_name || m.from_email || 'Itilizatè';
+            seed.participantEmails[user.uid] = user.email || '';
+            seed.participantEmails[m.from_uid] = m.from_email || '';
+            await ref.set(seed, { merge:true });
+            await ref.collection('messages').add({
+              from:m.from_uid, text:m.text_||'', link:m.link||null, created_at:m.created_at
+            });
+            var upd = { lastMessage:m.text_||('🔗 '+m.link), lastAt:m.created_at };
+            upd['unread.' + user.uid] = firebase.firestore.FieldValue.increment(1);
+            await ref.set(upd, { merge:true });
+            await sb.from('pending_messages').update({ claimed:true, claimed_at:new Date().toISOString() }).eq('id', m.id);
+          }catch(e){}
+        }
+      }catch(e){}
+    }
 
     var tab = 'info';
     var role = { driver:null, partners:[] };
@@ -402,27 +479,41 @@
         + '<div style="font-size:.58rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4);margin:20px 0 10px">Dènye anvwa ou yo</div>'
         + '<div id="zs-hist"><div class="zp-empty">K ap chaje…</div></div>';
       $('#zs-go').addEventListener('click', async function(){
-        var mail = ($('#zs-mail').value||'').trim();
+        var mail = ($('#zs-mail').value||'').trim().toLowerCase();
         var amt = parseFloat($('#zs-amt').value) || 0;
         var note = ($('#zs-note').value||'').trim();
         if(!mail){ toast('Ekri imel moun nan'); return; }
         if(amt <= 0){ toast('Konbe pwen ou vle voye ?'); return; }
-        if(mail.toLowerCase() === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
+        if(mail === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
         var btn = this; btn.disabled = true; btn.textContent = 'K ap voye…';
         try{
-          var dest = await findUserByEmail(mail);
-          if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
           var ok = await chargePoints(amt);
           if(!ok){ toast('Ou pa gen ase pwen'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
-          await fs.collection('users').doc(dest.uid).set(
-            { points: firebase.firestore.FieldValue.increment(amt) }, { merge:true });
-          if(sb){
-            try{ await sb.from('point_transfers').insert({
+          var dest = await findUserByEmail(mail);
+          if(dest){
+            /* Nou jwenn kont lan tousuit — antre pwen yo dirèkteman. */
+            await fs.collection('users').doc(dest.uid).set(
+              { points: firebase.firestore.FieldValue.increment(amt) }, { merge:true });
+            if(sb){ try{ await sb.from('point_transfers').insert({
               from_uid:currentUser.uid, from_name:currentUser.displayName||currentUser.email, from_email:currentUser.email||null,
               to_uid:dest.uid, to_name:dest.name, to_email:dest.email, amount:amt, note:note||null
-            }); }catch(e){}
+            }); }catch(e){} }
+            toast('Pwen voye bay ' + (dest.name||dest.email));
+          } else {
+            /* Nou pa jwenn kont lan kounye a — nou pa bloke pou sa.
+               Pwen yo mete la, y ap antre otomatikman lè imel sa konekte. */
+            if(sb){
+              try{ await sb.from('pending_points').insert({
+                to_email:mail, amount:amt, from_uid:currentUser.uid,
+                from_name:currentUser.displayName||currentUser.email, from_email:currentUser.email||null, note:note||null
+              }); }catch(e){}
+              try{ await sb.from('point_transfers').insert({
+                from_uid:currentUser.uid, from_name:currentUser.displayName||currentUser.email, from_email:currentUser.email||null,
+                to_uid:null, to_name:null, to_email:mail, amount:amt, note:note||null
+              }); }catch(e){}
+            }
+            toast('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte');
           }
-          toast('Pwen voye bay ' + (dest.name||dest.email));
           $('#zs-mail').value=''; $('#zs-amt').value=''; $('#zs-note').value='';
           transferCache = null; loadSendHistory();
         }catch(e){ toast('Nou pa ka voye pwen yo kounye a'); }
@@ -436,11 +527,12 @@
       var uid = currentUser.uid;
       box.innerHTML = transferCache.length ? transferCache.map(function(t){
         var out = t.from_uid === uid;
+        var waiting = out && !t.to_uid;
         return '<div class="zptx ' + (out?'out':'in') + '"><div class="ic"><svg viewBox="0 0 24 24">'
           + (out ? '<path d="M5 12h14M13 6l6 6-6 6"/>' : '<path d="M19 12H5M11 6l-6 6 6 6"/>') + '</svg></div>'
           + '<div class="bd"><b>' + (out ? 'Voye bay ' + esc(t.to_name||t.to_email||'') : 'Resevwa nan men ' + esc(t.from_name||t.from_email||'')) + '</b>'
           + '<span>' + new Date(t.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
-          + (t.note ? ' · ' + esc(t.note) : '') + '</span></div><div class="am">' + (out?'−':'+') + Number(t.amount).toFixed(1) + '</div></div>';
+          + (t.note ? ' · ' + esc(t.note) : '') + (waiting ? ' · ap tann ' + esc(t.to_email) + ' konekte' : '') + '</span></div><div class="am">' + (out?'−':'+') + Number(t.amount).toFixed(1) + '</div></div>';
       }).join('') : '<div class="zp-empty">Ou poko voye ni resevwa pwen.</div>';
     }
 
@@ -497,88 +589,176 @@
         + '<div style="font-size:.58rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4);margin:18px 0 10px">Konvèsasyon ou yo</div>'
         + '<div id="mg-list" class="zp-empty">K ap chaje…</div>';
       $('#mg-start').addEventListener('click', async function(){
-        var mail = ($('#mg-mail').value||'').trim();
+        var mail = ($('#mg-mail').value||'').trim().toLowerCase();
         if(!mail){ toast('Ekri imel zanmi w lan'); return; }
-        if(mail.toLowerCase() === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye tèt ou mesaj'); return; }
+        if(mail === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye tèt ou mesaj'); return; }
         var dest = await findUserByEmail(mail);
-        if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); return; }
-        await openThread(dest.uid, dest.name, dest.email);
+        if(dest) await openThread(dest.uid, dest.name, dest.email);
+        else await openThread(null, mail, mail);   /* pa jwenn kont — nou kòmanse yon fil k ap tann */
       });
       var convs = await loadConversations();
       convCache = convs;
+      /* Mesaj mwen te voye bay yon moun ki poko gen kont — yo pa nan
+         Firestore ankò, yo nan kès datant lan. Nou montre yo tou, pou
+         yo pa disparèt nan lis la. */
+      var pendingByEmail = {};
+      if(sb && currentUser){
+        try{
+          var pp = await sb.from('pending_messages').select('*').eq('from_uid', currentUser.uid).eq('claimed', false);
+          (pp.data||[]).forEach(function(r){
+            var k = r.to_email;
+            if(!pendingByEmail[k]) pendingByEmail[k] = { email:k, lastMessage:r.text_||('🔗 '+r.link), lastAt:r.created_at };
+            else if(new Date(r.created_at) > new Date(pendingByEmail[k].lastAt)){ pendingByEmail[k].lastMessage = r.text_||('🔗 '+r.link); pendingByEmail[k].lastAt = r.created_at; }
+          });
+        }catch(e){}
+      }
       var list = $('#mg-list'); if(!list) return;
-      list.innerHTML = convs.length ? convs.map(function(c){
+      var items = convs.map(function(c){
         var o = otherOf(c);
         var unread = (c.unread && c.unread[currentUser.uid]) || 0;
-        return '<div class="zptx' + (unread?' out':'') + '" style="cursor:pointer" data-conv="' + esc(o.uid) + '|' + esc(o.name) + '|' + esc(o.email) + '">'
+        return { key:o.uid, html: '<div class="zptx' + (unread?' out':'') + '" style="cursor:pointer" data-conv="' + esc(o.uid) + '|' + esc(o.name) + '|' + esc(o.email) + '">'
           + '<div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
           + '<div class="bd"><b>' + esc(o.name) + (unread ? ' · ' + unread + ' nouvo' : '') + '</b>'
-          + '<span>' + esc(c.lastMessage||'') + '</span></div></div>';
-      }).join('') : '<div class="zp-empty">Ou poko gen konvèsasyon. Ekri yon imel anwo pou kòmanse.</div>';
+          + '<span>' + esc(c.lastMessage||'') + '</span></div></div>' };
+      });
+      Object.keys(pendingByEmail).forEach(function(k){
+        var p = pendingByEmail[k];
+        items.push({ key:k, html: '<div class="zptx" style="cursor:pointer" data-conv="|' + esc(k) + '|' + esc(k) + '">'
+          + '<div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
+          + '<div class="bd"><b>' + esc(k) + '</b><span><span class="msdot grey" style="margin-right:5px"></span>' + esc(p.lastMessage) + '</span></div></div>' });
+      });
+      list.innerHTML = items.length ? items.map(function(x){ return x.html; }).join('')
+        : '<div class="zp-empty">Ou poko gen konvèsasyon. Ekri yon imel anwo pou kòmanse.</div>';
       $$('#mg-list [data-conv]').forEach(function(el){
         el.addEventListener('click', function(){
           var p = el.getAttribute('data-conv').split('|');
-          openThread(p[0], p[1], p[2]);
+          openThread(p[0]||null, p[1], p[2]);
         });
       });
     }
+    var convUnsub2 = null, threadRows = [], threadReadUpTo = {};
+    function stopThreadListeners(){
+      if(msgUnsub){ msgUnsub(); msgUnsub = null; }
+      if(convUnsub2){ convUnsub2(); convUnsub2 = null; }
+    }
     async function openThread(otherUid, otherName, otherEmail){
-      msgOpenId = convId(currentUser.uid, otherUid);
+      stopThreadListeners();
+      msgOpenId = otherUid ? convId(currentUser.uid, otherUid) : null;
       var box = $('#zp-in'); if(!box) return;
       box.innerHTML =
           '<button class="trk-back" id="mg-back" type="button" style="border:0;background:none;color:var(--ink-3);'
           + 'cursor:pointer;font-family:var(--sans);font-size:.68rem;padding:0 0 14px">← Tounen nan lis la</button>'
         + '<div style="font-weight:600;font-size:.9rem;margin-bottom:12px">' + esc(otherName) + '</div>'
+        + (otherUid ? '' : '<p class="zp-hint" style="margin-bottom:12px">' + esc(otherEmail) + ' poko gen kont sou Zetwal. Mesaj ou yo ap tann li konekte pou yo rive.</p>')
         + '<div id="mg-thread" style="max-height:360px;overflow-y:auto;margin-bottom:14px"></div>'
         + '<div style="display:flex;gap:8px"><input type="text" id="mg-input" placeholder="Ekri yon mesaj…" style="flex:1;padding:11px 13px;'
           + 'border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--ink-1);font-family:var(--sans);font-size:.8rem">'
         + '<button class="zp-btn go" id="mg-send" style="width:auto;padding:11px 16px">Voye</button></div>';
-      $('#mg-back').addEventListener('click', function(){ if(msgUnsub){ msgUnsub(); msgUnsub=null; } msgOpenId=null; renderMsgList(); });
+      $('#mg-back').addEventListener('click', function(){ stopThreadListeners(); msgOpenId=null; renderMsgList(); });
       $('#mg-send').addEventListener('click', function(){ sendMessage(otherUid, otherName, otherEmail); });
       $('#mg-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(otherUid, otherName, otherEmail); });
 
+      if(!otherUid){ renderPendingThread(otherEmail); return; }
+
       var ref = fs.collection('conversations').doc(msgOpenId);
-      var seed = {};
-      seed['participants'] = [currentUser.uid, otherUid];
-      seed['participantNames'] = {}; seed['participantNames'][currentUser.uid] = currentUser.displayName || currentUser.email;
-      seed['participantNames'][otherUid] = otherName;
-      seed['participantEmails'] = {}; seed['participantEmails'][currentUser.uid] = currentUser.email || '';
-      seed['participantEmails'][otherUid] = otherEmail || '';
+      var seed = { participants:[currentUser.uid, otherUid], participantNames:{}, participantEmails:{} };
+      seed.participantNames[currentUser.uid] = currentUser.displayName || currentUser.email;
+      seed.participantNames[otherUid] = otherName;
+      seed.participantEmails[currentUser.uid] = currentUser.email || '';
+      seed.participantEmails[otherUid] = otherEmail || '';
       try{ await ref.set(seed, { merge:true }); }catch(e){}
       try{
-        var upd = {}; upd['unread.' + currentUser.uid] = 0;
-        await ref.set({ unread: (function(){ var o={}; o[currentUser.uid]=0; return o; })() }, { merge:true });
+        var u = {}; u[currentUser.uid] = 0;
+        var ru = {}; ru[currentUser.uid] = firebase.firestore.FieldValue.serverTimestamp();
+        await ref.set({ unread:u, readUpTo:ru }, { merge:true });
       }catch(e){}
 
-      if(msgUnsub) msgUnsub();
+      threadRows = []; threadReadUpTo = {};
+      convUnsub2 = ref.onSnapshot(function(doc){
+        threadReadUpTo = (doc.exists && doc.data().readUpTo) || {};
+        paintThread(otherUid);
+      });
       msgUnsub = ref.collection('messages').orderBy('created_at', 'asc').limit(200)
         .onSnapshot(function(snap){
-          var thread = $('#mg-thread'); if(!thread) return;
-          var rows = []; snap.forEach(function(d){ rows.push(d.data()); });
-          thread.innerHTML = rows.length ? rows.map(function(m){
-            var mine = m.from === currentUser.uid;
-            return '<div style="display:flex;justify-content:' + (mine?'flex-end':'flex-start') + ';margin-bottom:8px">'
-              + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;'
-              + (mine ? 'background:var(--gold);color:#0A0A0A' : 'background:rgba(255,255,255,.06);color:var(--ink-1)') + '">'
-              + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text||m.link) + '</a>' : esc(m.text||''))
-              + '</div></div>';
-          }).join('') : '<div class="zp-empty">Ekri premye mesaj la.</div>';
-          thread.scrollTop = thread.scrollHeight;
+          threadRows = []; snap.forEach(function(d){ threadRows.push(d.data()); });
+          paintThread(otherUid);
+          /* Chak fwa mesaj nouvo rive pandan fil la ouvri, yo li tousuit */
+          var ru2 = {}; ru2[currentUser.uid] = firebase.firestore.FieldValue.serverTimestamp();
+          ref.set({ readUpTo:ru2 }, { merge:true }).catch(function(){});
         }, function(){});
+    }
+    function toMillis(t){
+      if(!t) return 0;
+      if(t.toMillis) return t.toMillis();
+      if(t.seconds) return t.seconds*1000;
+      return new Date(t).getTime() || 0;
+    }
+    function paintThread(otherUid){
+      var thread = $('#mg-thread'); if(!thread) return;
+      var otherRead = toMillis(threadReadUpTo[otherUid]);
+      thread.innerHTML = threadRows.length ? threadRows.map(function(m){
+        var mine = m.from === currentUser.uid;
+        var dot = '';
+        if(mine){
+          var mt = toMillis(m.created_at);
+          var cls = (otherRead && otherRead >= mt) ? 'blue' : 'yellow';
+          var lbl = cls === 'blue' ? 'Li li' : 'Resevwa';
+          dot = '<span class="msdot ' + cls + '" title="' + lbl + '"></span>';
+        }
+        return '<div style="display:flex;justify-content:' + (mine?'flex-end':'flex-start') + ';margin-bottom:8px;align-items:flex-end;gap:5px">'
+          + (mine ? dot : '')
+          + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;'
+          + (mine ? 'background:var(--gold);color:#0A0A0A' : 'background:rgba(255,255,255,.06);color:var(--ink-1)') + '">'
+          + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text||m.link) + '</a>' : esc(m.text||''))
+          + '</div></div>';
+      }).join('') : '<div class="zp-empty">Ekri premye mesaj la.</div>';
+      thread.scrollTop = thread.scrollHeight;
+    }
+    async function renderPendingThread(otherEmail){
+      var thread = $('#mg-thread'); if(!thread) return;
+      thread.innerHTML = '<div class="zp-empty">K ap chaje…</div>';
+      var rows = [];
+      if(sb && currentUser){
+        try{
+          var r = await sb.from('pending_messages').select('*')
+            .eq('from_uid', currentUser.uid).eq('to_email', otherEmail).order('created_at',{ascending:true});
+          rows = r.data || [];
+        }catch(e){}
+      }
+      thread.innerHTML = rows.length ? rows.map(function(m){
+        return '<div style="display:flex;justify-content:flex-end;margin-bottom:8px;align-items:flex-end;gap:5px">'
+          + '<span class="msdot grey" title="Ap tann li konekte"></span>'
+          + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;background:var(--gold);color:#0A0A0A">'
+          + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text_||m.link) + '</a>' : esc(m.text_||''))
+          + '</div></div>';
+      }).join('') : '<div class="zp-empty">Ekri premye mesaj la — l ap tann ' + esc(otherEmail) + ' konekte.</div>';
+      thread.scrollTop = thread.scrollHeight;
+    }
+    async function deliverMessage(otherUid, otherEmail, text, link){
+      if(!otherUid){
+        if(sb){
+          try{ await sb.from('pending_messages').insert({
+            to_email: otherEmail, from_uid:currentUser.uid,
+            from_name:currentUser.displayName||currentUser.email, from_email:currentUser.email||null,
+            text_: text||null, link: link||null
+          }); }catch(e){}
+        }
+        return;
+      }
+      var cid = convId(currentUser.uid, otherUid);
+      var ref = fs.collection('conversations').doc(cid);
+      await ref.collection('messages').add({ from:currentUser.uid, text:text||null, link:link||null, created_at: firebase.firestore.FieldValue.serverTimestamp() });
+      var upd = { lastMessage: link ? '🔗 ' + (text||link) : text, lastAt: firebase.firestore.FieldValue.serverTimestamp() };
+      upd['unread.' + otherUid] = firebase.firestore.FieldValue.increment(1);
+      await ref.set(upd, { merge:true });
     }
     async function sendMessage(otherUid, otherName, otherEmail){
       var inp = $('#mg-input'); var text = (inp.value||'').trim();
       if(!text) return;
       inp.value = '';
-      var cid = convId(currentUser.uid, otherUid);
-      var ref = fs.collection('conversations').doc(cid);
-      try{
-        await ref.collection('messages').add({ from:currentUser.uid, text:text, created_at: firebase.firestore.FieldValue.serverTimestamp() });
-        var upd = {};
-        upd.lastMessage = text; upd.lastAt = firebase.firestore.FieldValue.serverTimestamp();
-        upd['unread.' + otherUid] = firebase.firestore.FieldValue.increment(1);
-        await ref.set(upd, { merge:true });
-      }catch(e){ toast('Mesaj la pa pase — eseye ankò'); }
+      try{ await deliverMessage(otherUid, otherEmail, text, null); }
+      catch(e){ toast('Mesaj la pa pase — eseye ankò'); }
+      if(!otherUid) renderPendingThread(otherEmail);
     }
     /* API piblik pou lòt paj yo (shop.html, move.html) pataje yon atik
        dirèkteman nan yon mesaj — sèvi ak lyen an sèlman, san mete non yon
@@ -588,18 +768,15 @@
       setTimeout(function(){
         var mail = prompt('Imel zanmi ou vle pataje ' + (label||'sa') + ' la avè l :');
         if(!mail) return;
+        mail = mail.trim().toLowerCase();
         findUserByEmail(mail).then(function(dest){
-          if(!dest){ toast('Nou pa jwenn okenn kont ak imel sa'); return; }
-          openThread(dest.uid, dest.name, dest.email).then(function(){
-            setTimeout(function(){
-              var cid = convId(currentUser.uid, dest.uid);
-              fs.collection('conversations').doc(cid).collection('messages').add({
-                from:currentUser.uid, text:label||url, link:url, created_at: firebase.firestore.FieldValue.serverTimestamp()
-              });
-              fs.collection('conversations').doc(cid).set({
-                lastMessage:'🔗 ' + (label||url), lastAt: firebase.firestore.FieldValue.serverTimestamp()
-              }, { merge:true });
-            }, 500);
+          var uid = dest ? dest.uid : null;
+          var name = dest ? dest.name : mail;
+          var em = dest ? dest.email : mail;
+          openThread(uid, name, em).then(function(){
+            deliverMessage(uid, em, label||url, url).then(function(){
+              if(!uid) renderPendingThread(em);
+            });
           });
         });
       }, 400);
