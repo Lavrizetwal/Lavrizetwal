@@ -1510,14 +1510,19 @@ async function seedUser(user, name){
   try{
     var ref = fs.collection('users').doc(user.uid);
     var snap = await ref.get();
+    var mail = (user.email||'').toLowerCase();
     if(!snap.exists){
-      await ref.set({
-        name  : name || user.displayName || '',
-        email : (user.email || '').toLowerCase(),
-        points: 0,
-        createdAt: new Date().toISOString()
-      }, { merge:true });
+      await ref.set({ name:name||user.displayName||'', email:mail, points:0, createdAt:new Date().toISOString() }, { merge:true });
+      return;
     }
+    /* Yon kont ki te kreye deja (pa egzanp, ki te genyen pwen nan yon jwèt
+       anvan l te janm konekte sou lòt paj) ka pa gen imel anrejistre.
+       Nou konplete l la, san n al touche pwen li deja genyen. */
+    var d = snap.data() || {};
+    var patch = {};
+    if(mail && d.email !== mail) patch.email = mail;   /* manke, oswa move ka (majiskil) */
+    if(!d.name && (name || user.displayName)) patch.name = name || user.displayName;
+    if(Object.keys(patch).length) await ref.set(patch, { merge:true });
   }catch(e){ console.warn('users doc:', e.message); }
 }
 
