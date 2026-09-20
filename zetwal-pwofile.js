@@ -569,10 +569,15 @@
     async function loadConversations(){
       if(!fs || !currentUser) return [];
       try{
+        /* San .orderBy() apre .where('participants','array-contains',...) —
+           konbinezon sa mande yon endèks konpoze espesyal nan Firestore.
+           Nou triye rezilta a nan navigatè a pito, pou nou pa depann de
+           yon endèks moun ta dwe kreye alamen nan console Firebase la. */
         var r = await fs.collection('conversations')
-          .where('participants', 'array-contains', currentUser.uid)
-          .orderBy('lastAt', 'desc').limit(50).get();
-        return r.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); });
+          .where('participants', 'array-contains', currentUser.uid).limit(50).get();
+        var rows = r.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); });
+        rows.sort(function(a,b){ return toMillis(b.lastAt) - toMillis(a.lastAt); });
+        return rows;
       }catch(e){ return []; }
     }
     function otherOf(conv){
