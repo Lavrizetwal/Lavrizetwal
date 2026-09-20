@@ -4508,9 +4508,18 @@ async function loadProfileConvs(uid){
   const box=document.getElementById('pf-convs'); if(!box) return;
   const fs=getStore(); if(!fs) return;
   try{
-    const q=await fs.collection('conversations').where('participants','array-contains',uid).orderBy('lastAt','desc').limit(30).get();
-    if(q.docs.length===0){ box.innerHTML=emptyState('send','Pa gen konvèsasyon','Itilizatè sa a poko voye ni resevwa mesaj.'); paintIcons(); return; }
-    box.innerHTML=q.docs.map(doc=>{
+    /* San .orderBy() apre .where('participants','array-contains',...) —
+       konbinezon sa mande yon endèks konpoze nan Firestore. Nou triye
+       rezilta a nan navigatè a pito. */
+    const q=await fs.collection('conversations').where('participants','array-contains',uid).limit(30).get();
+    const docsArr=q.docs.slice().sort((a,b)=>{
+      const ta=a.data().lastAt, tb=b.data().lastAt;
+      const ma=ta?(ta.toDate?ta.toDate().getTime():new Date(ta).getTime()):0;
+      const mb=tb?(tb.toDate?tb.toDate().getTime():new Date(tb).getTime()):0;
+      return mb-ma;
+    });
+    if(docsArr.length===0){ box.innerHTML=emptyState('send','Pa gen konvèsasyon','Itilizatè sa a poko voye ni resevwa mesaj.'); paintIcons(); return; }
+    box.innerHTML=docsArr.map(doc=>{
       const c=doc.data()||{}; const names=c.participantNames||{};
       const other=(c.participants||[]).filter(x=>x!==uid)[0];
       return '<div class="mv" style="cursor:pointer" onclick="openProfileConv(\''+doc.id+'\')">'
