@@ -27,6 +27,7 @@
     appId: "1:291921316186:web:f55e8b34526960df394b63"
   };
 
+  var ADMIN_EMAILS = ['mikenestorlive@gmail.com', 'schnaydernaderice1@gmail.com'];
   var sb = null, auth = null, fs = null;
   var bootTries = 0;
 
@@ -376,9 +377,11 @@
       if(role.driver) roles.push('Chofè');
       if(role.partners.length) roles.push(role.partners.length > 1 ? 'Patnè (' + role.partners.length + ')' : 'Patnè');
 
+      var isAdmin = u.email && ADMIN_EMAILS.indexOf(u.email.toLowerCase()) !== -1;
       var head = '<div class="zpcard"><div class="k">Solid pwen ou</div>'
         + '<div class="v">' + pts.toFixed(1) + '<s>pwen</s></div></div>'
         + (roles.length ? '<div style="margin-bottom:14px">' + roles.map(function(r){ return '<span class="zprole">'+r+'</span>'; }).join('') + '</div>' : '')
+        + (isAdmin ? '<a class="zp-btn go" href="admin.html" style="width:100%;margin-bottom:10px">Aksè Administrasyon</a>' : '')
         + '<button class="zp-btn" id="zp-share" style="width:100%;margin-bottom:16px">Pataje pwofil mwen</button>';
 
       var tabs = '<div class="zptabs">'
