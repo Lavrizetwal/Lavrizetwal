@@ -809,10 +809,19 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .trk-drv{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:10px;margin-bottom:14px;
   border:1px solid var(--line);background:rgba(255,255,255,.028)}
 .trk-drv .av{width:38px;height:38px;border-radius:50%;background:var(--g-08);border:1px solid var(--g-24);
-  color:var(--gold);display:grid;place-items:center;font-weight:700;flex-shrink:0}
+  color:var(--gold);display:grid;place-items:center;font-weight:700;flex-shrink:0;overflow:hidden}
 .trk-drv b{display:block;font-size:.82rem}
 .trk-drv span{display:block;font-size:.68rem;color:var(--ink-4);margin-top:1px}
 .trk-drv .btn{margin-left:auto;padding:7px 14px;font-size:.6rem}
+.trk-drv .av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.trk-veh{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:10px;margin-bottom:14px;
+  border:1px solid var(--line);background:rgba(255,255,255,.02)}
+.trk-veh img{width:52px;height:38px;border-radius:6px;object-fit:cover;flex-shrink:0}
+.trk-veh-ph{width:52px;height:38px;border-radius:6px;background:var(--g-08);color:var(--gold);
+  display:grid;place-items:center;flex-shrink:0}
+.trk-veh-ph svg{width:18px;height:18px}
+.trk-veh b{display:block;font-size:.76rem}
+.trk-veh span{display:block;font-size:.66rem;color:var(--ink-4);margin-top:1px}
 .trk-pos{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:10px;margin-bottom:14px;
   border:1px solid var(--g-24);background:var(--g-08);color:var(--gold)}
 .trk-pos svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;flex-shrink:0}
@@ -879,6 +888,9 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .pfrole{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;
   border:1px solid var(--g-24);background:var(--g-08);color:var(--gold);font-size:.62rem;
   font-weight:700;letter-spacing:.6px;margin:4px 6px 0 0}
+.certbadge{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:99px;
+  border:1px solid rgba(0,224,138,.3);background:rgba(0,224,138,.08);color:var(--ok);font-size:.62rem;
+  font-weight:700;letter-spacing:.4px;margin:0 8px 8px 0}
 .pf-av-row{display:flex;align-items:center;gap:16px;margin-bottom:18px}
 .pf-av-big{width:64px;height:64px;border-radius:50%;flex-shrink:0;overflow:hidden;background:var(--g-08);
   border:1px solid var(--g-24);color:var(--gold);font-family:var(--serif);font-size:1.5rem;font-weight:700;
@@ -2983,9 +2995,21 @@ function trackTpl(o){
   } else if(needsDriver && (o.status === 'accepted' || o.status === 'on_way')){
     pos1 = '<div class="trk-pos dim">' + ICON_V + '<div><b>N ap tann pozisyon chofè a</b><span>Li ka pran kèk segonn</span></div></div>';
   }
-  var driver = o.driver_name ? '<div class="trk-drv"><div class="av">' + initial(o.driver_name) + '</div>'
-    + '<div><b>' + esc(o.driver_name) + '</b>' + (o.driver_phone ? '<span>' + esc(o.driver_phone) + '</span>' : '') + '</div>'
-    + (o.driver_phone ? '<a class="btn btn-o" href="tel:' + esc(o.driver_phone) + '">Rele</a>' : '') + '</div>' : '';
+  var driver = '';
+  if(o.driver_name){
+    driver = '<div class="trk-drv"><div class="av">'
+      + (o.driver_photo_url ? '<img src="' + esc(o.driver_photo_url) + '" alt="">' : initial(o.driver_name))
+      + '</div><div><b>' + esc(o.driver_name) + '</b>'
+      + (o.driver_phone ? '<span>' + esc(o.driver_phone) + '</span>' : '') + '</div>'
+      + (o.driver_phone ? '<a class="btn btn-o" href="tel:' + esc(o.driver_phone) + '">Rele</a>' : '') + '</div>';
+    var vparts = [o.vehicle_color, o.vehicle_make].filter(Boolean).join(' ');
+    if(vparts || o.vehicle_plate || o.vehicle_photo_url){
+      driver += '<div class="trk-veh">'
+        + (o.vehicle_photo_url ? '<img src="' + esc(o.vehicle_photo_url) + '" alt="">' : '<div class="trk-veh-ph">' + ICON_V + '</div>')
+        + '<div><b>' + esc(vparts || 'Machin') + '</b>'
+        + (o.vehicle_plate ? '<span>Plak : ' + esc(o.vehicle_plate) + '</span>' : '') + '</div></div>';
+    }
+  }
   var wait = (o.status === 'requested')
     ? '<p class="hintline" id="trk-wait" data-since="' + esc(o.created_at) + '">Ap tann yon chofè reponn…</p>' : '';
   var pen = o.wait_penalty > 0
@@ -3349,7 +3373,7 @@ if(auth) auth.onAuthStateChanged(async function(user){
   $('#a-st').textContent = status; $('#dr-st').textContent = status;
   pqWatch(user);
   $('#a-rides').style.display=''; $('#dr-rides').style.display='';
-  loadRole().then(function(){ if(ROLE.driver) loadJobs(); if(spPartner) loadMyItems(); });
+  loadRole().then(function(){ if(ROLE.driver) loadJobs(); if(spPartner){ loadMyItems(); loadPartnerOrders(); } });
   if($('#r-name') && !$('#r-name').value) $('#r-name').value = name;
   loadMine();
   checkUserLinks();
@@ -3383,7 +3407,7 @@ async function loadRole(){
     });
   }catch(e){}
   spPartner = ROLE.partners[0] || null;
-  spTab = ROLE.driver ? 'jobs' : 'items';
+  spTab = ROLE.driver ? 'jobs' : (ROLE.partners.length ? 'orders' : 'items');
   paintRole();
 }
 function paintRole(){
@@ -3417,19 +3441,25 @@ $('#sp-x').addEventListener('click', spaceClose);
 
 function renderSpace(){
   var box = $('#sp-body'); if(!box) return;
-  var tabs = '';
-  if(ROLE.driver && ROLE.partners.length){
-    tabs = '<div class="sp-tabs">'
-      + '<button class="' + (spTab==='jobs'?'on':'') + '" data-t="jobs">Kous yo</button>'
-      + '<button class="' + (spTab==='items'?'on':'') + '" data-t="items">Atik mwen yo</button></div>';
-  }
-  box.innerHTML = tabs + '<div id="sp-in"></div>';
+  var opts = [];
+  if(ROLE.driver) opts.push(['jobs','Kous yo']);
+  if(ROLE.partners.length){ opts.push(['orders','Kòmand yo']); opts.push(['items','Atik mwen yo']); }
+  var tabs = opts.length > 1
+    ? '<div class="sp-tabs">' + opts.map(function(o){
+        return '<button class="' + (spTab===o[0]?'on':'') + '" data-t="' + o[0] + '">' + o[1] + '</button>';
+      }).join('') + '</div>' : '';
+  var cert = '';
+  if(ROLE.driver) cert += '<span class="certbadge">' + ICON_CERT + 'Chofè sètifye</span>';
+  ROLE.partners.forEach(function(p){ cert += '<span class="certbadge">' + ICON_CERT + 'Patnè sètifye</span>'; });
+  box.innerHTML = (cert ? '<div style="margin-bottom:14px">' + cert + '</div>' : '') + tabs + '<div id="sp-in"></div>';
   $$('#sp-body .sp-tabs button').forEach(function(b){
     b.addEventListener('click', function(){ spTab = b.getAttribute('data-t'); renderSpace(); });
   });
   if(spTab === 'jobs' && ROLE.driver) renderJobs();
+  else if(spTab === 'orders' && ROLE.partners.length) renderPartnerOrders();
   else renderMyItems();
 }
+var ICON_CERT = '<svg viewBox="0 0 24 24" width="13" height="13" style="stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>';
 
 /* ── Chofè : kous ki disponib, epi kous pa m ── */
 var jobsAll = [];
@@ -3503,6 +3533,13 @@ async function jobAct(id, kind, to){
     patch.driver_uid  = window._me.uid;
     patch.driver_name = ROLE.driver.name || (window._me.displayName || '');
     patch.driver_phone = ROLE.driver.phone || null;
+    /* Kliyan an dwe wè kilès k ap vini avan l rive — kopye enfo
+       machin/chofè yo dirèkteman sou kous la, yon sèl fwa, isit la. */
+    patch.driver_photo_url  = ROLE.driver.driver_photo_url || null;
+    patch.vehicle_make      = ROLE.driver.vehicle_make || null;
+    patch.vehicle_color     = ROLE.driver.vehicle_color || null;
+    patch.vehicle_plate     = ROLE.driver.vehicle_plate || null;
+    patch.vehicle_photo_url = ROLE.driver.vehicle_photo_url || null;
     /* Tan tann lan depase 3 min? Nou kalkile penalite a yon sèl fwa la a,
        pito pase yon minitè k ap ekri chak 5 segonn (sa ta egzije telefòn
        kliyan an rete louvri san rete, e li ta chaje baz done a pou gremesi). */
@@ -3547,6 +3584,59 @@ function jobWatchStop(){
 }
 
 /* ── Patnè : atik mwen yo, ak sa k ap tann validasyon ── */
+/* ── Patnè : kòmand ki adrese pou biznis li a ── */
+var partnerOrders = [];
+async function loadPartnerOrders(){
+  if(!sb || !spPartner){ partnerOrders = []; return; }
+  try{
+    var r = await sb.from('move_orders').select('*').eq('partner_id', spPartner.id)
+      .order('created_at', {ascending:false}).limit(60);
+    partnerOrders = r.data || [];
+  }catch(e){ partnerOrders = []; }
+  if($('#space').classList.contains('open') && spTab === 'orders') renderPartnerOrders();
+}
+var PO_FLOW = { requested:'accepted', accepted:'picked', picked:'done' };
+var PO_LABEL = { accepted:'Aksepte kòmand lan', picked:'Pare pou ranmase', done:'Livre / ranmase' };
+function renderPartnerOrders(){
+  var box = $('#sp-in'); if(!box) return;
+  if(!spPartner){ box.innerHTML = '<div class="nulle">' + ICON_V + 'Ou pa gen okenn biznis ankò.</div>'; return; }
+  var open = partnerOrders.filter(function(o){ return o.status !== 'done' && o.status !== 'cancelled'; });
+  var done = partnerOrders.filter(function(o){ return o.status === 'done' || o.status === 'cancelled'; }).slice(0, 10);
+  var html = '';
+  html += '<div class="side-s" style="margin-bottom:10px">Kòmand k ap tann ' + esc(spPartner.name) + '</div>';
+  html += open.length ? open.map(poCard).join('') : '<div class="nulle">' + ICON_V + 'Pa gen kòmand k ap tann kounye a.</div>';
+  if(done.length){
+    html += '<div class="side-s" style="margin:18px 0 10px">Fini dènyèman</div>' + done.map(poCard).join('');
+  }
+  box.innerHTML = html;
+  $$('#sp-in [data-po]').forEach(function(b){
+    b.addEventListener('click', function(){ partnerOrderAct(b.getAttribute('data-po'), b.getAttribute('data-to')); });
+  });
+}
+function poCard(o){
+  var S = STATUS[o.status] || STATUS.requested;
+  var items = (o.items||[]).map(function(it){ return it.q + '× ' + it.name; }).join(', ');
+  var next = PO_FLOW[o.status];
+  var btn = next ? '<button class="btn btn-g" style="width:100%;margin-top:10px" data-po="' + esc(o.id) + '" data-to="' + next + '">' + PO_LABEL[next] + '</button>' : '';
+  return '<div class="rc ' + esc(o.status) + '"><div class="rc-h"><div class="rc-n">' + esc(o.client_name||'Kliyan')
+    + ' · ' + (o.order_mode==='pickup'?'Vin chèche':'Livrezon') + '</div>'
+    + '<span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
+    + '<div style="font-size:.76rem;color:var(--ink-3);margin:6px 0">' + esc(items) + '</div>'
+    + '<div class="rc-g"><div><div class="rc-k">Total</div><div class="rc-v" style="color:var(--gold)">' + fmt(o.total) + ' HTG</div></div>'
+    + '<div><div class="rc-k">Telefòn</div><div class="rc-v">' + esc(o.client_phone||'—') + '</div></div></div>' + btn + '</div>';
+}
+async function partnerOrderAct(id, to){
+  if(!sb || !to) return;
+  var patch = { status: to, updated_at: new Date().toISOString() };
+  try{
+    var r = await sb.from('move_orders').update(patch).eq('id', id);
+    if(r.error) throw r.error;
+    var o = partnerOrders.filter(function(x){ return x.id === id; })[0];
+    if(o) Object.assign(o, patch);
+    renderPartnerOrders();
+    toast(to === 'done' ? 'Kòmand fini' : 'Mizajou voye bay kliyan an');
+  }catch(e){ toast('Nou pa ka mete l ajou'); }
+}
 async function loadMyItems(){
   if(!sb || !spPartner) { spItems = []; return; }
   try{
@@ -3728,8 +3818,12 @@ function checkUserLinks(){
 function renderPfInfo(){
   var box = $('#pf-in'); if(!box) return;
   var u = window._me, prof = window._profile || {};
+  var cert = '';
+  if(ROLE.driver) cert += '<span class="certbadge">' + ICON_CERT + 'Chofè sètifye</span>';
+  ROLE.partners.forEach(function(){ cert += '<span class="certbadge">' + ICON_CERT + 'Patnè sètifye</span>'; });
   box.innerHTML =
-      '<div class="pf-av-row"><div class="pf-av-big" id="pf-av-big">'
+      (cert ? '<div style="margin-bottom:16px">' + cert + '</div>' : '')
+    + '<div class="pf-av-row"><div class="pf-av-big" id="pf-av-big">'
         + (prof.photo_url ? '<img src="' + esc(prof.photo_url) + '" alt="">' : initial(u.displayName||u.email))
       + '</div><label class="btn btn-o" style="cursor:pointer">Chanje foto<input type="file" id="pf-photo" accept="image/*" style="display:none"></label></div>'
     + '<div class="fld"><label for="pf-name">Non</label><input type="text" id="pf-name" value="' + esc(u.displayName||'') + '"></div>'
@@ -4551,22 +4645,18 @@ $('#j-send').addEventListener('click', async function(){
   }
   btn.disabled = false; btn.textContent = 'Voye demann mwen';
 
-  var m = 'Bonjou Zetwal !\n\n'
-    + (jKind === 'driver' ? 'Mwen vle vin livrè.' : jKind === 'manje'
-       ? 'Mwen vle enskri restoran mwen : ' + g('j-bn') : 'Mwen vle enskri magazen mwen : ' + g('j-bn')) + '\n\n'
-    + 'Non : ' + g('j-fn') + ' ' + g('j-ln') + '\nTelefòn : ' + g('j-tel')
-    + (g('j-mail') ? '\nImel : ' + g('j-mail') : '')
-    + (jKind === 'driver' ? '\nMachin : ' + g('j-vt') + (g('j-vp') ? ' · ' + g('j-vp') : '') : '')
-    + '\nPapye voye : ' + docs.length + '\n\nMèsi !';
-  window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
-
   if(saved){
+    /* Enfo ak foto yo rete sou Zetwal — yo pa pase sou WhatsApp.
+       Yon administratè gade yo, epi rele pou verifye papye fizik yo. */
     $('#j-body').innerHTML = '<div class="warn" style="border-color:rgba(0,224,138,.3);'
-      + 'background:rgba(0,224,138,.07);color:#7BE8BC">Demann ou <b>rive</b>. '
-      + 'Yon administratè ap gade papye w yo epi rele w nan nimewo ou ba nou an.</div>';
+      + 'background:rgba(0,224,138,.07);color:#7BE8BC">Demann ou <b>rive</b> — enfo ak foto ou yo rete sou Zetwal.'
+      + '<br><br>Yon administratè ap gade papye w yo, epi <b>rele w nan nimewo ou ba nou an</b> pou yon verifikasyon '
+      + 'materyèl. Si gen yon bagay ki manke, l ap voye w yon mesaj — ou ka wè l nan <b>Pwofil mwen → Mesaj</b>.</div>';
     $('#j-send').style.display = 'none';
+    toast('Demann ou anrejistre');
+  } else {
+    toast('Nou pa ka voye demann lan kounye a — eseye ankò');
   }
-  toast(saved ? 'Demann ou anrejistre' : 'Demann lan ale sou WhatsApp');
 });
 
 /* ══ 17. DEPA ═════════════════════════════════════════════════ */
