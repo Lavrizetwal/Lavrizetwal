@@ -200,7 +200,7 @@ a{color:inherit;text-decoration:none}
 
 /* blòk kont nan meni telefòn nan */
 #dr-auth{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
-#dr-auth .who{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+#dr-auth .who{display:flex;align-items:center;gap:12px;margin-bottom:16px;cursor:pointer}
 #dr-auth .who .av{width:42px;height:42px;font-size:.92rem}
 #dr-auth .nm{font-family:var(--serif);font-size:1.15rem;font-weight:600;line-height:1.2}
 #dr-auth .sub{font-size:.6rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4)}
@@ -1116,7 +1116,15 @@ burger.addEventListener('click', function(){
   document.body.classList.toggle('lock', open);
 });
 var whoMini = $('#who-mini');
-if(whoMini) whoMini.addEventListener('click', function(){ burger.click(); });
+if(whoMini) whoMini.addEventListener('click', function(){
+  if(window.ZetwalProfile) window.ZetwalProfile.open();
+  else burger.click();
+});
+var drWho = $('#dr-who');
+if(drWho) drWho.addEventListener('click', function(){
+  drawer.classList.remove('open'); burger.classList.remove('x'); document.body.classList.remove('lock');
+  if(window.ZetwalProfile) window.ZetwalProfile.open();
+});
 $$('#drawer a').forEach(function(a){
   a.addEventListener('click', function(){
     drawer.classList.remove('open'); burger.classList.remove('x');
