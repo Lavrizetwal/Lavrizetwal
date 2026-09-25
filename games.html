@@ -150,7 +150,7 @@ a{color:inherit;text-decoration:none}
 #drawer a.dl:nth-of-type(5){transition-delay:250ms}
 #drawer a.dl:hover{color:var(--gold)}
 #dr-auth{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
-#dr-auth .who{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+#dr-auth .who{display:flex;align-items:center;gap:12px;margin-bottom:14px;cursor:pointer}
 #dr-auth .who .av{width:42px;height:42px;font-size:.92rem}
 #dr-auth .nm{font-family:var(--serif);font-size:1.15rem;font-weight:600;line-height:1.2}
 #dr-auth .sub{font-size:.6rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4)}
@@ -467,8 +467,13 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .l-btns .btn{flex:1}
 .l-note{margin-top:14px;font-size:.66rem;color:var(--ink-4);line-height:1.6}
 
+#who-mini{display:none}
 @media(max-width:820px){
   .menu,.nav-act{display:none}
+  #who-mini.on{display:inline-flex;padding:0 10px;height:32px;gap:6px;margin-right:6px}
+  #who-mini .av{width:20px;height:20px;font-size:.52rem;flex-shrink:0}
+  #who-mini .pts{font-size:.66rem;padding:0;gap:0}
+  #who-mini .pts s{display:none}
   .burger{display:flex}
 }
 @media(max-width:560px){
@@ -539,6 +544,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
         <button class="pill" id="a-out" type="button">Dekonekte</button>
       </div>
     </div>
+    <button class="pill" id="who-mini" type="button" aria-label="Kont mwen"><span class="av" id="who-mini-av">Z</span><span class="pts" id="who-mini-pt">0.0<s>pwen</s></span></button>
     <button class="burger" id="burger" type="button" aria-label="Meni" aria-expanded="false"><span></span><span></span></button>
   </div>
 </nav>
@@ -860,6 +866,16 @@ burger.addEventListener('click', function(){
   burger.classList.toggle('x', open);
   burger.setAttribute('aria-expanded', open);
   document.body.classList.toggle('lock', open);
+});
+var whoMini = $('#who-mini');
+if(whoMini) whoMini.addEventListener('click', function(){
+  if(window.ZetwalProfile) window.ZetwalProfile.open();
+  else burger.click();
+});
+var drWho = $('#dr-who');
+if(drWho) drWho.addEventListener('click', function(){
+  drawer.classList.remove('open'); burger.classList.remove('x'); document.body.classList.remove('lock');
+  if(window.ZetwalProfile) window.ZetwalProfile.open();
 });
 $$('#drawer a.dl').forEach(function(a){
   a.addEventListener('click', function(){
@@ -1465,6 +1481,7 @@ function setPoints(n){
   PTS = Number(n) || 0;
   countPts($('#a-pt'), PTS); countPts($('#dr-pt'), PTS);
   $('#who-pt').innerHTML = PTS.toFixed(1) + '<s>pwen</s>';
+  var wmp = $('#who-mini-pt'); if(wmp) wmp.innerHTML = PTS.toFixed(1) + '<s>pwen</s>';
   paintPts();
 }
 function initial(s){ return (s || 'Z').trim().charAt(0).toUpperCase() || 'Z'; }
@@ -1476,6 +1493,7 @@ if(auth) auth.onAuthStateChanged(async function(user){
   if(!user){
     PTS = 0; lockHub();
     $('#login-btn').style.display=''; $('#who-btn').style.display='none';
+    var whoMiniEl2 = $('#who-mini'); if(whoMiniEl2) whoMiniEl2.classList.remove('on');
     $('#dr-login').style.display=''; $('#dr-who').style.display='none';
     $('#dr-out').style.display='none'; $('#dr-admin').style.display='none';
     $('#a-admin').style.display='none'; acct.classList.remove('open');
@@ -1484,8 +1502,9 @@ if(auth) auth.onAuthStateChanged(async function(user){
   var name = user.displayName || user.email || user.phoneNumber || 'Itilizatè';
   var first = String(name).split(' ')[0];
   $('#login-btn').style.display='none'; $('#who-btn').style.display='';
+  var whoMiniEl = $('#who-mini'); if(whoMiniEl) whoMiniEl.classList.add('on');
   $('#dr-login').style.display='none'; $('#dr-who').style.display='flex'; $('#dr-out').style.display='';
-  $('#who-nm').textContent=first; $('#who-av').textContent=initial(name);
+  $('#who-nm').textContent=first; $('#who-av').textContent=initial(name); var wma=$('#who-mini-av'); if(wma) wma.textContent=initial(name);
   $('#a-av').textContent=initial(name); $('#dr-av').textContent=initial(name);
   $('#a-nm').textContent=name; $('#dr-nm').textContent=first;
   $('#a-ml').textContent=user.email || user.phoneNumber || '';
