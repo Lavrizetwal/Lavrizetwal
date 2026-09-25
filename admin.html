@@ -1378,6 +1378,18 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </section>
 
+    <!-- ═════ MOVE — CHOFÈ YO ═════ -->
+    <section class="panel" id="tab-drivers">
+      <div class="card">
+        <div class="card-head">
+          <h3><span data-icon="truck"></span> Chofè aktif yo</h3>
+          <button class="btn btn-ghost btn-sm" onclick="loadDrivers()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button>
+        </div>
+        <p class="card-sub">Konplete machin ak foto yo — kliyan an wè sa apre chofè a aksepte yon kous.</p>
+        <div id="dv-body"></div>
+      </div>
+    </section>
+
     <!-- ═════ MOVE — PARTENAIRES ═════ -->
     <section class="panel" id="tab-partners">
       <div class="card" id="pt-list-card">
@@ -1861,6 +1873,7 @@ const NAV=[
   {g:'Move', items:[
     {id:'move',label:'Courses & commandes',icon:'orders'},
     {id:'apply',label:'Demandes reçues',icon:'user'},
+    {id:'drivers',label:'Chofè yo',icon:'truck'},
     {id:'partners',label:'Partenaires',icon:'box'},
     {id:'moveprice',label:'Tarifs Move',icon:'coins'}
   ]},
@@ -1893,6 +1906,7 @@ const TAB_META={
   pointasks:{t:'Demann pwen',s:'Les clients demandent, vous décidez'},
   profils:{t:'Pwofil & Mesaj',s:'Sécurité — consultation des profils et conversations'},
   apply:{t:'Demandes reçues',s:'Livreurs, restaurants et magasins'},
+  drivers:{t:'Chofè yo',s:'Véhicule, photo et certification'},
   partners:{t:'Partenaires',s:'Restaurants, magasins et leurs articles'},
   moveprice:{t:'Tarifs Move',s:'Course, livraison, objets, enfants'},
   points:{t:'Points clients',s:'Ajouter ou retirer des points'},
@@ -1962,6 +1976,7 @@ window.switchTab = (name)=>{
   if(name==='pointasks')     loadPointAsks();
   if(name==='profils')       initProfilSearch();
   if(name==='apply')         loadApps();
+  if(name==='drivers')       loadDrivers();
   if(name==='partners')      loadPartners();
   if(name==='moveprice')     loadMovePrice();
   if(name==='points')        initPoints();
@@ -4271,6 +4286,8 @@ function apCard(a){
     +'<button class="btn btn-quiet btn-sm" onclick="apReject(\''+escH(a.id)+'\')">Refuser</button>';
   else if(a.status==='approved' && a.partner_id) acts=
      '<button class="btn btn-ghost btn-sm" onclick="switchTab(\'partners\');setTimeout(()=>editPartner(\''+escH(a.partner_id)+'\'),400)">Ouvrir la fiche</button>';
+  if(a.status!=='rejected') acts +=
+     '<button class="btn btn-ghost btn-sm" onclick="apMessage(\''+escH(a.id)+'\')">'+icon('send','sm')+' Voye mesaj</button>';
 
   return '<div class="mv '+escH(a.status)+'">'
     +'<div class="mv-h"><div><div class="mv-t">'+escH(nom)+'</div>'
@@ -4352,6 +4369,135 @@ window.apReject=async(id)=>{
   }catch(e){ toast('Refus impossible : '+rlsHint(e),'error'); }
 };
 window.loadApps=loadApps; window.renderApps=renderApps;
+
+/* Ekri kandida a lè yon bagay manke — sèvi ak menm sistèm mesaj
+   itilizatè yo deja genyen (Pwofil mwen → Mesaj). Si moun nan poko
+   janm konekte (pa gen uid ankò), mesaj la ap tann li nan Supabase,
+   menm jan ak pwen ki voye pou yon imel ki poko konekte. */
+function apConvId(uidA,uidB){ return [uidA,uidB].sort().join('_'); }
+window.apMessage=async(id)=>{
+  const a=apRows.find(x=>x.id===id); if(!a) return;
+  const mail=(a.email||'').toLowerCase().trim();
+  if(!mail){ toast('Demann sa a pa gen imel — nou pa ka voye mesaj','error'); return; }
+  const txt=prompt('Mesaj pou '+([a.first_name,a.last_name].filter(Boolean).join(' ')||mail)+' :',
+    'Bonjou, nou bezwen yon lòt foto pou papye ou yo. Tanpri reponn nan mesaj sa a.');
+  if(!txt || !txt.trim()) return;
+  const fs=getStore(); if(!fs || !auth || !auth.currentUser){ toast('Koneksyon Firebase pa pare','error'); return; }
+  const me=auth.currentUser;
+  try{
+    if(a.user_uid){
+      const cid=apConvId(me.uid,a.user_uid);
+      const ref=fs.collection('conversations').doc(cid);
+      const seed={participants:[me.uid,a.user_uid],participantNames:{},participantEmails:{}};
+      seed.participantNames[me.uid]=me.displayName||'Administratè Zetwal';
+      seed.participantNames[a.user_uid]=[a.first_name,a.last_name].filter(Boolean).join(' ')||mail;
+      seed.participantEmails[me.uid]=me.email||'';
+      seed.participantEmails[a.user_uid]=mail;
+      await ref.set(seed,{merge:true});
+      await ref.collection('messages').add({from:me.uid,text:txt.trim(),created_at:firebase.firestore.FieldValue.serverTimestamp()});
+      const upd={lastMessage:txt.trim(),lastAt:firebase.firestore.FieldValue.serverTimestamp()};
+      upd['unread.'+a.user_uid]=firebase.firestore.FieldValue.increment(1);
+      await ref.set(upd,{merge:true});
+    } else if(db){
+      await db.from('pending_messages').insert({
+        to_email:mail, from_uid:me.uid, from_name:me.displayName||'Administratè Zetwal',
+        from_email:me.email||null, text_:txt.trim()
+      });
+    }
+    toast('Mesaj voye — li ap parèt nan Mesaj lè '+mail+' konekte','success');
+  }catch(e){ toast('Mesaj pa pase : '+rlsHint(e),'error'); }
+};
+
+/* ════════════════════════════════════════════════════════════
+   §12dis — CHOFÈ YO : machin, foto, sètifikasyon
+   ════════════════════════════════════════════════════════════ */
+let dvRows=[], dvOpenId=null;
+async function loadDrivers(){
+  const box=document.getElementById('dv-body'); if(!box) return;
+  if(!dvRows.length) box.innerHTML=skeletonCards(2);
+  try{
+    const {data,error}=await db.from('drivers').select('*').eq('active',true).order('certified_at',{ascending:false});
+    if(error) throw error;
+    dvRows=data||[]; renderDrivers();
+  }catch(e){
+    box.innerHTML=errorState('Chofè pa disponib',
+      "La table drivers n'a pas les colonnes nécessaires. Exécutez zetwal-flote.sql dans Supabase.",
+      'loadDrivers()', e.message);
+  }
+}
+async function uploadFleetImage(file,prefix,maxW){
+  const c=await compressImage(file,maxW);
+  const path=prefix+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+c.ext;
+  const {error}=await db.storage.from('fleet').upload(path,c.blob,{cacheControl:'31536000',upsert:false,contentType:c.type});
+  if(error) throw error;
+  return db.storage.from('fleet').getPublicUrl(path).data.publicUrl;
+}
+function renderDrivers(){
+  const box=document.getElementById('dv-body'); if(!box) return;
+  if(!dvRows.length){ box.innerHTML=emptyState('truck','Aucun chofè',"Personne n'a encore été accepté comme livreur."); paintIcons(); return; }
+  box.innerHTML=dvRows.map(dvCard).join('');
+  paintIcons();
+  dvRows.forEach(d=>{
+    const mk=document.getElementById('dv-mk-'+d.id), cl=document.getElementById('dv-cl-'+d.id);
+    if(mk) mk.addEventListener('change',()=>{ d._mk=mk.value; });
+    if(cl) cl.addEventListener('change',()=>{ d._cl=cl.value; });
+  });
+}
+function dvCard(d){
+  const complet = d.vehicle_make && d.vehicle_color && d.driver_photo_url && d.vehicle_photo_url;
+  const open = dvOpenId===d.id;
+  return '<div class="mv"><div class="mv-h" style="align-items:center;gap:var(--s3);cursor:pointer" onclick="dvToggle(\''+d.id+'\')">'
+    + (d.driver_photo_url?'<img src="'+escH(d.driver_photo_url)+'" style="width:44px;height:44px;border-radius:50%;object-fit:cover">'
+       :'<div style="width:44px;height:44px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:700">'+escH((d.name||'?').charAt(0).toUpperCase())+'</div>')
+    + '<div><div class="mv-t">'+escH(d.name||'—')+'</div><div class="mv-s">'+escH(d.phone||d.email||'—')+'</div></div>'
+    + '<span class="mv-p" style="margin-left:auto;font-size:.62rem;color:'+(complet?'var(--ok)':'var(--warn)')+'">'+(complet?'Konplè':'Enfo manke')+'</span></div>'
+    + (open ? dvEditBody(d) : '') + '</div>';
+}
+function dvEditBody(d){
+  return '<div style="margin-top:var(--s3);padding-top:var(--s3);border-top:1px solid var(--line)">'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin-bottom:var(--s3)">'
+      + '<div><label class="card-sub" style="display:block;margin-bottom:6px">Mak machin</label>'
+        + '<input class="input" id="dv-mk-'+d.id+'" value="'+escH(d.vehicle_make||'')+'" placeholder="Toyota, Honda…"></div>'
+      + '<div><label class="card-sub" style="display:block;margin-bottom:6px">Koulè</label>'
+        + '<input class="input" id="dv-cl-'+d.id+'" value="'+escH(d.vehicle_color||'')+'" placeholder="Wouj, Nwa…"></div>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin-bottom:var(--s3)">'
+      + '<div><label class="card-sub" style="display:block;margin-bottom:6px">Foto chofè a</label>'
+        + (d.driver_photo_url?'<img src="'+escH(d.driver_photo_url)+'" style="width:100%;height:90px;object-fit:cover;border-radius:8px;margin-bottom:6px">':'')
+        + '<input type="file" accept="image/*" onchange="dvUpload(\''+d.id+'\',\'driver_photo_url\',this)"></div>'
+      + '<div><label class="card-sub" style="display:block;margin-bottom:6px">Foto machin nan (deyò)</label>'
+        + (d.vehicle_photo_url?'<img src="'+escH(d.vehicle_photo_url)+'" style="width:100%;height:90px;object-fit:cover;border-radius:8px;margin-bottom:6px">':'')
+        + '<input type="file" accept="image/*" onchange="dvUpload(\''+d.id+'\',\'vehicle_photo_url\',this)"></div>'
+    + '</div>'
+    + '<button class="btn btn-primary btn-sm" onclick="dvSave(\''+d.id+'\')">Anrejistre</button>'
+    + '<span id="dv-busy-'+d.id+'" class="card-sub" style="margin-left:var(--s3)"></span>'
+    + '</div>';
+}
+window.dvToggle=(id)=>{ dvOpenId = dvOpenId===id ? null : id; renderDrivers(); };
+window.dvUpload=async(id,field,input)=>{
+  const file=input.files&&input.files[0]; if(!file) return;
+  const busy=document.getElementById('dv-busy-'+id); if(busy) busy.textContent='Voye foto a…';
+  try{
+    const url=await uploadFleetImage(file, field==='driver_photo_url'?'chofè':'machin', 640);
+    const {error}=await db.from('drivers').update({[field]:url}).eq('id',id);
+    if(error) throw error;
+    const d=dvRows.find(x=>x.id===id); if(d) d[field]=url;
+    if(busy) busy.textContent='';
+    toast('Foto anrejistre','success'); renderDrivers();
+  }catch(e){ if(busy) busy.textContent=''; toast('Voye foto pa reyisi : '+rlsHint(e),'error'); }
+};
+window.dvSave=async(id)=>{
+  const d=dvRows.find(x=>x.id===id); if(!d) return;
+  const mk=document.getElementById('dv-mk-'+id), cl=document.getElementById('dv-cl-'+id);
+  try{
+    const patch={ vehicle_make:(mk&&mk.value||'').trim()||null, vehicle_color:(cl&&cl.value||'').trim()||null };
+    const {error}=await db.from('drivers').update(patch).eq('id',id);
+    if(error) throw error;
+    Object.assign(d,patch);
+    toast('Enfo chofè a anrejistre','success'); renderDrivers();
+  }catch(e){ toast('Anrejistreman pa reyisi : '+rlsHint(e),'error'); }
+};
+window.loadDrivers=loadDrivers;
 
 /* ════════════════════════════════════════════════════════════
    §12ennead — PWEN VOYE : registre des transferts entre clients
