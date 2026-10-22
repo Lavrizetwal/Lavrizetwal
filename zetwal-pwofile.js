@@ -274,7 +274,12 @@ window.zQR=window.zQR||function(text){
     async function claimPending(user){
       if(!sb || !fs || !user || !user.email) return;
       var mail = user.email.toLowerCase();
-      try{
+      var zc = window.ZB ? await ZB.pts('claim') : null;
+      if(zc !== null){
+        if(zc.ok && zc.count) toast(zc.count > 1
+          ? zc.count + ' anvwa pwen te ap tann ou — yo antre sou kont ou'
+          : 'Yon anvwa pwen te ap tann ou — li antre sou kont ou');
+      } else try{
         var pts = await sb.from('pending_points').select('*').eq('to_email', mail).eq('claimed', false);
         var rows = pts.data || [];
         for(var i=0;i<rows.length;i++){
@@ -400,6 +405,7 @@ window.zQR=window.zQR||function(text){
 
     async function chargePoints(amount){
       if(!currentUser || amount <= 0) return false;
+      if(window.ZB){ var z = await ZB.spend(amount, 'profil'); if(z !== null) return z; }
       try{
         return await fs.runTransaction(async function(tx){
           var ref = fsUser();
@@ -571,6 +577,17 @@ window.zQR=window.zQR||function(text){
         if(mail === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
         var btn = this; btn.disabled = true; btn.textContent = 'K ap voye…';
         try{
+          var zt = window.ZB ? await ZB.pts('transfer_email', { to_email:mail, amount:amt, note:note }) : null;
+          if(zt !== null){
+            if(!zt.ok){
+              toast(zt.error === 'insufficient' ? 'Ou pa gen ase pwen' : (zt.error === 'self' ? 'Ou pa ka voye pwen pou tèt ou' : 'Nou pa ka voye pwen yo kounye a'));
+              btn.disabled=false; btn.textContent='Voye pwen yo'; return;
+            }
+            toast(zt.delivered ? ('Pwen voye bay ' + (zt.name||mail)) : ('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte'));
+            $('#zs-mail').value=''; $('#zs-amt').value=''; $('#zs-note').value='';
+            transferCache = null; loadSendHistory();
+            btn.disabled = false; btn.textContent = 'Voye pwen yo'; return;
+          }
           var ok = await chargePoints(amt);
           if(!ok){ toast('Ou pa gen ase pwen'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
           var dest = await findUserByEmail(mail);
@@ -976,6 +993,13 @@ window.zQR=window.zQR||function(text){
     /* Moun k ap voye a : debite → konsome jeton → kredite → ekri rejis la.
        Si yon etap echwe apre debit la, nou renmèt pwen yo. */
     async function doQrSend(tok, amt, note){
+      var zq = window.ZB ? await ZB.pts('transfer_qr', { token:tok, amount:amt, note:note }) : null;
+      if(zq !== null){
+        if(zq.ok) return { ok:true, name:zq.name };
+        if(zq.error === 'insufficient') return { ok:false, msg:'Ou pa gen ase pwen' };
+        if(zq.error === 'invalid_token') return { ok:false, msg:'Kòd la pa valid ankò — mande yon nouvo kòd' };
+        return { ok:false, msg:'Nou pa ka voye pwen yo kounye a — verifye solid ou anvan ou eseye ankò' };
+      }
       var debited = await chargePoints(amt);
       if(!debited) return { ok:false, msg:'Ou pa gen ase pwen' };
       async function refund(){
@@ -1045,6 +1069,13 @@ window.zQR=window.zQR||function(text){
 
     async function doStoreSale(tok, amt, htg, note){
       if(!(await checkStaff())) return { ok:false, msg:'Fonksyon sa a se pou anplwaye yo' };
+      var zs = window.ZB ? await ZB.pts('sale', { token:tok, amount:amt, note:note }) : null;
+      if(zs !== null){
+        if(zs.ok) return { ok:true, name:zs.name };
+        if(zs.error === 'invalid_token') return { ok:false, msg:'Kòd la pa valid ankò — mande kliyan an yon nouvo kòd' };
+        if(zs.status === 403) return { ok:false, msg:'Fonksyon sa a se pou anplwaye yo' };
+        return { ok:false, msg:'Nou pa ka anrejistre vant lan kounye a — anyen pa fèt, eseye ankò' };
+      }
       var owner = null;
       try{
         var c = await sb.rpc('qr_consume', { p_token:tok, p_by_uid:currentUser.uid, p_by_email:currentUser.email||'', p_kind:'store_sale' });
