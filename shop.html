@@ -558,6 +558,13 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
 .ptline.on .bx svg{opacity:1}
 .ptline .tx{flex:1;font-size:.75rem;line-height:1.5}
 .ptline .tx b{color:var(--gold)}
+.paylab{font-size:.56rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-4);margin:16px 0 8px}
+.kind.dim{opacity:.45}
+.kind span[data-sub]{display:block;line-height:1.35}
+.paydone{text-align:center;padding:4px 2px 2px}
+.pd-ref{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-4);margin-bottom:10px}
+.pd-big{font-family:var(--serif);font-size:2.3rem;font-weight:700;color:var(--gold);line-height:1.1;margin-bottom:10px}
+.paydone .hintline{margin:0 auto;max-width:34ch}
 
 /* Kòmand */
 .oc{padding:15px 16px;border-radius:6px;border:1px solid var(--line);background:rgba(255,255,255,.025);
@@ -860,12 +867,8 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <div class="fld" style="margin-bottom:14px"><label for="ck-name">Non ou</label><input type="text" id="ck-name" placeholder="Non ak siyati"></div>
     <div class="fld" style="margin-bottom:14px"><label for="ck-tel">Telefòn</label><input type="text" id="ck-tel" placeholder="+509 …"></div>
     <div id="cart-sum"></div>
-    <div class="ptline" id="pt-pay" style="display:none">
-      <span class="bx"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
-      <span class="tx" id="pt-pay-tx"></span>
-    </div>
+    <div id="ck-pay-wrap"></div>
     <button class="btn btn-g" id="cart-go" type="button">Konfime kòmand la</button>
-    <button type="button" id="cart-wa" class="walink">Voye tou sou WhatsApp, si w vle yon moun konfime avè w</button>
     <button class="btn btn-o" id="cart-clr" type="button" style="margin-top:9px">Vide panye a</button>
   </div>
 </aside>
@@ -1562,13 +1565,12 @@ function openDetail(id){
 
   var acts = '';
   if(s==='ok'){
-    acts = '<button class="btn btn-g" id="d-add">'+(CART.has(p.id)?'Nan panye a ✓':'Ajoute nan panye')+'</button>'
-         + '<button class="btn btn-o" id="d-wa">WhatsApp <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>';
+    acts = '<button class="btn btn-g" id="d-pay">Peye kounye a</button>'
+         + '<button class="btn btn-o" id="d-add">'+(CART.has(p.id)?'Nan panye a ✓':'Ajoute nan panye')+'</button>';
   } else if(s==='sold'){
     acts = '<div class="btn btn-o" style="cursor:default;opacity:.6">Pwodwi sa a vandi</div>';
   } else {
-    acts = '<button class="btn btn-g" id="d-order">Kòmande pwodwi sa</button>'
-         + '<button class="btn btn-o" id="d-wa">WhatsApp <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>';
+    acts = '<button class="btn btn-g" id="d-order">Kòmande pwodwi sa</button>';
   }
 
   $('#d-body').innerHTML =
@@ -1603,11 +1605,8 @@ function openDetail(id){
       +'<button class="tagx gold" id="d-share-msg" style="margin-top:9px;margin-left:8px;cursor:pointer;background:none">Voye nan Mesaj</button></div></div>'
     +'<div class="dacts">'+acts+'</div>';
 
-  var wa = $('#d-wa');
-  if(wa) wa.addEventListener('click', function(){
-    var m = 'Bonjou ! Mwen enterese nan pwodwi sa a :\n\n'+p.name+'\n'+fmt(p.price)+' HTG\nRef #'+ref(p.id)+'\n'+url;
-    window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(m),'_blank');
-  });
+  var dpay = $('#d-pay');
+  if(dpay) dpay.addEventListener('click', function(){ closeDetail(); openOrder(p.id); });
   var ad = $('#d-add');
   if(ad) ad.addEventListener('click', function(){
     cartToggle(p.id);
@@ -1780,24 +1779,129 @@ function renderCart(){
   foot.style.display='block';
   paintPointsLine();
 }
-var usePoints = false;
-function paintPointsLine(){
-  var line = $('#pt-pay'); if(!line) return;
-  var s = cartTotals();
-  if(!PTS_RATE_SHOP || !PTS || !s.total){ line.style.display='none'; usePoints=false; line.classList.remove('on'); return; }
-  var need = s.total / PTS_RATE_SHOP;
-  var ok = PTS >= need;
-  line.style.display='flex';
-  $('#pt-pay-tx').innerHTML = ok
-    ? 'Peye ak pwen mwen yo — sa a koute <b>'+need.toFixed(1)+' pwen</b> (ou gen '+PTS.toFixed(1)+')'
-    : 'Ou bezwen <b>'+need.toFixed(1)+' pwen</b> pou peye sa a — ou gen sèlman '+PTS.toFixed(1);
-  line.classList.toggle('dim', !ok);
-  if(!ok) usePoints = false;
+var usePoints = false, cartPay = 'points';
+
+/* ── Fason pou peye : « pwen » oswa « kach » ──────────────────
+   Menm lojik pou panye a ak pou achte dirèk yon pwodwi.
+   · pwen : debite sou kont lan touswit, kòmand lan make « peye ».
+   · kach : kòmand lan make « peman ap tann » jiskaske yon admin
+     oswa yon anplwaye resevwa lajan an epi peze « Peman aksepte ». */
+function payChoice(cur, total){
+  var need = PTS_RATE_SHOP ? total / PTS_RATE_SHOP : 0;
+  var can = !!window._me && total > 0 && PTS >= need;
+  return { can:can, need:need, method:(cur === 'points' && !can) ? 'cash' : cur };
 }
-$('#pt-pay').addEventListener('click', function(){
-  if(this.classList.contains('dim')) return;
-  usePoints = !usePoints; this.classList.toggle('on', usePoints);
-});
+function payHtml(px){
+  var b = 'display:block;font-size:.82rem;margin-bottom:2px', sp = 'font-size:.63rem;color:var(--ink-4)';
+  return '<div class="paylab">Fason pou w peye</div>'
+    + '<div class="two" id="'+px+'-pay">'
+    +   '<button type="button" class="kind" data-pay="points"><b style="'+b+'">Peye ak pwen</b><span style="'+sp+'" data-sub></span></button>'
+    +   '<button type="button" class="kind" data-pay="cash"><b style="'+b+'">Peye kach</b><span style="'+sp+'">Nan magazen an</span></button>'
+    + '</div><p class="hintline" id="'+px+'-pay-note"></p>';
+}
+function payPaint(px, cur, total, mode, goBtn){
+  var c = payChoice(cur, total), box = $('#'+px+'-pay');
+  if(!box) return c.method;
+  var bp = box.querySelector('[data-pay="points"]'), bc = box.querySelector('[data-pay="cash"]');
+  bp.classList.toggle('dim', !c.can); bp.classList.toggle('on', c.method === 'points');
+  bc.classList.toggle('on', c.method === 'cash');
+  bp.querySelector('[data-sub]').textContent = !window._me ? 'Konekte pou w itilize l'
+    : c.can ? c.need.toFixed(1)+' pwen (ou gen '+PTS.toFixed(1)+')'
+    : 'Ou gen '+PTS.toFixed(1)+' / '+c.need.toFixed(1)+' pwen';
+  var note = $('#'+px+'-pay-note');
+  if(c.method === 'points'){
+    note.innerHTML = 'Pwen yo soti sou kont ou touswit epi kòmand ou a peye. Ou ka achte pwen nan magazen an : montre kòd QR ou bay yon anplwaye.';
+  } else if(mode === 'pickup'){
+    note.innerHTML = 'Si w nan magazen an, peye kach : kòmand ou make « peman ap tann » jiskaske yon anplwaye resevwa lajan an epi konfime l. Pote <b>'+fmt(total)+' HTG</b>.';
+  } else {
+    note.innerHTML = 'Ou ka peye kach nan magazen an, oswa lè kòmand lan rive. Peman an make « ap tann » jiskaske yon anplwaye konfime l.';
+  }
+  if(goBtn && !goBtn.disabled) goBtn.textContent = c.method === 'points' ? 'Peye '+c.need.toFixed(1)+' pwen' : 'Konfime — peye kach';
+  return c.method;
+}
+function payWire(px, setCur){
+  var box = $('#'+px+'-pay'); if(!box) return;
+  box.querySelectorAll('[data-pay]').forEach(function(b){
+    b.addEventListener('click', function(){
+      if(b.classList.contains('dim')){
+        toast(window._me ? 'Pa gen ase pwen — peye kach, oswa achte pwen nan magazen an' : 'Konekte pou w peye ak pwen');
+        return;
+      }
+      setCur(b.getAttribute('data-pay'));
+    });
+  });
+}
+/* Anvan nou pran lajan : pri ak stòk yo verifye ankò nan baz la */
+async function verifyFresh(list){
+  if(!sb || !list.length) return { ok:true };
+  try{
+    var r = await sb.from('products').select('id,name,price,stock_quantity,status').in('id', list.map(function(x){ return x.id; }));
+    if(r.error) return { ok:true };
+    var by = {}; (r.data||[]).forEach(function(x){ by[x.id] = x; });
+    var changed = false, msg = '';
+    list.forEach(function(it){
+      var f = by[it.id], loc = PRODUCTS.filter(function(x){ return x.id===it.id; })[0];
+      if(!f){ msg = msg || 'Yon pwodwi pa disponib ankò'; return; }
+      if(loc && Number(loc.price) !== Number(f.price)) changed = true;
+      if(loc){ loc.price = f.price; loc.stock_quantity = f.stock_quantity; loc.status = f.status; }
+      if(stateOf(f) !== 'ok') msg = msg || ((f.name||'Pwodwi')+' pa disponib kounye a');
+      else if((f.stock_quantity||0) < it.q) msg = msg || ((f.name||'Pwodwi')+' pa gen ase nan stòk');
+    });
+    if(msg) return { ok:false, msg:msg };
+    if(changed) return { ok:false, msg:'Pri a chanje — verifye epi konfime ankò' };
+  }catch(e){}
+  return { ok:true };
+}
+/* Anrejistre kòmand lan. Si baz la poko gen nouvo kolòn peman yo
+   (zetwal-paiement.sql), nou eseye ankò san yo — sit la kontinye mache. */
+async function insertShopOrder(row){
+  var r = await sb.from('move_orders').insert(row).select().single();
+  if(r.error && /payment_status|pay_location|column/i.test(r.error.message||'')){
+    var slim = Object.assign({}, row); delete slim.payment_status; delete slim.pay_location;
+    r = await sb.from('move_orders').insert(slim).select().single();
+  }
+  return r;
+}
+/* Rejis tranzaksyon pwen yo pou administratè a (admin.html → Tranzaksyon) */
+async function logShopPayment(order, pts, total, summary){
+  if(!sb || !window._me) return;
+  try{
+    await sb.from('point_transfers').insert({
+      kind:'shop_payment', from_uid:window._me.uid,
+      from_name:window._me.displayName||window._me.email, from_email:window._me.email||null,
+      to_uid:'', to_name:'Zetwal Shop', to_email:null,
+      amount:pts, htg_amount:total, order_id:order && order.id || null, note:(summary||'').slice(0,240)
+    });
+  }catch(e){}
+}
+/* Konfimasyon apre kòmand — itilize menm fenèt « Pase yon kòmand » lan */
+function payDone(o){
+  $('#o-ttl').textContent = o.method === 'points' ? 'Peman fèt ✓' : 'Kòmand anrejistre';
+  $('#o-lead').textContent = o.method === 'points' ? 'Kòmand ou a peye.' : 'Ou poko peye — dènye etap la.';
+  var h = '<div class="paydone"><div class="pd-ref">Referans #'+esc(o.ref)+'</div>';
+  if(o.method === 'points'){
+    h += '<div class="pd-big">'+o.pts.toFixed(1)+' pwen</div>'
+      + '<p class="hintline">soti sou kont ou. N ap prepare kòmand ou a — ou ka swiv li nan « Kòmand mwen yo ».</p>';
+  } else {
+    h += '<div class="pd-big">'+fmt(o.total)+' HTG</div>'
+      + (o.mode === 'pickup'
+        ? '<p class="hintline">Prezante w nan kès magazen an epi peye <b>'+fmt(o.total)+' HTG</b> kach bay yon anplwaye. Kòmand ou a make « peman ap tann » jiskaske li konfime lajan an.</p>'
+        : '<p class="hintline">Peye <b>'+fmt(o.total)+' HTG</b> kach nan magazen an, oswa lè kòmand lan rive. Kòmand ou a make « peman ap tann » jiskaske yon anplwaye konfime l.</p>');
+  }
+  h += '<button class="btn btn-g" id="pd-ok" type="button" style="width:100%;margin-top:18px">Wè kòmand mwen yo</button></div>';
+  $('#o-body').innerHTML = h;
+  $('#pd-ok').addEventListener('click', function(){ closeOrder(); ordersOpen(); });
+  $('#omask').classList.add('open'); document.body.classList.add('lock');
+}
+
+function paintPointsLine(){
+  if(!$('#ck-pay')) return;
+  var s = cartTotals();
+  cartPay = payPaint('ck', cartPay, s.total, ckMode, $('#cart-go'));
+  usePoints = cartPay === 'points';
+}
+$('#ck-pay-wrap').innerHTML = payHtml('ck');
+payWire('ck', function(v){ cartPay = v; paintPointsLine(); });
 $('#cart-clr').addEventListener('click', function(){
   var ids = []; CART.forEach(function(v,k){ ids.push(k); });
   CART.clear(); ids.forEach(paintCardCart);
@@ -1813,52 +1917,55 @@ $('#cart-go').addEventListener('click', async function(){
   if(!tel){ toast('Nou bezwen yon nimewo'); return; }
   if(ckMode !== 'pickup' && !addr){ toast('Ki kote pou nou livre ?'); return; }
 
-  var items = []; CART.forEach(function(it){ items.push({ id:it.p.id, name:it.p.name, price:it.p.price, q:it.qty }); });
-  var ptsNeeded = usePoints ? +(s.total / PTS_RATE_SHOP).toFixed(2) : 0;
-  var btn = this; btn.disabled = true; btn.textContent = 'K ap voye…';
+  var bad = ''; CART.forEach(function(it){ if(!bad && stateOf(it.p) !== 'ok') bad = it.p.name || 'Yon pwodwi'; });
+  if(bad){ toast(bad+' pa disponib kounye a — retire l nan panye a'); return; }
 
-  if(usePoints){
+  var btn = this;
+  btn.disabled = true; btn.textContent = 'K ap verifye…';
+  var list = []; CART.forEach(function(it){ list.push({ id:it.p.id, q:it.qty }); });
+  var chk = await verifyFresh(list);
+  if(!chk.ok){
+    toast(chk.msg); btn.disabled = false; paint(); renderCart(); return;
+  }
+  s = cartTotals();
+  var items = []; CART.forEach(function(it){ items.push({ id:it.p.id, name:it.p.name, price:it.p.price, q:it.qty }); });
+  var method = payChoice(cartPay, s.total).method;
+  var ptsNeeded = method === 'points' ? +(s.total / PTS_RATE_SHOP).toFixed(2) : 0;
+  btn.textContent = 'K ap voye…';
+
+  if(method === 'points'){
     var okPts = await chargePointsShop(ptsNeeded);
-    if(!okPts){ toast('Ou pa gen ase pwen — dekoche pou peye kach'); btn.disabled=false; btn.textContent='Konfime kòmand la'; return; }
+    if(!okPts){ toast('Ou pa gen ase pwen — peye kach, oswa achte pwen nan magazen an'); btn.disabled=false; paintPointsLine(); return; }
   }
   var row = {
     kind:'shop', partner_id:null, partner_name:'Zetwal Shop', order_mode: ckMode,
     items: items, subtotal: s.t, service_fee: 0, delivery_fee: s.deliv, total: s.total,
-    paid_with: usePoints ? 'pwen' : 'cash', points_used: usePoints ? ptsNeeded : null,
+    paid_with: method === 'points' ? 'pwen' : 'cash', points_used: method === 'points' ? ptsNeeded : null,
+    payment_status: method === 'points' ? 'paid' : 'pending',
+    pay_location: method === 'cash' ? (ckMode === 'pickup' ? 'store' : 'delivery') : null,
     address: addr || null, client_name: name, client_phone: tel,
     client_email: window._me.email, client_uid: window._me.uid, status: 'requested'
   };
   var saved = false, savedRow = null;
   if(sb){
-    try{ var r = await sb.from('move_orders').insert(row).select().single(); if(!r.error){ saved=true; savedRow=r.data; } }catch(e){}
+    try{ var r = await insertShopOrder(row); if(!r.error){ saved = true; savedRow = r.data; } }catch(e){}
   }
-  btn.disabled = false; btn.textContent = 'Konfime kòmand la';
+  btn.disabled = false;
 
   if(!saved){
-    if(usePoints) await chargePointsShop(-ptsNeeded);
+    if(method === 'points') await chargePointsShop(-ptsNeeded);
+    paintPointsLine();
     toast('Nou pa ka voye kòmand la kounye a — eseye ankò');
     return;
   }
+  if(method === 'points') logShopPayment(savedRow, ptsNeeded, s.total, items.map(function(i){ return i.name+' ×'+i.q; }).join(', '));
 
-  var lines = [];
-  CART.forEach(function(it){ lines.push('• '+it.p.name+' × '+it.qty+' = '+fmt(it.qty*(it.p.price||0))+' HTG  (#'+ref(it.p.id)+')'); });
-  window._lastWaMsg = 'Bonjou ! Mwen vle pase yon kòmand :\n\n'+lines.join('\n')
-    +'\n\nMòd : '+(ckMode==='pickup'?'Vin chèche l':'Livrezon — '+addr)
-    +'\nNon : '+name+'\nTelefòn : '+tel
-    +'\n\nSOU-TOTAL : '+fmt(s.t)+' HTG'+(s.deliv?'\nLIVREZON : '+fmt(s.deliv)+' HTG':'')
-    +'\nTOTAL : '+fmt(s.total)+' HTG'
-    +(usePoints ? '\nPEYE AK PWEN : '+ptsNeeded.toFixed(1)+' pwen ✓' : '')
-    +'\n\nKont mwen : '+window._me.email+'\n\nMèsi !';
-
-  toast(usePoints ? 'Kòmand peye ak pwen — anrejistre' : 'Kòmand ou a anrejistre');
+  var done = { method:method, total:s.total, pts:ptsNeeded, mode:ckMode, ref:ref(savedRow && savedRow.id) };
   var clearedIds = []; CART.forEach(function(v,k){ clearedIds.push(k); });
   CART.clear(); clearedIds.forEach(paintCardCart); paintCartBtn(); renderCart(); cartSave();
-  usePoints = false; ckMode = 'delivery';
-  if(savedRow) loadMyOrders(window._me.email);
-});
-$('#cart-wa').addEventListener('click', function(){
-  if(!window._lastWaMsg){ toast('Konfime kòmand ou anvan'); return; }
-  window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(window._lastWaMsg),'_blank');
+  cartPay = 'points'; ckMode = 'delivery'; paintPointsLine();
+  cartClose(); payDone(done);
+  loadMyOrders(window._me.email);
 });
 
 /* Sovgade panye a : Supabase si konekte, sinon nan navigatè a */
@@ -1902,7 +2009,11 @@ var oProd = null, oQty = 1;
 function openOrder(id){
   var p = PRODUCTS.filter(function(x){ return x.id===id; })[0]; if(!p) return;
   oProd = p; oQty = 1;
-  $('#o-lead').textContent = 'Nou pral mete w sou lis la epi n ap avize w lè li disponib.';
+  var avail = stateOf(p) === 'ok';
+  $('#o-ttl').textContent = avail ? 'Achte kounye a' : 'Pase yon kòmand';
+  $('#o-lead').textContent = avail
+    ? 'Chwazi kijan w vle peye : ak pwen, oswa kach nan magazen an.'
+    : 'Nou pral mete w sou lis la epi n ap avize w lè li disponib.';
   if(!window._me){
     $('#o-body').innerHTML =
        '<div class="dcell" style="text-align:center;padding:22px"><div class="dv" style="font-weight:400;line-height:1.7">'
@@ -1932,12 +2043,9 @@ function openOrder(id){
         +esc(window._me.displayName||'')+'" placeholder="Non ak siyati"></div>'
       +'<div class="fld"><label for="o-tel">Telefòn</label><input type="text" id="o-tel" placeholder="+509 …"></div>'
       +'<div class="fld"><label for="o-note">Nòt (koulè, tay, presizyon)</label><input type="text" id="o-note" placeholder="Sa w vle nou konnen"></div>'
-      +'<div class="ptline" id="o-pt-pay" style="display:none">'
-        +'<span class="bx"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>'
-        +'<span class="tx" id="o-pt-pay-tx"></span></div>'
-      +'<button class="btn btn-g" id="o-send" style="width:100%">Konfime kòmand la</button>'
-      +'<button type="button" id="o-wa" class="walink">Voye tou sou WhatsApp, si w vle yon moun konfime avè w</button>';
-    var oMode = 'delivery', oUsePts = false;
+      +(avail ? '<div id="o-pay-wrap">'+payHtml('o')+'</div>' : '')
+      +'<button class="btn btn-g" id="o-send" style="width:100%;margin-top:14px">'+(avail ? 'Konfime' : 'Voye demann lan')+'</button>';
+    var oMode = 'delivery', oPay = 'points';
     $$('#o-mode [data-om]').forEach(function(b){
       b.addEventListener('click', function(){
         oMode = b.getAttribute('data-om');
@@ -1947,18 +2055,12 @@ function openOrder(id){
         oPaint();
       });
     });
-    $('#o-pt-pay').addEventListener('click', function(){
-      if(this.classList.contains('dim')) return;
-      oUsePts = !oUsePts; this.classList.toggle('on', oUsePts);
-    });
-    window._oGetMode = function(){ return { mode:oMode, usePts:oUsePts }; };
+    window._oGetMode = function(){ return { mode:oMode, pay:avail ? oPay : null, usePts:avail && oPay==='points' }; };
+    window._oSetPay = function(v){ oPay = v; };
+    if(avail) payWire('o', function(v){ oPay = v; oPaint(); });
     $('#o-m').addEventListener('click', function(){ oQty=Math.max(1,oQty-1); oPaint(); });
-    $('#o-p').addEventListener('click', function(){ oQty=oQty+1; oPaint(); });
+    $('#o-p').addEventListener('click', function(){ oQty=Math.min(oQty+1, avail ? (p.stock_quantity||1) : 99); oPaint(); });
     $('#o-send').addEventListener('click', sendOrder);
-    $('#o-wa').addEventListener('click', function(){
-      if(!window._lastWaMsg){ toast('Konfime kòmand ou anvan'); return; }
-      window.open('https://wa.me/'+CONFIG.whatsapp+'?text='+encodeURIComponent(window._lastWaMsg),'_blank');
-    });
     oPaint();
   }
   $('#omask').classList.add('open'); document.body.classList.add('lock');
@@ -1966,20 +2068,14 @@ function openOrder(id){
 function oPaint(){
   $('#o-q').textContent = oQty;
   var sub = oQty*(oProd.price||0);
-  var s = window._oGetMode ? window._oGetMode() : { mode:'delivery', usePts:false };
+  var s = window._oGetMode ? window._oGetMode() : { mode:'delivery', pay:null };
   var deliv = s.mode==='pickup' ? 0 : SHOP_DELIVERY_FEE;
   var total = sub + deliv;
   $('#o-t').textContent = fmt(total)+' HTG'+(deliv?' (+'+fmt(deliv)+' livrezon)':'');
-  var line = $('#o-pt-pay');
-  if(line && PTS){
-    var need = total / PTS_RATE_SHOP;
-    var ok = PTS >= need;
-    line.style.display = 'flex';
-    line.classList.toggle('dim', !ok);
-    $('#o-pt-pay-tx').innerHTML = ok
-      ? 'Peye ak pwen mwen yo — sa a koute <b>'+need.toFixed(1)+' pwen</b> (ou gen '+PTS.toFixed(1)+')'
-      : 'Ou bezwen <b>'+need.toFixed(1)+' pwen</b> pou peye sa a — ou gen sèlman '+PTS.toFixed(1);
-  } else if(line){ line.style.display = 'none'; }
+  if(s.pay && $('#o-pay')){
+    var m = payPaint('o', s.pay, total, s.mode, $('#o-send'));
+    if(window._oSetPay) window._oSetPay(m);
+  }
 }
 function closeOrder(){ $('#omask').classList.remove('open'); document.body.classList.remove('lock'); }
 $('#o-x').addEventListener('click', closeOrder);
@@ -1990,52 +2086,61 @@ async function sendOrder(){
   var name = ($('#o-name').value||'').trim();
   var tel  = ($('#o-tel').value||'').trim();
   var note = ($('#o-note').value||'').trim();
-  var s = window._oGetMode ? window._oGetMode() : { mode:'delivery', usePts:false };
+  var s = window._oGetMode ? window._oGetMode() : { mode:'delivery', pay:null };
   var addr = s.mode === 'pickup' ? '' : ($('#o-addr').value||'').trim();
   if(!name){ toast('Ekri non ou anvan'); $('#o-name').focus(); return; }
   if(!tel){ toast('Nou bezwen yon nimewo'); return; }
   if(s.mode !== 'pickup' && !addr){ toast('Ki kote pou nou livre ?'); return; }
 
+  var btn = $('#o-send'); btn.disabled = true; btn.textContent = 'K ap verifye…';
+  if(s.pay){
+    var chk = await verifyFresh([{ id:oProd.id, q:oQty }]);
+    if(!chk.ok){ toast(chk.msg); btn.disabled = false; oPaint(); return; }
+  }
   var sub = oQty*(oProd.price||0);
   var deliv = s.mode === 'pickup' ? 0 : SHOP_DELIVERY_FEE;
   var total = sub + deliv;
-  var ptsNeeded = s.usePts ? +(total / PTS_RATE_SHOP).toFixed(2) : 0;
-  var btn = $('#o-send'); btn.disabled = true; btn.textContent = 'Ap voye…';
+  var method = s.pay ? payChoice(s.pay, total).method : null;
+  var ptsNeeded = method === 'points' ? +(total / PTS_RATE_SHOP).toFixed(2) : 0;
+  btn.textContent = 'K ap voye…';
 
-  if(s.usePts){
+  if(method === 'points'){
     var okPts = await chargePointsShop(ptsNeeded);
-    if(!okPts){ toast('Ou pa gen ase pwen — dekoche pou peye kach'); btn.disabled=false; btn.textContent='Konfime kòmand la'; return; }
+    if(!okPts){ toast('Ou pa gen ase pwen — peye kach, oswa achte pwen nan magazen an'); btn.disabled=false; oPaint(); return; }
   }
-  var saved = false;
+  var row = {
+    kind:'shop', partner_id:null, partner_name:'Zetwal Shop', order_mode: s.mode,
+    items:[{ id:oProd.id, name:oProd.name, price:oProd.price, q:oQty }],
+    subtotal: sub, service_fee: 0, delivery_fee: deliv, total: total,
+    paid_with: method === 'points' ? 'pwen' : (method === 'cash' ? 'cash' : null),
+    points_used: method === 'points' ? ptsNeeded : null,
+    payment_status: method === 'points' ? 'paid' : (method === 'cash' ? 'pending' : null),
+    pay_location: method === 'cash' ? (s.mode === 'pickup' ? 'store' : 'delivery') : null,
+    address: addr || null, client_name: name, client_phone: tel,
+    client_email: window._me.email, client_uid: window._me.uid, status: 'requested'
+  };
+  var saved = false, savedRow = null;
   if(sb){
-    try{
-      var r = await sb.from('move_orders').insert({
-        kind:'shop', partner_id:null, partner_name:'Zetwal Shop', order_mode: s.mode,
-        items:[{ id:oProd.id, name:oProd.name, price:oProd.price, q:oQty }],
-        subtotal: sub, service_fee: 0, delivery_fee: deliv, total: total,
-        paid_with: s.usePts ? 'pwen' : 'cash', points_used: s.usePts ? ptsNeeded : null,
-        address: addr || null, client_name: name, client_phone: tel,
-        client_email: window._me.email, client_uid: window._me.uid, status: 'requested'
-      });
-      if(!r.error) saved = true;
-    }catch(e){}
+    try{ var r = await insertShopOrder(row); if(!r.error){ saved = true; savedRow = r.data; } }catch(e){}
   }
-  btn.disabled = false; btn.textContent = 'Konfime kòmand la';
+  btn.disabled = false;
   if(!saved){
-    if(s.usePts) await chargePointsShop(-ptsNeeded);
+    if(method === 'points') await chargePointsShop(-ptsNeeded);
+    oPaint();
     toast('Nou pa ka voye kòmand la kounye a — eseye ankò');
     return;
   }
-  closeOrder();
-  window._lastWaMsg = 'Bonjou ! Mwen vle pase yon kòmand :\n\n'+oProd.name+'\nRef #'+ref(oProd.id)
-    +'\nKantite : '+oQty+'\nMòd : '+(s.mode==='pickup'?'Vin chèche l':'Livrezon — '+addr)
-    +'\nTotal : '+fmt(total)+' HTG'+(s.usePts?'\nPEYE AK PWEN : '+ptsNeeded.toFixed(1)+' pwen ✓':'')
-    +'\n\nNon : '+name+(tel?'\nTelefòn : '+tel:'')+(note?'\nNòt : '+note:'')+'\nImel : '+window._me.email+'\n\nMèsi !';
-  toast(s.usePts ? 'Kòmand peye ak pwen — anrejistre' : 'Kòmand ou a anrejistre');
+  if(method === 'points') logShopPayment(savedRow, ptsNeeded, total, oProd.name+' ×'+oQty);
   loadMyOrders(window._me.email);
+  if(method){
+    payDone({ method:method, total:total, pts:ptsNeeded, mode:s.mode, ref:ref(savedRow && savedRow.id) });
+  } else {
+    closeOrder(); toast('Demann ou a anrejistre — n ap avize w lè pwodwi a disponib');
+  }
 }
 
 /* Kòmand mwen yo */
+function sKey(o){ return (o.status||'')+'|'+(o.payment_status||''); }
 async function loadMyOrders(email){
   if(!sb || !email) return;
   var legacy = [], fresh = [];
@@ -2062,7 +2167,7 @@ async function loadMyOrders(email){
   myOrders = fresh.concat(legacy).sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); });
   var seen = {};
   try{ seen = JSON.parse(localStorage.getItem(LS_SEEN)||'{}'); }catch(e){}
-  var news = myOrders.filter(function(o){ return o.status!=='pending' && o.status!=='requested' && seen[o.id]!==o.status; });
+  var news = myOrders.filter(function(o){ return o.status!=='pending' && o.status!=='requested' && seen[o.id]!==sKey(o); });
   $('#nbadge').classList.toggle('on', news.length>0);
   var p = myOrders.filter(function(o){return o.status==='pending'||o.status==='requested';}).length;
   $('#a-orders').textContent = 'Kòmand mwen yo' + (myOrders.length?' ('+myOrders.length+')':'');
@@ -2073,7 +2178,7 @@ async function loadMyOrders(email){
 }
 function ordersOpen(){
   var seen = {};
-  myOrders.forEach(function(o){ seen[o.id]=o.status; });
+  myOrders.forEach(function(o){ seen[o.id]=sKey(o); });
   try{ localStorage.setItem(LS_SEEN, JSON.stringify(seen)); }catch(e){}
   $('#nbadge').classList.remove('on');
   $('#orders').classList.add('open'); $('#veil').classList.add('open');
@@ -2119,6 +2224,13 @@ function renderOrders(){
     var k = L[o.status] || L.pending;
     var msg = o.admin_note ? '<div class="oc-m '+k.c+'">'+esc(o.admin_note)+'</div>'
             : o.status==='accepted' ? '<div class="oc-m accepted">Kòmand ou a aksepte. N ap kontakte w.</div>' : '';
+    var payLine = '';
+    if(o._fresh && o.paid_with === 'pwen') payLine = '<div class="oc-m accepted">Peye ak pwen ✓ ('+Number(o.points_used||0).toFixed(1)+' pwen)</div>';
+    else if(o._fresh && o.paid_with === 'cash'){
+      if(o.payment_status === 'accepted') payLine = '<div class="oc-m accepted">Peman kach resevwa ✓</div>';
+      else if(o.payment_status === 'rejected') payLine = '<div class="oc-m refused">Peman an pa aksepte — kontakte nou</div>';
+      else payLine = '<div class="oc-m pending">Peman kach ap tann — prezante w nan kès la ak '+fmt(o.total)+' HTG</div>';
+    }
     var canTrack = o._fresh && ['requested','accepted','on_way','arrived','picked'].indexOf(o.status) !== -1;
     var track = canTrack ? '<a class="mini" style="margin-top:10px;display:inline-flex" href="taxi.html?swiv='+esc(o.id)+'&t=order" target="_blank">Swiv kòmand lan →</a>' : '';
     return '<div class="oc '+k.c+'">'
@@ -2130,7 +2242,7 @@ function renderOrders(){
         +'<div><div class="oc-k">Dat</div><div class="oc-v">'
           +(o.created_at?new Date(o.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}):'—')+'</div></div>'
         +'<div><div class="oc-k">Referans</div><div class="oc-v">#'+ref(o.id)+'</div></div>'
-      +'</div>'+msg+track+'</div>';
+      +'</div>'+payLine+msg+track+'</div>';
   }).join('');
 }
 
@@ -2665,7 +2777,49 @@ if('serviceWorker' in navigator){
   + ".zp-rc-h{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px}"
   + ".zp-rc-n{font-size:.8rem;font-weight:600}"
   + ".zp-rc-b{font-size:.56rem;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:99px;white-space:nowrap}"
-  + ".zp-rc-v{font-size:.72rem;color:var(--ink-3)}";
+  + ".zp-rc-v{font-size:.72rem;color:var(--ink-3)}"
+  + ".zq-ov{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);display:grid;place-items:center;"
+  + "  padding:18px;opacity:0;transition:opacity .2s cubic-bezier(.23,1,.32,1)}"
+  + ".zq-ov.on{opacity:1}"
+  + ".zq-sh{width:min(420px,100%);max-height:92vh;overflow-y:auto;border-radius:14px;border:1px solid var(--g-24,rgba(212,175,55,.24));"
+  + "  background:#0b0b0b;padding:20px 20px 22px;box-shadow:0 30px 80px rgba(0,0,0,.65);color:#fff;font-family:var(--sans,system-ui)}"
+  + ".zq-sh-h{display:flex;align-items:center;gap:10px;margin-bottom:16px}"
+  + ".zq-sh-h b{font-family:var(--serif,Georgia,serif);font-size:1.25rem;font-weight:600}"
+  + ".zq-who{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,.08));"
+  + "  background:rgba(255,255,255,.03);margin-bottom:14px}"
+  + ".zq-who b{display:block;font-size:.86rem}.zq-who small{display:block;font-size:.66rem;color:var(--ink-3,rgba(255,255,255,.4));word-break:break-all}"
+  + ".zq-av{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;background:var(--g-08,rgba(212,175,55,.08));"
+  + "  border:1px solid var(--g-24,rgba(212,175,55,.24));color:var(--gold,#D4AF37);font-family:var(--serif,Georgia,serif);font-weight:700}"
+  + ".zq-bal{font-size:.7rem;color:var(--ink-3,rgba(255,255,255,.5));margin-bottom:12px}.zq-bal b{color:var(--gold,#D4AF37)}"
+  + ".zq-chips{display:flex;gap:7px;flex-wrap:wrap;margin:-4px 0 14px}"
+  + ".zq-chips button{padding:7px 14px;border-radius:99px;border:1px solid var(--g-24,rgba(212,175,55,.24));background:none;color:var(--gold,#D4AF37);"
+  + "  font-family:inherit;font-size:.68rem;font-weight:700;cursor:pointer;touch-action:manipulation;transition:transform .12s cubic-bezier(.23,1,.32,1)}"
+  + ".zq-chips button:active{transform:scale(.95)}"
+  + ".zq-sum{font-size:.72rem;line-height:1.6;color:var(--ink-2,rgba(255,255,255,.7));margin:0 0 12px;min-height:1.2em}.zq-sum b{color:var(--gold,#D4AF37)}"
+  + ".zq-box{display:flex;flex-direction:column;align-items:center;gap:12px}"
+  + ".zq-qr{width:min(250px,72vw);aspect-ratio:1;background:#fff;border-radius:14px;padding:14px;display:grid;place-items:center;"
+  + "  box-shadow:0 0 0 1px var(--g-24,rgba(212,175,55,.24)),0 18px 50px rgba(0,0,0,.45)}"
+  + ".zq-qr svg{width:100%;height:100%;display:block}"
+  + ".zq-load{color:#333;font-size:.74rem;text-align:center;line-height:1.5}.zq-load small{color:#777;font-size:.62rem}"
+  + ".zq-cd{font-size:.62rem;letter-spacing:1px;color:var(--ink-4,rgba(255,255,255,.3));text-transform:uppercase;min-height:1em}"
+  + ".zq-scanbox{width:min(460px,100%)}"
+  + ".zq-vid{position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:1;margin-bottom:12px}"
+  + ".zq-vid video{width:100%;height:100%;object-fit:cover;display:block}"
+  + ".zq-frame{position:absolute;inset:16%;border:2px solid var(--gold,#D4AF37);border-radius:16px;box-shadow:0 0 0 999px rgba(0,0,0,.38);pointer-events:none}"
+  + ".zq-hint{font-size:.7rem;color:var(--ink-3,rgba(255,255,255,.55));text-align:center;margin-bottom:12px;line-height:1.5}"
+  + ".zq-man{font-size:.66rem;color:var(--ink-3,rgba(255,255,255,.5))}.zq-man summary{cursor:pointer}"
+  + ".zq-guest{text-align:center;padding:30px 16px;color:var(--ink-2,rgba(255,255,255,.65));font-size:.84rem;line-height:1.7}"
+  + ".zq-guest .zp-btn{margin:14px auto 0}"
+  + ".zq-grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:34px;align-items:center}"
+  + ".zq-main{padding:26px 22px;border-radius:16px;border:1px solid var(--line,rgba(255,255,255,.08));background:rgba(255,255,255,.025)}"
+  + ".zq-k{font-size:.56rem;letter-spacing:2.4px;text-transform:uppercase;color:var(--gold,#D4AF37);margin-bottom:16px;text-align:center}"
+  + ".zq-side .zq-k{text-align:left}"
+  + ".zq-steps{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:14px}"
+  + ".zq-steps li{padding-left:16px;border-left:2px solid var(--g-24,rgba(212,175,55,.24));font-size:.78rem;line-height:1.6;color:var(--ink-2,rgba(255,255,255,.62))}"
+  + ".zq-steps b{display:block;color:#fff;font-size:.84rem;margin-bottom:2px}"
+  + ".zq-side .zp-btn{width:100%}"
+  + "@media(max-width:760px){.zq-grid{grid-template-columns:1fr;gap:24px}.zq-main{padding:22px 14px}}"
+  + "@media (prefers-reduced-motion:reduce){.zq-ov{transition:none}}";
 
   var STATUS_LABEL = {
     requested:'Ap tann', accepted:'Aksepte', on_way:'Sou wout', arrived:'Chofè rive',
@@ -2721,7 +2875,7 @@ if('serviceWorker' in navigator){
     $('#zp-x').addEventListener('click', close);
     if(veil) veil.addEventListener('click', close);
     addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
-    window.ZetwalProfile = { open:open, close:close };
+    window.ZetwalProfile = { open:open, close:close, scan:startScan, refreshQR:refreshQR };
 
     /* Pwòp swiv itilizatè pa nou — nou pa depann de window._me, kèk
        paj (akèy, lavri) pa menm ekspoze l. Yon lòt «onAuthStateChanged»
@@ -2738,6 +2892,9 @@ if('serviceWorker' in navigator){
       }
       if(panel.classList.contains('open')) render();
       if(user) claimPending(user);
+      watchPoints(currentUser);
+      renderHome();
+      if(user && pendingZq){ var zt = pendingZq; pendingZq = null; setTimeout(function(){ handleToken(zt); }, 500); }
     });
 
     /* Pwen ak mesaj ki te voye pou nou pandan nou pa t ko konekte —
@@ -2841,7 +2998,9 @@ if('serviceWorker' in navigator){
           out.push(Object.assign({_kind:'Pwen', _t:'transfer'}, r, {
             status: out_ ? (r.to_uid ? 'done' : 'pending') : 'done',
             updated_at: r.created_at,
-            _title: out_ ? 'Pwen voye bay ' + (r.to_name||r.to_email||'') : 'Pwen resevwa nan men ' + (r.from_name||r.from_email||''),
+            _title: r.kind === 'store_sale' ? 'Pwen achte nan boutik la'
+                  : r.kind === 'shop_payment' ? 'Peman kòmand Shop ak pwen'
+                  : out_ ? 'Pwen voye bay ' + (r.to_name||r.to_email||'') : 'Pwen resevwa nan men ' + (r.from_name||r.from_email||''),
             _price: r.amount, _out: out_
           }));
         });
@@ -2899,6 +3058,7 @@ if('serviceWorker' in navigator){
       await loadRole();
 
       var roles = [];
+      if(await checkStaff()) roles.push('Anplwaye');
       if(role.driver) roles.push('Chofè');
       if(role.partners.length) roles.push(role.partners.length > 1 ? 'Patnè (' + role.partners.length + ')' : 'Patnè');
 
@@ -2910,8 +3070,8 @@ if('serviceWorker' in navigator){
         + '<button class="zp-btn" id="zp-share" style="width:100%;margin-bottom:16px">Pataje pwofil mwen</button>';
 
       var tabs = '<div class="zptabs">'
-        + ['info','msg','hist','notif','send','ask'].map(function(k){
-            var lab = {info:'Enfo',msg:'Mesaj',hist:'Istwa',notif:'Notifikasyon',send:'Voye pwen',ask:'Mande pwen'}[k];
+        + ['info','msg','hist','notif','qr','send','ask'].map(function(k){
+            var lab = {info:'Enfo',msg:'Mesaj',hist:'Istwa',notif:'Notifikasyon',qr:'Kòd QR',send:'Voye pwen',ask:'Mande pwen'}[k];
             return '<button class="' + (tab===k?'on':'') + '" data-t="' + k + '">' + lab + '</button>';
           }).join('') + '</div>';
 
@@ -2926,6 +3086,7 @@ if('serviceWorker' in navigator){
       else if(tab === 'hist') renderHist();
       else if(tab === 'notif') renderNotif();
       else if(tab === 'ask') renderAsk();
+      else if(tab === 'qr') renderQRTab();
       else renderSend();
     }
 
@@ -3021,7 +3182,8 @@ if('serviceWorker' in navigator){
     function renderSend(){
       var box = $('#zp-in'); if(!box) return;
       box.innerHTML =
-          '<div class="zp-fld"><label for="zs-mail">Imel moun w ap voye a (Gmail oswa lòt)</label>'
+          '<button class="zp-btn go" type="button" id="zs-scan" style="margin-bottom:16px">Voye pa skane kòd QR yon moun</button>'
+        + '<div class="zp-fld"><label for="zs-mail">Oswa imel moun w ap voye a (Gmail oswa lòt)</label>'
           + '<input type="email" id="zs-mail" placeholder="egzanp@imel.com"></div>'
         + '<div class="zp-fld"><label for="zs-amt">Konbe pwen</label><input type="number" id="zs-amt" min="1" step="0.1" placeholder="10"></div>'
         + '<div class="zp-fld"><label for="zs-note">Yon ti mo (fakiltatif)</label><input type="text" id="zs-note" placeholder="Pou bòdwo lekòl la…"></div>'
@@ -3029,6 +3191,7 @@ if('serviceWorker' in navigator){
         + '<p class="zp-hint">Pwen yo soti sou kont ou tousuit, epi yo antre sou kont moun nan. Administratè a wè tout tranzaksyon.</p>'
         + '<div style="font-size:.58rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4);margin:20px 0 10px">Dènye anvwa ou yo</div>'
         + '<div id="zs-hist"><div class="zp-empty">K ap chaje…</div></div>';
+      $('#zs-scan').addEventListener('click', function(){ startScan('send'); });
       $('#zs-go').addEventListener('click', async function(){
         var mail = ($('#zs-mail').value||'').trim().toLowerCase();
         var amt = parseFloat($('#zs-amt').value) || 0;
@@ -3081,7 +3244,9 @@ if('serviceWorker' in navigator){
         var waiting = out && !t.to_uid;
         return '<div class="zptx ' + (out?'out':'in') + '"><div class="ic"><svg viewBox="0 0 24 24">'
           + (out ? '<path d="M5 12h14M13 6l6 6-6 6"/>' : '<path d="M19 12H5M11 6l-6 6 6 6"/>') + '</svg></div>'
-          + '<div class="bd"><b>' + (out ? 'Voye bay ' + esc(t.to_name||t.to_email||'') : 'Resevwa nan men ' + esc(t.from_name||t.from_email||'')) + '</b>'
+          + '<div class="bd"><b>' + (t.kind === 'store_sale' ? 'Pwen achte nan boutik la'
+              : t.kind === 'shop_payment' ? 'Peman kòmand Shop'
+              : out ? 'Voye bay ' + esc(t.to_name||t.to_email||'') : 'Resevwa nan men ' + esc(t.from_name||t.from_email||'')) + '</b>'
           + '<span>' + new Date(t.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
           + (t.note ? ' · ' + esc(t.note) : '') + (waiting ? ' · ap tann ' + esc(t.to_email) + ' konekte' : '') + '</span></div><div class="am">' + (out?'−':'+') + Number(t.amount).toFixed(1) + '</div></div>';
       }).join('') : '<div class="zp-empty">Ou poko voye ni resevwa pwen.</div>';
@@ -3107,6 +3272,469 @@ if('serviceWorker' in navigator){
         }catch(e){ toast('Nou pa ka voye demann lan kounye a'); }
         btn.disabled = false;
       });
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       KÒD QR PWEN — resevwa pwen, voye pa skane, vann pwen (anplwaye)
+       ────────────────────────────────────────────────────────────
+       · Kliyan an montre yon QR ki chanje chak fwa (jeton 5 minit,
+         yon sèl itilizasyon — wè zetwal-paiement.sql).
+       · Moun k ap voye a skane l, ekri kantite a, epi li voye.
+       · Yon anplwaye / admin ki gen dwa a ka skane QR kliyan an epi
+         ajoute pwen li achte nan boutik la (vant pwen).
+       · Tout tranzaksyon yo ekri nan point_transfers pou admin.html.
+       ════════════════════════════════════════════════════════════ */
+    var QR_REFRESH_AT = 45;           /* segonn anvan ekspirasyon — nouvo kòd otomatik */
+    var staffCache = { at:0, v:false, uid:null };
+    var pendingZq = null;
+    var mounts = [];                  /* kat « resevwa » ki sou ekran kounye a */
+    var htgRate = null;
+
+    function siteBase(){
+      return /^https?:$/.test(location.protocol) ? location.origin + '/' : 'https://zetwal.org/';
+    }
+    function qrPayload(token){ return siteBase() + '?zq=' + token; }
+    function parseToken(text){
+      text = String(text||'').trim();
+      var m = text.match(/[?&#]zq=([A-Za-z0-9]{8,64})/);
+      if(m) return m[1];
+      m = text.match(/^ZQ:([A-Za-z0-9]{8,64})$/i);
+      if(m) return m[1];
+      if(/^[A-Za-z0-9]{16,40}$/.test(text)) return text;
+      return null;
+    }
+    function firstRow(d){ return Array.isArray(d) ? d[0] : d; }
+    function round2(n){ return Math.round((Number(n)||0) * 100) / 100; }
+    function loginPrompt(){
+      var b = document.getElementById('login-btn');
+      if(b) b.click(); else if(typeof window.openAuth === 'function') window.openAuth();
+    }
+    function loadScript(src){
+      return new Promise(function(res, rej){
+        var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    /* Anplwaye = administratè OSWA yon aksè tanporè aktif ki gen « sellpts » */
+    async function checkStaff(){
+      if(!currentUser || !currentUser.email) return false;
+      var mail = currentUser.email.toLowerCase();
+      if(ADMIN_EMAILS.indexOf(mail) !== -1) return true;
+      if(staffCache.uid === currentUser.uid && Date.now() - staffCache.at < 60000) return staffCache.v;
+      var ok = false;
+      try{
+        var r = await sb.from('temp_access').select('permissions,expires_at,status').eq('email', mail).eq('status','active');
+        ok = (r.data||[]).some(function(a){
+          var p = a.permissions;
+          if(typeof p === 'string'){ try{ p = JSON.parse(p); }catch(e){ p = []; } }
+          return new Date(a.expires_at) > new Date() && (p||[]).indexOf('sellpts') !== -1;
+        });
+      }catch(e){}
+      staffCache = { at:Date.now(), v:ok, uid:currentUser.uid };
+      return ok;
+    }
+    async function pointRate(){
+      if(htgRate) return htgRate;
+      htgRate = 1;
+      try{
+        var r = await sb.from('site_settings').select('key,value').eq('key','move_points_rate');
+        var v = parseFloat(((r.data||[])[0]||{}).value);
+        if(v > 0) htgRate = v;
+      }catch(e){}
+      return htgRate;
+    }
+
+    /* ── Jeton QR ─────────────────────────────────────────────── */
+    async function qrIssue(){
+      var r = await sb.rpc('qr_issue', {
+        p_uid:currentUser.uid, p_email:currentUser.email||'',
+        p_name:currentUser.displayName||currentUser.email||'', p_ttl_sec:300
+      });
+      if(r.error) throw r.error;
+      var row = firstRow(r.data);
+      if(!row || !row.token) throw new Error('jeton vid');
+      return row;
+    }
+
+    /* Kat « Kòd mwen » — li rejenere tèt li anvan l ekspire, epi li
+       sispann yon fwa l pa sou paj la ankò. */
+    function mountReceive(el){
+      if(!el) return;
+      var st = { el:el, token:null, exp:0, busy:false, failedAt:0 };
+      mounts = mounts.filter(function(m){ return document.body.contains(m.el); });
+      mounts.push(st);
+      el.innerHTML =
+          '<div class="zq-box"><div class="zq-qr" data-r="qr"><div class="zq-load">K ap prepare kòd la…</div></div>'
+        + '<div class="zq-cd" data-r="cd"></div>'
+        + '<button class="zp-btn" type="button" data-r="new">Nouvo kòd</button></div>';
+      var q = el.querySelector('[data-r="qr"]'), cd = el.querySelector('[data-r="cd"]');
+      async function gen(){
+        if(st.busy || !currentUser) return;
+        st.busy = true;
+        try{
+          var row = await qrIssue();
+          st.token = row.token; st.exp = new Date(row.expires_at).getTime(); st.failedAt = 0;
+          var svg = window.zQR ? window.zQR(qrPayload(row.token)) : '';
+          q.innerHTML = svg || '<div class="zq-load">QR pa disponib</div>';
+          q.setAttribute('data-token', row.token);
+        }catch(e){
+          st.failedAt = Date.now(); st.exp = 0;
+          q.innerHTML = '<div class="zq-load">Kòd QR poko aktive.<br><small>Administratè a dwe egzekite zetwal-paiement.sql nan Supabase.</small></div>';
+        }
+        st.busy = false; paint();
+      }
+      function paint(){
+        if(!st.exp){ cd.textContent = ''; return; }
+        var s = Math.max(0, Math.round((st.exp - Date.now()) / 1000));
+        cd.textContent = 'Chanje otomatikman nan ' + Math.floor(s/60) + ':' + ('0' + (s%60)).slice(-2);
+      }
+      var tick = setInterval(function(){
+        if(!document.body.contains(el)){ clearInterval(tick); return; }
+        paint();
+        if(document.hidden || st.busy) return;
+        var left = st.exp - Date.now();
+        if(st.exp && left <= QR_REFRESH_AT * 1000) gen();
+        else if(!st.exp && st.failedAt && Date.now() - st.failedAt > 30000) gen();
+      }, 1000);
+      el.querySelector('[data-r="new"]').addEventListener('click', function(){ st.failedAt = 0; gen(); });
+      st.gen = gen;
+      gen();
+    }
+    function refreshQR(){
+      mounts = mounts.filter(function(m){ return document.body.contains(m.el); });
+      mounts.forEach(function(m){ if(m.gen) m.gen(); });
+    }
+
+    /* Kliyan an resevwa pwen → toast + nouvo kòd (ansyen an ka deja itilize) */
+    var ptsUnsub = null, lastPts = null;
+    function watchPoints(user){
+      if(ptsUnsub){ try{ ptsUnsub(); }catch(e){} ptsUnsub = null; }
+      lastPts = null;
+      if(!user || !fs) return;
+      try{
+        ptsUnsub = fs.collection('users').doc(user.uid).onSnapshot(function(s){
+          var p = Number((s.exists ? s.data().points : 0) || 0) || 0;
+          if(lastPts !== null && p > lastPts + 0.0001){
+            histCache = null; transferCache = null;
+            mounts = mounts.filter(function(m){ return document.body.contains(m.el); });
+            if(mounts.length){ toast('Ou resevwa ' + (p - lastPts).toFixed(1) + ' pwen !'); refreshQR(); }
+          }
+          lastPts = p;
+        }, function(){});
+      }catch(e){}
+    }
+
+    /* ── Fenèt (sheet) jenerik ───────────────────────────────── */
+    function closeSheet(){ var m = document.getElementById('zq-sheet'); if(m) m.remove(); }
+    function sheet(html){
+      closeSheet();
+      var m = document.createElement('div'); m.className = 'zq-ov'; m.id = 'zq-sheet';
+      m.innerHTML = '<div class="zq-sh" role="dialog" aria-modal="true">' + html + '</div>';
+      document.body.appendChild(m);
+      m.addEventListener('click', function(e){ if(e.target === m) closeSheet(); });
+      requestAnimationFrame(function(){ m.classList.add('on'); });
+      var x = m.querySelector('[data-r="x"]'); if(x) x.addEventListener('click', closeSheet);
+      return m;
+    }
+    function whoHtml(info){
+      var nm = info.owner_name || info.owner_email || 'Kliyan';
+      return '<div class="zq-who"><span class="zq-av">' + esc(initial(nm)) + '</span><div><b>' + esc(nm) + '</b>'
+        + '<small>' + esc(info.owner_email || '') + '</small></div></div>';
+    }
+    function sheetHead(title){
+      return '<div class="zq-sh-h"><b>' + esc(title) + '</b>'
+        + '<button class="zp-x" type="button" data-r="x" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>';
+    }
+    function afterMoney(){
+      histCache = null; transferCache = null;
+      if(panel.classList.contains('open')) render();
+    }
+
+    /* ── Eskanè kamera ───────────────────────────────────────── */
+    var scanState = { stream:null, timer:0 };
+    function stopScan(){
+      if(scanState.timer){ clearTimeout(scanState.timer); scanState.timer = 0; }
+      if(scanState.stream){ scanState.stream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} }); scanState.stream = null; }
+      var ov = document.getElementById('zq-scan'); if(ov) ov.remove();
+    }
+    function openScanner(opts){
+      stopScan();
+      var ov = document.createElement('div'); ov.className = 'zq-ov on'; ov.id = 'zq-scan';
+      ov.innerHTML = '<div class="zq-sh zq-scanbox">' + sheetHead(opts.title)
+        + '<div class="zq-vid"><video playsinline muted autoplay></video><div class="zq-frame"></div></div>'
+        + '<div class="zq-hint" data-r="hint">Mete kamera a sou kòd QR la.</div>'
+        + '<details class="zq-man" data-r="man"><summary>Kamera pa mache ? Antre kòd la alamen</summary>'
+        + '<div class="zp-fld" style="margin-top:10px"><input type="text" data-r="mi" placeholder="Kole lyen an oswa kòd la" autocomplete="off"></div>'
+        + '<button class="zp-btn" type="button" data-r="mok">Kontinye</button></details></div>';
+      document.body.appendChild(ov);
+      var hint = ov.querySelector('[data-r="hint"]'), video = ov.querySelector('video');
+      var done = false, lastBad = 0;
+      ov.querySelector('[data-r="x"]').addEventListener('click', stopScan);
+      ov.addEventListener('click', function(e){ if(e.target === ov) stopScan(); });
+      function finish(text){
+        if(done) return;
+        var t = parseToken(text);
+        if(!t){
+          if(Date.now() - lastBad > 2500){ lastBad = Date.now(); hint.textContent = 'Kòd sa a pa yon kòd Zetwal. Eseye ankò.'; }
+          return;
+        }
+        done = true; stopScan(); opts.onToken(t);
+      }
+      ov.querySelector('[data-r="mok"]').addEventListener('click', function(){
+        var v = ov.querySelector('[data-r="mi"]').value;
+        if(!parseToken(v)){ hint.textContent = 'Kòd la pa valid.'; return; }
+        finish(v);
+      });
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        hint.textContent = 'Kamera pa disponib sou aparèy sa a — antre kòd la alamen.';
+        ov.querySelector('[data-r="man"]').open = true; return;
+      }
+      (async function(){
+        var detector = null;
+        try{
+          if('BarcodeDetector' in window){
+            var fm = await BarcodeDetector.getSupportedFormats();
+            if(fm.indexOf('qr_code') !== -1) detector = new BarcodeDetector({ formats:['qr_code'] });
+          }
+        }catch(e){ detector = null; }
+        if(!detector && !window.jsQR){
+          hint.textContent = 'K ap chaje eskanè a…';
+          try{ await loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'); }
+          catch(e){ hint.textContent = 'Eskanè a pa chaje — antre kòd la alamen.'; ov.querySelector('[data-r="man"]').open = true; return; }
+        }
+        try{
+          scanState.stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } }, audio:false });
+        }catch(e){
+          hint.textContent = 'Nou pa jwenn aksè nan kamera a — otorize l, oswa antre kòd la alamen.';
+          ov.querySelector('[data-r="man"]').open = true; return;
+        }
+        if(done || !document.getElementById('zq-scan')){ stopScan(); return; }
+        video.srcObject = scanState.stream;
+        try{ await video.play(); }catch(e){}
+        hint.textContent = 'Mete kamera a sou kòd QR la.';
+        var cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently:true });
+        (async function loop(){
+          if(done || !document.getElementById('zq-scan')) return;
+          try{
+            if(video.readyState >= 2 && video.videoWidth){
+              if(detector){
+                var r = await detector.detect(video);
+                if(r && r[0] && r[0].rawValue) finish(r[0].rawValue);
+              } else if(window.jsQR){
+                var w = Math.min(520, video.videoWidth), h = Math.round(video.videoHeight * w / video.videoWidth);
+                cv.width = w; cv.height = h; cx.drawImage(video, 0, 0, w, h);
+                var img = cx.getImageData(0, 0, w, h);
+                var res = window.jsQR(img.data, w, h, { inversionAttempts:'attemptBoth' });
+                if(res && res.data) finish(res.data);
+              }
+            }
+          }catch(e){
+            /* Détecteur natif en panne → on bascule sur jsQR */
+            if(detector){
+              detector = null;
+              if(!window.jsQR){ try{ await loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'); }catch(e2){} }
+            }
+          }
+          if(!done) scanState.timer = setTimeout(loop, 160);
+        })();
+      })();
+    }
+
+    /* ── Apre yon skanè oswa yon lyen ?zq=… ─────────────────── */
+    async function handleToken(tok, mode){
+      if(!currentUser){ pendingZq = tok; toast('Konekte pou w kontinye'); loginPrompt(); return; }
+      var info = null;
+      try{
+        var r = await sb.rpc('qr_peek', { p_token:tok });
+        if(r.error) throw r.error;
+        info = firstRow(r.data);
+      }catch(e){ toast('Sèvis QR la poko disponib'); return; }
+      if(!info){ toast('Kòd sa a pa valid ankò — mande moun nan yon nouvo kòd'); return; }
+      if(info.owner_uid === currentUser.uid){ toast('Sa se kòd pa w — se lòt moun nan ki dwe skane l'); return; }
+      var staff = await checkStaff();
+      if(mode === 'sell' && !staff){ toast('Fonksyon sa a se pou anplwaye yo'); return; }
+      if(!mode) mode = staff ? 'choose' : 'send';
+      if(mode === 'choose') chooseSheet(tok, info);
+      else if(mode === 'sell') sellSheet(tok, info);
+      else sendSheet(tok, info);
+    }
+    function startScan(mode){
+      if(!currentUser){ toast('Konekte anvan'); loginPrompt(); return; }
+      openScanner({
+        title: mode === 'sell' ? 'Skane kòd kliyan an' : 'Skane kòd moun nan',
+        onToken: function(t){ handleToken(t, mode); }
+      });
+    }
+
+    function chooseSheet(tok, info){
+      var m = sheet(sheetHead('Kisa w vle fè ?') + whoHtml(info)
+        + '<button class="zp-btn go" type="button" data-r="s" style="margin-bottom:10px">Voye pwen ba moun sa</button>'
+        + '<button class="zp-btn" type="button" data-r="v" style="width:100%">Vann pwen (kliyan peye kach)</button>');
+      m.querySelector('[data-r="s"]').addEventListener('click', function(){ sendSheet(tok, info); });
+      m.querySelector('[data-r="v"]').addEventListener('click', function(){ sellSheet(tok, info); });
+    }
+
+    async function sendSheet(tok, info){
+      var bal = await currentPoints();
+      var m = sheet(sheetHead('Voye pwen') + whoHtml(info)
+        + '<div class="zq-bal">Solid ou : <b>' + bal.toFixed(1) + '</b> pwen</div>'
+        + '<div class="zp-fld"><label for="zq-amt">Konbe pwen</label>'
+        + '<input type="number" id="zq-amt" min="1" step="0.1" inputmode="decimal" placeholder="10"></div>'
+        + '<div class="zq-chips">' + [10, 50, 100, 500].map(function(v){ return '<button type="button" data-v="' + v + '">' + v + '</button>'; }).join('') + '</div>'
+        + '<div class="zp-fld"><label for="zq-note">Yon ti mo (fakiltatif)</label><input type="text" id="zq-note" placeholder="Pou…"></div>'
+        + '<button class="zp-btn go" type="button" id="zq-go">Voye pwen yo</button>'
+        + '<p class="zp-hint">Pwen yo soti sou kont ou tousuit epi yo antre sou kont ' + esc(info.owner_name || info.owner_email || 'moun nan') + '.</p>');
+      var amtEl = m.querySelector('#zq-amt');
+      m.querySelectorAll('.zq-chips button').forEach(function(b){
+        b.addEventListener('click', function(){ amtEl.value = b.getAttribute('data-v'); });
+      });
+      amtEl.focus();
+      m.querySelector('#zq-go').addEventListener('click', async function(){
+        var btn = this, amt = round2(amtEl.value), note = (m.querySelector('#zq-note').value || '').trim();
+        if(!(amt > 0)){ toast('Konbe pwen ou vle voye ?'); return; }
+        if(amt > bal + 0.0001){ toast('Ou pa gen ase pwen'); return; }
+        btn.disabled = true; btn.textContent = 'K ap voye…';
+        var res = await doQrSend(tok, amt, note);
+        if(res.ok){
+          closeSheet(); toast('Pwen voye bay ' + (res.name || 'moun nan'));
+          afterMoney();
+        } else { toast(res.msg); btn.disabled = false; btn.textContent = 'Voye pwen yo'; }
+      });
+    }
+
+    /* Moun k ap voye a : debite → konsome jeton → kredite → ekri rejis la.
+       Si yon etap echwe apre debit la, nou renmèt pwen yo. */
+    async function doQrSend(tok, amt, note){
+      var debited = await chargePoints(amt);
+      if(!debited) return { ok:false, msg:'Ou pa gen ase pwen' };
+      async function refund(){
+        try{ await fsUser().set({ points: firebase.firestore.FieldValue.increment(amt) }, { merge:true }); }catch(e){}
+      }
+      var owner = null;
+      try{
+        var c = await sb.rpc('qr_consume', { p_token:tok, p_by_uid:currentUser.uid, p_by_email:currentUser.email||'', p_kind:'transfer' });
+        if(c.error) throw c.error;
+        owner = firstRow(c.data);
+      }catch(e){ await refund(); return { ok:false, msg:'Sèvis QR la pa reponn — pwen yo pa soti' }; }
+      if(!owner){ await refund(); return { ok:false, msg:'Kòd la pa valid ankò — mande yon nouvo kòd' }; }
+      try{
+        await fs.collection('users').doc(owner.owner_uid).set(
+          { points: firebase.firestore.FieldValue.increment(amt) }, { merge:true });
+      }catch(e){ await refund(); return { ok:false, msg:'Nou pa ka kredite kont lan — pwen yo retounen sou kont ou' }; }
+      try{
+        var ins = await sb.from('point_transfers').insert({
+          kind:'qr_transfer',
+          from_uid:currentUser.uid, from_name:currentUser.displayName||currentUser.email, from_email:currentUser.email||null,
+          to_uid:owner.owner_uid, to_name:owner.owner_name||owner.owner_email, to_email:owner.owner_email||null,
+          amount:amt, note:note||null
+        });
+        if(ins.error) console.warn('[ZetwalProfile] rejis pa anrejistre:', ins.error.message);
+      }catch(e){}
+      return { ok:true, name:owner.owner_name || owner.owner_email };
+    }
+
+    async function sellSheet(tok, info){
+      var rate = await pointRate();
+      var m = sheet(sheetHead('Vann pwen') + whoHtml(info)
+        + '<div class="zp-fld"><label for="zq-amt">Konbe pwen kliyan an achte</label>'
+        + '<input type="number" id="zq-amt" min="1" step="0.1" inputmode="decimal" placeholder="100"></div>'
+        + '<div class="zq-chips">' + [50, 100, 500, 1000].map(function(v){ return '<button type="button" data-v="' + v + '">' + v + '</button>'; }).join('') + '</div>'
+        + '<div class="zp-fld"><label for="zq-htg">Lajan kach ou resevwa (HTG) — 1 pwen = ' + rate + ' HTG</label>'
+        + '<input type="number" id="zq-htg" min="0" step="1" inputmode="decimal" placeholder="0"></div>'
+        + '<div class="zp-fld"><label for="zq-note">Nòt (fakiltatif)</label><input type="text" id="zq-note"></div>'
+        + '<div class="zq-sum" id="zq-sum"></div>'
+        + '<button class="zp-btn go" type="button" id="zq-go">Konfime — mwen resevwa lajan an</button>'
+        + '<p class="zp-hint">Pwen yo antre sou kont kliyan an. Tranzaksyon an anrejistre ak kont ou (' + esc(currentUser.email || '') + ') pou administratè a.</p>');
+      var amtEl = m.querySelector('#zq-amt'), htgEl = m.querySelector('#zq-htg'), sum = m.querySelector('#zq-sum');
+      var htgTouched = false;
+      function paint(){
+        var a = round2(amtEl.value);
+        if(!htgTouched) htgEl.value = a > 0 ? String(round2(a * rate)) : '';
+        sum.innerHTML = a > 0
+          ? 'Ajoute <b>' + a.toFixed(1) + ' pwen</b> sou kont <b>' + esc(info.owner_name || info.owner_email || '') + '</b> · resevwa <b>' + fmt(Number(htgEl.value) || 0) + ' HTG</b> kach'
+          : '';
+      }
+      amtEl.addEventListener('input', paint);
+      htgEl.addEventListener('input', function(){ htgTouched = true; paint(); });
+      m.querySelectorAll('.zq-chips button').forEach(function(b){
+        b.addEventListener('click', function(){ amtEl.value = b.getAttribute('data-v'); paint(); });
+      });
+      amtEl.focus();
+      m.querySelector('#zq-go').addEventListener('click', async function(){
+        var btn = this, amt = round2(amtEl.value), htg = round2(htgEl.value), note = (m.querySelector('#zq-note').value || '').trim();
+        if(!(amt > 0)){ toast('Konbe pwen kliyan an achte ?'); return; }
+        btn.disabled = true; btn.textContent = 'K ap anrejistre…';
+        var res = await doStoreSale(tok, amt, htg, note);
+        if(res.ok){
+          closeSheet(); toast(amt.toFixed(1) + ' pwen ajoute sou kont ' + (res.name || 'kliyan an'));
+          afterMoney();
+        } else { toast(res.msg); btn.disabled = false; btn.textContent = 'Konfime — mwen resevwa lajan an'; }
+      });
+    }
+
+    async function doStoreSale(tok, amt, htg, note){
+      if(!(await checkStaff())) return { ok:false, msg:'Fonksyon sa a se pou anplwaye yo' };
+      var owner = null;
+      try{
+        var c = await sb.rpc('qr_consume', { p_token:tok, p_by_uid:currentUser.uid, p_by_email:currentUser.email||'', p_kind:'store_sale' });
+        if(c.error) throw c.error;
+        owner = firstRow(c.data);
+      }catch(e){ return { ok:false, msg:'Sèvis QR la pa reponn — anyen pa fèt' }; }
+      if(!owner) return { ok:false, msg:'Kòd la pa valid ankò — mande kliyan an yon nouvo kòd' };
+      try{
+        await fs.collection('users').doc(owner.owner_uid).set(
+          { points: firebase.firestore.FieldValue.increment(amt) }, { merge:true });
+      }catch(e){ return { ok:false, msg:'Nou pa ka kredite kont kliyan an — mande l yon nouvo kòd' }; }
+      try{
+        var ins = await sb.from('point_transfers').insert({
+          kind:'store_sale',
+          from_uid:'', from_name:'Boutik Zetwal', from_email:null,
+          to_uid:owner.owner_uid, to_name:owner.owner_name||owner.owner_email, to_email:owner.owner_email||null,
+          amount:amt, htg_amount:htg, note:note||null,
+          operator_uid:currentUser.uid, operator_email:currentUser.email||null,
+          operator_name:currentUser.displayName||currentUser.email||null
+        });
+        if(ins.error){ console.warn('[ZetwalProfile] rejis pa anrejistre:', ins.error.message);
+          toast('Pwen yo antre, men rejis la pa anrejistre — enfòme administratè a'); }
+      }catch(e){}
+      return { ok:true, name:owner.owner_name || owner.owner_email };
+    }
+
+    /* ── Afichaj : tab « Kòd QR » nan pwofil + seksyon paj akèy ── */
+    async function qrButtonsHtml(){
+      var staff = await checkStaff();
+      return '<button class="zp-btn go" type="button" data-r="scan">Skane yon kòd pou voye pwen</button>'
+        + (staff ? '<button class="zp-btn" type="button" data-r="sell" style="width:100%;margin-top:10px">Vann pwen — skane kòd kliyan an</button>' : '');
+    }
+    function wireQrButtons(root){
+      var s = root.querySelector('[data-r="scan"]'); if(s) s.addEventListener('click', function(){ startScan('send'); });
+      var v = root.querySelector('[data-r="sell"]'); if(v) v.addEventListener('click', function(){ startScan('sell'); });
+    }
+    async function renderQRTab(){
+      var box = $('#zp-in'); if(!box) return;
+      box.innerHTML = '<div class="zq-tab"><div id="zq-panel-rcv"></div>'
+        + '<p class="zp-hint" style="text-align:center">Montre kòd sa a bay moun k ap voye w pwen yo — li chanje chak fwa.</p>'
+        + '<div id="zq-panel-btn" style="margin-top:14px"></div></div>';
+      mountReceive($('#zq-panel-rcv'));
+      var b = $('#zq-panel-btn'); b.innerHTML = await qrButtonsHtml(); wireQrButtons(b);
+    }
+    async function renderHome(){
+      var el = document.getElementById('zq-home'); if(!el) return;
+      if(!currentUser){
+        el.innerHTML = '<div class="zq-guest"><p>Konekte pou w wè kòd QR ou, resevwa pwen, epi voye pwen bay zanmi w.</p>'
+          + '<button class="zp-btn go" type="button" id="zq-login" style="max-width:260px">Konekte</button></div>';
+        var lg = document.getElementById('zq-login'); if(lg) lg.addEventListener('click', loginPrompt);
+        return;
+      }
+      el.innerHTML = '<div class="zq-grid"><div class="zq-main"><div class="zq-k">Kòd QR mwen</div><div id="zq-home-rcv"></div></div>'
+        + '<div class="zq-side"><div class="zq-k">Sa w ka fè</div>'
+        + '<ul class="zq-steps"><li><b>Resevwa pwen</b>Montre kòd la bay moun k ap voye w yo. Li chanje chak fwa.</li>'
+        + '<li><b>Voye pwen</b>Skane kòd yon moun, ekri kantite a, epi voye.</li>'
+        + '<li><b>Achte pwen nan boutik la</b>Montre kòd ou bay yon anplwaye — li ajoute pwen yo sou kont ou.</li></ul>'
+        + '<div id="zq-home-btn"></div></div></div>';
+      mountReceive(document.getElementById('zq-home-rcv'));
+      var hb = document.getElementById('zq-home-btn'); hb.innerHTML = await qrButtonsHtml(); wireQrButtons(hb);
     }
 
     /* ════════════════════════════════════════════════════════════
@@ -3340,6 +3968,12 @@ if('serviceWorker' in navigator){
 
     /* Yon lyen pataje (?moun=uid) — envite moun nan konekte pou l wè l */
     var qs = new URLSearchParams(location.search);
+    if(qs.get('zq')){
+      pendingZq = parseToken(qs.get('zq'));
+      try{ var u0 = new URL(location.href); u0.searchParams.delete('zq'); history.replaceState(null, '', u0.pathname + (u0.search || '') + u0.hash); }catch(e){}
+      if(pendingZq && currentUser){ var zt0 = pendingZq; pendingZq = null; setTimeout(function(){ handleToken(zt0); }, 800); }
+      else if(pendingZq){ setTimeout(function(){ if(pendingZq) toast('Konekte pou w kontinye ak kòd QR la'); }, 1200); }
+    }
     if(qs.get('moun') && !currentUser){
       setTimeout(function(){ toast('Yon pwofil pataje avè w — konekte pou wè l'); }, 700);
     }
@@ -3348,7 +3982,6 @@ if('serviceWorker' in navigator){
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
-
 </script>
 </body>
 </html>
