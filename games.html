@@ -18,7 +18,155 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R" crossorigin="anonymous"></script>
+<script id="zb-bridge">
+/* Zetwal — pont d'identité (Firebase → Supabase) + points sécurisés.
+   Placé juste après supabase-js : il enveloppe createClient pour que
+   chaque requête REST/Storage porte le jeton « pont » de la personne
+   connectée (RLS), et il expose ZB pour les opérations de points. */
+(function(){
+  if(window.ZB) return;
+  var ORIG = window.fetch.bind(window);
+  var SB = null, KEY = null, FN = null, clients = [];
+  var cache = null, inflight = null, failUntil = 0;
+
+  function fbUser(){
+    try{ return (window.firebase && firebase.apps && firebase.apps.length && firebase.auth().currentUser) || null; }
+    catch(e){ return null; }
+  }
+
+  async function bridgeToken(){
+    var u = fbUser();
+    if(!u || !FN) return null;
+    if(cache && cache.uid === u.uid && cache.exp - Date.now() > 120000) return cache.tok;
+    if(Date.now() < failUntil) return null;
+    if(inflight && inflight.uid === u.uid) return inflight.p;
+    var p = (async function(){
+      try{
+        var idt = await u.getIdToken();
+        var r = await ORIG(FN + '/fb-exchange', { method:'POST',
+          headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':KEY }, body:'{}' });
+        if(!r.ok) throw new Error('exchange ' + r.status);
+        var j = await r.json();
+        if(!j || !j.token) throw new Error('exchange vide');
+        cache = { uid:u.uid, tok:j.token, exp:Date.now() + (j.expires_in || 3600) * 1000 };
+        clients.forEach(function(c){ try{ c.realtime.setAuth(j.token); }catch(e){} });
+        return j.token;
+      }catch(e){ failUntil = Date.now() + 30000; return null; }
+      finally{ inflight = null; }
+    })();
+    inflight = { uid:u.uid, p:p };
+    return p;
+  }
+
+  function wrapFetch(base){
+    return async function(input, init){
+      try{
+        var url = typeof input === 'string' ? input : (input && input.url) || '';
+        if(SB && (url.indexOf(SB + '/rest/v1') === 0 || url.indexOf(SB + '/storage/v1') === 0)){
+          var t = await bridgeToken();
+          if(t){
+            if(typeof input === 'string' || !(input instanceof Request)){
+              var h = new Headers((init && init.headers) || {});
+              h.set('Authorization', 'Bearer ' + t);
+              init = Object.assign({}, init, { headers:h });
+            } else {
+              var h2 = new Headers(input.headers); h2.set('Authorization', 'Bearer ' + t);
+              input = new Request(input, { headers:h2 });
+            }
+          }
+        }
+      }catch(e){}
+      return base(input, init);
+    };
+  }
+
+  function patch(){
+    var S = window.supabase;
+    if(!S || !S.createClient || S.__zb) return;
+    var orig = S.createClient;
+    S.createClient = function(url, key, opts){
+      SB = SB || String(url).replace(/\/+$/, ''); KEY = KEY || key; FN = SB + '/functions/v1';
+      opts = opts || {}; opts.global = opts.global || {};
+      opts.global.fetch = wrapFetch(opts.global.fetch || ORIG);
+      var c = orig.call(this, url, key, opts);
+      clients.push(c);
+      return c;
+    };
+    S.__zb = 1;
+  }
+  patch();
+
+  /* ── Appels aux fonctions serveur ── */
+  async function call(fn, body){
+    var u = fbUser();
+    if(!u || !FN) return { ok:false, error:'login' };
+    var idt; try{ idt = await u.getIdToken(); }catch(e){ return { ok:false, error:'login' }; }
+    var r;
+    try{
+      r = await ORIG(FN + '/' + fn, { method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':KEY },
+        body:JSON.stringify(body || {}) });
+    }catch(e){ return { ok:false, error:'network', unknown:true }; }
+    var j = {}; try{ j = await r.json(); }catch(e){}
+    if(r.status === 404) return { unavailable:true };
+    if(r.status === 429) return { ok:false, error:'rate' };
+    if(!r.ok) return { ok:false, error:(j && j.error) || 'server', status:r.status };
+    return j;
+  }
+
+  /* La fonction zpoints est-elle déployée ? (une seule vérification par page) */
+  var probe = null;
+  function available(){
+    if(!fbUser()) return Promise.resolve(false);
+    if(probe) return probe;
+    probe = call('zpoints', { op:'ping' }).then(function(r){
+      if(r && r.ok) return true;
+      if(r && (r.error === 'login' || r.error === 'network')) probe = null;   /* on réessaiera */
+      return false;
+    });
+    return probe;
+  }
+
+  /* pts(op, args) → réponse du serveur, ou null si le serveur de points
+     n'est pas disponible (déploiement pas encore fait) → l'appelant
+     retombe sur l'ancien comportement. */
+  async function pts(op, args){
+    if(!(await available())) return null;
+    var body = Object.assign({}, args || {}, { op:op });
+    return call('zpoints', body);
+  }
+
+  /* spend(montant, raison) : compatible avec l'ancien chargePoints.
+       montant > 0  → débite (true/false)
+       montant < 0  → rembourse le dernier débit de ce montant (true/false)
+     Renvoie null si le serveur de points n'est pas disponible. */
+  var recent = [];
+  async function spend(amount, reason){
+    amount = Number(amount);
+    if(!isFinite(amount) || amount === 0) return false;
+    if(amount > 0){
+      var r = await pts('charge', { amount:amount, reason:reason || 'achat' });
+      if(r === null) return null;
+      if(r.ok && r.txn){ recent.push({ txn:r.txn, amount:amount, t:Date.now() }); if(recent.length > 20) recent.shift(); return true; }
+      return false;
+    }
+    var need = Math.round(-amount * 100) / 100;
+    for(var i = recent.length - 1; i >= 0; i--){
+      if(recent[i].amount === need){
+        var tx = recent.splice(i, 1)[0];
+        var rr = await pts('refund', { txn:tx.txn });
+        if(rr === null) return null;
+        return !!rr.ok;
+      }
+    }
+    return false;
+  }
+
+  window.ZB = { token:bridgeToken, call:call, pts:pts, spend:spend, available:available,
+    fnUrl:function(){ return FN; }, key:function(){ return KEY; } };
+})();
+</script>
 <style>
 
 /* ════════════════════════════════════════════════════════════════
@@ -1248,7 +1396,12 @@ $('#l-go').addEventListener('click', async function(){
   if(!g || !window._me || !d) return;
   if(PTS < g.cost){ toast('Ou pa gen ase pwen'); return; }
   var btn = this; btn.disabled = true; btn.textContent = 'Yon ti moman…';
-  try{
+  var zg = window.ZB ? await ZB.spend(g.cost, 'jwet') : null;
+  if(zg === false){
+    btn.disabled = false; btn.textContent = 'Peye '+g.cost+' pwen epi jwe';
+    toast('Ou pa gen ase pwen'); return;
+  }
+  if(zg === null) try{
     await d.collection('users').doc(window._me.uid)
       .set({ points: firebase.firestore.FieldValue.increment(-g.cost) }, { merge:true });
   }catch(e){
@@ -1901,7 +2054,12 @@ window.zQR=window.zQR||function(text){
     async function claimPending(user){
       if(!sb || !fs || !user || !user.email) return;
       var mail = user.email.toLowerCase();
-      try{
+      var zc = window.ZB ? await ZB.pts('claim') : null;
+      if(zc !== null){
+        if(zc.ok && zc.count) toast(zc.count > 1
+          ? zc.count + ' anvwa pwen te ap tann ou — yo antre sou kont ou'
+          : 'Yon anvwa pwen te ap tann ou — li antre sou kont ou');
+      } else try{
         var pts = await sb.from('pending_points').select('*').eq('to_email', mail).eq('claimed', false);
         var rows = pts.data || [];
         for(var i=0;i<rows.length;i++){
@@ -2027,6 +2185,7 @@ window.zQR=window.zQR||function(text){
 
     async function chargePoints(amount){
       if(!currentUser || amount <= 0) return false;
+      if(window.ZB){ var z = await ZB.spend(amount, 'profil'); if(z !== null) return z; }
       try{
         return await fs.runTransaction(async function(tx){
           var ref = fsUser();
@@ -2198,6 +2357,17 @@ window.zQR=window.zQR||function(text){
         if(mail === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
         var btn = this; btn.disabled = true; btn.textContent = 'K ap voye…';
         try{
+          var zt = window.ZB ? await ZB.pts('transfer_email', { to_email:mail, amount:amt, note:note }) : null;
+          if(zt !== null){
+            if(!zt.ok){
+              toast(zt.error === 'insufficient' ? 'Ou pa gen ase pwen' : (zt.error === 'self' ? 'Ou pa ka voye pwen pou tèt ou' : 'Nou pa ka voye pwen yo kounye a'));
+              btn.disabled=false; btn.textContent='Voye pwen yo'; return;
+            }
+            toast(zt.delivered ? ('Pwen voye bay ' + (zt.name||mail)) : ('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte'));
+            $('#zs-mail').value=''; $('#zs-amt').value=''; $('#zs-note').value='';
+            transferCache = null; loadSendHistory();
+            btn.disabled = false; btn.textContent = 'Voye pwen yo'; return;
+          }
           var ok = await chargePoints(amt);
           if(!ok){ toast('Ou pa gen ase pwen'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
           var dest = await findUserByEmail(mail);
@@ -2603,6 +2773,13 @@ window.zQR=window.zQR||function(text){
     /* Moun k ap voye a : debite → konsome jeton → kredite → ekri rejis la.
        Si yon etap echwe apre debit la, nou renmèt pwen yo. */
     async function doQrSend(tok, amt, note){
+      var zq = window.ZB ? await ZB.pts('transfer_qr', { token:tok, amount:amt, note:note }) : null;
+      if(zq !== null){
+        if(zq.ok) return { ok:true, name:zq.name };
+        if(zq.error === 'insufficient') return { ok:false, msg:'Ou pa gen ase pwen' };
+        if(zq.error === 'invalid_token') return { ok:false, msg:'Kòd la pa valid ankò — mande yon nouvo kòd' };
+        return { ok:false, msg:'Nou pa ka voye pwen yo kounye a — verifye solid ou anvan ou eseye ankò' };
+      }
       var debited = await chargePoints(amt);
       if(!debited) return { ok:false, msg:'Ou pa gen ase pwen' };
       async function refund(){
@@ -2672,6 +2849,13 @@ window.zQR=window.zQR||function(text){
 
     async function doStoreSale(tok, amt, htg, note){
       if(!(await checkStaff())) return { ok:false, msg:'Fonksyon sa a se pou anplwaye yo' };
+      var zs = window.ZB ? await ZB.pts('sale', { token:tok, amount:amt, note:note }) : null;
+      if(zs !== null){
+        if(zs.ok) return { ok:true, name:zs.name };
+        if(zs.error === 'invalid_token') return { ok:false, msg:'Kòd la pa valid ankò — mande kliyan an yon nouvo kòd' };
+        if(zs.status === 403) return { ok:false, msg:'Fonksyon sa a se pou anplwaye yo' };
+        return { ok:false, msg:'Nou pa ka anrejistre vant lan kounye a — anyen pa fèt, eseye ankò' };
+      }
       var owner = null;
       try{
         var c = await sb.rpc('qr_consume', { p_token:tok, p_by_uid:currentUser.uid, p_by_email:currentUser.email||'', p_kind:'store_sale' });
