@@ -35,21 +35,35 @@
     catch(e){ return null; }
   }
 
+  var lastReload = 0;
+  /* Jeton Firebase à jour : si l'e-mail n'est pas encore vérifié, on recharge
+     le compte (au plus 1 fois / 30 s) pour voir si la personne a cliqué le lien. */
+  async function fbToken(u){
+    try{
+      if(u.email && !u.emailVerified && typeof u.reload === 'function' && Date.now() - lastReload > 30000){
+        lastReload = Date.now();
+        await u.reload();
+        if(u.emailVerified) return await u.getIdToken(true);
+      }
+    }catch(e){}
+    return u.getIdToken();
+  }
+
   async function bridgeToken(){
     var u = fbUser();
     if(!u || !FN) return null;
-    if(cache && cache.uid === u.uid && cache.exp - Date.now() > 120000) return cache.tok;
+    if(cache && cache.uid === u.uid && cache.ver === !!u.emailVerified && cache.exp - Date.now() > 120000) return cache.tok;
     if(Date.now() < failUntil) return null;
     if(inflight && inflight.uid === u.uid) return inflight.p;
     var p = (async function(){
       try{
-        var idt = await u.getIdToken();
+        var idt = await fbToken(u);
         var r = await ORIG(FN + '/fb-exchange', { method:'POST',
           headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':KEY }, body:'{}' });
         if(!r.ok) throw new Error('exchange ' + r.status);
         var j = await r.json();
         if(!j || !j.token) throw new Error('exchange vide');
-        cache = { uid:u.uid, tok:j.token, exp:Date.now() + (j.expires_in || 3600) * 1000 };
+        cache = { uid:u.uid, ver:!!u.emailVerified, tok:j.token, exp:Date.now() + (j.expires_in || 3600) * 1000 };
         clients.forEach(function(c){ try{ c.realtime.setAuth(j.token); }catch(e){} });
         return j.token;
       }catch(e){ failUntil = Date.now() + 30000; return null; }
@@ -101,7 +115,7 @@
   async function call(fn, body){
     var u = fbUser();
     if(!u || !FN) return { ok:false, error:'login' };
-    var idt; try{ idt = await u.getIdToken(); }catch(e){ return { ok:false, error:'login' }; }
+    var idt; try{ idt = await fbToken(u); }catch(e){ return { ok:false, error:'login' }; }
     var r;
     try{
       r = await ORIG(FN + '/' + fn, { method:'POST',
@@ -163,7 +177,14 @@
     return false;
   }
 
-  window.ZB = { token:bridgeToken, call:call, pts:pts, spend:spend, available:available,
+  /* notice(args) : demande au serveur d'envoyer une notification (e-mail ou SMS) pour un événement
+     (linge prêt, commande acceptée…). Le serveur revérifie tout ; renvoie null si indisponible. */
+  async function notice(args){
+    try{ if(!(await available())) return null; return await call('zpoints', Object.assign({ op:'notice' }, args || {})); }
+    catch(e){ return null; }
+  }
+
+  window.ZB = { token:bridgeToken, call:call, pts:pts, spend:spend, available:available, notice:notice,
     fnUrl:function(){ return FN; }, key:function(){ return KEY; } };
 })();
 </script>
@@ -1673,6 +1694,31 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
       </svg>
       Kontinye ak Google
     </button>
+    <div id="m-more" style="display:grid;gap:10px;margin-top:10px">
+      <button class="gbtn" id="m-fb" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#1877F2" d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12Z"/></svg>
+        Kontinye ak Facebook
+      </button>
+      <button class="gbtn" id="m-phone" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg>
+        Kontinye ak nimewo telefòn
+      </button>
+    </div>
+    <div id="m-ph" style="display:none;margin-top:14px">
+      <div id="m-ph-1">
+        <div class="fld"><label for="m-ph-num">Nimewo telefòn</label>
+          <input id="m-ph-num" type="text" inputmode="tel" autocomplete="tel" placeholder="+509 3712 3456"></div>
+        <button class="btn btn-g" id="m-ph-send" type="button">Voye kòd SMS la</button>
+      </div>
+      <div id="m-ph-2" style="display:none">
+        <div class="fld"><label for="m-ph-code">Kòd 6 chif ou resevwa a</label>
+          <input id="m-ph-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></div>
+        <button class="btn btn-g" id="m-ph-ok" type="button">Konfime kòd la</button>
+        <p class="note"><a id="m-ph-back">Chanje nimewo a</a></p>
+      </div>
+      <div id="m-recaptcha"></div>
+    </div>
+
     <p class="note" id="m-note"><a id="m-forgot">Ou bliye modpas ou ?</a></p>
     <div class="err" id="m-err"></div>
   </div>
@@ -3423,6 +3469,7 @@ async function submitAuth(){
       var cred = await auth.createUserWithEmailAndPassword(mail, pass);
       if(cred.user && name) await cred.user.updateProfile({ displayName:name });
       await seedUser(cred.user, name);
+      try{ await cred.user.sendEmailVerification(); if(window.zAuthNote) zAuthNote('Nou voye yon imel verifikasyon bay ' + mail + '. Klike lyen an pou w ka reklame pwen ki ap tann ou.'); }catch(e){}
     } else await auth.signInWithEmailAndPassword(mail, pass);
     busy(false, label); shutAuth();
   }catch(e){ busy(false, label); msg(say(e)); }
@@ -3439,6 +3486,109 @@ $('#m-google').addEventListener('click', async function(){
     shutAuth();
   }catch(e){ msg(say(e)); }
 });
+/* ── Lòt fason pou konekte : Facebook, telefòn (SMS) + imel verifikasyon ── */
+(function(){
+  function note(t){
+    var d = document.createElement('div'); d.setAttribute('role','status');
+    d.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);max-width:92vw;background:#14110a;color:#f1e7c9;border:1px solid rgba(201,162,75,.45);padding:12px 16px;border-radius:10px;font:500 .78rem/1.4 system-ui,sans-serif;z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,.5)';
+    d.textContent = t; document.body.appendChild(d); setTimeout(function(){ d.remove(); }, 8000);
+  }
+  window.zAuthNote = note;
+  var X = {
+    'auth/account-exists-with-different-credential': "Imel sa a deja gen yon kont ak yon lòt metòd. Konekte ak metòd sa a pito.",
+    'auth/invalid-phone-number'   : "Nimewo telefòn nan pa bon. Egzanp : +509 3712 3456",
+    'auth/missing-phone-number'   : "Antre nimewo telefòn ou.",
+    'auth/invalid-verification-code': "Kòd la pa bon. Verifye epi eseye ankò.",
+    'auth/missing-verification-code': "Antre kòd la.",
+    'auth/code-expired'           : "Kòd la ekspire. Mande yon nouvo kòd.",
+    'auth/quota-exceeded'         : "Twòp SMS voye jodi a. Eseye pita oswa itilize Google / imel.",
+    'auth/captcha-check-failed'   : "Verifikasyon sekirite a echwe. Eseye ankò.",
+    'auth/cancelled-popup-request': "Fenèt la te fèmen. Eseye ankò.",
+    'auth/unauthorized-domain'    : "Domèn sa a poko otorize nan Firebase.",
+    'auth/user-disabled'          : "Kont sa a bloke. Kontakte Zetwal."
+  };
+  for(var k in X) if(!ERRORS[k]) ERRORS[k] = X[k];
+
+  /* Facebook */
+  var fb = $('#m-fb');
+  if(fb) fb.addEventListener('click', async function(){
+    if(!auth) return; clearMsg();
+    try{
+      var p = new firebase.auth.FacebookAuthProvider(); p.addScope('email');
+      var r = await auth.signInWithPopup(p);
+      await seedUser(r.user, r.user && r.user.displayName);
+      shutAuth();
+    }catch(e){
+      if(e && e.code === 'auth/account-exists-with-different-credential' && e.email){
+        try{
+          var m = await auth.fetchSignInMethodsForEmail(e.email);
+          var w = m.indexOf('google.com') >= 0 ? 'Google' : (m.indexOf('password') >= 0 ? 'imel + modpas' : 'lòt metòd la');
+          msg('Imel ' + e.email + ' deja gen yon kont. Konekte ak ' + w + ' pito.'); return;
+        }catch(x){}
+      }
+      msg(say(e));
+    }
+  });
+
+  /* Telefòn */
+  var conf = null, ver = null;
+  function normPhone(v){
+    v = String(v || '').replace(/[\s().-]/g, '');
+    if(/^\+\d{8,15}$/.test(v)) return v;
+    if(/^00\d{8,15}$/.test(v)) return '+' + v.slice(2);
+    if(/^509\d{8}$/.test(v)) return '+' + v;
+    if(/^\d{8}$/.test(v)) return '+509' + v;
+    return null;
+  }
+  function resetV(){
+    try{ if(ver) ver.clear(); }catch(e){}
+    var c = $('#m-recaptcha'); if(c) c.innerHTML = '';
+    ver = new firebase.auth.RecaptchaVerifier('m-recaptcha', { size:'invisible' });
+  }
+  var ph = $('#m-phone');
+  if(ph) ph.addEventListener('click', function(){
+    var b = $('#m-ph'); var open = b.style.display === 'none';
+    b.style.display = open ? '' : 'none'; clearMsg();
+    if(open) setTimeout(function(){ $('#m-ph-num').focus(); }, 50);
+  });
+  var send = $('#m-ph-send');
+  if(send) send.addEventListener('click', async function(){
+    if(!auth) return;
+    var n = normPhone($('#m-ph-num').value);
+    if(!n){ msg('Nimewo a pa bon. Egzanp : +509 3712 3456'); return; }
+    clearMsg(); send.disabled = true; var old = send.textContent; send.textContent = 'K ap voye…';
+    try{
+      resetV();
+      conf = await auth.signInWithPhoneNumber(n, ver);
+      $('#m-ph-1').style.display = 'none'; $('#m-ph-2').style.display = '';
+      msg('Nou voye yon kòd SMS bay ' + n + '.', true);
+      setTimeout(function(){ $('#m-ph-code').focus(); }, 50);
+    }catch(e){ msg(say(e)); try{ resetV(); }catch(x){} }
+    send.disabled = false; send.textContent = old;
+  });
+  var back = $('#m-ph-back');
+  if(back) back.addEventListener('click', function(){
+    conf = null; $('#m-ph-2').style.display = 'none'; $('#m-ph-1').style.display = ''; $('#m-ph-code').value = ''; clearMsg();
+  });
+  var ok = $('#m-ph-ok');
+  if(ok) ok.addEventListener('click', async function(){
+    var c = ($('#m-ph-code').value || '').trim();
+    if(!conf){ msg('Mande yon kòd anvan.'); return; }
+    if(!/^\d{6}$/.test(c)){ msg('Antre kòd 6 chif la.'); return; }
+    clearMsg(); ok.disabled = true; var old = ok.textContent; ok.textContent = 'K ap verifye…';
+    try{
+      var r = await conf.confirm(c), u = r.user, nm = u.displayName;
+      if(!nm){
+        nm = 'Kliyan ' + String(u.phoneNumber || '').slice(-4);
+        try{ await u.updateProfile({ displayName:nm }); await u.getIdToken(true); }catch(e){}
+      }
+      await seedUser(u, nm);
+      shutAuth();
+    }catch(e){ msg(say(e)); }
+    ok.disabled = false; ok.textContent = old;
+  });
+})();
+
 $('#m-forgot').addEventListener('click', async function(){
   var mail = $('#m-mail').value.trim();
   if(!mail){ msg("Antre imel ou anvan, epi klike ankò."); return; }
@@ -3710,6 +3860,7 @@ async function jobAct(id, kind, to){
     var r = await sb.from(t).update(patch).eq('id', id);
     if(r.error) throw r.error;
     if(o) Object.assign(o, patch);
+    if(to === 'accepted' && window.ZB) ZB.notice({ event:'move', table:(kind === 'ride' ? 'ride' : 'order'), id:id });
     if(to === 'on_way') jobWatchStart(t, id);
     if(to === 'arrived' || to === 'picked' || to === 'done') jobWatchStop();
     if(to === 'done' && o && o.paid_with === 'pwen' && o.points_used > 0 && fs && window._me){
@@ -3792,6 +3943,7 @@ async function partnerOrderAct(id, to){
     var o = partnerOrders.filter(function(x){ return x.id === id; })[0];
     if(o) Object.assign(o, patch);
     renderPartnerOrders();
+    if(to === 'accepted' && window.ZB) ZB.notice({ event:'move', table:'order', id:id });
     toast(to === 'done' ? 'Kòmand fini' : 'Mizajou voye bay kliyan an');
   }catch(e){ toast('Nou pa ka mete l ajou'); }
 }
@@ -4346,8 +4498,8 @@ async function findUserByEmail(mail){
 function renderPfSend(){
   var box = $('#pf-in'); if(!box) return;
   box.innerHTML =
-     '<div class="fld"><label for="sd-mail">Imel moun w ap voye a</label>'
-     + '<input type="email" id="sd-mail" placeholder="egzanp@imel.com"></div>'
+     '<div class="fld"><label for="sd-mail">Imel OSWA nimewo telefòn moun w ap voye a</label>'
+     + '<input type="text" id="sd-mail" autocomplete="off" autocapitalize="none" placeholder="egzanp@imel.com oswa +509 3712 3456"></div>'
      + '<div class="fld"><label for="sd-amt">Konbe pwen</label>'
      + '<input type="number" id="sd-amt" min="1" step="0.1" placeholder="10"></div>'
      + '<div class="fld"><label for="sd-note">Yon ti mo (fakiltatif)</label>'
@@ -4383,7 +4535,7 @@ async function sendPoints(){
   var mail = ($('#sd-mail').value||'').trim().toLowerCase();
   var amt = parseFloat($('#sd-amt').value) || 0;
   var note = ($('#sd-note').value||'').trim();
-  if(!mail){ toast('Ekri imel moun nan'); return; }
+  if(!mail){ toast('Ekri imel oswa nimewo telefòn moun nan'); return; }
   if(amt <= 0){ toast('Konbe pwen ou vle voye ?'); return; }
   if(mail === (window._me.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
   if(amt > (window._pts||0)){ toast('Ou pa gen ase pwen'); return; }
@@ -4391,17 +4543,19 @@ async function sendPoints(){
   var btn = $('#sd-go'); btn.disabled = true; btn.textContent = 'K ap voye…';
   var meUid = window._me.uid, meName = window._me.displayName || window._me.email;
   try{
-    var zt = window.ZB ? await ZB.pts('transfer_email', { to_email:mail, amount:amt, note:note }) : null;
+    var zt = window.ZB ? await ZB.pts('transfer_to', { to:mail, amount:amt, note:note }) : null;
     if(zt !== null){
       if(!zt.ok){
-        toast(zt.error === 'insufficient' ? 'Ou pa gen ase pwen' : 'Nou pa ka voye pwen yo kounye a');
+        toast(zt.error === 'insufficient' ? 'Ou pa gen ase pwen' : (zt.error === 'self' ? 'Ou pa ka voye pwen pou tèt ou' : (zt.error === 'destinataire' ? 'Imel oswa nimewo telefòn nan pa bon' : 'Nou pa ka voye pwen yo kounye a')));
         btn.disabled=false; btn.textContent='Voye pwen yo'; return;
       }
-      toast(zt.delivered ? ('Pwen voye bay ' + (zt.name||mail)) : ('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte'));
+      toast((zt.delivered ? ('Pwen voye bay ' + (zt.name||mail)) : ('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte'))
+        + (zt.notified ? (zt.notified === 'sms' ? ' · nou avèti l pa SMS' : ' · nou avèti l pa imel') : ''));
       $('#sd-mail').value=''; $('#sd-amt').value=''; $('#sd-note').value='';
       loadMyTransfers();
       btn.disabled = false; btn.textContent = 'Voye pwen yo'; return;
     }
+    if(mail.indexOf('@') < 0){ toast('Voye pa nimewo telefòn pa disponib kounye a — eseye pita oswa itilize imel la'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
     var ok = await chargePoints(amt);
     if(!ok){ toast('Ou pa gen ase pwen'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
     var dest = await findUserByEmail(mail);
@@ -4814,6 +4968,7 @@ $('#j-send').addEventListener('click', async function(){
   }
   btn.disabled = false; btn.textContent = 'Voye demann mwen';
 
+  if(saved && window.ZB) ZB.notice({ event:'application_received' });
   if(saved){
     /* Enfo ak foto yo rete sou Zetwal — yo pa pase sou WhatsApp.
        Yon administratè gade yo, epi rele pou verifye papye fizik yo. */
