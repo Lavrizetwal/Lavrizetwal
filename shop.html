@@ -28,6 +28,8 @@
   if(window.ZB) return;
   var ORIG = window.fetch.bind(window);
   var SB = null, KEY = null, FN = null, clients = [];
+  /* Clé PUBLIQUE (publishable) exigée par Supabase pour appeler les fonctions Edge. Faite pour être visible. */
+  var FNKEY = 'sb_publishable_2kZsCCv5jrAce6XIH8oxew_tTH2uL85';
   var cache = null, inflight = null, failUntil = 0;
 
   function fbUser(){
@@ -59,7 +61,7 @@
       try{
         var idt = await fbToken(u);
         var r = await ORIG(FN + '/fb-exchange', { method:'POST',
-          headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':KEY }, body:'{}' });
+          headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':FNKEY }, body:'{}' });
         if(!r.ok) throw new Error('exchange ' + r.status);
         var j = await r.json();
         if(!j || !j.token) throw new Error('exchange vide');
@@ -119,7 +121,7 @@
     var r;
     try{
       r = await ORIG(FN + '/' + fn, { method:'POST',
-        headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':KEY },
+        headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':FNKEY },
         body:JSON.stringify(body || {}) });
     }catch(e){ return { ok:false, error:'network', unknown:true }; }
     var j = {}; try{ j = await r.json(); }catch(e){}
