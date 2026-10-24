@@ -29,21 +29,35 @@
     catch(e){ return null; }
   }
 
+  var lastReload = 0;
+  /* Jeton Firebase à jour : si l'e-mail n'est pas encore vérifié, on recharge
+     le compte (au plus 1 fois / 30 s) pour voir si la personne a cliqué le lien. */
+  async function fbToken(u){
+    try{
+      if(u.email && !u.emailVerified && typeof u.reload === 'function' && Date.now() - lastReload > 30000){
+        lastReload = Date.now();
+        await u.reload();
+        if(u.emailVerified) return await u.getIdToken(true);
+      }
+    }catch(e){}
+    return u.getIdToken();
+  }
+
   async function bridgeToken(){
     var u = fbUser();
     if(!u || !FN) return null;
-    if(cache && cache.uid === u.uid && cache.exp - Date.now() > 120000) return cache.tok;
+    if(cache && cache.uid === u.uid && cache.ver === !!u.emailVerified && cache.exp - Date.now() > 120000) return cache.tok;
     if(Date.now() < failUntil) return null;
     if(inflight && inflight.uid === u.uid) return inflight.p;
     var p = (async function(){
       try{
-        var idt = await u.getIdToken();
+        var idt = await fbToken(u);
         var r = await ORIG(FN + '/fb-exchange', { method:'POST',
           headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':KEY }, body:'{}' });
         if(!r.ok) throw new Error('exchange ' + r.status);
         var j = await r.json();
         if(!j || !j.token) throw new Error('exchange vide');
-        cache = { uid:u.uid, tok:j.token, exp:Date.now() + (j.expires_in || 3600) * 1000 };
+        cache = { uid:u.uid, ver:!!u.emailVerified, tok:j.token, exp:Date.now() + (j.expires_in || 3600) * 1000 };
         clients.forEach(function(c){ try{ c.realtime.setAuth(j.token); }catch(e){} });
         return j.token;
       }catch(e){ failUntil = Date.now() + 30000; return null; }
@@ -95,7 +109,7 @@
   async function call(fn, body){
     var u = fbUser();
     if(!u || !FN) return { ok:false, error:'login' };
-    var idt; try{ idt = await u.getIdToken(); }catch(e){ return { ok:false, error:'login' }; }
+    var idt; try{ idt = await fbToken(u); }catch(e){ return { ok:false, error:'login' }; }
     var r;
     try{
       r = await ORIG(FN + '/' + fn, { method:'POST',
@@ -157,7 +171,14 @@
     return false;
   }
 
-  window.ZB = { token:bridgeToken, call:call, pts:pts, spend:spend, available:available,
+  /* notice(args) : demande au serveur d'envoyer une notification (e-mail ou SMS) pour un événement
+     (linge prêt, commande acceptée…). Le serveur revérifie tout ; renvoie null si indisponible. */
+  async function notice(args){
+    try{ if(!(await available())) return null; return await call('zpoints', Object.assign({ op:'notice' }, args || {})); }
+    catch(e){ return null; }
+  }
+
+  window.ZB = { token:bridgeToken, call:call, pts:pts, spend:spend, available:available, notice:notice,
     fnUrl:function(){ return FN; }, key:function(){ return KEY; } };
 })();
 </script>
@@ -1536,6 +1557,33 @@ tbody tr:last-child td{border-bottom:none}
     </section>
 
     <!-- ═════ PAIEMENTS EN LIQUIDE ═════ -->
+    <section class="panel" id="tab-broadcast">
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="send"></span> Messages Zetwal — e-mail / SMS</h3></div>
+        <p class="card-sub">Envoyez un message à une personne ou à un groupe. Chaque personne le reçoit <b>par e-mail</b> si elle en a un (Google, Facebook, e-mail), sinon <b>par SMS</b> (inscription par téléphone). Les SMS sont payants : comptez d'abord les destinataires.</p>
+        <div class="toolbar" style="flex-wrap:wrap;gap:10px">
+          <select id="bc-aud" class="input" onchange="bcAud()">
+            <option value="one">Une personne</option><option value="all">Tous les comptes connus</option>
+            <option value="drivers">Chauffeurs actifs</option><option value="partners">Partenaires actifs</option>
+          </select>
+          <input type="text" id="bc-to" class="input" placeholder="E-mail, numéro (+509…) ou identifiant" style="min-width:240px">
+          <select id="bc-ch" class="input">
+            <option value="auto">Canal : automatique</option><option value="email">E-mail seulement</option><option value="sms">SMS seulement</option>
+          </select>
+        </div>
+        <div class="fld" style="margin-top:12px"><label for="bc-sub">Objet (titre de l'e-mail, début du SMS)</label>
+          <input type="text" id="bc-sub" class="input" maxlength="120" placeholder="Ex. : Promotion ce samedi"></div>
+        <div class="fld" style="margin-top:10px"><label for="bc-txt">Message <span id="bc-cnt" style="color:var(--muted)">0 / 600</span></label>
+          <textarea id="bc-txt" class="input" rows="5" maxlength="600" oninput="bcCount()" placeholder="Écrivez votre message…"></textarea></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center">
+          <button class="btn btn-ghost" onclick="bcPreview()">Compter les destinataires</button>
+          <button class="btn btn-gold" id="bc-go" onclick="bcSend()">Envoyer</button>
+          <span id="bc-res" style="font-size:.8rem;color:var(--muted)"></span>
+        </div>
+        <p class="card-sub" style="margin-top:14px">Limites : 300 destinataires par envoi, 3 envois de groupe par heure. Le message est signé « — Zetwal ».</p>
+      </div>
+    </section>
+
     <section class="panel" id="tab-cashpay">
       <div class="card">
         <div class="card-head">
@@ -2143,6 +2191,7 @@ const NAV=[
   ]},
   {g:'Réglages', items:[
     {id:'profils',label:'Pwofil & Mesaj',icon:'user'},
+    {id:'broadcast',label:'Messages e-mail / SMS',icon:'send'},
     {id:'transfers',label:'Transactions de points',icon:'swap'},
     {id:'pointasks',label:'Demann pwen',icon:'send'},
     {id:'points',label:'Points clients',icon:'trophy'},
@@ -2168,6 +2217,7 @@ const TAB_META={
   move:{t:'Courses & commandes',s:'Taxi, nourriture et paquets'},
   transfers:{t:'Transactions de points',s:'Envois, ventes en magasin et paiements Shop'},
   cashpay:{t:'Paiements en liquide',s:'Commandes Shop payées en espèces'},
+  broadcast:{t:'Messages Zetwal',s:'E-mail ou SMS à une personne ou un groupe'},
   qrlabels:{t:'Étiquettes QR',s:'Imprimer les étiquettes des produits'},
   pointasks:{t:'Demann pwen',s:'Les clients demandent, vous décidez'},
   profils:{t:'Pwofil & Mesaj',s:'Sécurité — consultation des profils et conversations'},
@@ -2240,6 +2290,7 @@ window.switchTab = (name)=>{
   if(name==='move')          loadMove();
   if(name==='transfers')     loadTransfers();
   if(name==='cashpay')       loadCashPay();
+  if(name==='broadcast')     bcAud();
   if(name==='qrlabels')      { loadProducts().then(renderLabels); renderLabels(); }
   if(name==='pointasks')     loadPointAsks();
   if(name==='profils')       initProfilSearch();
@@ -2960,11 +3011,53 @@ window.filterWash=()=>{
     return (!q||r.customer_name?.toLowerCase().includes(q)||ph.includes(q))&&(!st||rs===st);
   }));
 };
+
+/* ═══ MESSAGES ZETWAL (e-mail / SMS) + notifications d'événements ═══ */
+async function zNotice(args,who){
+  try{
+    if(!window.ZB) return;
+    const r=await ZB.notice(args); if(!r) return;
+    if(r.sent) toast((who||'Client')+' prévenu par '+(r.channel==='sms'?'SMS':'e-mail'),'success');
+    else if(r.reason==='no_contact') toast((who||'Client')+' non prévenu : aucun e-mail ni numéro connu','info');
+    else if(r.reason==='failed') toast('Message non envoyé (service e-mail/SMS)','error');
+  }catch(e){}
+}
+window.zNotice=zNotice;
+window.bcAud=()=>{ const one=document.getElementById('bc-aud').value==='one'; const t=document.getElementById('bc-to'); if(t) t.style.display=one?'':'none'; };
+window.bcCount=()=>{ const v=document.getElementById('bc-txt').value.length; document.getElementById('bc-cnt').textContent=v+' / 600'; };
+async function bcCall(preview){
+  const body={audience:document.getElementById('bc-aud').value,to:(document.getElementById('bc-to').value||'').trim(),
+    channel:document.getElementById('bc-ch').value,subject:(document.getElementById('bc-sub').value||'').trim(),
+    text:(document.getElementById('bc-txt').value||'').trim(),preview:!!preview};
+  if(!window.ZB) return {ok:false,error:'unavailable'};
+  const r=await ZB.pts('broadcast',body);
+  return r===null?{ok:false,error:'unavailable'}:r;
+}
+const BC_ERR={unavailable:"Le serveur de messages n'est pas déployé (fonction zpoints).",no_recipient:'Aucun destinataire joignable avec ce canal.',
+  too_many:'Plus de 300 destinataires : choisissez un groupe plus petit.',too_often:'Maximum 3 envois de groupe par heure.',message:'Objet et message obligatoires.',
+  audience:'Groupe inconnu.',login:'Reconnectez-vous.',server:'Erreur du serveur.'};
+window.bcPreview=async()=>{
+  const out=document.getElementById('bc-res'); out.textContent='Calcul…';
+  const r=await bcCall(true);
+  out.textContent=r.ok?(r.email+' e-mail(s) · '+r.sms+' SMS · '+r.skipped+' sans contact'):(BC_ERR[r.error]||('Erreur : '+r.error));
+};
+window.bcSend=async()=>{
+  const out=document.getElementById('bc-res'), btn=document.getElementById('bc-go');
+  if(!(document.getElementById('bc-sub').value||'').trim()||!(document.getElementById('bc-txt').value||'').trim()){ out.textContent=BC_ERR.message; return; }
+  const pv=await bcCall(true);
+  if(!pv.ok){ out.textContent=BC_ERR[pv.error]||('Erreur : '+pv.error); return; }
+  if(!confirm('Envoyer ce message à '+pv.email+' e-mail(s) et '+pv.sms+' SMS (payants) ?')) return;
+  btn.disabled=true; out.textContent='Envoi…';
+  const r=await bcCall(false);
+  btn.disabled=false;
+  if(r.ok){ out.textContent='Envoyé : '+r.sent.email+' e-mail(s), '+r.sent.sms+' SMS'+(r.failed?(' · '+r.failed+' échec(s)'):''); toast('Message envoyé','success'); }
+  else out.textContent=BC_ERR[r.error]||('Erreur : '+r.error);
+};
 window.updateWashStatus=async(id,status)=>{
   const rec=allWashRecords.find(r=>r.id===id); if(!rec) return;
   const {error}=await db.from('wash_records').update({status,details:{...(rec.details||{}),status}}).eq('id',id);
   if(error){toast('Mise à jour impossible : '+error.message,'error');return;}
-  toast('Statut mis à jour','success'); await loadWashRecords();
+  toast('Statut mis à jour','success'); if(status==='ready') zNotice({event:'wash',id:id},'Client'); await loadWashRecords();
 };
 window.deleteWashRecord=async(id)=>{
   if(!confirm('Supprimer cette fiche ?')) return;
@@ -3312,7 +3405,7 @@ window.acceptOrder=async(id)=>{
   if(o.client_email) await createNotification('order_accepted','Commande acceptée — '+o.product_name,
     'Votre commande de '+o.quantity+' unité(s) est acceptée. Prix estimé : '+fmtP(o.total_estimated)+' HTG',
     'client:'+o.client_email,{order_id:id});
-  toast('Commande acceptée, le client est informé','success');
+  toast('Commande acceptée, le client est informé','success'); zNotice({event:'order',id:id},'Client');
   await loadOrders();
 };
 window.refuseOrder=async(id)=>{
@@ -3322,7 +3415,7 @@ window.refuseOrder=async(id)=>{
   if(error){toast('Mise à jour impossible : '+error.message,'error');return;}
   if(o.client_email) await createNotification('order_refused','Commande refusée — '+o.product_name,
     reason||"Cette commande n'a pas pu être acceptée.",'client:'+o.client_email,{order_id:id});
-  toast('Commande refusée','info');
+  toast('Commande refusée','info'); zNotice({event:'order',id:id},'Client');
   await loadOrders();
 };
 window.deleteOrder=async(id)=>{
@@ -3947,6 +4040,7 @@ async function mvPatch(t,id,patch){
     const arr = t==='ride'?mvRides:mvOrders;
     const row = arr.find(x=>x.id===id); if(row) Object.assign(row,patch);
     renderMove();
+    if(patch.status==='accepted') zNotice({event:'move',table:t,id:id},'Client');
     return true;
   }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); return false; }
 }
@@ -4634,6 +4728,7 @@ window.apApprove=async(id)=>{
       status:'approved', partner_id:partnerId, reviewed_at:new Date().toISOString()
     }).eq('id',id);
     if(e2) throw e2;
+    zNotice({event:'application',id:id},'Candidat');
     Object.assign(a,{status:'approved',partner_id:partnerId});
     renderApps();
   }catch(e){ toast('Acceptation impossible : '+rlsHint(e),'error'); }
@@ -4646,6 +4741,7 @@ window.apReject=async(id)=>{
       status:'rejected', admin_note:(why||'').trim()||null, reviewed_at:new Date().toISOString()
     }).eq('id',id);
     if(error) throw error;
+    zNotice({event:'application',id:id},'Candidat');
     const a=apRows.find(x=>x.id===id); if(a) Object.assign(a,{status:'rejected',admin_note:why});
     renderApps(); toast('Demande refusée','success');
   }catch(e){ toast('Refus impossible : '+rlsHint(e),'error'); }
@@ -4838,14 +4934,14 @@ function renderTransfers(){
     const who=(n,e)=>escH(n||e||'—')+(n&&e?'<div style="font-size:.68rem;color:var(--muted);font-weight:400">'+escH(e)+'</div>':'');
     const cells=[
       ['Compte envoyeur',who(t.from_name,t.from_email)],
-      ['Compte receveur',who(t.to_name,t.to_email)]
+      ['Compte receveur',who(t.to_name,t.to_email||t.to_phone)]
     ];
     if(t.kind==='store_sale') cells.push(['Admin / employé qui a encaissé',who(t.operator_name,t.operator_email)]);
     if(t.htg_amount!=null&&t.htg_amount!=='') cells.push(['Valeur',fmtP(t.htg_amount)+' HTG']);
     cells.push(['Date',txDate(t.created_at)]);
     if(t.order_id) cells.push(['Commande Shop','#'+String(t.order_id).replace(/-/g,'').slice(0,8).toUpperCase()]);
     return '<div class="mv"><div class="mv-h"><div><div class="mv-t"><span class="tx-badge '+K.c+'">'+K.t+'</span>'
-      +escH(t.from_name||t.from_email||'—')+' → '+escH(t.to_name||t.to_email||'—')+'</div>'
+      +escH(t.from_name||t.from_email||'—')+' → '+escH(t.to_name||t.to_email||t.to_phone||'—')+'</div>'
       +'<div class="mv-s">'+txDate(t.created_at)+'</div></div>'
       +'<div class="mv-p">'+fmtP(t.amount)+' pwen</div></div>'
       +'<div class="mv-g">'+cells.map(c=>'<div class="mv-c"><div class="mv-k">'+c[0]+'</div><div class="mv-v">'+c[1]+'</div></div>').join('')+'</div>'
@@ -4856,7 +4952,7 @@ function renderTransfers(){
 }
 function txExport(){
   const list=txFiltered(); if(!list.length){ toast('Rien à exporter','info'); return; }
-  const cols=['created_at','kind','from_name','from_email','to_name','to_email','operator_name','operator_email','amount','htg_amount','order_id','note'];
+  const cols=['created_at','kind','from_name','from_email','to_name','to_email','to_phone','operator_name','operator_email','amount','htg_amount','order_id','note'];
   const esc=v=>{ v=(v==null?'':String(v)); return /[",;\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
   const csv='﻿'+cols.join(';')+'\n'+list.map(t=>cols.map(c=>esc(t[c])).join(';')).join('\n');
   const a=document.createElement('a');
@@ -4946,6 +5042,7 @@ async function cpPatch(id,patch,okMsg){
     const {error}=await db.from('move_orders').update(patch).eq('id',id);
     if(error) throw error;
     Object.assign(o,patch); cpArmed=null; renderCashPay(); cpBadge(); toast(okMsg,'success');
+    if(patch.status==='accepted') zNotice({event:'move',table:'order',id:id},'Client');
   }catch(e){
     toast('Mise à jour impossible : '+((e&&e.message)||e)+' — exécutez zetwal-paiement.sql si ce n\'est pas fait','error');
   }
