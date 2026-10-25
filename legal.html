@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Conditions d'utilisation et confidentialité — Zetwal</title>
+<meta name="description" content="Conditions d'utilisation et politique de confidentialité de la plateforme Zetwal (Lavri, Shop, Kòmand, Jwèt, points).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050505; --bg-2:#0A0A0A; --bg-3:#101010;
+  --gold:#D4AF37; --gold-lt:#F0D98A;
+  --g-08:rgba(212,175,55,.08); --g-14:rgba(212,175,55,.14); --g-45:rgba(212,175,55,.45);
+  --ink:#fff; --ink-2:rgba(255,255,255,.72); --ink-3:rgba(255,255,255,.48); --line:rgba(255,255,255,.1);
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Montserrat',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.75;font-size:.95rem;-webkit-font-smoothing:antialiased}
+a{color:var(--gold);text-decoration-color:var(--g-45);text-underline-offset:3px}
+a:hover{color:var(--gold-lt)}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px}
+header.top{position:sticky;top:0;z-index:20;background:rgba(5,5,5,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:62px}
+.brand{font-family:var(--serif);font-size:1.15rem;letter-spacing:3px;font-weight:700;color:var(--ink);text-decoration:none}
+.brand em{font-style:normal;color:var(--gold)}
+.back{font-size:.7rem;letter-spacing:1.4px;text-transform:uppercase;font-weight:500;text-decoration:none;color:var(--ink-2);border:1px solid var(--line);padding:9px 14px;border-radius:99px}
+.back:hover{color:var(--gold);border-color:var(--g-45)}
+.hero{padding:44px 0 18px}
+.hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(1.9rem,6vw,2.7rem);line-height:1.15}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p{color:var(--ink-3);font-size:.78rem;margin-top:10px;letter-spacing:.4px}
+.tabs{display:flex;gap:8px;margin:22px 0 4px;border-bottom:1px solid var(--line)}
+.tab{appearance:none;background:none;border:0;color:var(--ink-3);font:500 .78rem var(--sans);letter-spacing:1.2px;text-transform:uppercase;padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--gold);border-bottom-color:var(--gold)}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.doc{display:none;padding:26px 0 30px}
+.doc.on{display:block}
+.sum{background:var(--g-08);border:1px solid var(--g-14);border-radius:14px;padding:18px 20px;margin-bottom:28px}
+.sum h2{font-family:var(--serif);font-size:1.15rem;color:var(--gold);margin-bottom:8px;font-weight:600}
+.sum ul{padding-left:18px;color:var(--ink-2);font-size:.86rem}
+.sum li{margin:4px 0}
+.toc{border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin-bottom:30px;background:var(--bg-2)}
+.toc b{display:block;font:600 .68rem var(--sans);letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+.toc ol{padding-left:20px;columns:2;column-gap:28px;font-size:.82rem}
+.toc li{margin:3px 0;break-inside:avoid}
+.toc a{color:var(--ink-2);text-decoration:none}
+.toc a:hover{color:var(--gold)}
+h2.s{font-family:var(--serif);font-weight:600;font-size:1.45rem;margin:34px 0 8px;color:var(--ink);scroll-margin-top:80px}
+h2.s span{color:var(--gold);margin-right:8px}
+h3{font:600 .8rem var(--sans);letter-spacing:1px;text-transform:uppercase;color:var(--gold-lt);margin:18px 0 4px}
+p,li{color:var(--ink-2)}
+p{margin:8px 0}
+ul.l,ol.l{padding-left:22px;margin:8px 0}
+ul.l li,ol.l li{margin:5px 0}
+b,strong{font-weight:600;color:var(--ink)}
+.todo{background:rgba(255,200,0,.16);color:#FFD966;border:1px dashed rgba(255,200,0,.5);padding:0 6px;border-radius:5px;font-weight:500;font-size:.88em}
+.note{border-left:3px solid var(--gold);background:var(--bg-3);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0;font-size:.88rem}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem}
+th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;color:var(--ink-2)}
+th{background:var(--bg-3);color:var(--ink);font-weight:600}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+footer{border-top:1px solid var(--line);padding:30px 0 50px;text-align:center;color:var(--ink-3);font-size:.72rem;letter-spacing:.6px}
+footer .brand{font-size:.95rem}
+@media(max-width:640px){body{font-size:.92rem}.toc ol{columns:1}.hero{padding-top:30px}.tab{padding:12px 10px;font-size:.7rem}}
+@media print{header.top,.tabs,.back,footer{display:none}body{background:#fff;color:#000}p,li,td,th,.toc a{color:#000}.doc{display:block!important;page-break-after:always}h2.s,h3,.sum h2{color:#000}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./">ZET<em>WAL</em></a>
+  <a class="back" href="./">&larr; Retounen sou Zetwal</a>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Règles de la <em>plateforme</em></h1>
+    <p>Dernière mise à jour : 25 octobre 2026 &nbsp;·&nbsp; Version en vigueur : 1.0</p>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Documents">
+    <button class="tab" role="tab" id="t-cgu" aria-controls="cgu" aria-selected="true" data-doc="cgu">Conditions d'utilisation</button>
+    <button class="tab" role="tab" id="t-conf" aria-controls="confidentialite" aria-selected="false" data-doc="confidentialite">Confidentialité</button>
+  </div>
+
+<!-- ═══════════════════ CONDITIONS D'UTILISATION ═══════════════════ -->
+<article class="doc on" id="cgu" role="tabpanel" aria-labelledby="t-cgu">
+  <div class="sum">
+    <h2>Rezime nan kreyòl</h2>
+    <ul>
+      <li>Zetwal se yon platfòm ki rasanble sèvis: lavri (lesiv), boutik (Shop), kous ak livrezon (Kòmand) ak jwèt.</li>
+      <li>Pwen Zetwal sèvi sèlman sou Zetwal. Yo pa lajan, yo pa ka chanje an lajan, e yo pa ka ranbouse sof si gen erè.</li>
+      <li>Chofè ak patnè yo se moun endepandan: Zetwal mete w an kontak ak yo.</li>
+      <li>Pa fè fwod, pa pran plizyè kont, pa abize kòd QR yo. Nou ka sispann yon kont ki pa respekte règ yo.</li>
+      <li>Tèks ofisyèl la se vèsyon franse a ki anba a.</li>
+    </ul>
+  </div>
+
+  <nav class="toc" aria-label="Sommaire"><b>Sommaire</b><ol>
+    <li><a href="#c1">Qui sommes-nous, objet</a></li>
+    <li><a href="#c2">Acceptation et modifications</a></li>
+    <li><a href="#c3">Compte et accès</a></li>
+    <li><a href="#c4">Les points Zetwal</a></li>
+    <li><a href="#c5">Lavri (laverie)</a></li>
+    <li><a href="#c6">Shop (boutique)</a></li>
+    <li><a href="#c7">Kòmand (courses, commandes, colis)</a></li>
+    <li><a href="#c8">Chauffeurs et partenaires</a></li>
+    <li><a href="#c9">Jwèt (jeux)</a></li>
+    <li><a href="#c10">Comportements interdits</a></li>
+    <li><a href="#c11">Messages et notifications</a></li>
+    <li><a href="#c12">Propriété intellectuelle</a></li>
+    <li><a href="#c13">Responsabilité</a></li>
+    <li><a href="#c14">Suspension et fermeture</a></li>
+    <li><a href="#c15">Droit applicable, litiges</a></li>
+    <li><a href="#c16">Contact</a></li>
+  </ol></nav>
+
+  <h2 class="s" id="c1"><span>1.</span>Qui sommes-nous, objet</h2>
+  <p>Le site <b>zetwal.org</b> et ses pages (Akey, Lavri, Shop, Kòmand, Jwèt) forment la plateforme <b>Zetwal</b>, exploitée par <b>Zetwal Organisation</b>, <span class="todo">À COMPLÉTER : forme juridique, NIF, numéro de patente, adresse à Haïti</span> (« <b>Zetwal</b> », « nous »).</p>
+  <p>Les présentes conditions encadrent l'utilisation de la plateforme par toute personne qui l'utilise (« <b>vous</b> », « l'<b>utilisateur</b> »), qu'elle soit cliente, chauffeure, partenaire ou simple visiteuse.</p>
+
+  <h2 class="s" id="c2"><span>2.</span>Acceptation et modifications</h2>
+  <p>En créant un compte ou en utilisant un service, vous acceptez ces conditions et notre <a href="#confidentialite" data-go="confidentialite">politique de confidentialité</a>. Si vous n'êtes pas d'accord, n'utilisez pas la plateforme.</p>
+  <p>Nous pouvons modifier ces conditions (nouveau service, changement de la loi, correction). La date de mise à jour figure en haut de cette page. Pour un changement important, nous vous en informons dans la plateforme ou par message. Continuer à utiliser Zetwal après la mise à jour vaut acceptation.</p>
+
+  <h2 class="s" id="c3"><span>3.</span>Compte et accès</h2>
+  <ul class="l">
+    <li><b>Âge.</b> La plateforme est réservée aux personnes de 18 ans révolus. Un mineur ne peut l'utiliser qu'avec l'accord et sous la responsabilité d'un parent ou tuteur.</li>
+    <li><b>Inscription.</b> Vous pouvez vous inscrire avec Google, Facebook, une adresse e-mail et un mot de passe, ou un numéro de téléphone (code reçu par SMS). Les informations données doivent être exactes et à jour.</li>
+    <li><b>Un compte par personne.</b> Les comptes sont personnels. Ne partagez pas votre accès. Vous êtes responsable de ce qui se fait avec votre compte.</li>
+    <li><b>Sécurité.</b> Si vous pensez que votre compte est utilisé par quelqu'un d'autre, changez votre mot de passe, déconnectez-vous et prévenez-nous sans attendre.</li>
+    <li><b>Déconnexion.</b> Vous pouvez vous déconnecter à tout moment depuis n'importe quelle page.</li>
+  </ul>
+
+  <h2 class="s" id="c4"><span>4.</span>Les points Zetwal</h2>
+  <div class="note">Les points sont un <b>crédit d'usage interne à Zetwal</b>. Ils ne sont ni de la monnaie, ni un dépôt bancaire, ni un produit d'épargne ou d'investissement.</div>
+  <ul class="l">
+    <li><b>Utilisation.</b> Les points servent à payer ou réduire le prix de services et d'achats sur Zetwal, selon les offres affichées. Le taux et les conditions peuvent changer ; ceux affichés au moment de l'opération s'appliquent.</li>
+    <li><b>Obtention.</b> Vous pouvez recevoir des points par achat en magasin (paiement en espèces à un point de vente Zetwal), par cadeau d'un autre utilisateur, par transfert ou QR code, par récompense (jeux, offres) ou par ajustement décidé par Zetwal.</li>
+    <li><b>Aucune valeur en argent.</b> Les points ne se changent pas en espèces et ne se retirent pas. Ils ne se transmettent pas hors de Zetwal et ne peuvent pas être vendus ou échangés contre de l'argent entre utilisateurs.</li>
+    <li><b>Remboursement.</b> Les points déjà acquis ne sont pas remboursables. Exceptions : erreur de notre part, opération annulée ou refusée, ou annulation dans le délai prévu par la plateforme (par exemple, annulation rapide d'un paiement par points). Dans ces cas, les points sont recrédités.</li>
+    <li><b>Envoi de points.</b> Vous pouvez envoyer des points à une autre personne, par QR code, par adresse e-mail ou par numéro de téléphone. Vérifiez le destinataire avant d'envoyer : <b>un envoi confirmé ne peut pas être repris</b> par Zetwal, sauf cas de fraude ou d'erreur technique prouvée. Si le destinataire n'a pas encore de compte, les points l'attendent jusqu'à ce qu'il en crée un avec ce contact vérifié.</li>
+    <li><b>QR codes.</b> Un QR code de points ne sert qu'une fois. Ne le partagez qu'avec la personne à qui vous voulez donner les points.</li>
+    <li><b>Correction et annulation.</b> Nous pouvons corriger ou retirer des points obtenus par erreur, bug, fraude ou violation de ces règles, après vérification.</li>
+    <li><b>Durée.</b> <span class="todo">À COMPLÉTER : durée de validité éventuelle des points ou « sans limite tant que le compte est actif »</span></li>
+    <li><b>Évolution.</b> Les règles des points peuvent évoluer, notamment pour respecter la réglementation haïtienne sur les paiements et la monnaie électronique. Nous vous informerons des changements qui vous touchent.</li>
+  </ul>
+
+  <h2 class="s" id="c5"><span>5.</span>Lavri (laverie)</h2>
+  <ul class="l">
+    <li><b>Dépôt.</b> Lors du dépôt, une fiche est créée à votre nom avec votre numéro de téléphone. Vérifiez qu'elle est exacte ; c'est à ce numéro que vous serez prévenu(e) quand votre linge est prêt.</li>
+    <li><b>Prix et délais.</b> Les prix et les délais sont ceux affichés ou convenus au dépôt. Un délai est une estimation.</li>
+    <li><b>Linge prêt.</b> Quand votre linge est prêt, nous vous envoyons un message (e-mail ou SMS). Le linge doit être retiré dans un délai de <span class="todo">À COMPLÉTER : nombre de jours</span>. Passé ce délai, des frais de garde peuvent s'appliquer <span class="todo">À COMPLÉTER</span>.</li>
+    <li><b>Linge perdu ou abîmé.</b> Signalez tout problème dès le retrait. Notre responsabilité est limitée à <span class="todo">À COMPLÉTER : barème (par exemple un multiple du prix du lavage, plafond en HTG)</span>, sauf faute grave de notre part. Ne confiez pas d'objets de valeur, d'argent ni de documents dans vos vêtements.</li>
+    <li><b>Instructions.</b> Indiquez toute consigne particulière (couleurs fragiles, tissu délicat). Nous ne répondons pas des dégâts dus à l'étiquette manquante ou à une consigne non signalée.</li>
+  </ul>
+
+  <h2 class="s" id="c6"><span>6.</span>Shop (boutique)</h2>
+  <ul class="l">
+    <li><b>Offres.</b> Les produits, prix (en gourdes, HTG) et stocks sont ceux affichés. Un produit peut devenir indisponible ; une erreur de prix évidente peut être corrigée avant confirmation.</li>
+    <li><b>Commande.</b> Une commande n'est ferme qu'après <b>acceptation par Zetwal</b> (vous êtes prévenu(e)). Zetwal peut la refuser, par exemple si le produit n'est plus disponible.</li>
+    <li><b>Paiement.</b> Par points, ou en espèces au retrait ou à la livraison, selon l'option choisie. Une commande payée en espèces est confirmée après réception du paiement.</li>
+    <li><b>Retrait et livraison.</b> Retrait au magasin ou livraison aux frais affichés. Vérifiez votre commande à la réception.</li>
+    <li><b>Retours et remboursements.</b> <span class="todo">À COMPLÉTER : délai de réclamation, produits non repris, mode de remboursement (points ou espèces)</span></li>
+  </ul>
+
+  <h2 class="s" id="c7"><span>7.</span>Kòmand (courses, commandes, colis)</h2>
+  <ul class="l">
+    <li><b>Rôle de Zetwal.</b> Kòmand met en relation les clients avec des <b>chauffeurs, livreurs et restaurants ou commerces partenaires indépendants</b>. Le transport, la préparation et la livraison sont réalisés par ces prestataires, pas par Zetwal, sauf indication contraire.</li>
+    <li><b>Demande et acceptation.</b> Une course ou commande n'est ferme que lorsqu'un chauffeur ou un partenaire l'accepte ; vous êtes alors prévenu(e). Le prix estimé peut varier selon la distance, l'attente ou les options.</li>
+    <li><b>Attente et annulation.</b> Après un temps d'attente gratuit, des frais d'attente peuvent s'appliquer et être déduits du paiement du chauffeur ou ajoutés au prix, comme indiqué dans l'application. <span class="todo">À COMPLÉTER : règles d'annulation par le client</span></li>
+    <li><b>Transport d'enfants.</b> Le client est responsable de l'exactitude des informations fournies (nom de l'enfant, adresse, personne autorisée). L'enfant n'est remis qu'à la personne autorisée qui donne le <b>code de remise</b> prévu. Ne communiquez ce code qu'à cette personne.</li>
+    <li><b>Colis et repas.</b> Il est interdit d'envoyer des produits illégaux ou dangereux. Le client décrit honnêtement le colis. Pour les repas, la qualité et l'hygiène relèvent du restaurant partenaire.</li>
+    <li><b>Suivi et position.</b> Pour suivre la course, la plateforme peut utiliser la position du chauffeur pendant la course, et la vôtre si vous la partagez (voir la politique de confidentialité).</li>
+    <li><b>Paiement.</b> Par points ou en espèces au chauffeur ou au partenaire, selon l'option affichée.</li>
+  </ul>
+
+  <h2 class="s" id="c8"><span>8.</span>Chauffeurs et partenaires</h2>
+  <ul class="l">
+    <li><b>Candidature.</b> Pour devenir chauffeur, livreur ou partenaire, vous remplissez un formulaire avec des informations personnelles et des documents (par exemple pièce d'identité, permis, véhicule, patente). Elles doivent être exactes. Nous examinons la demande et pouvons l'accepter ou la refuser, sans obligation de motif détaillé ; vous êtes prévenu(e) de la décision.</li>
+    <li><b>Statut indépendant.</b> Un chauffeur ou partenaire agit en son nom, à son compte. Il n'est pas salarié de Zetwal, sauf contrat écrit contraire.</li>
+    <li><b>Obligations légales.</b> Vous êtes seul responsable d'avoir les autorisations requises par la loi haïtienne (permis de conduire valide, carte d'immatriculation, assurance, taxes, autorisations d'activité). Zetwal peut demander des justificatifs et suspendre l'accès s'ils manquent.</li>
+    <li><b>Conduite.</b> Respecter les clients et le Code de la route, conduire en sécurité, ne pas transporter plus de personnes que prévu, ne pas conduire sous l'emprise d'alcool ou de drogues.</li>
+    <li><b>Rémunération.</b> La rémunération et ses modalités (points, espèces, commission de Zetwal) sont celles affichées dans l'application. <span class="todo">À COMPLÉTER : conversion des points gagnés en paiement, calendrier</span></li>
+  </ul>
+
+  <h2 class="s" id="c9"><span>9.</span>Jwèt (jeux)</h2>
+  <p>Les jeux de la plateforme sont des divertissements. Les points qu'ils peuvent donner suivent la section 4 : ils n'ont pas de valeur en argent. Les jeux ne sont pas des jeux d'argent et il n'y a pas de mise en argent. Tricher (bots, failles, comptes multiples) est interdit et peut entraîner le retrait des gains et la suspension du compte.</p>
+
+  <h2 class="s" id="c10"><span>10.</span>Comportements interdits</h2>
+  <ul class="l">
+    <li>Fraude, usurpation d'identité, fausses informations, faux paiements ou fausses réclamations.</li>
+    <li>Créer plusieurs comptes pour obtenir des avantages, ou utiliser un compte qui n'est pas le vôtre.</li>
+    <li>Abuser des QR codes, des transferts ou de la messagerie (spam, harcèlement, menaces, contenus illégaux).</li>
+    <li>Tenter d'accéder à des données qui ne sont pas les vôtres, de contourner la sécurité, de perturber ou de copier la plateforme (analyse automatisée, extraction de données, attaque).</li>
+    <li>Utiliser Zetwal pour des activités illégales, notamment le blanchiment d'argent.</li>
+  </ul>
+  <p>Zetwal peut signaler les faits graves aux autorités compétentes.</p>
+
+  <h2 class="s" id="c11"><span>11.</span>Messages et notifications</h2>
+  <p>Selon votre mode d'inscription, nous vous écrivons par <b>e-mail</b> (Google, e-mail, Facebook avec e-mail) ou par <b>SMS</b> (inscription par téléphone). Ces messages de service concernent par exemple : votre linge prêt, votre commande acceptée ou refusée, votre course acceptée, l'état de votre candidature, la réception de points.</p>
+  <p>Zetwal peut aussi vous envoyer des messages d'information ou promotionnels. Vous pouvez demander à ne plus les recevoir en nous écrivant (section 16). Les messages de service nécessaires à l'exécution d'une opération restent envoyés. Les frais éventuels de réception de SMS selon votre opérateur restent à votre charge.</p>
+
+  <h2 class="s" id="c12"><span>12.</span>Propriété intellectuelle</h2>
+  <p>Le nom Zetwal, le logo, le design, les textes, les images et le code de la plateforme appartiennent à Zetwal ou à leurs titulaires et sont protégés. Vous recevez un droit personnel, non exclusif et non transférable d'utiliser la plateforme. Toute copie ou réutilisation sans accord écrit est interdite. Les contenus que vous publiez (photo de profil, messages) restent à vous, mais vous nous autorisez à les afficher pour faire fonctionner le service.</p>
+
+  <h2 class="s" id="c13"><span>13.</span>Responsabilité</h2>
+  <ul class="l">
+    <li>Nous faisons de notre mieux pour que la plateforme soit disponible et fiable, mais nous ne garantissons pas l'absence d'interruption ou d'erreur (maintenance, coupure d'électricité ou d'Internet, panne d'un fournisseur).</li>
+    <li>Zetwal n'est pas responsable des services rendus par les chauffeurs et partenaires indépendants, sauf faute de notre part dans l'organisation de la mise en relation.</li>
+    <li>Dans la limite permise par la loi, notre responsabilité est limitée aux dommages directs et prouvés, et ne dépasse pas, pour une opération donnée, <span class="todo">À COMPLÉTER : plafond (par exemple le prix payé pour l'opération)</span>.</li>
+    <li>Rien dans ces conditions n'exclut une responsabilité qui ne peut pas l'être selon la loi (faute lourde ou intentionnelle, dommage corporel).</li>
+    <li>Un cas de force majeure (catastrophe, troubles, coupure générale) peut suspendre nos obligations.</li>
+  </ul>
+
+  <h2 class="s" id="c14"><span>14.</span>Suspension et fermeture</h2>
+  <p>Nous pouvons suspendre ou fermer un compte qui ne respecte pas ces conditions, après avertissement lorsque c'est possible, immédiatement en cas de fraude ou de danger. Les points obtenus de façon irrégulière peuvent être retirés. Vous pouvez demander la fermeture de votre compte à tout moment (section 16) ; les points restants n'étant pas remboursables, utilisez-les ou transférez-les avant. Certaines données sont conservées si la loi l'exige (voir la politique de confidentialité).</p>
+
+  <h2 class="s" id="c15"><span>15.</span>Droit applicable, litiges</h2>
+  <p>Ces conditions sont régies par le <b>droit haïtien</b>. En cas de difficulté, contactez-nous d'abord : nous cherchons une solution amiable. À défaut, les tribunaux compétents de <span class="todo">À COMPLÉTER : juridiction, par exemple Port-au-Prince</span> sont saisis. Si une clause est jugée invalide, les autres restent applicables.</p>
+
+  <h2 class="s" id="c16"><span>16.</span>Contact</h2>
+  <p>Pour toute question, réclamation ou demande (compte, points, données, désabonnement) : <span class="todo">À COMPLÉTER : e-mail de contact</span> — <span class="todo">À COMPLÉTER : WhatsApp / téléphone</span> — <span class="todo">À COMPLÉTER : adresse</span>.</p>
+</article>
+
+<!-- ═══════════════════ CONFIDENTIALITÉ ═══════════════════ -->
+<article class="doc" id="confidentialite" role="tabpanel" aria-labelledby="t-conf">
+  <div class="sum">
+    <h2>Rezime nan kreyòl</h2>
+    <ul>
+      <li>Nou kolekte sèlman done nou bezwen pou sèvis la mache: non, imèl oswa telefòn, pwen, kòmand, kous ak, pou chofè ak patnè, dokiman yo.</li>
+      <li>Nou pa vann done w. Nou pa fè piblisite ak done w pou lòt konpayi.</li>
+      <li>Kèk founisè teknik (Google/Firebase, Supabase, Cloudflare, GitHub, Resend, Twilio) trete done yo pou nou, pafwa nan lòt peyi.</li>
+      <li>Ou gen dwa wè, korije oswa efase done w, ak refize mesaj pwomosyon. Ekri nou.</li>
+    </ul>
+  </div>
+
+  <nav class="toc" aria-label="Sommaire"><b>Sommaire</b><ol>
+    <li><a href="#p1">Responsable</a></li>
+    <li><a href="#p2">Données que nous collectons</a></li>
+    <li><a href="#p3">Pourquoi nous les utilisons</a></li>
+    <li><a href="#p4">Avec qui nous les partageons</a></li>
+    <li><a href="#p5">Transferts hors d'Haïti</a></li>
+    <li><a href="#p6">Durée de conservation</a></li>
+    <li><a href="#p7">Vos droits</a></li>
+    <li><a href="#p8">Sécurité</a></li>
+    <li><a href="#p9">Cookies et stockage local</a></li>
+    <li><a href="#p10">Mineurs</a></li>
+    <li><a href="#p11">Modifications</a></li>
+    <li><a href="#p12">Contact</a></li>
+  </ol></nav>
+
+  <h2 class="s" id="p1"><span>1.</span>Responsable</h2>
+  <p>Le responsable du traitement de vos données est <b>Zetwal Organisation</b>, <span class="todo">À COMPLÉTER : adresse à Haïti, NIF</span>. Cette politique explique quelles données nous utilisons et pourquoi. Elle complète les <a href="#cgu" data-go="cgu">conditions d'utilisation</a>.</p>
+
+  <h2 class="s" id="p2"><span>2.</span>Données que nous collectons</h2>
+  <div class="scroll"><table>
+    <tr><th>Catégorie</th><th>Exemples</th><th>Origine</th></tr>
+    <tr><td><b>Compte</b></td><td>Nom, photo de profil, adresse e-mail et/ou numéro de téléphone, identifiant de compte, mode d'inscription (Google, Facebook, e-mail, téléphone), état de vérification de l'e-mail</td><td>Vous, ou Google / Facebook si vous les utilisez</td></tr>
+    <tr><td><b>Points</b></td><td>Solde, historique des opérations (achats, envois, réceptions, paiements), QR codes utilisés</td><td>Plateforme</td></tr>
+    <tr><td><b>Lavri</b></td><td>Fiche de lavage : nom, numéro de téléphone, prestation, statut, montants</td><td>Vous, au dépôt</td></tr>
+    <tr><td><b>Shop</b></td><td>Panier, commandes, adresse de livraison, coordonnées, mode de paiement, historique d'achats</td><td>Vous</td></tr>
+    <tr><td><b>Kòmand</b></td><td>Adresses de départ et d'arrivée, détails de la course ou de la commande, nom et informations de l'enfant et de la personne autorisée le cas échéant, code de remise, statut, prix, position GPS pendant la course</td><td>Vous, chauffeurs, partenaires</td></tr>
+    <tr><td><b>Candidatures</b> (chauffeurs, partenaires)</td><td>Identité, date de naissance, numéro de pièce d'identité, adresse, téléphone, e-mail, permis, véhicule et plaque, patente et informations de l'entreprise, photos et documents joints</td><td>Vous</td></tr>
+    <tr><td><b>Jeux et messages</b></td><td>Scores, parties, conversations dans la messagerie de la plateforme</td><td>Vous</td></tr>
+    <tr><td><b>Données techniques</b></td><td>Adresse IP, type d'appareil et de navigateur, journaux d'erreur et de sécurité, dates de connexion</td><td>Appareil, hébergeurs</td></tr>
+  </table></div>
+  <p>Nous ne vous demandons <b>jamais votre mot de passe</b> par message, e-mail ou SMS. Les mots de passe sont gérés par le service d'authentification, pas lisibles par nous.</p>
+
+  <h2 class="s" id="p3"><span>3.</span>Pourquoi nous les utilisons</h2>
+  <table>
+    <tr><th>Finalité</th><th>Fondement</th></tr>
+    <tr><td>Créer et sécuriser votre compte, vous connecter</td><td>Exécution du service</td></tr>
+    <tr><td>Gérer vos points, commandes, courses, lavages et paiements</td><td>Exécution du service</td></tr>
+    <tr><td>Vous envoyer des messages de service (linge prêt, commande ou course acceptée, candidature, points reçus)</td><td>Exécution du service</td></tr>
+    <tr><td>Vérifier l'identité et les documents des chauffeurs et partenaires, assurer la sécurité des courses</td><td>Intérêt légitime, obligations légales, sécurité des personnes</td></tr>
+    <tr><td>Prévenir la fraude et les abus, protéger la plateforme (limites, journaux)</td><td>Intérêt légitime</td></tr>
+    <tr><td>Tenir la comptabilité et respecter les obligations fiscales et légales haïtiennes</td><td>Obligation légale</td></tr>
+    <tr><td>Messages d'information ou promotionnels</td><td>Votre consentement, que vous pouvez retirer à tout moment</td></tr>
+    <tr><td>Améliorer la plateforme (statistiques d'usage globales)</td><td>Intérêt légitime</td></tr>
+  </table>
+  <p>Nous <b>ne vendons pas</b> vos données personnelles et nous ne les utilisons pas pour de la publicité ciblée de tiers.</p>
+
+  <h2 class="s" id="p4"><span>4.</span>Avec qui nous les partageons</h2>
+  <ul class="l">
+    <li><b>Entre utilisateurs, ce qui est nécessaire.</b> Un client voit le prénom, le véhicule, la plaque, la photo et le téléphone du chauffeur qui accepte sa course. Le chauffeur voit les informations utiles à la course ou à la livraison (adresse, nom, téléphone). Le partenaire voit les commandes qui le concernent. Quand vous envoyez des points, le destinataire voit votre nom.</li>
+    <li><b>Notre équipe.</b> Les administrateurs et employés ne voient que ce que leur rôle permet.</li>
+    <li><b>Prestataires techniques</b> qui traitent des données pour notre compte :</li>
+  </ul>
+  <div class="scroll"><table>
+    <tr><th>Prestataire</th><th>Rôle</th></tr>
+    <tr><td>Google (Firebase)</td><td>Authentification, base des points et des profils, connexion avec Google</td></tr>
+    <tr><td>Supabase</td><td>Base de données, fichiers et fonctions de la plateforme</td></tr>
+    <tr><td>Cloudflare, GitHub Pages</td><td>Hébergement et protection du site</td></tr>
+    <tr><td>Resend</td><td>Envoi des e-mails</td></tr>
+    <tr><td>Twilio</td><td>Envoi des SMS et codes de vérification</td></tr>
+    <tr><td>Facebook (Meta)</td><td>Seulement si vous choisissez de vous connecter avec Facebook</td></tr>
+  </table></div>
+  <ul class="l">
+    <li><b>Autorités.</b> Si la loi ou une décision de justice l'exige, ou pour protéger des personnes ou prévenir un délit grave.</li>
+    <li><b>Changement d'activité.</b> En cas de reprise ou de réorganisation de Zetwal, vos données pourraient suivre l'activité, avec la même protection.</li>
+  </ul>
+
+  <h2 class="s" id="p5"><span>5.</span>Transferts hors d'Haïti</h2>
+  <p>Nos prestataires techniques ont leurs serveurs à l'étranger (notamment aux États-Unis ou en Europe). Vos données peuvent donc être traitées hors d'Haïti. Nous choisissons des prestataires reconnus qui appliquent des mesures de sécurité et des engagements de confidentialité.</p>
+
+  <h2 class="s" id="p6"><span>6.</span>Durée de conservation</h2>
+  <ul class="l">
+    <li><b>Compte et historique :</b> tant que votre compte est actif, puis <span class="todo">À COMPLÉTER : durée, par exemple 12 mois</span> après sa fermeture.</li>
+    <li><b>Opérations financières et factures :</b> <span class="todo">À COMPLÉTER : durée légale de conservation comptable en Haïti</span>.</li>
+    <li><b>Candidatures refusées et documents :</b> <span class="todo">À COMPLÉTER : par exemple 6 à 12 mois</span> ; documents des chauffeurs et partenaires actifs : tant qu'ils exercent, puis <span class="todo">À COMPLÉTER</span>.</li>
+    <li><b>Journaux de sécurité :</b> <span class="todo">À COMPLÉTER : par exemple 12 mois</span>.</li>
+  </ul>
+  <p>Passé ces durées, les données sont supprimées ou rendues anonymes.</p>
+
+  <h2 class="s" id="p7"><span>7.</span>Vos droits</h2>
+  <p>Vous pouvez à tout moment :</p>
+  <ul class="l">
+    <li><b>accéder</b> à vos données et en recevoir une copie ;</li>
+    <li><b>corriger</b> les données inexactes (votre profil est modifiable dans la plateforme) ;</li>
+    <li><b>demander la suppression</b> de votre compte et de vos données, sauf celles que la loi nous oblige à garder ;</li>
+    <li><b>vous opposer</b> à certains usages, notamment aux messages promotionnels, et <b>retirer</b> un consentement donné ;</li>
+    <li>demander des explications sur le traitement de vos données.</li>
+  </ul>
+  <p>Écrivez-nous (section 12). Nous vérifions votre identité pour protéger votre compte, puis nous répondons dans un délai de <span class="todo">À COMPLÉTER : par exemple 30 jours</span>. Supprimer un compte entraîne la perte des points restants (voir les conditions d'utilisation).</p>
+
+  <h2 class="s" id="p8"><span>8.</span>Sécurité</h2>
+  <p>Nous protégeons vos données par des mesures techniques et organisationnelles : connexion chiffrée (HTTPS), accès limités par rôle, contrôles côté serveur pour les opérations sensibles (points, paiements), limites anti-abus, journalisation et sauvegardes. Aucun système n'est parfait : si une atteinte à vos données présentait un risque pour vous, nous vous préviendrions et préviendrions les autorités si nécessaire. De votre côté, choisissez un mot de passe solide et ne le partagez pas.</p>
+
+  <h2 class="s" id="p9"><span>9.</span>Cookies et stockage local</h2>
+  <p>La plateforme utilise le stockage de votre navigateur (cookies techniques, stockage local) pour garder votre session ouverte, vos préférences et votre panier. Ces éléments sont nécessaires au fonctionnement. Nous n'y mettons pas de publicité ciblée. Les polices (Google Fonts) et les services de connexion peuvent recevoir votre adresse IP lors du chargement. Vous pouvez effacer ces données dans les paramètres de votre navigateur ; vous serez alors déconnecté(e).</p>
+  <p><b>Position GPS.</b> Elle n'est utilisée que pour les courses et le suivi, et seulement si votre appareil vous demande l'autorisation et que vous l'acceptez. Vous pouvez la refuser ou la retirer dans les réglages de votre appareil.</p>
+
+  <h2 class="s" id="p10"><span>10.</span>Mineurs</h2>
+  <p>La plateforme s'adresse aux personnes de 18 ans et plus. Pour le transport d'enfants, nous traitons les informations de l'enfant (nom, trajet) fournies par le parent ou le tuteur, uniquement pour effectuer la course en sécurité. Si vous pensez qu'un mineur nous a donné des données sans autorisation, contactez-nous pour les supprimer.</p>
+
+  <h2 class="s" id="p11"><span>11.</span>Modifications</h2>
+  <p>Nous pouvons mettre à jour cette politique. La date de mise à jour figure en haut de la page ; pour un changement important, nous vous préviendrons.</p>
+
+  <h2 class="s" id="p12"><span>12.</span>Contact</h2>
+  <p>Pour toute question ou demande sur vos données : <span class="todo">À COMPLÉTER : e-mail de contact</span> — <span class="todo">À COMPLÉTER : WhatsApp / téléphone</span> — <span class="todo">À COMPLÉTER : adresse</span>.</p>
+</article>
+</main>
+
+<footer><div class="wrap">
+  <a class="brand" href="./">ZET<em>WAL</em></a>
+  <p style="margin-top:8px">© 2026 Zetwal Organisation — Tout dwa rezève</p>
+</div></footer>
+
+<script>
+(function(){
+  var tabs = document.querySelectorAll('.tab'), docs = document.querySelectorAll('.doc');
+  function show(id, push){
+    if (id !== 'cgu' && id !== 'confidentialite') id = 'cgu';
+    tabs.forEach(function(t){ t.setAttribute('aria-selected', String(t.dataset.doc === id)); });
+    docs.forEach(function(d){ d.classList.toggle('on', d.id === id); });
+    document.title = (id === 'cgu' ? "Conditions d'utilisation" : 'Politique de confidentialité') + ' — Zetwal';
+    if (push) { try { history.replaceState(null, '', '#' + id); } catch (e) {} }
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ show(t.dataset.doc, true); window.scrollTo(0, 0); }); });
+  document.querySelectorAll('[data-go]').forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); show(a.dataset.go, true); window.scrollTo(0, 0); });
+  });
+  function fromHash(){
+    var h = (location.hash || '').replace('#', '');
+    if (h === 'cgu' || h === 'confidentialite') { show(h); return; }
+    if (/^c\d+$/.test(h)) { show('cgu'); } else if (/^p\d+$/.test(h)) { show('confidentialite'); }
+    var el = h && document.getElementById(h);
+    if (el) setTimeout(function(){ el.scrollIntoView(); }, 30);
+  }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>
