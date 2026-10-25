@@ -13,6 +13,7 @@ const SHELL = [
   '/lavri.html',
   '/taxi.html',
   '/shop.html',
+  '/legal.html',
   '/games.html',
   '/mall.html',
   '/manifest.json',
