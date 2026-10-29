@@ -62,6 +62,7 @@
         var idt = await fbToken(u);
         var r = await ORIG(FN + '/fb-exchange', { method:'POST',
           headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idt, 'apikey':FNKEY }, body:'{}' });
+        if(r.status === 403){ try{ window.dispatchEvent(new Event('zmfa:required')); }catch(e){} }
         if(!r.ok) throw new Error('exchange ' + r.status);
         var j = await r.json();
         if(!j || !j.token) throw new Error('exchange vide');
@@ -126,6 +127,7 @@
     }catch(e){ return { ok:false, error:'network', unknown:true }; }
     var j = {}; try{ j = await r.json(); }catch(e){}
     if(r.status === 404) return { unavailable:true };
+    if(r.status === 403 && j && j.error === 'mfa_required'){ try{ window.dispatchEvent(new Event('zmfa:required')); }catch(e){} return { ok:false, error:'mfa_required', status:403 }; }
     if(r.status === 429) return { ok:false, error:'rate' };
     if(!r.ok) return { ok:false, error:(j && j.error) || 'server', status:r.status };
     return j;
@@ -186,8 +188,300 @@
     catch(e){ return null; }
   }
 
-  window.ZB = { token:bridgeToken, call:call, pts:pts, spend:spend, available:available, notice:notice,
-    fnUrl:function(){ return FN; }, key:function(){ return KEY; } };
+  /* drop() : oublie le jeton en mémoire (verrouillage / déverrouillage de la seconde sécurité) */
+  function drop(){ cache = null; inflight = null; failUntil = 0; probe = null; }
+
+  window.ZB = { drop:drop, token:bridgeToken, call:call, pts:pts, spend:spend, available:available, notice:notice,
+    fnUrl:function(){ return FN; }, fnKey:function(){ return FNKEY; }, key:function(){ return KEY; } };
+})();
+</script>
+<script id="zb-mfa">
+/* Zetwal — seconde sécurité (clé d'accès WebAuthn : empreinte ou visage de l'appareil).
+   · L'empreinte / le visage restent sur l'appareil. Zetwal ne reçoit qu'une clé publique.
+   · Compte protégé = écran de verrouillage après chaque connexion et après 5 min sans activité.
+   · Rien ne change pour les comptes qui n'ont pas activé cette option. */
+(function(){
+  if(window.ZMFA) return;
+  var IDLE = 300000, TOUCH_EVERY = 60000, ACT_KEY = 'zt_act', ENR_KEY = 'zt_mfa_enr';
+  var st = { available:true, enrolled:null, valid:null, methods:[], uid:null };
+  var uiLocked = false, lastTouch = 0, lastAct = Date.now(), timer = null, ready = false, supported = null;
+
+  function $(s, r){ return (r || document).querySelector(s); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+  function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+  /* ── conversions WebAuthn ── */
+  function u8(s){ s = String(s).replace(/-/g, '+').replace(/_/g, '/'); s += '='.repeat((4 - s.length % 4) % 4); var b = atob(s), a = new Uint8Array(b.length); for(var i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a.buffer; }
+  function b64(buf){ var a = new Uint8Array(buf), s = ''; for(var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function toCreate(o){
+    var p = { challenge:u8(o.challenge), rp:o.rp, user:{ id:null, name:o.user.name, displayName:o.user.displayName },
+      pubKeyCredParams:o.pubKeyCredParams, timeout:o.timeout, attestation:o.attestation, authenticatorSelection:o.authenticatorSelection };
+    p.user.id = u8(o.user.id);
+    p.excludeCredentials = (o.excludeCredentials || []).map(function(c){ return { id:u8(c.id), type:'public-key', transports:c.transports }; });
+    return p;
+  }
+  function toGet(o){
+    return { challenge:u8(o.challenge), rpId:o.rpId, timeout:o.timeout, userVerification:o.userVerification,
+      allowCredentials:(o.allowCredentials || []).map(function(c){ return { id:u8(c.id), type:'public-key', transports:c.transports }; }) };
+  }
+  function attJson(c){
+    var r = c.response;
+    return { id:c.id, rawId:b64(c.rawId), type:c.type, clientExtensionResults:(c.getClientExtensionResults ? c.getClientExtensionResults() : {}),
+      authenticatorAttachment:c.authenticatorAttachment || undefined,
+      response:{ clientDataJSON:b64(r.clientDataJSON), attestationObject:b64(r.attestationObject), transports:(r.getTransports ? r.getTransports() : []) } };
+  }
+  function assJson(c){
+    var r = c.response;
+    return { id:c.id, rawId:b64(c.rawId), type:c.type, clientExtensionResults:(c.getClientExtensionResults ? c.getClientExtensionResults() : {}),
+      authenticatorAttachment:c.authenticatorAttachment || undefined,
+      response:{ clientDataJSON:b64(r.clientDataJSON), authenticatorData:b64(r.authenticatorData), signature:b64(r.signature), userHandle:r.userHandle ? b64(r.userHandle) : null } };
+  }
+
+  async function isSupported(){
+    if(supported !== null) return supported;
+    try{ supported = !!(window.PublicKeyCredential && window.isSecureContext !== false && (await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())); }
+    catch(e){ supported = false; }
+    return supported;
+  }
+
+  async function api(body){
+    if(!window.ZB) return { unavailable:true };
+    return ZB.call('zmfa', body);
+  }
+  function fbUser(){ try{ return (window.firebase && firebase.apps && firebase.apps.length && firebase.auth().currentUser) || null; }catch(e){ return null; } }
+
+  /* ── styles ── */
+  function css(){
+    if($('#zm-css')) return;
+    var s = document.createElement('style'); s.id = 'zm-css';
+    s.textContent =
+'html.zm-lock body{overflow:hidden!important}html.zm-lock body>*:not(#zm-ov):not(#zm-md):not(script):not(style){visibility:hidden!important}' +
+'#zm-ov,#zm-md{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto;' +
+'background:radial-gradient(1200px 600px at 50% -10%,rgba(212,175,55,.16),transparent 60%),#050505;color:#fff;font-family:var(--sans,Montserrat,system-ui,sans-serif)}' +
+'#zm-md{background:rgba(5,5,5,.86);backdrop-filter:blur(6px)}' +
+'.zm-card{width:100%;max-width:440px;background:#0b0b0b;border:1px solid rgba(212,175,55,.28);border-radius:20px;padding:28px 24px;box-shadow:0 30px 80px rgba(0,0,0,.6);text-align:center}' +
+'.zm-ic{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.35)}' +
+'.zm-ic svg{width:30px;height:30px;stroke:#D4AF37;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}' +
+'.zm-card h2{font-family:var(--serif,"Cormorant Garamond",Georgia,serif);font-weight:600;font-size:1.6rem;line-height:1.2;margin-bottom:8px}' +
+'.zm-card p{color:rgba(255,255,255,.72);font-size:.86rem;line-height:1.65;margin:8px 0}' +
+'.zm-btn{display:block;width:100%;margin-top:12px;padding:15px 18px;border-radius:99px;border:1px solid #D4AF37;background:#D4AF37;color:#111;font:600 .74rem var(--sans,Montserrat,system-ui,sans-serif);letter-spacing:1.4px;text-transform:uppercase;cursor:pointer;min-height:48px}' +
+'.zm-btn:disabled{opacity:.4;cursor:not-allowed}.zm-btn.o{background:transparent;color:#fff;border-color:rgba(255,255,255,.22)}' +
+'.zm-btn:focus-visible,.zm-opt:focus-within,.zm-chk:focus-within{outline:2px solid #F0D98A;outline-offset:2px}' +
+'.zm-err{color:#FF8A8A;font-size:.8rem;min-height:1.2em;margin-top:10px}.zm-ok{color:#00E08A}' +
+'.zm-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;text-align:left}' +
+'.zm-opt{display:block;border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:14px 12px;cursor:pointer;font-size:.8rem;line-height:1.4}' +
+'.zm-opt input{position:absolute;opacity:0}.zm-opt b{display:block;font-size:.84rem;margin-bottom:2px}' +
+'.zm-opt:has(input:checked){border-color:#D4AF37;background:rgba(212,175,55,.1)}' +
+'.zm-chk{display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:.78rem;line-height:1.55;color:rgba(255,255,255,.8);margin:12px 0;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;cursor:pointer}' +
+'.zm-chk input{margin-top:3px;width:18px;height:18px;flex:none;accent-color:#D4AF37}.zm-chk a{color:#D4AF37}' +
+'.zm-small{font-size:.7rem!important;color:rgba(255,255,255,.5)!important}' +
+'#zt-sec-banner{width:min(560px,92vw);margin:18px auto 0}' +
+'.zm-ban{display:flex;gap:14px;align-items:center;text-align:left;border:1px solid rgba(212,175,55,.4);background:linear-gradient(135deg,rgba(212,175,55,.14),rgba(212,175,55,.04));border-radius:16px;padding:14px 16px}' +
+'.zm-ban .zm-ic{width:44px;height:44px;margin:0;flex:none}.zm-ban .zm-ic svg{width:22px;height:22px}' +
+'.zm-ban b{display:block;font-size:.84rem;color:#fff}.zm-ban span{display:block;font-size:.72rem;color:rgba(255,255,255,.65);line-height:1.45}' +
+'.zm-ban .zm-btn{width:auto;margin:0 0 0 auto;padding:11px 16px;font-size:.62rem;white-space:nowrap;min-height:40px}' +
+'@media(max-width:520px){.zm-ban{flex-wrap:wrap}.zm-ban .zm-btn{width:100%;margin:6px 0 0}.zm-opts{grid-template-columns:1fr}}';
+    document.head.appendChild(s);
+  }
+  var LOCK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2"/></svg>';
+  var FP_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 11v3a6 6 0 0 1-.9 3.1M8 13a4 4 0 0 1 8 0v1.5a9 9 0 0 1-1.2 4.5M5 12a7 7 0 0 1 14 0M4 15.5A12 12 0 0 0 5.5 20M19 12.5c0 2-.3 3.7-.9 5.3"/></svg>';
+
+  /* ── écran de verrouillage ── */
+  function removeEl(id){ var e = document.getElementById(id); if(e && e.parentNode) e.parentNode.removeChild(e); }
+  function showLock(mode, reason){
+    css(); uiLocked = true;
+    document.documentElement.classList.add('zm-lock');
+    removeEl('zm-ov');
+    var o = document.createElement('div'); o.id = 'zm-ov'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-labelledby', 'zm-t');
+    var msg = reason === 'idle' ? 'Ou pa t aktif pandan plis pase 5 minit. Pou pwoteje pwen ou yo, verifye idantite w ankò.' : 'Pou pwoteje pwen ou yo ak kont ou, verifye idantite w ak anprent dwèt oswa vizaj ou.';
+    if(mode === 'check'){
+      o.innerHTML = '<div class="zm-card"><div class="zm-ic">' + LOCK_SVG + '</div><h2 id="zm-t">Sekirite Zetwal</h2><p>Verifikasyon an kou…</p></div>';
+    } else {
+      o.innerHTML = '<div class="zm-card"><div class="zm-ic">' + LOCK_SVG + '</div><h2 id="zm-t">Kont ou an sekirite</h2><p>' + msg + '</p>' +
+        '<button type="button" class="zm-btn" id="zm-go">Debloke ak anprent / vizaj</button>' +
+        '<button type="button" class="zm-btn o" id="zm-out">Dekonekte</button>' +
+        '<div class="zm-err" id="zm-e" role="alert"></div>' +
+        '<p class="zm-small">Telefòn ou a mande anprent dwèt ou oswa vizaj ou. Zetwal pa wè yo. Ou pa ka itilize aparèy sa a ? Kontakte Zetwal pou reyinisyalize sekirite a.</p></div>';
+    }
+    document.body.appendChild(o);
+    var go = $('#zm-go'); if(go){ go.addEventListener('click', unlock); try{ go.focus(); }catch(e){} }
+    var out = $('#zm-out'); if(out) out.addEventListener('click', signOut);
+  }
+  function hideLock(){ uiLocked = false; document.documentElement.classList.remove('zm-lock'); removeEl('zm-ov'); }
+  function setErr(id, m, ok){ var e = $(id); if(e){ e.textContent = m || ''; e.className = 'zm-err' + (ok ? ' zm-ok' : ''); } }
+
+  var ERR = { consent:'Ou dwe koche kazye konsantman an.', too_many:'Ou gen twòp kle anrejistre (maksimòm 5).', already_registered:'Kle sa a deja anrejistre.',
+    verification:'Verifikasyon an echwe. Eseye ankò.', challenge:'Sesyon verifikasyon an ekspire. Eseye ankò.', not_enrolled:'Ou poko aktive sekirite sa a.',
+    mfa_required:'Ou dwe debloke kont ou anvan.', network:'Pa gen koneksyon. Eseye ankò.', server:'Pwoblèm sèvè. Eseye ankò.' };
+  function domMsg(e){
+    var n = e && e.name;
+    if(n === 'NotAllowedError') return 'Ou anile oswa telefòn nan pa t aksepte verifikasyon an. Eseye ankò.';
+    if(n === 'InvalidStateError') return 'Aparèy sa a deja anrejistre.';
+    if(n === 'NotSupportedError' || n === 'SecurityError') return 'Aparèy oswa navigatè sa a pa sipòte sekirite sa a.';
+    return 'Verifikasyon an pa mache. Eseye ankò.';
+  }
+
+  async function unlock(){
+    var btn = $('#zm-go'); if(btn) btn.disabled = true; setErr('#zm-e', '');
+    try{
+      var r = await api({ op:'auth_options' });
+      if(!r || !r.ok){ setErr('#zm-e', ERR[(r && r.error)] || 'Eseye ankò.'); if(btn) btn.disabled = false; return; }
+      var cred = await navigator.credentials.get({ publicKey:toGet(r.options) });
+      var v = await api({ op:'auth_verify', response:assJson(cred) });
+      if(!v || !v.ok){ setErr('#zm-e', ERR[(v && v.error)] || 'Verifikasyon an echwe.'); if(btn) btn.disabled = false; return; }
+      st.valid = true; lastTouch = Date.now(); lastAct = Date.now(); lsSet(ACT_KEY, String(lastAct));
+      if(window.ZB && ZB.drop) ZB.drop();
+      setErr('#zm-e', 'Kont ou debloke.', true);
+      setTimeout(function(){ try{ location.reload(); }catch(e){ hideLock(); } }, 250);
+    }catch(e){ setErr('#zm-e', domMsg(e)); if(btn) btn.disabled = false; }
+  }
+  async function signOut(){
+    try{ await api({ op:'lock' }); }catch(e){}
+    try{ lsDel(ENR_KEY); await firebase.auth().signOut(); }catch(e){}
+    try{ location.reload(); }catch(e){}
+  }
+
+  /* ── état serveur ── */
+  async function refresh(){
+    var u = fbUser();
+    if(!u){ st.enrolled = null; st.valid = null; return st; }
+    var r = await api({ op:'status' });
+    if(!r || r.unavailable){ st.available = false; return st; }
+    if(!r.ok){ return st; }
+    st.available = true; st.uid = u.uid; st.enrolled = !!r.enrolled; st.valid = !!r.valid; st.methods = r.methods || [];
+    if(st.enrolled) lsSet(ENR_KEY, u.uid); else lsDel(ENR_KEY);
+    return st;
+  }
+  async function evaluate(reason){
+    await refresh();
+    if(st.enrolled && !st.valid){ if(window.ZB && ZB.drop) ZB.drop(); showLock('ask', reason); }
+    else if(uiLocked && (!st.enrolled || st.valid)) hideLock();
+    renderBanner(); emitChange();
+  }
+  function emitChange(){ try{ window.dispatchEvent(new CustomEvent('zmfa:changed', { detail:{ enrolled:st.enrolled, valid:st.valid } })); }catch(e){} }
+
+  /* ── activité et délai de 5 minutes ── */
+  function getAct(){ var s = Number(lsGet(ACT_KEY)) || 0; return Math.max(lastAct, s); }
+  function onAct(){ lastAct = Date.now(); if(lastAct - (Number(lsGet(ACT_KEY)) || 0) > 5000) lsSet(ACT_KEY, String(lastAct)); }
+  async function tick(){
+    if(!fbUser() || st.enrolled !== true || uiLocked) return;
+    var now = Date.now();
+    if(now - getAct() > IDLE){ if(window.ZB && ZB.drop) ZB.drop(); showLock('ask', 'idle'); return; }
+    if(now - lastTouch > TOUCH_EVERY && getAct() > lastTouch){
+      lastTouch = now;
+      var r = await api({ op:'touch' });
+      if(r && r.ok && r.enrolled && !r.valid){ if(window.ZB && ZB.drop) ZB.drop(); showLock('ask', r.reason === 'idle' ? 'idle' : ''); }
+    }
+  }
+
+  /* ── activation ── */
+  var PRIV = 'legal.html#confidentialite';
+  async function openEnroll(){
+    css(); removeEl('zm-md');
+    var ok = await isSupported();
+    var m = document.createElement('div'); m.id = 'zm-md'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-labelledby', 'zm-mt');
+    m.innerHTML = '<div class="zm-card"><div class="zm-ic">' + FP_SVG + '</div><h2 id="zm-mt">Ranfòse sekirite kont mwen</h2>' +
+      '<p>Apre ou konekte, w ap oblije verifye idantite w yon dezyèm fwa ak anprent dwèt oswa vizaj ou, epi chak fwa ou pa aktif pandan 5 minit.</p>' +
+      '<div class="zm-opts" role="radiogroup" aria-label="Chwa verifikasyon"><label class="zm-opt"><input type="radio" name="zm-pref" value="fingerprint" checked><b>Anprent dwèt</b>Mwen pito anprent dwèt</label>' +
+      '<label class="zm-opt"><input type="radio" name="zm-pref" value="face"><b>Rekonesans vizaj</b>Mwen pito vizaj mwen</label></div>' +
+      '<p class="zm-small">Se telefòn (oswa òdinatè) ou ki fè verifikasyon an ak sa li sipòte. Si ou chwazi yon bagay aparèy la pa genyen, l ap mande w sa li gen.</p>' +
+      '<label class="zm-chk"><input type="checkbox" id="zm-cons"><span>Mwen konprann ke <b>anprent dwèt oswa vizaj mwen pa janm kite aparèy mwen</b>: Zetwal sere sèlman yon kle piblik, dat ak vèsyon konsantman mwen. Mwen dakò pou done sa yo trete jan sa eksplike nan <a href="' + PRIV + '" target="_blank" rel="noopener">Politik konfidansyalite</a> a. Mwen ka dezaktive sa nenpòt ki lè.</span></label>' +
+      '<button type="button" class="zm-btn" id="zm-act" disabled>Aktive sekirite a</button>' +
+      '<button type="button" class="zm-btn o" id="zm-cancel">Pita</button><div class="zm-err" id="zm-me" role="alert"></div></div>';
+    document.body.appendChild(m);
+    var cons = $('#zm-cons'), act = $('#zm-act');
+    if(!ok){ setErr('#zm-me', 'Aparèy oswa navigatè sa a pa sipòte anprent/vizaj. Eseye ak yon telefòn ki gen yon kwochè ekran oswa bayometri.'); cons.disabled = true; }
+    cons.addEventListener('change', function(){ act.disabled = !cons.checked || !ok; });
+    $('#zm-cancel').addEventListener('click', function(){ removeEl('zm-md'); });
+    act.addEventListener('click', async function(){
+      act.disabled = true; setErr('#zm-me', '');
+      var pref = ($('input[name="zm-pref"]:checked') || {}).value || 'fingerprint';
+      try{
+        var r = await api({ op:'reg_options', consent:true, pref:pref });
+        if(!r || !r.ok){ setErr('#zm-me', r && r.error === 'mfa_required' ? ERR.mfa_required : (ERR[r && r.error] || 'Eseye ankò.')); act.disabled = false; return; }
+        var cred = await navigator.credentials.create({ publicKey:toCreate(r.options) });
+        var label = (navigator.userAgentData && navigator.userAgentData.platform) || (/Android/i.test(navigator.userAgent) ? 'Android' : /iPhone|iPad/i.test(navigator.userAgent) ? 'iPhone/iPad' : 'Òdinatè');
+        var v = await api({ op:'reg_verify', response:attJson(cred), label:label });
+        if(!v || !v.ok){ setErr('#zm-me', ERR[v && v.error] || 'Verifikasyon an echwe.'); act.disabled = false; return; }
+        lastTouch = Date.now(); lastAct = Date.now(); lsSet(ACT_KEY, String(lastAct));
+        await refresh(); renderBanner(); emitChange();
+        m.querySelector('.zm-card').innerHTML = '<div class="zm-ic">' + LOCK_SVG + '</div><h2>Sekirite aktive</h2><p>Kont ou pwoteje kounye a. Ou pral verifye idantite w chak fwa ou konekte ak apre 5 minit san aktivite.</p><button type="button" class="zm-btn" id="zm-done">Byen konprann</button>';
+        $('#zm-done').addEventListener('click', function(){ removeEl('zm-md'); });
+      }catch(e){ setErr('#zm-me', domMsg(e)); act.disabled = !cons.checked; }
+    });
+    try{ cons.focus(); }catch(e){}
+  }
+
+  async function removeKey(id){
+    var r = await api({ op:'remove', id:id });
+    if(r && r.ok){ await refresh(); renderBanner(); emitChange(); return { ok:true }; }
+    if(r && r.error === 'mfa_required'){ await evaluate(); }
+    return { ok:false, error:(r && r.error) || 'server' };
+  }
+
+  /* ── bannière d'accueil ── */
+  async function renderBanner(){
+    var host = document.getElementById('zt-sec-banner'); if(!host) return;
+    var show = st.available && st.enrolled === false && !!fbUser() && (await isSupported());
+    if(!show){ host.innerHTML = ''; host.style.display = 'none'; return; }
+    css(); host.style.display = '';
+    host.innerHTML = '<div class="zm-ban"><div class="zm-ic">' + FP_SVG + '</div><div><b>Ranfòse sekirite kont mwen</b><span>Pwoteje pwen ou yo ak anprent dwèt oswa vizaj ou.</span></div><button type="button" class="zm-btn" id="zm-ban-go">Ranfòse sekirite kont mwen</button></div>';
+    var b = document.getElementById('zm-ban-go'); if(b) b.addEventListener('click', openEnroll);
+  }
+
+  /* ── section « Sekirite » du profil ── */
+  function mountProfile(el){
+    if(!el) return;
+    async function draw(){
+      await refresh();
+      if(!st.available){ el.innerHTML = ''; return; }
+      var sup = await isSupported();
+      var h = '<div class="zp-k" style="margin-top:14px">Sekirite kont mwen</div>';
+      if(st.enrolled){
+        h += '<p style="font-size:.8rem;opacity:.8;margin:6px 0 10px">Dezyèm liy sekirite aktive. Verifikasyon obligatwa apre chak koneksyon ak apre 5 minit san aktivite.</p>';
+        h += st.methods.map(function(k){ return '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.08);font-size:.78rem"><span>' + esc(k.label || 'Aparèy') + ' · ' + (k.pref === 'face' ? 'vizaj' : 'anprent') + '</span><button type="button" class="zp-btn" data-zm-rm="' + esc(k.id) + '" style="padding:6px 12px">Retire</button></div>'; }).join('');
+        h += '<button type="button" class="zp-btn" id="zm-add" style="width:100%;margin-top:10px">Ajoute yon lòt aparèy</button><div class="zm-err" id="zm-pe"></div>';
+      } else if(sup){
+        h += '<p style="font-size:.8rem;opacity:.8;margin:6px 0 10px">Ajoute yon dezyèm liy sekirite ak anprent dwèt oswa vizaj ou.</p><button type="button" class="zp-btn" id="zm-add" style="width:100%">Ranfòse sekirite kont mwen</button>';
+      } else {
+        h += '<p style="font-size:.8rem;opacity:.7;margin:6px 0">Aparèy sa a pa sipòte anprent/vizaj.</p>';
+      }
+      el.innerHTML = h;
+      var a = el.querySelector('#zm-add'); if(a) a.addEventListener('click', openEnroll);
+      el.querySelectorAll('[data-zm-rm]').forEach(function(b){ b.addEventListener('click', async function(){
+        if(!confirm('Retire sekirite sa a sou aparèy sa a ?')) return;
+        b.disabled = true; var r = await removeKey(b.getAttribute('data-zm-rm'));
+        if(!r.ok){ var e = el.querySelector('#zm-pe'); if(e) e.textContent = ERR[r.error] || 'Pa t posib.'; b.disabled = false; } else draw();
+      }); });
+    }
+    draw();
+    window.addEventListener('zmfa:changed', function(){ if(document.body.contains(el)) draw(); });
+  }
+
+  /* ── démarrage ── */
+  function boot(){
+    if(ready) return; ready = true; css();
+    ['pointerdown','keydown','touchstart','wheel','scroll'].forEach(function(ev){ document.addEventListener(ev, onAct, { passive:true, capture:true }); });
+    window.addEventListener('storage', function(e){ if(e.key === ACT_KEY) lastAct = Math.max(lastAct, Number(e.newValue) || 0); });
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden && fbUser() && st.enrolled === true && !uiLocked) evaluate(); });
+    window.addEventListener('zmfa:required', function(){ if(fbUser()) evaluate(); });
+    var a = firebase.auth();
+    a.onAuthStateChanged(function(u){
+      if(!u){ st = { available:st.available, enrolled:null, valid:null, methods:[], uid:null }; hideLock(); lsDel(ENR_KEY); renderBanner(); return; }
+      if(lsGet(ENR_KEY) === u.uid && !uiLocked) showLock('check');       /* pas de flash du contenu */
+      evaluate();
+    });
+    timer = setInterval(tick, 10000);
+  }
+  var tries = 0, w = setInterval(function(){
+    tries++;
+    if(window.firebase && firebase.apps && firebase.apps.length){ clearInterval(w); try{ boot(); }catch(e){} }
+    else if(tries > 200){ clearInterval(w); }
+  }, 100);
+
+  window.ZMFA = { state:function(){ return st; }, open:openEnroll, mountProfile:mountProfile, refresh:evaluate, supported:isSupported };
 })();
 </script>
 <style>
@@ -854,6 +1148,13 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
   #sky,#spot,#grain{display:none}
 }
 </style>
+<style id="zt-legal-css">
+footer .zt-lg{flex-basis:100%;display:flex;gap:8px 20px;flex-wrap:wrap;margin-top:2px;font-size:.58rem;letter-spacing:1.6px;text-transform:uppercase}
+footer .zt-lg a{color:var(--ink-3,rgba(255,255,255,.48));text-decoration:none;padding:6px 0}
+footer .zt-lg a:hover,footer .zt-lg a:focus-visible{color:var(--gold,#D4AF37)}
+#m-legal{margin-top:10px;font-size:.62rem;line-height:1.6;opacity:.8}
+#m-legal a{color:var(--gold,#D4AF37);text-decoration:underline;text-underline-offset:2px}
+</style>
 </head>
 <body>
 
@@ -1025,6 +1326,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     <footer>
       <div class="fb">ZETWAL <em>SHOP</em></div>
       <small>© 2026 Zetwal Organisation — Tout dwa rezève</small>
+      <nav class="zt-lg" aria-label="Dokiman legal"><a href="legal.html#cgu">Kondisyon itilizasyon</a><a href="legal.html#confidentialite">Konfidansyalite</a></nav>
       <button id="top" type="button"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg> Anwo</button>
     </footer>
   </div>
@@ -1202,6 +1504,7 @@ footer small{font-size:.54rem;letter-spacing:1.8px;text-transform:uppercase;colo
     </div>
 
     <p class="note" id="m-note"><a id="m-forgot">Ou bliye modpas ou ?</a></p>
+    <p class="note" id="m-legal">Lè w kreye yon kont, w aksepte <a href="legal.html#cgu" target="_blank" rel="noopener">Kondisyon itilizasyon</a> ak <a href="legal.html#confidentialite" target="_blank" rel="noopener">Politik konfidansyalite</a> nou yo.</p>
     <div class="err" id="m-err"></div>
   </div>
 </div>
@@ -3411,7 +3714,8 @@ if('serviceWorker' in navigator){
             return '<button class="' + (tab===k?'on':'') + '" data-t="' + k + '">' + lab + '</button>';
           }).join('') + '</div>';
 
-      box.innerHTML = head + tabs + '<div id="zp-in"></div>';
+      box.innerHTML = head + '<div id="zp-sec"></div>' + tabs + '<div id="zp-in"></div>';
+      try{ if(window.ZMFA) ZMFA.mountProfile($('#zp-sec')); }catch(e){}
       $('#zp-share').addEventListener('click', function(){ shareProfile(u); });
       $('#zp-out').addEventListener('click', async function(){
         try{ await auth.signOut(); }catch(e){}
