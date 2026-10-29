@@ -77,7 +77,7 @@ footer .brand{font-size:.95rem}
 <main class="wrap">
   <section class="hero">
     <h1>Règles de la <em>plateforme</em></h1>
-    <p>Dernière mise à jour : 25 octobre 2026 &nbsp;·&nbsp; Version en vigueur : 1.0</p>
+    <p>Dernière mise à jour : 29 octobre 2026 &nbsp;·&nbsp; Version en vigueur : 1.1</p>
   </section>
 
   <div class="tabs" role="tablist" aria-label="Documents">
@@ -132,6 +132,7 @@ footer .brand{font-size:.95rem}
     <li><b>Un compte par personne.</b> Les comptes sont personnels. Ne partagez pas votre accès. Vous êtes responsable de ce qui se fait avec votre compte.</li>
     <li><b>Sécurité.</b> Si vous pensez que votre compte est utilisé par quelqu'un d'autre, changez votre mot de passe, déconnectez-vous et prévenez-nous sans attendre.</li>
     <li><b>Déconnexion.</b> Vous pouvez vous déconnecter à tout moment depuis n'importe quelle page.</li>
+    <li><b>Seconde sécurité (facultative).</b> Vous pouvez activer une vérification supplémentaire par l'<b>empreinte digitale</b> ou la <b>reconnaissance du visage</b> de votre appareil. Une fois activée, elle est demandée après chaque connexion et après 5 minutes sans activité, sur toutes les pages. Vous pouvez la retirer à tout moment depuis votre profil. Si vous perdez ou changez d'appareil et ne pouvez plus vous débloquer, contactez-nous : après vérification de votre identité, nous réinitialisons cette option et vous pouvez en activer une nouvelle. Zetwal ne peut ni voir, ni copier, ni récupérer votre empreinte ou votre visage.</li>
   </ul>
 
   <h2 class="s" id="c4"><span>4.</span>Les points Zetwal</h2>
@@ -234,6 +235,7 @@ footer .brand{font-size:.95rem}
       <li>Nou pa vann done w. Nou pa fè piblisite ak done w pou lòt konpayi.</li>
       <li>Kèk founisè teknik (Google/Firebase, Supabase, Cloudflare, GitHub, Resend, Twilio) trete done yo pou nou, pafwa nan lòt peyi.</li>
       <li>Ou gen dwa wè, korije oswa efase done w, ak refize mesaj pwomosyon. Ekri nou.</li>
+      <li>Si ou aktive dezyèm sekirite a, anprent dwèt ou oswa vizaj ou pa janm kite telefòn ou: Zetwal sere sèlman yon kle piblik.</li>
     </ul>
   </div>
 
@@ -265,6 +267,8 @@ footer .brand{font-size:.95rem}
     <tr><td><b>Kòmand</b></td><td>Adresses de départ et d'arrivée, détails de la course ou de la commande, nom et informations de l'enfant et de la personne autorisée le cas échéant, code de remise, statut, prix, position GPS pendant la course</td><td>Vous, chauffeurs, partenaires</td></tr>
     <tr><td><b>Candidatures</b> (chauffeurs, partenaires)</td><td>Identité, date de naissance, numéro de pièce d'identité, adresse, téléphone, e-mail, permis, véhicule et plaque, patente et informations de l'entreprise, photos et documents joints</td><td>Vous</td></tr>
     <tr><td><b>Jeux et messages</b></td><td>Scores, parties, conversations dans la messagerie de la plateforme</td><td>Vous</td></tr>
+    <tr><td><b>Seconde sécurité</b> (si vous l'activez)</td><td>Clé publique de votre appareil, type de vérification choisi (empreinte ou visage), nom de l'appareil, dates d'activation et de dernière utilisation, date et version de votre consentement, journal des activations/retraits/échecs. <b>Jamais d'empreinte, d'image de visage ni de code biométrique.</b></td><td>Vous, votre appareil</td></tr>
+    <tr><td><b>Position approximative</b> (météo de l'accueil)</td><td>Coordonnées arrondies si vous autorisez la localisation, sinon localisation approximative déduite de votre adresse IP. Elles ne sont pas conservées dans votre compte.</td><td>Votre appareil, votre connexion</td></tr>
     <tr><td><b>Données techniques</b></td><td>Adresse IP, type d'appareil et de navigateur, journaux d'erreur et de sécurité, dates de connexion</td><td>Appareil, hébergeurs</td></tr>
   </table></div>
   <p>Nous ne vous demandons <b>jamais votre mot de passe</b> par message, e-mail ou SMS. Les mots de passe sont gérés par le service d'authentification, pas lisibles par nous.</p>
@@ -278,6 +282,8 @@ footer .brand{font-size:.95rem}
     <tr><td>Vérifier l'identité et les documents des chauffeurs et partenaires, assurer la sécurité des courses</td><td>Intérêt légitime, obligations légales, sécurité des personnes</td></tr>
     <tr><td>Prévenir la fraude et les abus, protéger la plateforme (limites, journaux)</td><td>Intérêt légitime</td></tr>
     <tr><td>Tenir la comptabilité et respecter les obligations fiscales et légales haïtiennes</td><td>Obligation légale</td></tr>
+    <tr><td>Protéger votre compte et vos points avec la seconde sécurité (empreinte ou visage)</td><td>Votre consentement, donné avant l'activation et retirable à tout moment</td></tr>
+    <tr><td>Afficher la météo, la date et l'heure sur l'accueil</td><td>Intérêt légitime ; votre autorisation pour la position précise</td></tr>
     <tr><td>Messages d'information ou promotionnels</td><td>Votre consentement, que vous pouvez retirer à tout moment</td></tr>
     <tr><td>Améliorer la plateforme (statistiques d'usage globales)</td><td>Intérêt légitime</td></tr>
   </table>
@@ -296,6 +302,7 @@ footer .brand{font-size:.95rem}
     <tr><td>Cloudflare, GitHub Pages</td><td>Hébergement et protection du site</td></tr>
     <tr><td>Resend</td><td>Envoi des e-mails</td></tr>
     <tr><td>Twilio</td><td>Envoi des SMS et codes de vérification</td></tr>
+    <tr><td>Fournisseur de météo (WeatherAPI.com), via notre serveur</td><td>Reçoit des coordonnées arrondies ou l'adresse IP pour donner la météo locale ; ne reçoit ni votre nom, ni votre compte</td></tr>
     <tr><td>Facebook (Meta)</td><td>Seulement si vous choisissez de vous connecter avec Facebook</td></tr>
   </table></div>
   <ul class="l">
@@ -311,6 +318,7 @@ footer .brand{font-size:.95rem}
     <li><b>Compte et historique :</b> tant que votre compte est actif, puis <span class="todo">À COMPLÉTER : durée, par exemple 12 mois</span> après sa fermeture.</li>
     <li><b>Opérations financières et factures :</b> <span class="todo">À COMPLÉTER : durée légale de conservation comptable en Haïti</span>.</li>
     <li><b>Candidatures refusées et documents :</b> <span class="todo">À COMPLÉTER : par exemple 6 à 12 mois</span> ; documents des chauffeurs et partenaires actifs : tant qu'ils exercent, puis <span class="todo">À COMPLÉTER</span>.</li>
+    <li><b>Seconde sécurité :</b> la clé publique et son journal sont conservés tant que vous ne les retirez pas ; ils sont supprimés à la fermeture du compte, sauf journal de sécurité conservé <span class="todo">À COMPLÉTER : durée</span>.</li>
     <li><b>Journaux de sécurité :</b> <span class="todo">À COMPLÉTER : par exemple 12 mois</span>.</li>
   </ul>
   <p>Passé ces durées, les données sont supprimées ou rendues anonymes.</p>
@@ -328,10 +336,18 @@ footer .brand{font-size:.95rem}
 
   <h2 class="s" id="p8"><span>8.</span>Sécurité</h2>
   <p>Nous protégeons vos données par des mesures techniques et organisationnelles : connexion chiffrée (HTTPS), accès limités par rôle, contrôles côté serveur pour les opérations sensibles (points, paiements), limites anti-abus, journalisation et sauvegardes. Aucun système n'est parfait : si une atteinte à vos données présentait un risque pour vous, nous vous préviendrions et préviendrions les autorités si nécessaire. De votre côté, choisissez un mot de passe solide et ne le partagez pas.</p>
+  <h3>Seconde sécurité : empreinte ou visage (facultative)</h3>
+  <ul class="l">
+    <li><b>Comment ça marche.</b> Votre téléphone ou ordinateur vérifie votre empreinte ou votre visage <b>lui-même</b>, grâce à un composant sécurisé de l'appareil. Il ne nous envoie qu'une preuve de réussite signée par une clé. Nous conservons uniquement la <b>clé publique</b> correspondante, qui ne permet pas de reconstituer votre empreinte ou votre visage.</li>
+    <li><b>Votre choix.</b> Vous indiquez si vous préférez l'empreinte ou le visage. C'est l'appareil qui décide de la méthode réellement proposée, selon ce qu'il sait faire et ce que vous y avez enregistré.</li>
+    <li><b>Consentement.</b> Cette option est activée seulement si vous cochez la case de consentement avant l'activation. Nous conservons la date et la version de ce consentement.</li>
+    <li><b>Fonctionnement.</b> Une fois activée, la vérification est demandée après chaque connexion et après 5 minutes sans activité. Elle est contrôlée par notre serveur : sans elle, les opérations sur vos points et l'accès à vos données personnelles sont refusés.</li>
+    <li><b>Retrait.</b> Vous pouvez la désactiver à tout moment dans votre profil ; la clé publique est alors supprimée. En cas de perte de l'appareil, Zetwal peut la réinitialiser après vérification de votre identité.</li>
+  </ul>
 
   <h2 class="s" id="p9"><span>9.</span>Cookies et stockage local</h2>
-  <p>La plateforme utilise le stockage de votre navigateur (cookies techniques, stockage local) pour garder votre session ouverte, vos préférences et votre panier. Ces éléments sont nécessaires au fonctionnement. Nous n'y mettons pas de publicité ciblée. Les polices (Google Fonts) et les services de connexion peuvent recevoir votre adresse IP lors du chargement. Vous pouvez effacer ces données dans les paramètres de votre navigateur ; vous serez alors déconnecté(e).</p>
-  <p><b>Position GPS.</b> Elle n'est utilisée que pour les courses et le suivi, et seulement si votre appareil vous demande l'autorisation et que vous l'acceptez. Vous pouvez la refuser ou la retirer dans les réglages de votre appareil.</p>
+  <p>La plateforme utilise le stockage de votre navigateur (cookies techniques, stockage local) pour garder votre session ouverte, vos préférences et votre panier. Ces éléments sont nécessaires au fonctionnement. Nous y gardons aussi, sur votre appareil, un repère d'activité (pour le délai de 5 minutes de la seconde sécurité) et la dernière météo affichée. Nous n'y mettons pas de publicité ciblée. Les polices (Google Fonts) et les services de connexion peuvent recevoir votre adresse IP lors du chargement. Vous pouvez effacer ces données dans les paramètres de votre navigateur ; vous serez alors déconnecté(e).</p>
+  <p><b>Position GPS.</b> Elle n'est utilisée que pour les courses, le suivi et la météo précise de l'accueil, et seulement si votre appareil vous demande l'autorisation et que vous l'acceptez. Vous pouvez la refuser ou la retirer dans les réglages de votre appareil.</p>
 
   <h2 class="s" id="p10"><span>10.</span>Mineurs</h2>
   <p>La plateforme s'adresse aux personnes de 18 ans et plus. Pour le transport d'enfants, nous traitons les informations de l'enfant (nom, trajet) fournies par le parent ou le tuteur, uniquement pour effectuer la course en sécurité. Si vous pensez qu'un mineur nous a donné des données sans autorisation, contactez-nous pour les supprimer.</p>
