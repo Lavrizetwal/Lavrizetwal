@@ -191,6 +191,8 @@ window.zQR=window.zQR||function(text){
   + "@media(max-width:760px){.zq-grid{grid-template-columns:1fr;gap:24px}.zq-main{padding:22px 14px}}"
   + "@media (prefers-reduced-motion:reduce){.zq-ov{transition:none}}";
 
+  var CSS2 = ".zh{position:relative;padding:18px 16px 16px;border-radius:18px;border:1px solid var(--g-24,rgba(212,175,55,.24));background:radial-gradient(120% 140% at 0% 0%,rgba(212,175,55,.18),rgba(212,175,55,0) 58%),rgba(255,255,255,.03);margin-bottom:14px;overflow:hidden}\n.zh-top{display:flex;align-items:center;gap:12px}\n.zh-av{width:54px;height:54px;border-radius:50%;overflow:hidden;flex-shrink:0;display:grid;place-items:center;border:1.5px solid var(--gold,#D4AF37);background:var(--g-08,rgba(212,175,55,.08));color:var(--gold,#D4AF37);font-family:var(--serif,Georgia,serif);font-size:1.5rem;font-weight:700}\n.zh-av img{width:100%;height:100%;object-fit:cover}\n.zh-id{min-width:0;flex:1}\n.zh-id b{display:block;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.zh-lv{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:var(--gold,#D4AF37);font-weight:700;margin-top:3px}\n.zh-lv svg{width:14px;height:14px;fill:var(--gold,#D4AF37)}\n.zh-bal{margin-top:16px}\n.zh-bal .k{font-size:.74rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-3,rgba(255,255,255,.5))}\n.zh-bal .v{font-family:var(--serif,Georgia,serif);font-size:2.7rem;line-height:1.05;font-weight:700;color:var(--gold,#D4AF37);font-variant-numeric:tabular-nums}\n.zh-bal .v s{font-family:var(--sans,system-ui);font-size:.8rem;font-weight:600;color:var(--ink-3,rgba(255,255,255,.5));text-decoration:none;margin-left:8px}\n.zh-mo{font-size:.8rem;color:var(--ink-2,rgba(255,255,255,.65));margin-top:5px;min-height:1.25em}\n.zh-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:12px}\n.zh-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#B89020,#F0D98A);border-radius:99px;transition:width .9s cubic-bezier(.22,1,.36,1)}\n.zh-nx{font-size:.74rem;color:var(--ink-3,rgba(255,255,255,.5));margin-top:6px;min-height:1.1em}\n.zh-acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}\n.zh-act{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 4px;min-height:66px;border-radius:14px;border:1px solid var(--line,rgba(255,255,255,.08));background:rgba(255,255,255,.035);color:var(--ink-1,#fff);font-family:var(--sans,system-ui);font-size:.74rem;font-weight:600;cursor:pointer;touch-action:manipulation;transition:transform .12s cubic-bezier(.23,1,.32,1),border-color .15s}\n.zh-act svg{width:21px;height:21px;stroke:var(--gold,#D4AF37);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}\n.zh-act:active{transform:scale(.95)}\n.zh-act:hover{border-color:var(--g-24,rgba(212,175,55,.24))}\n.zh-act .zt-n{position:absolute;top:5px;right:8px}\n.zt-bar{position:sticky;top:-18px;z-index:3;display:flex;gap:6px;overflow-x:auto;margin:0 -22px 14px;padding:10px 22px;background:rgba(8,8,8,.97);border-bottom:1px solid var(--line,rgba(255,255,255,.08));scrollbar-width:none}\n.zt-bar::-webkit-scrollbar{display:none}\n.zt-bar button{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:0 15px;border-radius:99px;border:1px solid var(--line,rgba(255,255,255,.08));background:none;color:var(--ink-2,rgba(255,255,255,.65));font-family:var(--sans,system-ui);font-size:.8rem;font-weight:600;cursor:pointer;touch-action:manipulation}\n.zt-bar button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}\n.zt-bar button.on{background:var(--gold,#D4AF37);border-color:var(--gold,#D4AF37);color:#0A0A0A}\n.zt-n{min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:#FF6B6B;color:#fff;font-size:.68rem;display:inline-grid;place-items:center;font-weight:700}\n.zc{padding:14px;border-radius:14px;border:1px dashed var(--g-24,rgba(212,175,55,.24));background:var(--g-08,rgba(212,175,55,.08));margin-bottom:14px}\n.zc b{display:block;font-size:.88rem;margin-bottom:4px}\n.zc p{font-size:.78rem;color:var(--ink-2,rgba(255,255,255,.65));margin:0 0 10px;line-height:1.5}\n.zc-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:10px}\n.zc-bar i{display:block;height:100%;background:var(--gold,#D4AF37);border-radius:99px}\n.zc-l{display:flex;flex-wrap:wrap;gap:8px}\n.zc-l button{min-height:38px;padding:0 13px;border-radius:99px;border:1px solid var(--g-24,rgba(212,175,55,.24));background:none;color:var(--gold,#D4AF37);font-family:var(--sans,system-ui);font-size:.76rem;font-weight:700;cursor:pointer}\n.hf{display:flex;gap:8px;margin-bottom:12px}\n.hf input{flex:1;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line,rgba(255,255,255,.08));background:rgba(255,255,255,.04);color:var(--ink-1,#fff);font-family:var(--sans,system-ui);font-size:.86rem}\n.hch{display:flex;gap:6px;overflow-x:auto;margin-bottom:6px;scrollbar-width:none}\n.hch::-webkit-scrollbar{display:none}\n.hch button{flex:0 0 auto;min-height:38px;padding:0 15px;border-radius:99px;border:1px solid var(--line,rgba(255,255,255,.08));background:none;color:var(--ink-2,rgba(255,255,255,.65));font-family:var(--sans,system-ui);font-size:.78rem;font-weight:600;cursor:pointer}\n.hch button.on{border-color:var(--gold,#D4AF37);color:var(--gold,#D4AF37);background:var(--g-08,rgba(212,175,55,.08))}\n.hd{font-size:.74rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3,rgba(255,255,255,.5));margin:16px 2px 8px;font-weight:600}\n.hx{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;min-height:66px;border-radius:14px;border:1px solid var(--line,rgba(255,255,255,.08));background:rgba(255,255,255,.03);color:var(--ink-1,#fff);font-family:var(--sans,system-ui);cursor:pointer;margin-bottom:8px;touch-action:manipulation;transition:transform .12s cubic-bezier(.23,1,.32,1),border-color .15s,background .15s;animation:hxin .35s both}\n.hx:hover{border-color:var(--g-24,rgba(212,175,55,.24));background:rgba(255,255,255,.055)}\n.hx:active{transform:scale(.985)}\n.hx .ic{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;background:rgba(255,255,255,.06);color:var(--gold,#D4AF37)}\n.hx.in .ic{color:var(--ok,#00E08A);background:rgba(0,224,138,.08)}\n.hx .ic svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}\n.hx .bd{flex:1;min-width:0}\n.hx .bd b{display:block;font-size:.9rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.hx .bd span{display:block;font-size:.76rem;color:var(--ink-3,rgba(255,255,255,.5));margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.hx .am{text-align:right;flex-shrink:0}\n.hx .am b{display:block;font-family:var(--serif,Georgia,serif);font-size:1.08rem;font-weight:700;color:var(--gold,#D4AF37)}\n.hx.in .am b{color:var(--ok,#00E08A)}\n.hx .am i{font-style:normal;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:99px;display:inline-block;margin-top:4px;border:1px solid transparent}\n.hx .un{min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:#FF6B6B;color:#fff;font-size:.7rem;display:grid;place-items:center;font-weight:700;flex-shrink:0}\n.hx-sum{font-size:.78rem;color:var(--ink-3,rgba(255,255,255,.5));margin:8px 2px 0}\n.hx-more{width:100%;min-height:46px;margin-top:6px}\n@keyframes hxin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}\n.sk{height:66px;border-radius:14px;margin-bottom:8px;background:linear-gradient(90deg,rgba(255,255,255,.03) 25%,rgba(255,255,255,.075) 50%,rgba(255,255,255,.03) 75%);background-size:200% 100%;animation:skm 1.3s linear infinite}\n@keyframes skm{to{background-position:-200% 0}}\n.zp-empty2{text-align:center;padding:34px 16px 24px;color:var(--ink-2,rgba(255,255,255,.65));font-size:.84rem;line-height:1.6}\n.zp-empty2 .big{width:64px;height:64px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;background:var(--g-08,rgba(212,175,55,.08));border:1px solid var(--g-24,rgba(212,175,55,.24));color:var(--gold,#D4AF37)}\n.zp-empty2 .big svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}\n.zp-empty2 .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}\n.zp-foot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid var(--line,rgba(255,255,255,.08))}\n.zp-foot .zp-btn{min-height:46px}\n.zf-ov{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s cubic-bezier(.23,1,.32,1)}\n.zf-ov.on{opacity:1}\n.zf{width:min(520px,100%);max-height:94vh;overflow-y:auto;background:#0b0b0b;border:1px solid var(--g-24,rgba(212,175,55,.24));border-radius:22px 22px 0 0;padding:8px 20px 26px;transform:translateY(46px);transition:transform .38s cubic-bezier(.22,1,.36,1);color:#fff;font-family:var(--sans,system-ui);box-shadow:0 -20px 80px rgba(0,0,0,.6)}\n.zf-ov.on .zf{transform:none}\n@media(min-width:700px){.zf-ov{align-items:center}.zf{border-radius:22px;max-height:90vh}}\n.zf-grab{width:44px;height:4px;border-radius:99px;background:rgba(255,255,255,.18);margin:6px auto 10px}\n.zf-x{position:absolute;right:14px;top:12px}\n.zf-top{text-align:center;padding:6px 0 18px;border-bottom:1px dashed rgba(255,255,255,.16)}\n.zf-ic{width:58px;height:58px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;background:var(--g-08,rgba(212,175,55,.08));border:1px solid var(--g-24,rgba(212,175,55,.24));color:var(--gold,#D4AF37)}\n.zf-ic.in{color:var(--ok,#00E08A);background:rgba(0,224,138,.08);border-color:rgba(0,224,138,.3)}\n.zf-ic svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}\n.zf-t{font-size:.92rem;font-weight:600;margin-bottom:6px}\n.zf-amt{font-family:var(--serif,Georgia,serif);font-size:2.6rem;line-height:1.1;font-weight:700;color:var(--gold,#D4AF37)}\n.zf-amt.in{color:var(--ok,#00E08A)}\n.zf-amt s{font-family:var(--sans,system-ui);font-size:.85rem;color:var(--ink-3,rgba(255,255,255,.5));text-decoration:none;margin-left:8px;font-weight:600}\n.zf-chip{display:inline-block;font-size:.74rem;font-weight:700;padding:5px 13px;border-radius:99px;margin-top:10px;border:1px solid transparent}\n.zf-date{font-size:.8rem;color:var(--ink-3,rgba(255,255,255,.5));margin-top:10px}\n.zf-ref{display:inline-flex;align-items:center;gap:8px;margin-top:12px;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line,rgba(255,255,255,.1));background:rgba(255,255,255,.04);color:var(--ink-2,rgba(255,255,255,.7));font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;letter-spacing:.8px;cursor:pointer}\n.zf-ref svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}\n.zf-sec{margin-top:20px}\n.zf-sec h4{margin:0 0 10px;font-size:.74rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold,#D4AF37);font-weight:700}\n.zf-tl{list-style:none;padding:0;margin:0}\n.zf-tl li{position:relative;padding:0 0 16px 30px;font-size:.88rem;font-weight:600}\n.zf-tl li::before{content:\"\";position:absolute;left:0;top:3px;width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.14);border:2px solid #0b0b0b;box-shadow:0 0 0 1px rgba(255,255,255,.14)}\n.zf-tl li::after{content:\"\";position:absolute;left:6px;top:20px;bottom:0;width:2px;background:rgba(255,255,255,.1)}\n.zf-tl li:last-child::after{display:none}\n.zf-tl li.done::before{background:var(--gold,#D4AF37);box-shadow:0 0 0 1px var(--gold,#D4AF37)}\n.zf-tl li.done::after{background:var(--g-45,rgba(212,175,55,.45))}\n.zf-tl li.now::before{background:#00E08A;box-shadow:0 0 0 4px rgba(0,224,138,.2)}\n.zf-tl li.bad::before{background:#FF6B6B;box-shadow:0 0 0 4px rgba(255,107,107,.2)}\n.zf-tl li.todo{color:var(--ink-3,rgba(255,255,255,.5));font-weight:500}\n.zf-tl small{display:block;color:var(--ink-3,rgba(255,255,255,.5));font-size:.76rem;font-weight:400;margin-top:2px}\n.zf-row{display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid var(--line,rgba(255,255,255,.08));font-size:.86rem}\n.zf-row span{color:var(--ink-3,rgba(255,255,255,.5));flex-shrink:0}\n.zf-row b{font-weight:600;text-align:right;word-break:break-word}\n.zf-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}\n.zf-acts .zp-btn{min-height:50px;font-size:.82rem;width:100%}\n.zf-acts .zp-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}\n.zf-acts .zp-btn.go{grid-column:1/-1}\n.zf-fine{font-size:.74rem;color:var(--ink-4,rgba(255,255,255,.35));text-align:center;margin-top:14px;line-height:1.5}\n.mg-new{margin-bottom:12px;border:1px solid var(--line,rgba(255,255,255,.08));border-radius:14px;background:rgba(255,255,255,.03)}\n.mg-new summary{cursor:pointer;min-height:46px;padding:0 14px;display:flex;align-items:center;font-size:.84rem;font-weight:600;color:var(--gold,#D4AF37);list-style:none}\n.mg-new summary::-webkit-details-marker{display:none}\n.mg-newb{display:flex;gap:8px;padding:0 12px 12px}\n.mg-newb input{flex:1;min-height:46px;padding:0 13px;border-radius:12px;border:1px solid var(--line,rgba(255,255,255,.08));background:rgba(255,255,255,.04);color:var(--ink-1,#fff);font-family:var(--sans,system-ui);font-size:.86rem}\n.mg-newb .zp-btn{width:auto;min-height:46px}\n.av{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;background:var(--g-08,rgba(212,175,55,.08));border:1px solid var(--g-24,rgba(212,175,55,.24));color:var(--gold,#D4AF37);font-family:var(--serif,Georgia,serif);font-weight:700;font-size:1.1rem}\n.mt-h{display:flex;align-items:center;gap:12px;padding:2px 0 12px;border-bottom:1px solid var(--line,rgba(255,255,255,.08));margin-bottom:6px}\n.mt-back{width:42px;height:42px;border-radius:50%;border:1px solid var(--line,rgba(255,255,255,.1));background:none;color:var(--ink-1,#fff);cursor:pointer;display:grid;place-items:center;flex-shrink:0}\n.mt-back svg,.mt-send svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}\n.mt-n{flex:1;min-width:0}\n.mt-n b{display:block;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.mt-n small{display:block;font-size:.74rem;color:var(--ink-3,rgba(255,255,255,.5))}\n.mt-pay{min-height:42px;padding:0 13px;font-size:.76rem;white-space:nowrap}\n.mt-feed{display:flex;flex-direction:column;max-height:50vh;min-height:140px;overflow-y:auto;padding:4px 2px 10px}\n.mb{max-width:82%;padding:10px 13px 7px;border-radius:18px;font-size:.9rem;line-height:1.45;word-break:break-word;margin-bottom:6px}\n.mb.me{align-self:flex-end;background:var(--gold,#D4AF37);color:#0A0A0A;border-bottom-right-radius:6px}\n.mb.ot{align-self:flex-start;background:rgba(255,255,255,.08);color:var(--ink-1,#fff);border-bottom-left-radius:6px}\n.mb a{color:inherit;text-decoration:underline;display:block;margin-bottom:4px}\n.mb small{display:flex;justify-content:flex-end;align-items:center;gap:5px;font-size:.68rem;opacity:.7;margin-top:3px}\n.md{align-self:center;font-size:.72rem;color:var(--ink-3,rgba(255,255,255,.5));margin:12px 0 8px;letter-spacing:1px;text-transform:uppercase}\n.mt-in{display:flex;gap:8px;align-items:center;position:sticky;bottom:-18px;padding:10px 0 4px;background:linear-gradient(to top,rgba(8,8,8,.98) 70%,rgba(8,8,8,0))}\n.mt-in input{flex:1;min-height:50px;padding:0 16px;border-radius:99px;border:1px solid var(--line,rgba(255,255,255,.1));background:rgba(255,255,255,.05);color:var(--ink-1,#fff);font-family:var(--sans,system-ui);font-size:.9rem}\n.mt-send{width:50px;height:50px;border-radius:50%;border:0;background:var(--gold,#D4AF37);color:#0A0A0A;cursor:pointer;display:grid;place-items:center;flex-shrink:0;touch-action:manipulation;transition:transform .12s cubic-bezier(.23,1,.32,1)}\n.mt-send:active{transform:scale(.92)}\n.zp-btn:focus-visible,.hx:focus-visible,.zh-act:focus-visible,.zt-bar button:focus-visible,.hch button:focus-visible,.zf-ref:focus-visible,.mt-send:focus-visible,.mt-back:focus-visible{outline:2px solid var(--gold,#D4AF37);outline-offset:2px}\n@media (prefers-reduced-motion:reduce){.hx,.sk,.zh-bar i,.zf,.zf-ov{animation:none!important;transition:none!important}}\n\n.zp-btn{min-height:44px}\n.zp-fld input,.zp-fld textarea{min-height:46px;font-size:.86rem}\n.zp-fld label{font-size:.72rem}\n.zp-hint{font-size:.76rem}\n.zp-empty{font-size:.84rem}\n.zptx .bd span{font-size:.76rem}\n.zptx .bd b{font-size:.88rem}\n";
+
   var STATUS_LABEL = {
     requested:'Ap tann', accepted:'Aksepte', on_way:'Sou wout', arrived:'Chofè rive',
     picked:'Kòmanse', done:'Fini', cancelled:'Anile', pending:'Ap tann'
@@ -206,9 +208,194 @@ window.zQR=window.zQR||function(text){
     cancelled:'color:#FF6B6B;border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)'
   };
 
+  /* ═══ générateur de reçu PDF ═══ */
+/* ── Reçu PDF (sans bibliothèque, tout reste dans le navigateur) ─────────────
+   Polices standard du PDF (Helvetica / Times), codage WinAnsi : é è ò ç etc. passent. */
+var ZR_WH = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,761,556,278,222,556,333,1000,556,556,333,1000,667,333,1000,278,611,278,278,222,222,333,333,350,556,1000,333,1000,500,333,944,278,500,667,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,333,400,584,333,333,333,556,537,278,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,584,611,556,556,556,556,500,556,500];
+var ZR_WB = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584,761,556,278,278,556,500,1000,556,556,333,1000,667,333,1000,278,611,278,278,278,278,500,500,350,556,1000,333,1000,556,333,944,278,500,667,278,333,556,556,556,556,280,556,333,737,370,556,584,333,737,333,400,584,333,333,333,611,556,278,333,333,365,556,834,834,834,611,722,722,722,722,722,722,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,556,556,556,556,556,278,278,278,278,611,611,611,611,611,611,611,584,611,611,611,611,611,556,611,556];
+var ZR_WT = [250,333,555,500,500,1000,833,278,333,333,500,570,250,333,250,278,500,500,500,500,500,500,500,500,500,500,333,333,570,570,570,500,930,722,667,722,722,667,611,778,778,389,500,778,667,944,722,778,611,778,722,556,667,722,722,1000,722,722,667,333,278,333,581,500,333,500,556,444,556,444,333,500,556,278,333,556,278,833,556,500,556,556,444,389,333,556,500,722,500,500,444,394,220,394,520,761,500,250,333,500,500,1000,500,500,333,1000,556,333,1000,250,667,250,250,333,333,500,500,350,500,1000,333,1000,389,333,722,250,444,722,250,333,500,500,500,500,220,500,333,747,300,500,570,333,747,333,400,570,300,300,333,556,540,250,333,300,330,500,750,750,750,500,722,722,722,722,722,722,1000,722,667,667,667,667,389,389,389,389,722,722,778,778,778,778,778,570,778,722,722,722,722,722,611,556,500,500,500,500,500,500,722,444,444,444,444,444,278,278,278,278,500,556,500,500,500,500,500,570,500,556,556,556,556,500,556,500];
+function zrEnc(s){
+  var map = {8364:128,8218:130,402:131,8222:132,8230:133,8224:134,8225:135,710:136,8240:137,352:138,8249:139,338:140,381:142,8216:145,8217:146,8220:147,8221:148,8226:149,8211:150,8212:151,732:152,8482:153,353:154,8250:155,339:156,382:158,376:159};
+  s = String(s == null ? '' : s);
+  try{ s = s.normalize('NFC'); }catch(e){}
+  var out = '';
+  for(var i = 0; i < s.length; i++){
+    var c = s.charCodeAt(i);
+    if(c >= 0xD800 && c <= 0xDBFF){ i++; continue; }          /* emoji : on les saute */
+    if(c === 0xFE0F || c === 0x200D || c === 0x200B) continue;
+    if(c === 10 || c === 13 || c === 9) out += ' ';
+    else if(c >= 32 && c <= 126) out += s.charAt(i);
+    else if(c >= 160 && c <= 255) out += s.charAt(i);
+    else if(c >= 128 && c <= 159) out += s.charAt(i);   /* déjà codé WinAnsi (le texte repasse par zrEnc) */
+    else if(map[c]) out += String.fromCharCode(map[c]);
+    else if(c === 0x2212) out += '-';
+    else if(c === 0x2192) out += '>';
+    else if(c === 0x2022) out += String.fromCharCode(149);
+    else out += '?';
+  }
+  return out;
+}
+function zrEsc(b){ return b.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)'); }
+function zrW(b, f, size){
+  var T = f === 'b' ? ZR_WB : (f === 't' ? ZR_WT : ZR_WH), w = 0;
+  for(var i = 0; i < b.length; i++){ var c = b.charCodeAt(i) - 32; w += (T[c] != null ? T[c] : 556); }
+  return w * size / 1000;
+}
+function zrWrap(b, f, size, maxW){
+  var words = b.split(' '), lines = [], cur = '';
+  words.forEach(function(w){
+    var t = cur ? cur + ' ' + w : w;
+    if(zrW(t, f, size) <= maxW || !cur){
+      if(zrW(t, f, size) > maxW && !cur){            /* mot trop long : on coupe */
+        var piece = '';
+        for(var k = 0; k < t.length; k++){
+          if(zrW(piece + t.charAt(k), f, size) > maxW && piece){ lines.push(piece); piece = ''; }
+          piece += t.charAt(k);
+        }
+        cur = piece;
+      } else cur = t;
+    } else { lines.push(cur); cur = w; }
+  });
+  if(cur) lines.push(cur);
+  return lines.length ? lines : [''];
+}
+/* rec = { ref, title, amount, unit, status, tone('ok'|'wait'|'bad'|'gold'), when, whenTxt, rows:[[kr,fr,val]], steps:[{l,t,s}], qr:{n,dark:function(r,c)}, payload, genTxt } */
+function zrBuild(rec){
+  var W = 595, H = 842, M = 44, CW = W - 2 * M;
+  var C = { gold:[.831,.686,.216], ink:[.07,.07,.07], grey:[.45,.45,.45], line:[.87,.87,.87], white:[1,1,1], black:[.02,.02,.02],
+            ok:[0,.55,.34], wait:[.78,.5,0], bad:[.8,.2,.2], soft:[.965,.955,.93] };
+  var pages = [], ops, y;
+  function col(c){ return c[0] + ' ' + c[1] + ' ' + c[2]; }
+  function fx(n){ return (Math.round(n * 100) / 100).toString(); }
+  function rect(x, yy, w, h, c){ ops.push(col(c) + ' rg ' + fx(x) + ' ' + fx(H - yy - h) + ' ' + fx(w) + ' ' + fx(h) + ' re f'); }
+  function line(x1, y1, x2, y2, c, wd){ ops.push(col(c) + ' RG ' + (wd || .6) + ' w ' + fx(x1) + ' ' + fx(H - y1) + ' m ' + fx(x2) + ' ' + fx(H - y2) + ' l S'); }
+  function txt(x, yy, s, f, size, c, align){
+    var b = zrEnc(s), w = zrW(b, f, size);
+    if(align === 'r') x = x - w; else if(align === 'c') x = x - w / 2;
+    ops.push('BT /' + (f === 'b' ? 'F2' : f === 't' ? 'F3' : 'F1') + ' ' + size + ' Tf ' + col(c) + ' rg ' + fx(x) + ' ' + fx(H - yy) + ' Td (' + zrEsc(b) + ') Tj ET');
+    return w;
+  }
+  function newPage(first){
+    ops = []; pages.push(ops);
+    if(first){
+      rect(0, 0, W, 118, C.black);
+      rect(0, 118, W, 3, C.gold);
+      txt(M, 62, 'ZETWAL', 't', 34, C.gold);
+      txt(M, 82, 'ORGANISATION  -  AYITI', 'a', 8.5, [.75,.75,.75]);
+      txt(W - M, 52, 'REKI  /  REÇU', 'b', 13, C.white, 'r');
+      txt(W - M, 72, rec.ref, 'b', 11, C.gold, 'r');
+      txt(W - M, 90, rec.genTxt || '', 'a', 8.5, [.75,.75,.75], 'r');
+      y = 156;
+    } else {
+      rect(0, 0, W, 40, C.black);
+      txt(M, 26, 'ZETWAL', 't', 16, C.gold);
+      txt(W - M, 26, rec.ref, 'b', 9.5, C.gold, 'r');
+      y = 74;
+    }
+  }
+  function need(h){ if(y + h > H - 56){ newPage(false); } }
+
+  newPage(true);
+
+  /* bloc montant */
+  rect(M, y - 18, CW, 88, C.soft);
+  rect(M, y - 18, 4, 88, C.gold);
+  txt(M + 20, y + 2, 'MONTAN  /  MONTANT', 'b', 8, C.grey);
+  var aw = txt(M + 20, y + 40, rec.amount, 'b', 30, C.ink);
+  txt(M + 20 + aw + 8, y + 40, rec.unit, 'b', 13, C.gold);
+  var tc = rec.tone === 'ok' ? C.ok : rec.tone === 'bad' ? C.bad : rec.tone === 'wait' ? C.wait : C.gold;
+  var sb = zrEnc(rec.status), sw = zrW(sb, 'b', 9.5) + 22;
+  rect(W - M - 14 - sw, y + 6, sw, 22, tc);
+  txt(W - M - 14 - sw / 2, y + 21, rec.status, 'b', 9.5, C.white, 'c');
+  txt(M + 20, y + 62, rec.whenTxt, 'a', 9.5, C.grey);
+  y += 92;
+
+  /* titre */
+  zrWrap(zrEnc(rec.title), 'b', 15, CW).forEach(function(l){ txt(M, y, l, 'b', 15, C.ink); y += 19; });
+  y += 6;
+
+  /* détails */
+  function section(kr, fr){ need(40); txt(M, y, kr + '  /  ' + fr, 'b', 8.5, C.gold); y += 8; line(M, y, W - M, y, C.gold, .8); y += 16; }
+  section('DETAY', 'DÉTAILS');
+  (rec.rows || []).forEach(function(r){
+    var lab1 = zrEnc(r[0]), lab2 = zrEnc(r[1]);
+    var vl = zrWrap(zrEnc(r[2]), 'b', 10.5, CW - 190);
+    var h = Math.max(vl.length * 13.5, 22) + 2;
+    need(h);
+    txt(M, y, lab1, 'a', 9.5, C.grey);
+    if(lab2 && lab2 !== lab1) txt(M, y + 11, lab2, 'a', 8, [.65,.65,.65]);
+    vl.forEach(function(l, i){ txt(W - M, y + i * 14, l, 'b', 10.5, C.ink, 'r'); });
+    y += h - 2;
+    line(M, y, W - M, y, C.line, .5);
+    y += 10;
+  });
+
+  /* suivi */
+  if(rec.steps && rec.steps.length){
+    y += 4; section('SUIVI', 'SUIVI');
+    rec.steps.forEach(function(s, i){
+      need(28);
+      var c = s.s === 'bad' ? C.bad : (s.s === 'now' ? C.ok : (s.s === 'todo' ? [.78,.78,.78] : C.gold));
+      rect(M + 2, y - 8, 9, 9, c);
+      if(i < rec.steps.length - 1) line(M + 6.5, y + 2, M + 6.5, y + 19, C.line, 1);
+      txt(M + 24, y, s.l, 'b', 10.5, C.ink);
+      if(s.t) txt(W - M, y, s.t, 'a', 9.5, C.grey, 'r');
+      y += 18;
+    });
+  }
+
+  /* pied : QR + mentions (dernière page) */
+  if(y > H - 132) newPage(false);                 /* le pied (QR + mentions) a besoin de place */
+  var fy = H - 112;
+  line(M, fy - 14, W - M, fy - 14, C.line, .6);
+  var qrx = M, qs = 0;
+  if(rec.qr && rec.qr.n){
+    var cell = 2.4; qs = rec.qr.n * cell;
+    rect(qrx - 4, fy - 6, qs + 8, qs + 8, C.white);
+    for(var r = 0; r < rec.qr.n; r++) for(var c2 = 0; c2 < rec.qr.n; c2++){
+      if(rec.qr.dark(r, c2)) rect(qrx + c2 * cell, fy - 2 + r * cell, cell + .05, cell + .05, C.black);
+    }
+  }
+  var tx = qrx + (qs ? qs + 20 : 0);
+  txt(tx, fy + 8, 'Referans  /  Référence', 'b', 8.5, C.gold);
+  txt(tx, fy + 24, rec.ref, 'b', 13, C.ink);
+  var note = 'Rekò sa a te jenere otomatikman pa aplikasyon Zetwal la. Li sèvi kòm prèv enfòmasyon sou tranzaksyon an, li pa ranplase yon fakti ofisyèl. / Ce reçu est généré automatiquement par l\'application Zetwal. Il est informatif et ne remplace pas une facture officielle.';
+  var ny = fy + 42;
+  zrWrap(zrEnc(note), 'a', 7.6, W - M - tx).slice(0, 5).forEach(function(l){ txt(tx, ny, l, 'a', 7.6, C.grey); ny += 10; });
+  txt(W - M, H - 24, 'zetwal.org', 'b', 8.5, C.gold, 'r');
+  pages.forEach(function(p, i){ p.push('BT /F1 7.5 Tf .6 .6 .6 rg ' + fx(M) + ' 22 Td (' + zrEsc(zrEnc('Paj ' + (i + 1) + ' / ' + pages.length)) + ') Tj ET'); });
+
+  /* assemblage du fichier */
+  var objs = [];
+  function add(s){ objs.push(s); return objs.length; }
+  add('<< /Type /Catalog /Pages 2 0 R >>');
+  add('');
+  add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+  add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+  add('<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold /Encoding /WinAnsiEncoding >>');
+  var kids = [];
+  pages.forEach(function(p){
+    var content = p.join('\n');
+    var cid = add('<< /Length ' + content.length + ' >>\nstream\n' + content + '\nendstream');
+    var pid = add('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + W + ' ' + H + '] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents ' + cid + ' 0 R >>');
+    kids.push(pid + ' 0 R');
+  });
+  var iid = add('<< /Title (' + zrEsc(zrEnc('Reçu Zetwal ' + rec.ref)) + ') /Producer (Zetwal) >>');
+  objs[1] = '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + kids.length + ' >>';
+  var out = '%PDF-1.4\n%\xE2\xE3\xCF\xD3\n', offs = [];
+  objs.forEach(function(o, i){ offs.push(out.length); out += (i + 1) + ' 0 obj\n' + o + '\nendobj\n'; });
+  var xr = out.length;
+  out += 'xref\n0 ' + (objs.length + 1) + '\n0000000000 65535 f \n';
+  offs.forEach(function(o){ out += ('0000000000' + o).slice(-10) + ' 00000 n \n'; });
+  out += 'trailer\n<< /Size ' + (objs.length + 1) + ' /Root 1 0 R /Info ' + iid + ' 0 R >>\nstartxref\n' + xr + '\n%%EOF\n';
+  var u8 = new Uint8Array(out.length);
+  for(var i = 0; i < out.length; i++) u8[i] = out.charCodeAt(i) & 255;
+  return u8;
+}
+
   function init(){
     if(document.getElementById('zp-panel')) return;   /* deja poze */
-    var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
+    var st = document.createElement('style'); st.textContent = CSS + CSS2; document.head.appendChild(st);
 
     var wrap = document.createElement('div');
     wrap.innerHTML =
@@ -320,7 +507,7 @@ window.zQR=window.zQR||function(text){
       }catch(e){}
     }
 
-    var tab = 'info';
+    var tab = 'hist';
     var role = { driver:null, partners:[] };
     var histCache = null, transferCache = null;
 
@@ -344,55 +531,417 @@ window.zQR=window.zQR||function(text){
       }catch(e){}
     }
 
-    async function loadHistory(){
-      var mail = currentUser && currentUser.email;
-      if(!sb || !mail) return [];
-      var out = [];
-      try{
-        var a = await sb.from('rides').select('*').eq('client_email', mail).order('created_at',{ascending:false}).limit(25);
-        (a.data||[]).forEach(function(r){ out.push(Object.assign({_kind:'Kòmand', _t:'ride'}, r,
-          { _title:(r.ride_mode==='object'?'Objè':r.ride_mode==='child'?'Timoun':'Kous') + ' · ' + (r.from_addr||'—').split(',')[0],
-            _price:r.price_estimated, _track:['requested','accepted','on_way','arrived','picked'].indexOf(r.status)!==-1 })); });
-      }catch(e){}
-      try{
-        var b = await sb.from('move_orders').select('*').eq('client_email', mail).order('created_at',{ascending:false}).limit(25);
-        (b.data||[]).forEach(function(r){ out.push(Object.assign({_kind:'Kòmand', _t:'order'}, r,
-          { _title:(r.kind==='manje'?'Manje':r.kind==='shop'?'Acha Shop':'Pake') + ' · ' + (r.partner_name||''),
-            _price:r.total, _track:['requested','accepted','on_way','arrived','picked'].indexOf(r.status)!==-1 })); });
-      }catch(e){}
-      try{
-        var c = await sb.from('orders').select('*').eq('client_email', mail).order('created_at',{ascending:false}).limit(25);
-        (c.data||[]).forEach(function(r){ out.push(Object.assign({_kind:'Shop'}, r,
-          { status:r.status||'pending', _title:'Shop · ' + (r.product_name||''), _price:r.total_estimated })); });
-      }catch(e){}
-      try{
-        var t = await loadTransfers();
-        var uid = currentUser.uid;
-        t.forEach(function(r){
-          var out_ = r.from_uid === uid;
-          out.push(Object.assign({_kind:'Pwen', _t:'transfer'}, r, {
-            status: out_ ? (r.to_uid ? 'done' : 'pending') : 'done',
-            updated_at: r.created_at,
-            _title: r.kind === 'store_sale' ? 'Pwen achte nan boutik la'
-                  : r.kind === 'shop_payment' ? 'Peman kòmand Shop ak pwen'
-                  : out_ ? 'Pwen voye bay ' + (r.to_name||r.to_email||'') : 'Pwen resevwa nan men ' + (r.from_name||r.from_email||''),
-            _price: r.amount, _out: out_
-          }));
-        });
-      }catch(e){}
-      out.sort(function(x,y){ return new Date(y.created_at||0) - new Date(x.created_at||0); });
-      return out;
+    /* ════════════════════════════════════════════════════════════
+       ESPAS KONT INTERAKTIF — tablo, istwa, fich tranzaksyon + PDF
+       ════════════════════════════════════════════════════════════ */
+    var IC = {
+      send:'<path d="M5 12h14M13 6l6 6-6 6"/>', recv:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+      car:'<path d="M5 16h14M6 16l1.6-6h8.8L18 16M7 16v3M17 16v3"/><circle cx="8.5" cy="13" r=".7"/><circle cx="15.5" cy="13" r=".7"/>',
+      bag:'<path d="M6 8h12l-1 12H7zM9 8a3 3 0 0 1 6 0"/>',
+      box:'<path d="M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8"/>',
+      food:'<path d="M6 3v8a2 2 0 0 0 2 2v8M10 3v6M6 7h4M17 3c-2 2-2 6 0 8v10"/>',
+      store:'<path d="M4 9l1-5h14l1 5M4 9v11h16V9M4 9a3 3 0 0 0 5 0 3 3 0 0 0 6 0 3 3 0 0 0 5 0"/>',
+      chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+      hist:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/>',
+      bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8M10 20a2 2 0 0 0 4 0"/>',
+      user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+      qr:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/>',
+      ask:'<path d="M12 5v14M5 12h14"/>',
+      pdf:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 14h6M9 17h4"/>',
+      share:'<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
+      copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
+      flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+      pin:'<path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+      redo:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',
+      check:'<path d="M20 6 9 17l-5-5"/>', back:'<path d="M15 6l-6 6 6 6"/>',
+      star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'
+    };
+    function sv(n){ return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (IC[n] || IC.check) + '</svg>'; }
+    var STATUS_FR = { requested:'En attente', accepted:'Acceptée', on_way:'En route', arrived:'Chauffeur arrivé', picked:'En cours', done:'Terminée', cancelled:'Annulée', pending:'En attente' };
+    var histState = { f:'all', q:'', n:15 };
+    var histP = null, prefillSend = null, lastShownPts = 0, unreadMsgs = 0, ficheOpener = null;
+
+    function qa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+    function ms(t){ return t ? (new Date(t).getTime() || 0) : 0; }
+    function hhmm(t){ return new Date(t).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }); }
+    function fullDate(t){ return new Date(t).toLocaleString('fr-FR', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+    function startOfToday(){ var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime(); }
+    function dayLabel(t){
+      var s0 = startOfToday();
+      if(t >= s0) return 'Jodi a';
+      if(t >= s0 - 86400000) return 'Yè';
+      return new Date(t).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+    }
+    function relTime(t){
+      if(!t) return '';
+      var d = Date.now() - t;
+      if(d < 60000) return 'kounye a';
+      if(d < 3600000) return Math.floor(d / 60000) + ' min';
+      var s0 = startOfToday();
+      if(t >= s0) return Math.floor(d / 3600000) + ' h';
+      if(t >= s0 - 86400000) return 'Yè';
+      return new Date(t).toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
+    }
+    function maskMail(m){ m = String(m || ''); var i = m.indexOf('@'); return i < 1 ? m : m.slice(0, Math.min(2, i)) + '•••' + m.slice(i); }
+    function maskTel(p){ p = String(p || ''); var d = p.replace(/\D/g, ''); return d.length < 6 ? p : (p.charAt(0) === '+' ? '+' : '') + d.slice(0, 3) + '•• ••' + d.slice(-2); }
+    function skeleton(n){ var h = ''; for(var i = 0; i < (n || 3); i++) h += '<div class="sk"></div>'; return h; }
+    function vibe(){ try{ if(navigator.vibrate) navigator.vibrate(12); }catch(e){} }
+    function copyText(t, okMsg){
+      function done(){ toast(okMsg || 'Kopye'); vibe(); }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done, function(){ toast(t); }); }
+      else { try{ var ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); done(); }catch(e){ toast(t); } }
     }
 
-    async function loadTransfers(){
+    /* ── Chaje istwa (4 sous). Si TOUT echwe, nou di l — nou pa fè kòmsi pa gen anyen. ── */
+    async function loadTransfers(limit, onFail){
       if(!sb || !currentUser) return [];
       try{
         var uid = currentUser.uid;
         var r = await sb.from('point_transfers').select('*')
           .or('from_uid.eq.' + uid + ',to_uid.eq.' + uid)
-          .order('created_at',{ascending:false}).limit(20);
+          .order('created_at', { ascending:false }).limit(limit || 20);
+        if(r.error){ if(onFail) onFail(); return []; }
         return r.data || [];
-      }catch(e){ return []; }
+      }catch(e){ if(onFail) onFail(); return []; }
+    }
+    async function loadHistory(){
+      var mail = currentUser && currentUser.email;
+      if(!sb || !mail) return [];
+      var out = [], failed = 0, ACTIVE = ['requested','accepted','on_way','arrived','picked'];
+      async function pull(table){
+        try{
+          var r = await sb.from(table).select('*').eq('client_email', mail).order('created_at', { ascending:false }).limit(50);
+          if(r.error){ failed++; return []; }
+          return r.data || [];
+        }catch(e){ failed++; return []; }
+      }
+      var res = await Promise.all([ pull('rides'), pull('move_orders'), pull('orders'), loadTransfers(60, function(){ failed++; }) ]);
+      res[0].forEach(function(r){ out.push(Object.assign({ _kind:'Kòmand', _t:'ride' }, r,
+        { _title:(r.ride_mode === 'object' ? 'Objè' : r.ride_mode === 'child' ? 'Timoun' : 'Kous') + ' · ' + (r.from_addr || '—').split(',')[0],
+          _price:r.price_estimated, _track:ACTIVE.indexOf(r.status) !== -1 })); });
+      res[1].forEach(function(r){ out.push(Object.assign({ _kind:'Kòmand', _t:'order' }, r,
+        { _title:(r.kind === 'manje' ? 'Manje' : r.kind === 'shop' ? 'Acha Shop' : 'Pake') + ' · ' + (r.partner_name || ''),
+          _price:r.total, _track:ACTIVE.indexOf(r.status) !== -1 })); });
+      res[2].forEach(function(r){ out.push(Object.assign({ _kind:'Shop', _t:'shop' }, r,
+        { status:r.status || 'pending', _title:'Shop · ' + (r.product_name || ''), _price:r.total_estimated })); });
+      var uid = currentUser.uid;
+      res[3].forEach(function(r){
+        var out_ = r.from_uid === uid;
+        out.push(Object.assign({ _kind:'Pwen', _t:'transfer' }, r, {
+          status: out_ ? (r.to_uid ? 'done' : 'pending') : 'done',
+          updated_at: r.created_at,
+          _title: r.kind === 'store_sale' ? 'Pwen achte nan boutik la'
+                : r.kind === 'shop_payment' ? 'Peman kòmand Shop ak pwen'
+                : out_ ? 'Pwen voye bay ' + (r.to_name || maskMail(r.to_email) || maskTel(r.to_phone) || '') : 'Pwen resevwa nan men ' + (r.from_name || maskMail(r.from_email) || ''),
+          _price: r.amount, _out: out_
+        }));
+      });
+      out.sort(function(x, y){ return ms(y.created_at) - ms(x.created_at); });
+      out.failed = failed;
+      return out;
+    }
+    function decorate(o){
+      if(o._d) return o;
+      var t = o._t || (o._kind === 'Shop' ? 'shop' : 'x'); o._t = t;
+      o._ts = ms(o.created_at);
+      var p = t === 'ride' ? 'K' : t === 'order' ? 'M' : t === 'transfer' ? 'P' : 'S';
+      var raw = String(o.id == null ? '' : o.id).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      raw = ('00000000' + raw).slice(-8);
+      o._ref = 'ZT-' + p + raw.slice(0, 4) + '-' + raw.slice(4);
+      if(t === 'transfer'){
+        o._cat = 'pts'; o._dir = o._out ? 'out' : 'in';
+        o._icon = o.kind === 'store_sale' ? 'store' : o.kind === 'shop_payment' ? 'bag' : (o._out ? 'send' : 'recv');
+        o._amt = (o._out ? '−' : '+') + Number(o._price || 0).toFixed(1); o._unit = 'pwen';
+      } else {
+        o._cat = t === 'shop' ? 'shop' : 'cmd'; o._dir = 'out';
+        o._icon = t === 'ride' ? 'car' : t === 'shop' ? 'bag' : (o.kind === 'manje' ? 'food' : o.kind === 'shop' ? 'bag' : 'box');
+        var pr = (t === 'ride' && o.price_final != null) ? o.price_final : o._price;
+        o._amt = fmt(pr); o._unit = 'HTG';
+      }
+      o._d = 1; return o;
+    }
+    function getHist(){
+      if(histCache) return Promise.resolve(histCache);
+      if(!histP) histP = loadHistory().then(function(h){ var f = h.failed; h.forEach(decorate); h.failed = f; histCache = h; histP = null; return h; },
+        function(){ histP = null; var h = []; h.failed = 4; return h; });
+      return histP;
+    }
+    function statusLabel(o){
+      if(o._t === 'transfer') return o.status === 'pending' ? 'Ap tann' : (o._out ? 'Voye' : 'Resevwa');
+      return STATUS_LABEL[o.status] || o.status || '';
+    }
+    function statusFr(o){
+      if(o._t === 'transfer') return o.status === 'pending' ? 'En attente' : (o._out ? 'Envoyé' : 'Reçu');
+      return STATUS_FR[o.status] || o.status || '';
+    }
+    function tone(o){ var s = o.status; return s === 'cancelled' ? 'bad' : (s === 'done' ? 'gold' : (s === 'requested' || s === 'pending') ? 'wait' : 'ok'); }
+    function chipStyle(o){ return o._t === 'transfer' ? (o.status === 'pending' ? STATUS_STYLE.pending : STATUS_STYLE.done) : (STATUS_STYLE[o.status] || STATUS_STYLE.requested); }
+    function itemsList(o){
+      var it = o.items; if(typeof it === 'string'){ try{ it = JSON.parse(it); }catch(e){ it = null; } }
+      if(!Array.isArray(it)) return [];
+      return it.map(function(x){
+        var n = x && (x.name || x.nom || x.title || x.label), q = x && (x.qty || x.quantity || x.qte || 1), pr = x && (x.price != null ? x.price : (x.prix != null ? x.prix : null));
+        if(!n) return null;
+        return q + ' × ' + n + (pr != null && isFinite(Number(pr)) ? ' — ' + fmt(Number(pr) * Number(q)) + ' HTG' : '');
+      }).filter(Boolean);
+    }
+    var PAY_ST = { paid:['Peye','Payé'], pending:['Ap tann peman','Paiement en attente'], accepted:['Peman aksepte','Paiement accepté'], rejected:['Peman refize','Paiement refusé'] };
+    /* Liy detay : [kreyòl, fransè, valè] — menm done pou fich la ak PDF la. Nou pa janm mete kòd sekrè (drop_code) ni telefòn. */
+    function detailRows(o){
+      var R = [];
+      function add(k, f, v){ if(v !== null && v !== undefined && String(v).trim() !== '' && String(v) !== 'null') R.push([k, f, String(v)]); }
+      var t = o._t;
+      if(t === 'transfer'){
+        var other = o._out ? (o.to_name || '') : (o.from_name || '');
+        var om = o._out ? o.to_email : o.from_email, op = o._out ? o.to_phone : null;
+        add('Kalite', 'Type', o.kind === 'store_sale' ? 'Achte pwen nan boutik' : o.kind === 'shop_payment' ? 'Peman Shop ak pwen' : (o.kind === 'qr_transfer' ? 'Transfè pa kòd QR' : 'Transfè pwen'));
+        add(o._out ? 'Pou' : 'De', o._out ? 'Vers' : 'De', other);
+        add('Kontak', 'Contact', maskMail(om) || maskTel(op));
+        add('Kantite', 'Quantité', Number(o.amount || 0).toFixed(1) + ' pwen');
+        if(o.htg_amount) add('Valè an goud', 'Valeur en gourdes', fmt(o.htg_amount) + ' HTG');
+        if(o.kind === 'store_sale' && o.operator_name) add('Anplwaye', 'Employé', o.operator_name);
+        add('Nòt', 'Note', o.note);
+      } else if(t === 'ride'){
+        add('Kalite', 'Type', o.ride_mode === 'object' ? 'Livrezon objè' : o.ride_mode === 'child' ? 'Kous timoun' : 'Kous taksi');
+        add('Depa', 'Départ', o.from_addr); add('Rive', 'Arrivée', o.to_addr);
+        if(o.distance_km) add('Distans', 'Distance', Number(o.distance_km).toFixed(1) + ' km');
+        if(o.duration_min) add('Dire', 'Durée', Math.round(o.duration_min) + ' min');
+        add('Chofè', 'Chauffeur', o.driver_name);
+        var veh = [o.vehicle_make, o.vehicle_color, o.vehicle_plate].filter(Boolean).join(' · '); add('Machin', 'Véhicule', veh || o.vehicle);
+        add('Peman', 'Paiement', Number(o.points_used) > 0 ? 'Pwen (' + Number(o.points_used).toFixed(1) + ')' : (o.paid_with || ''));
+        add(o.price_final != null ? 'Pri final' : 'Pri estimasyon', o.price_final != null ? 'Prix final' : 'Prix estimé', fmt(o.price_final != null ? o.price_final : o.price_estimated) + ' HTG');
+        if(Number(o.wait_penalty_applied) > 0) add('Frè datant', 'Frais d\'attente', fmt(o.wait_penalty_applied) + ' HTG');
+        add('Nòt', 'Note', o.notes);
+      } else if(t === 'order'){
+        add('Kalite', 'Type', o.kind === 'manje' ? 'Kòmand manje' : o.kind === 'shop' ? 'Kòmand Shop (livrezon)' : 'Pake');
+        add('Patnè', 'Partenaire', o.partner_name);
+        itemsList(o).forEach(function(l, i){ add(i === 0 ? 'Atik yo' : '', i === 0 ? 'Articles' : '', l); });
+        if(Number(o.subtotal)) add('Sou-total', 'Sous-total', fmt(o.subtotal) + ' HTG');
+        if(Number(o.service_fee)) add('Frè sèvis', 'Frais de service', fmt(o.service_fee) + ' HTG');
+        if(Number(o.delivery_fee)) add('Frè livrezon', 'Frais de livraison', fmt(o.delivery_fee) + ' HTG');
+        if(Number(o.wait_penalty_applied) > 0) add('Frè datant', 'Frais d\'attente', fmt(o.wait_penalty_applied) + ' HTG');
+        add('Total', 'Total', fmt(o.total) + ' HTG');
+        add('Adrès', 'Adresse', o.address);
+        add('Chofè', 'Chauffeur', o.driver_name);
+        var v2 = [o.vehicle_make, o.vehicle_color, o.vehicle_plate].filter(Boolean).join(' · '); add('Machin', 'Véhicule', v2);
+        var ps = PAY_ST[o.payment_status];
+        add('Peman', 'Paiement', (Number(o.points_used) > 0 ? 'Pwen (' + Number(o.points_used).toFixed(1) + ')' : (o.paid_with || '')) + (ps ? (Number(o.points_used) > 0 || o.paid_with ? ' · ' : '') + ps[0] : '') + (o.pay_location ? ' · ' + (o.pay_location === 'store' ? 'nan magazen' : 'lè livrezon') : ''));
+        add('Nòt', 'Note', o.notes);
+      } else {
+        add('Kalite', 'Type', 'Kòmand Shop');
+        add('Pwodwi', 'Produit', o.product_name);
+        add('Kantite', 'Quantité', o.quantity);
+        if(Number(o.product_price)) add('Pri inite', 'Prix unitaire', fmt(o.product_price) + ' HTG');
+        add('Total', 'Total', fmt(o.total_estimated) + ' HTG');
+        add('Nòt', 'Note', o.notes);
+        add('Mesaj Zetwal', 'Message de Zetwal', o.admin_note);
+      }
+      add('Dat', 'Date', o._ts ? fullDate(o._ts) : '');
+      return R;
+    }
+    function timelineOf(o){
+      var st = o.status, S = [];
+      function step(l, t, s){ S.push({ l:l, t:t ? hhmm(ms(t)) + ' · ' + new Date(ms(t)).toLocaleDateString('fr-FR', { day:'numeric', month:'short' }) : '', s:s }); }
+      if(o._t === 'ride' || o._t === 'order'){
+        var ord = ['requested','accepted','on_way','arrived','picked','done'], idx = ord.indexOf(st);
+        var defs = [['Demann lan voye', o.created_at, 0], ['Aksepte', o.accepted_at, 1], ['Chofè rive', o.arrived_at, 3], ['Kòmanse', o.started_at, 4], ['Fini', o.done_at, 5]];
+        var lastReached = -1;
+        defs.forEach(function(d, i){ if(d[1] || (idx >= d[2] && st !== 'cancelled')) lastReached = i; });
+        defs.forEach(function(d, i){
+          var reached = i <= lastReached && (d[1] || idx >= d[2] || i < lastReached);
+          step(d[0], d[1], reached ? (i === lastReached && st !== 'done' && st !== 'cancelled' ? 'now' : 'done') : 'todo');
+        });
+        if(st === 'cancelled') step('Anile', o.updated_at, 'bad');
+      } else if(o._t === 'transfer'){
+        step('Pwen yo soti', o.created_at, 'done');
+        if(o._out && !o.to_uid) step('Ap tann moun nan konekte', null, 'now');
+        else step(o._out ? 'Pwen yo rive' : 'Pwen yo antre sou kont ou', o.created_at, 'done');
+      } else {
+        step('Kòmand voye', o.created_at, st === 'pending' ? 'now' : 'done');
+        if(st && st !== 'pending') step(STATUS_LABEL[st] || st, o.updated_at, st === 'cancelled' ? 'bad' : (st === 'done' ? 'done' : 'now'));
+      }
+      return S;
+    }
+
+    /* ── PDF ── */
+    function recOf(o){
+      var qrObj = null;
+      try{
+        if(typeof qrcode === 'function'){
+          var q = qrcode(0, 'M'); q.addData('ZETWAL|' + o._ref + '|' + o._amt + ' ' + o._unit + '|' + new Date(o._ts).toISOString().slice(0, 10)); q.make();
+          qrObj = { n:q.getModuleCount(), dark:function(r, c){ return q.isDark(r, c); } };
+        }
+      }catch(e){ qrObj = null; }
+      var steps = timelineOf(o).map(function(s){ return { l:s.l, t:s.t, s:s.s }; });
+      return {
+        ref:o._ref, title:o._title, amount:o._amt, unit:o._unit,
+        status: statusLabel(o) + '  /  ' + statusFr(o), tone: tone(o),
+        whenTxt: fullDate(o._ts), genTxt: 'Jenere / Généré le ' + new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }),
+        rows: detailRows(o).filter(function(r){ return r[0] !== 'Dat'; }), steps: steps, qr: qrObj
+      };
+    }
+    function buildReceiptPdf(o){ return new Blob([zrBuild(recOf(o))], { type:'application/pdf' }); }
+    function downloadPdf(o){
+      try{
+        var blob = buildReceiptPdf(o), url = URL.createObjectURL(blob), a = document.createElement('a');
+        a.href = url; a.download = 'zetwal-' + o._ref + '.pdf'; document.body.appendChild(a); a.click();
+        setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 5000);
+        toast('Reçu a telechaje'); vibe();
+      }catch(e){ toast('Nou pa ka fè PDF la kounye a'); }
+    }
+    async function shareFiche(o){
+      var text = 'Zetwal · ' + o._title + '\n' + o._amt + ' ' + o._unit + ' · ' + statusLabel(o) + '\nRef: ' + o._ref + '\n' + fullDate(o._ts);
+      try{
+        var file = new File([buildReceiptPdf(o)], 'zetwal-' + o._ref + '.pdf', { type:'application/pdf' });
+        if(navigator.canShare && navigator.canShare({ files:[file] })){ await navigator.share({ files:[file], title:'Reçu Zetwal', text:text }); return; }
+      }catch(e){ if(e && e.name === 'AbortError') return; }
+      if(navigator.share){ try{ await navigator.share({ title:'Reçu Zetwal', text:text }); return; }catch(e){ if(e && e.name === 'AbortError') return; } }
+      copyText(text, 'Rezime a kopye — kole l kote ou vle');
+    }
+
+    /* ── Fich tranzaksyon ── */
+    function ficheKey(e){ if(e.key === 'Escape'){ e.stopPropagation(); closeFiche(); } }
+    function closeFiche(){
+      var m = document.getElementById('zf-ov'); if(!m) return;
+      document.removeEventListener('keydown', ficheKey, true);
+      m.classList.remove('on'); setTimeout(function(){ if(m.parentNode) m.remove(); }, 230);
+      if(ficheOpener && document.body.contains(ficheOpener)){ try{ ficheOpener.focus(); }catch(e){} }
+      ficheOpener = null;
+    }
+    function openFiche(o){
+      decorate(o); closeFiche();
+      ficheOpener = document.activeElement;
+      var inn = o._dir === 'in';
+      var steps = timelineOf(o);
+      var rows = detailRows(o);
+      var acts = '<button class="zp-btn go" type="button" data-a="pdf">' + sv('pdf') + 'Telechaje PDF</button>'
+        + '<button class="zp-btn" type="button" data-a="share">' + sv('share') + 'Pataje</button>'
+        + '<button class="zp-btn" type="button" data-a="flag">' + sv('flag') + 'Siyale yon pwoblèm</button>';
+      if(o._track) acts += '<a class="zp-btn" target="_blank" rel="noopener" href="taxi.html?swiv=' + esc(o.id) + '&t=' + (o._t === 'ride' ? 'ride' : 'order') + '">' + sv('pin') + 'Swiv an dirèk</a>';
+      if(o._t === 'transfer' && o._out && (o.to_email || o.to_phone)) acts += '<button class="zp-btn" type="button" data-a="again">' + sv('redo') + 'Voye ankò</button>';
+      var html = '<div class="zf" role="dialog" aria-modal="true" aria-label="Detay tranzaksyon an"><div class="zf-grab"></div>'
+        + '<button class="zp-x zf-x" type="button" data-a="x" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>'
+        + '<div class="zf-top"><div class="zf-ic ' + (inn ? 'in' : '') + '">' + sv(o._icon) + '</div>'
+        + '<div class="zf-t">' + esc(o._title) + '</div>'
+        + '<div class="zf-amt ' + (inn ? 'in' : '') + '">' + esc(o._amt) + '<s>' + esc(o._unit) + '</s></div>'
+        + '<span class="zf-chip" style="' + chipStyle(o) + '">' + esc(statusLabel(o)) + '</span>'
+        + '<div class="zf-date">' + esc(fullDate(o._ts)) + '</div>'
+        + '<div><button class="zf-ref" type="button" data-a="ref" aria-label="Kopye nimewo referans lan">' + esc(o._ref) + sv('copy') + '</button></div></div>'
+        + '<div class="zf-sec"><h4>Suivi</h4><ul class="zf-tl">' + steps.map(function(s){
+            return '<li class="' + s.s + '">' + esc(s.l) + (s.t ? '<small>' + esc(s.t) + '</small>' : '') + '</li>'; }).join('') + '</ul></div>'
+        + '<div class="zf-sec"><h4>Detay</h4>' + rows.filter(function(r){ return r[0] !== 'Dat'; }).map(function(r){
+            return '<div class="zf-row"><span>' + esc(r[0]) + '</span><b>' + esc(r[2]) + '</b></div>'; }).join('') + '</div>'
+        + '<div class="zf-acts">' + acts + '</div>'
+        + '<p class="zf-fine">Kenbe nimewo referans lan si w bezwen kontakte Zetwal sou kòmand sa a.</p></div>';
+      var ov = document.createElement('div'); ov.className = 'zf-ov'; ov.id = 'zf-ov'; ov.innerHTML = html;
+      document.body.appendChild(ov);
+      document.addEventListener('keydown', ficheKey, true);
+      ov.addEventListener('click', function(e){
+        if(e.target === ov){ closeFiche(); return; }
+        var b = e.target.closest ? e.target.closest('[data-a]') : null; if(!b) return;
+        var a = b.getAttribute('data-a');
+        if(a === 'x') closeFiche();
+        else if(a === 'pdf') downloadPdf(o);
+        else if(a === 'share') shareFiche(o);
+        else if(a === 'ref') copyText(o._ref, 'Referans kopye');
+        else if(a === 'again'){ prefillSend = { mail:o.to_email || o.to_phone || '' }; closeFiche(); selectTab('send'); }
+        else if(a === 'flag') reportProblem(o);
+      });
+      requestAnimationFrame(function(){ ov.classList.add('on'); var x = ov.querySelector('[data-a="x"]'); if(x) x.focus({ preventScroll:true }); });
+    }
+    async function reportProblem(o){
+      var adm = ADMIN_EMAILS[0];
+      if((currentUser.email || '').toLowerCase() === adm){ toast('Ou se administratè a — gade nan paj admin lan'); return; }
+      closeFiche(); tab = 'msg'; await render();
+      var dest = null; try{ dest = await findUserByEmail(adm); }catch(e){}
+      await openThread(dest ? dest.uid : null, dest ? dest.name : 'Zetwal (sipò)', dest ? dest.email : adm);
+      var inp = $('#mg-input');
+      if(inp){ inp.value = 'Bonjou, mwen gen yon pwoblèm ak tranzaksyon ' + o._ref + ' (' + o._title + ', ' + o._amt + ' ' + o._unit + '). '; inp.focus(); }
+    }
+
+    /* ── Istwa : filt, rechèch, gwoupe pa jou, pajinasyon ── */
+    function rowHtml(o){
+      var inn = o._dir === 'in';
+      return '<button class="hx ' + (inn ? 'in' : 'out') + '" type="button" data-ref="' + esc(o._ref) + '">'
+        + '<span class="ic">' + sv(o._icon) + '</span>'
+        + '<span class="bd"><b>' + esc(o._title) + '</b><span>' + esc(hhmm(o._ts)) + ' · ' + esc(o._ref) + '</span></span>'
+        + '<span class="am"><b>' + esc(o._amt) + ' <small style="font-size:.62rem;font-family:var(--sans,system-ui);font-weight:600;color:var(--ink-3,rgba(255,255,255,.5))">' + esc(o._unit) + '</small></b>'
+        + '<i style="' + chipStyle(o) + '">' + esc(statusLabel(o)) + '</i></span></button>';
+    }
+    function bindRows(root){
+      qa('.hx[data-ref]', root).forEach(function(b){
+        b.addEventListener('click', function(){
+          var ref = b.getAttribute('data-ref');
+          var o = (histCache || []).filter(function(x){ return x._ref === ref; })[0];
+          if(o) openFiche(o);
+        });
+      });
+    }
+    function emptyHist(){
+      return '<div class="zp-empty2"><div class="big">' + sv('hist') + '</div><b style="color:var(--ink-1,#fff);font-size:.95rem">Istwa ou ap parèt isit la</b><br>'
+        + 'Chak kous, kòmand ak pwen ou voye oswa resevwa ap gen fich li, ak PDF ou ka pataje.'
+        + '<div class="row"><a class="zp-btn go" style="width:auto" href="taxi.html">Fè yon kòmand</a><a class="zp-btn" href="shop.html">Ale nan Shop</a></div></div>';
+    }
+    function paintHistList(){
+      var list = $('#hx-list'); if(!list) return;
+      var h = histCache || [], f = histState.f, q = histState.q.trim().toLowerCase();
+      var rows = h.filter(function(o){
+        if(f !== 'all' && o._cat !== f) return false;
+        if(!q) return true;
+        return (o._title + ' ' + o._ref + ' ' + statusLabel(o) + ' ' + (o.partner_name || '') + ' ' + (o.product_name || '') + ' ' + itemsList(o).join(' ')).toLowerCase().indexOf(q) !== -1;
+      });
+      var sum = $('#hx-sum'); if(sum) sum.textContent = rows.length + (rows.length > 1 ? ' tranzaksyon' : ' tranzaksyon') + (f !== 'all' || q ? ' (filtre)' : '');
+      if(!rows.length){ list.innerHTML = h.length ? '<div class="zp-empty2">Pa gen anyen ki matche. Eseye yon lòt mo oswa yon lòt filt.</div>' : emptyHist(); return; }
+      var shown = rows.slice(0, histState.n), html = '', lastDay = '';
+      shown.forEach(function(o){
+        var d = dayLabel(o._ts);
+        if(d !== lastDay){ html += '<div class="hd">' + esc(d) + '</div>'; lastDay = d; }
+        html += rowHtml(o);
+      });
+      if(rows.length > shown.length) html += '<button class="zp-btn hx-more" type="button" id="hx-more">Wè plis (' + (rows.length - shown.length) + ')</button>';
+      list.innerHTML = html; bindRows(list);
+      var more = $('#hx-more'); if(more) more.addEventListener('click', function(){ histState.n += 15; paintHistList(); });
+    }
+    function histErrorHtml(){
+      return '<div class="zp-empty2"><div class="big">' + sv('flag') + '</div><b style="color:var(--ink-1,#fff);font-size:.95rem">Nou pa t ka chaje istwa ou</b><br>Verifye koneksyon w oswa debloke kont ou, epi eseye ankò.'
+        + '<div class="row"><button class="zp-btn go" style="width:auto" type="button" id="hx-retry">Eseye ankò</button></div></div>';
+    }
+    async function renderHist(){
+      var box = $('#zp-in'); if(!box) return;
+      box.innerHTML = skeleton(4);
+      var h = await getHist();
+      if(tab !== 'hist' || !$('#zp-in')) return;
+      if(h.failed && !h.length){
+        box.innerHTML = histErrorHtml();
+        $('#hx-retry').addEventListener('click', function(){ histCache = null; renderHist(); });
+        return;
+      }
+      var chips = [['all','Tout'],['pts','Pwen'],['cmd','Kòmand'],['shop','Shop']];
+      box.innerHTML = '<div class="hf"><input type="search" id="hx-q" placeholder="Chèche (non, nimewo referans…)" autocomplete="off" aria-label="Chèche nan istwa" value="' + esc(histState.q) + '"></div>'
+        + '<div class="hch" role="group" aria-label="Filt">' + chips.map(function(c){ return '<button type="button" data-f="' + c[0] + '" class="' + (histState.f === c[0] ? 'on' : '') + '">' + c[1] + '</button>'; }).join('') + '</div>'
+        + '<div class="hx-sum" id="hx-sum"></div><div id="hx-list"></div>';
+      var tmr = 0;
+      $('#hx-q').addEventListener('input', function(){ var v = this.value; clearTimeout(tmr); tmr = setTimeout(function(){ histState.q = v; histState.n = 15; paintHistList(); }, 160); });
+      qa('.hch button', box).forEach(function(b){ b.addEventListener('click', function(){
+        histState.f = b.getAttribute('data-f'); histState.n = 15;
+        qa('.hch button', box).forEach(function(x){ x.classList.toggle('on', x === b); }); paintHistList(); }); });
+      paintHistList();
+    }
+    async function renderNotif(){
+      var box = $('#zp-in'); if(!box) return;
+      box.innerHTML = skeleton(3);
+      var h = await getHist();
+      if(tab !== 'notif' || !$('#zp-in')) return;
+      var news = h.filter(function(o){ return o.status && o.status !== 'requested' && o.status !== 'pending'; }).slice(0, 30);
+      if(!news.length){ box.innerHTML = '<div class="zp-empty2"><div class="big">' + sv('bell') + '</div>Pa gen nouvo mizajou pou kounye a.<br>Lè yon kòmand avanse oswa ou resevwa pwen, ou wè l isit la.</div>'; return; }
+      box.innerHTML = news.map(function(o){
+        var inn = o._dir === 'in' || o._t !== 'transfer';
+        var t = ms(o.updated_at || o.created_at);
+        return '<button class="hx ' + (inn ? 'in' : 'out') + '" type="button" data-ref="' + esc(o._ref) + '"><span class="ic">' + sv('check') + '</span>'
+          + '<span class="bd"><b>' + esc(o._title) + '</b><span>' + esc(statusLabel(o)) + ' · ' + esc(relTime(t)) + '</span></span>'
+          + '<span class="am"><b>' + esc(o._amt) + '</b></span></button>';
+      }).join('');
+      bindRows(box);
     }
 
     async function currentPoints(){
@@ -418,6 +967,73 @@ window.zQR=window.zQR||function(text){
       }catch(e){ return false; }
     }
 
+    /* ── Antèt, onglè, kont (render) ── */
+    var TABS = [['hist','Istwa','hist'],['msg','Mesaj','chat'],['notif','Nouvèl','bell'],['info','Enfo','user'],['qr','Kòd QR','qr'],['send','Voye','send'],['ask','Mande','ask']];
+    var LEVELS = [[0,'Nouvo manm'],[3,'Manm aktif'],[10,'Fidèl'],[25,'Eklèr'],[60,'Zetwal Vedèt']];
+    function levelOf(n){ var i = 0; LEVELS.forEach(function(l, k){ if(n >= l[0]) i = k; }); return { i:i, name:LEVELS[i][1], next:LEVELS[i + 1] || null, base:LEVELS[i][0] }; }
+    function countUp(el, to){
+      if(!el) return;
+      var from = lastShownPts; lastShownPts = to;
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
+      if(reduce || Math.abs(to - from) < 0.05){ el.firstChild.nodeValue = to.toFixed(1); return; }
+      var t0 = performance.now(), dur = 700;
+      (function step(now){
+        var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+        if(el.firstChild) el.firstChild.nodeValue = (from + (to - from) * e).toFixed(1);
+        if(k < 1) requestAnimationFrame(step);
+      })(t0);
+    }
+    function paintStats(h){
+      var m0 = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+      var pin = 0, pout = 0, cmds = 0, done = 0;
+      h.forEach(function(o){
+        if(o._ts >= m0){
+          if(o._t === 'transfer'){ if(o._out) pout += Number(o._price || 0); else pin += Number(o._price || 0); }
+          else cmds++;
+        }
+        if(o.status === 'done') done++;
+      });
+      var mo = $('#zh-mo');
+      if(mo) mo.textContent = (pin || pout || cmds)
+        ? 'Mwa sa a : +' + pin.toFixed(1) + ' / −' + pout.toFixed(1) + ' pwen · ' + cmds + (cmds > 1 ? ' kòmand' : ' kòmand')
+        : 'Poko gen mouvman mwa sa a.';
+      var lv = levelOf(done), name = $('#zh-lvn'); if(name) name.textContent = lv.name;
+      var bar = $('#zh-bar'), nx = $('#zh-nx');
+      if(bar){ var pc = lv.next ? Math.round((done - lv.base) / (lv.next[0] - lv.base) * 100) : 100; setTimeout(function(){ bar.style.width = Math.max(4, Math.min(100, pc)) + '%'; }, 60); }
+      if(nx) nx.textContent = lv.next ? (lv.next[0] - done) + ' aksyon ankò pou rive « ' + lv.next[1] + ' »' : 'Ou rive nan pi gwo nivo a — mèsi pou fidelite w !';
+    }
+    function setMsgBadge(n){
+      unreadMsgs = n;
+      qa('[data-badge="msg"]').forEach(function(el){ el.textContent = n > 99 ? '99+' : n; el.style.display = n ? '' : 'none'; });
+    }
+    function selectTab(k){
+      tab = k;
+      qa('#zp-b .zt-bar button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-t') === k); });
+      var on = $('#zp-b .zt-bar button.on'); if(on && on.scrollIntoView){ try{ on.scrollIntoView({ block:'nearest', inline:'center', behavior:'smooth' }); }catch(e){} }
+      stopThreadListeners(); msgOpenId = null;
+      if(!$('#zp-in')){ render(); return; }
+      renderTab();
+    }
+    function renderTab(){
+      if(tab === 'info') renderInfo();
+      else if(tab === 'msg') renderMsgList();
+      else if(tab === 'hist') renderHist();
+      else if(tab === 'notif') renderNotif();
+      else if(tab === 'ask') renderAsk();
+      else if(tab === 'qr') renderQRTab();
+      else renderSend();
+    }
+    function completion(prof, u){
+      var enr = window.ZMFA && ZMFA.state && ZMFA.state().enrolled === true;
+      var items = [
+        { ok:!!prof.photo_url, l:'Ajoute yon foto', go:function(){ selectTab('info'); } },
+        { ok:!!(prof.bio && String(prof.bio).trim()), l:'Ekri yon ti byografi', go:function(){ selectTab('info'); } },
+        { ok:!!prof.birthdate, l:'Mete dat nesans ou', go:function(){ selectTab('info'); } },
+        { ok:!(u.email && u.emailVerified === false), l:'Verifye imel ou', go:function(){ var z = $('#zp-ver'); if(z) z.click(); } }
+      ];
+      if(window.ZMFA && ZMFA.state && ZMFA.state().available !== false) items.push({ ok:!!enr, l:'Renmen sekirite kont ou', go:function(){ try{ ZMFA.open(); }catch(e){} } });
+      return items;
+    }
     async function render(){
       var box = $('#zp-b');
       var u = currentUser;
@@ -426,44 +1042,60 @@ window.zQR=window.zQR||function(text){
         box.innerHTML = '<div class="zp-empty">Konekte pou w wè pwofil ou.</div>';
         return;
       }
-      $('#zp-t').textContent = u.displayName || u.email || 'Pwofil mwen';
-      $('#zp-s').textContent = u.email || '';
-      box.innerHTML = '<div class="zp-empty">K ap chaje…</div>';
-
-      var pts = await currentPoints();
+      $('#zp-t').textContent = 'Kont mwen'; $('#zp-s').textContent = 'Zetwal';
+      box.innerHTML = '<div class="sk" style="height:210px"></div><div class="sk" style="height:48px"></div>' + skeleton(3);
+      var prof = await currentProfileDoc();
+      var pts = Number(prof.points || 0) || 0;
       await loadRole();
-
+      if(!currentUser) return;
       var roles = [];
       if(await checkStaff()) roles.push('Anplwaye');
       if(role.driver) roles.push('Chofè');
       if(role.partners.length) roles.push(role.partners.length > 1 ? 'Patnè (' + role.partners.length + ')' : 'Patnè');
-
       var isAdmin = u.email && ADMIN_EMAILS.indexOf(u.email.toLowerCase()) !== -1;
-      var head = '<div class="zpcard"><div class="k">Solid pwen ou</div>'
-        + '<div class="v">' + pts.toFixed(1) + '<s>pwen</s></div></div>'
-        + (roles.length ? '<div style="margin-bottom:14px">' + roles.map(function(r){ return '<span class="zprole">'+r+'</span>'; }).join('') + '</div>' : '')
-        + (isAdmin ? '<a class="zp-btn go" href="admin.html" style="width:100%;margin-bottom:10px">Aksè Administrasyon</a>' : '')
-        + '<button class="zp-btn" id="zp-share" style="width:100%;margin-bottom:16px">Pataje pwofil mwen</button>';
-
-      var tabs = '<div class="zptabs">'
-        + ['info','msg','hist','notif','qr','send','ask'].map(function(k){
-            var lab = {info:'Enfo',msg:'Mesaj',hist:'Istwa',notif:'Notifikasyon',qr:'Kòd QR',send:'Voye pwen',ask:'Mande pwen'}[k];
-            return '<button class="' + (tab===k?'on':'') + '" data-t="' + k + '">' + lab + '</button>';
-          }).join('') + '</div>';
-
-      box.innerHTML = head + tabs + '<div id="zp-in"></div>';
+      var name = u.displayName || u.email || 'Zetwal';
+      var acts = [['send','Voye','send'],['qr','Resevwa','qr'],['ask','Mande','ask'],['msg','Mesaj','chat']];
+      var head = '<div class="zh"><div class="zh-top"><div class="zh-av">' + (prof.photo_url ? '<img src="' + esc(prof.photo_url) + '" alt="">' : esc(initial(name))) + '</div>'
+        + '<div class="zh-id"><b>' + esc(name) + '</b><div class="zh-lv">' + sv('star').replace('<svg', '<svg fill="currentColor" stroke="none"') + '<span id="zh-lvn">…</span></div>'
+        + (roles.length ? '<div style="margin-top:4px">' + roles.map(function(r){ return '<span class="zprole" style="margin:2px 5px 0 0;padding:3px 10px;font-size:.68rem">' + esc(r) + '</span>'; }).join('') + '</div>' : '') + '</div></div>'
+        + '<div class="zh-bal"><div class="k">Solid pwen ou</div><div class="v"><span id="zh-v">' + lastShownPts.toFixed(1) + '</span><s>pwen</s></div><div class="zh-mo" id="zh-mo">&nbsp;</div></div>'
+        + '<div class="zh-bar" aria-hidden="true"><i id="zh-bar"></i></div><div class="zh-nx" id="zh-nx"></div>'
+        + '<div class="zh-acts">' + acts.map(function(a){
+            return '<button type="button" class="zh-act" data-go="' + a[0] + '">' + sv(a[2]) + a[1] + (a[0] === 'msg' ? '<span class="zt-n" data-badge="msg" style="display:none"></span>' : '') + '</button>'; }).join('') + '</div></div>';
+      var notices = (isAdmin ? '<a class="zp-btn go" href="admin.html" style="width:100%;margin-bottom:12px">Aksè Administrasyon</a>' : '')
+        + ((u.email && u.emailVerified === false && (u.providerData || []).some(function(p){ return p.providerId === 'password'; }))
+            ? '<div class="zp-hint" style="margin:0 0 12px;padding:12px 14px;border:1px solid var(--line,#333);border-radius:12px;font-size:.78rem">Imel ou poko verifye — verifikasyon an nesesè pou reklame pwen ki ap tann ou. <a id="zp-ver" style="cursor:pointer;text-decoration:underline">Voye lyen an ankò</a></div>' : '');
+      var comp = completion(prof, u), left = comp.filter(function(c){ return !c.ok; }), pct = Math.round((comp.length - left.length) / comp.length * 100);
+      var compHtml = left.length ? '<div class="zc"><b>Pwofil ou ' + pct + '% konplè</b><p>Kèk ti etap pou kont ou vin pi solid epi pi fasil pou zanmi w jwenn ou.</p>'
+        + '<div class="zc-bar"><i style="width:' + pct + '%"></i></div><div class="zc-l">' + left.map(function(c, i){ return '<button type="button" data-c="' + i + '">+ ' + esc(c.l) + '</button>'; }).join('') + '</div></div>' : '';
+      var tabs = '<div class="zt-bar" role="tablist" aria-label="Seksyon kont mwen">' + TABS.map(function(t){
+        return '<button type="button" role="tab" class="' + (tab === t[0] ? 'on' : '') + '" data-t="' + t[0] + '" aria-selected="' + (tab === t[0]) + '">' + sv(t[2]) + t[1]
+          + (t[0] === 'msg' ? '<span class="zt-n" data-badge="msg" style="display:none"></span>' : '') + '</button>'; }).join('') + '</div>';
+      box.innerHTML = head + notices + '<div id="zp-sec"></div>' + compHtml + tabs + '<div id="zp-in"></div>'
+        + '<div class="zp-foot"><button class="zp-btn" id="zp-share" type="button">Pataje pwofil mwen</button><button class="zp-btn" id="zp-out" type="button">Dekonekte</button></div>';
+      try{ if(window.ZMFA) ZMFA.mountProfile($('#zp-sec')); }catch(e){}
+      countUp($('#zh-v'), pts);
       $('#zp-share').addEventListener('click', function(){ shareProfile(u); });
-      $$('#zp-b .zptabs button').forEach(function(b){
-        b.addEventListener('click', function(){ tab = b.getAttribute('data-t'); render(); });
+      $('#zp-out').addEventListener('click', async function(){
+        try{ await auth.signOut(); }catch(e){}
+        try{ close(); }catch(e){}
       });
-
-      if(tab === 'info') renderInfo();
-      else if(tab === 'msg') renderMsgList();
-      else if(tab === 'hist') renderHist();
-      else if(tab === 'notif') renderNotif();
-      else if(tab === 'ask') renderAsk();
-      else if(tab === 'qr') renderQRTab();
-      else renderSend();
+      var zv = $('#zp-ver');
+      if(zv) zv.addEventListener('click', async function(){
+        try{ await auth.currentUser.sendEmailVerification(); toast('Nou voye lyen verifikasyon an bay ' + u.email); }
+        catch(e){ toast('Nou pa ka voye l kounye a — eseye pita'); }
+      });
+      qa('#zp-b .zt-bar button').forEach(function(b){ b.addEventListener('click', function(){ selectTab(b.getAttribute('data-t')); }); });
+      qa('#zp-b .zh-act').forEach(function(b){ b.addEventListener('click', function(){ vibe(); selectTab(b.getAttribute('data-go')); }); });
+      qa('#zp-b .zc-l button').forEach(function(b){ b.addEventListener('click', function(){ left[Number(b.getAttribute('data-c'))].go(); }); });
+      var onb = $('#zp-b .zt-bar button.on'); if(onb && onb.scrollIntoView){ try{ onb.scrollIntoView({ block:'nearest', inline:'center' }); }catch(e){} }
+      if(unreadMsgs) setMsgBadge(unreadMsgs);
+      renderTab();
+      getHist().then(function(h){ if($('#zh-mo')) paintStats(h); });
+      loadConversations().then(function(cs){
+        var n = 0; cs.forEach(function(c){ n += Number((c.unread && c.unread[u.uid]) || 0); });
+        convCache = cs; setMsgBadge(n);
+      }).catch(function(){});
     }
 
     function shareProfile(u){
@@ -475,21 +1107,22 @@ window.zQR=window.zQR||function(text){
 
     async function renderInfo(){
       var box = $('#zp-in'); if(!box) return;
-      box.innerHTML = '<div class="zp-empty">K ap chaje…</div>';
+      box.innerHTML = skeleton(3);
       var prof = await currentProfileDoc();
+      if(tab !== 'info' || !$('#zp-in')) return;
       var u = currentUser;
       box.innerHTML =
           '<div class="zp-av-row"><div class="zp-av-big" id="zp-av-big">'
             + (prof.photo_url ? '<img src="' + esc(prof.photo_url) + '" alt="">' : initial(u.displayName||u.email))
-          + '</div><label class="zp-btn" style="cursor:pointer">Chanje foto<input type="file" id="zp-photo" accept="image/*" style="display:none"></label></div>'
+          + '</div><label class="zp-btn" style="cursor:pointer;min-height:46px">Chanje foto<input type="file" id="zp-photo" accept="image/*" style="display:none"></label></div>'
         + '<div class="zp-fld"><label for="zp-name">Non</label><input type="text" id="zp-name" value="' + esc(u.displayName||'') + '"></div>'
         + '<div class="zp-fld"><label for="zp-bday">Dat nesans</label><input type="date" id="zp-bday" value="' + esc(prof.birthdate||'') + '"></div>'
         + '<div class="zp-fld"><label for="zp-bio">Byografi</label><textarea id="zp-bio" placeholder="Kèk mo sou ou…">' + esc(prof.bio||'') + '</textarea></div>'
-        + '<button class="zp-btn go" id="zp-save">Anrejistre chanjman yo</button>'
-        + '<p class="zp-hint">Enfo sa yo parèt lè w pataje pwofil ou ak yon zanmi.</p>';
+        + '<button class="zp-btn go" id="zp-save" style="min-height:50px">Anrejistre chanjman yo</button>'
+        + '<p class="zp-hint" style="font-size:.76rem">Enfo sa yo parèt lè w pataje pwofil ou ak yon zanmi.</p>';
       $('#zp-photo').addEventListener('change', async function(e){
         var f = e.target.files && e.target.files[0]; if(!f) return;
-        var av = $('#zp-av-big'); if(av) av.innerHTML = '<span style="font-size:.6rem">…</span>';
+        var av = $('#zp-av-big'); if(av) av.innerHTML = '<span style="font-size:.7rem">…</span>';
         try{
           var path = currentUser.uid + '/' + Date.now() + '.' + (f.name.split('.').pop()||'jpg');
           var up = await sb.storage.from('avatars').upload(path, f, { upsert:true });
@@ -506,44 +1139,10 @@ window.zQR=window.zQR||function(text){
           await fsUser().set({ birthdate:$('#zp-bday').value||null, bio:($('#zp-bio').value||'').trim() }, { merge:true });
           var name = ($('#zp-name').value||'').trim();
           if(name && auth.currentUser) await auth.currentUser.updateProfile({ displayName:name });
-          toast('Pwofil ou anrejistre');
+          toast('Pwofil ou anrejistre'); vibe();
         }catch(e){ toast('Nou pa ka anrejistre kounye a'); }
         btn.disabled = false; btn.textContent = 'Anrejistre chanjman yo';
       });
-    }
-
-    async function renderHist(){
-      var box = $('#zp-in'); if(!box) return;
-      box.innerHTML = '<div class="zp-empty">K ap chaje…</div>';
-      histCache = histCache || await loadHistory();
-      if(!histCache.length){ box.innerHTML = '<div class="zp-empty">Ou poko gen istwa sou Zetwal.</div>'; return; }
-      box.innerHTML = histCache.map(function(o){
-        var lab = STATUS_LABEL[o.status] || o.status;
-        var sty = STATUS_STYLE[o.status] || STATUS_STYLE.requested;
-        var track = o._track ? '<a class="zp-btn" style="margin-top:10px;padding:7px 13px;font-size:.6rem" '
-          + 'href="taxi.html?swiv=' + esc(o.id) + '&t=' + (o._t==='ride'?'ride':'order') + '" target="_blank">Swiv →</a>' : '';
-        var amt = o._t === 'transfer' ? (o._out?'−':'+') + Number(o._price).toFixed(1) + ' pwen' : fmt(o._price) + ' HTG';
-        return '<div class="zp-rc"><div class="zp-rc-h"><div class="zp-rc-n">' + esc(o._title) + '</div>'
-          + '<span class="zp-rc-b" style="' + sty + '">' + esc(lab) + '</span></div>'
-          + '<div class="zp-rc-v">' + amt + ' · ' + (o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : '—') + '</div>' + track + '</div>';
-      }).join('');
-    }
-
-    async function renderNotif(){
-      var box = $('#zp-in'); if(!box) return;
-      box.innerHTML = '<div class="zp-empty">K ap chaje…</div>';
-      histCache = histCache || await loadHistory();
-      var news = histCache.filter(function(o){ return o.status && o.status !== 'requested' && o.status !== 'pending'; });
-      if(!news.length){ box.innerHTML = '<div class="zp-empty">Pa gen nouvo mizajou.</div>'; return; }
-      box.innerHTML = news.map(function(o){
-        var lab = STATUS_LABEL[o.status] || o.status;
-        var isTransfer = o._t === 'transfer';
-        var cls = isTransfer ? (o._out ? 'out' : 'in') : 'in';
-        var tail = isTransfer ? ' (' + (o._out?'−':'+') + Number(o._price).toFixed(1) + ' pwen)' : ' — ' + esc(lab);
-        return '<div class="zptx ' + cls + '"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>'
-          + '<div class="bd"><b>' + esc(o._title) + tail + '</b>'
-          + '<span>' + (o.updated_at||o.created_at ? new Date(o.updated_at||o.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '') + '</span></div></div>';
-      }).join('');
     }
 
     async function findUserByEmail(mail){
@@ -559,8 +1158,8 @@ window.zQR=window.zQR||function(text){
       var box = $('#zp-in'); if(!box) return;
       box.innerHTML =
           '<button class="zp-btn go" type="button" id="zs-scan" style="margin-bottom:16px">Voye pa skane kòd QR yon moun</button>'
-        + '<div class="zp-fld"><label for="zs-mail">Oswa imel moun w ap voye a (Gmail oswa lòt)</label>'
-          + '<input type="email" id="zs-mail" placeholder="egzanp@imel.com"></div>'
+        + '<div class="zp-fld"><label for="zs-mail">Oswa imel OSWA nimewo telefòn moun w ap voye a</label>'
+          + '<input type="text" id="zs-mail" autocomplete="off" autocapitalize="none" placeholder="egzanp@imel.com oswa +509 3712 3456"></div>'
         + '<div class="zp-fld"><label for="zs-amt">Konbe pwen</label><input type="number" id="zs-amt" min="1" step="0.1" placeholder="10"></div>'
         + '<div class="zp-fld"><label for="zs-note">Yon ti mo (fakiltatif)</label><input type="text" id="zs-note" placeholder="Pou bòdwo lekòl la…"></div>'
         + '<button class="zp-btn go" id="zs-go">Voye pwen yo</button>'
@@ -568,26 +1167,29 @@ window.zQR=window.zQR||function(text){
         + '<div style="font-size:.58rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4);margin:20px 0 10px">Dènye anvwa ou yo</div>'
         + '<div id="zs-hist"><div class="zp-empty">K ap chaje…</div></div>';
       $('#zs-scan').addEventListener('click', function(){ startScan('send'); });
+      if(prefillSend){ var pm = $('#zs-mail'); if(pm){ pm.value = prefillSend.mail || ''; var pa = $('#zs-amt'); if(pa) pa.focus(); } prefillSend = null; }
       $('#zs-go').addEventListener('click', async function(){
         var mail = ($('#zs-mail').value||'').trim().toLowerCase();
         var amt = parseFloat($('#zs-amt').value) || 0;
         var note = ($('#zs-note').value||'').trim();
-        if(!mail){ toast('Ekri imel moun nan'); return; }
+        if(!mail){ toast('Ekri imel oswa nimewo telefòn moun nan'); return; }
         if(amt <= 0){ toast('Konbe pwen ou vle voye ?'); return; }
         if(mail === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
         var btn = this; btn.disabled = true; btn.textContent = 'K ap voye…';
         try{
-          var zt = window.ZB ? await ZB.pts('transfer_email', { to_email:mail, amount:amt, note:note }) : null;
+          var zt = window.ZB ? await ZB.pts('transfer_to', { to:mail, amount:amt, note:note }) : null;
           if(zt !== null){
             if(!zt.ok){
-              toast(zt.error === 'insufficient' ? 'Ou pa gen ase pwen' : (zt.error === 'self' ? 'Ou pa ka voye pwen pou tèt ou' : 'Nou pa ka voye pwen yo kounye a'));
+              toast(zt.error === 'insufficient' ? 'Ou pa gen ase pwen' : (zt.error === 'self' ? 'Ou pa ka voye pwen pou tèt ou' : (zt.error === 'destinataire' ? 'Imel oswa nimewo telefòn nan pa bon' : 'Nou pa ka voye pwen yo kounye a')));
               btn.disabled=false; btn.textContent='Voye pwen yo'; return;
             }
-            toast(zt.delivered ? ('Pwen voye bay ' + (zt.name||mail)) : ('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte'));
+            toast((zt.delivered ? ('Pwen voye bay ' + (zt.name||mail)) : ('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte'))
+              + (zt.notified ? (zt.notified === 'sms' ? ' · nou avèti l pa SMS' : ' · nou avèti l pa imel') : ''));
             $('#zs-mail').value=''; $('#zs-amt').value=''; $('#zs-note').value='';
             transferCache = null; loadSendHistory();
             btn.disabled = false; btn.textContent = 'Voye pwen yo'; return;
           }
+          if(mail.indexOf('@') < 0){ toast('Voye pa nimewo telefòn pa disponib kounye a — eseye pita oswa itilize imel la'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
           var ok = await chargePoints(amt);
           if(!ok){ toast('Ou pa gen ase pwen'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
           var dest = await findUserByEmail(mail);
@@ -633,9 +1235,9 @@ window.zQR=window.zQR||function(text){
           + (out ? '<path d="M5 12h14M13 6l6 6-6 6"/>' : '<path d="M19 12H5M11 6l-6 6 6 6"/>') + '</svg></div>'
           + '<div class="bd"><b>' + (t.kind === 'store_sale' ? 'Pwen achte nan boutik la'
               : t.kind === 'shop_payment' ? 'Peman kòmand Shop'
-              : out ? 'Voye bay ' + esc(t.to_name||t.to_email||'') : 'Resevwa nan men ' + esc(t.from_name||t.from_email||'')) + '</b>'
+              : out ? 'Voye bay ' + esc(t.to_name||t.to_email||t.to_phone||'') : 'Resevwa nan men ' + esc(t.from_name||t.from_email||'')) + '</b>'
           + '<span>' + new Date(t.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
-          + (t.note ? ' · ' + esc(t.note) : '') + (waiting ? ' · ap tann ' + esc(t.to_email) + ' konekte' : '') + '</span></div><div class="am">' + (out?'−':'+') + Number(t.amount).toFixed(1) + '</div></div>';
+          + (t.note ? ' · ' + esc(t.note) : '') + (waiting ? ' · ap tann ' + esc(t.to_email||t.to_phone) + ' konekte' : '') + '</span></div><div class="am">' + (out?'−':'+') + Number(t.amount).toFixed(1) + '</div></div>';
       }).join('') : '<div class="zp-empty">Ou poko voye ni resevwa pwen.</div>';
     }
 
@@ -1168,11 +1770,11 @@ window.zQR=window.zQR||function(text){
     async function renderMsgList(){
       var box = $('#zp-in'); if(!box) return;
       box.innerHTML =
-          '<div class="zp-fld"><label for="mg-mail">Kòmanse yon nouvo konvèsasyon (imel)</label>'
-          + '<div style="display:flex;gap:8px"><input type="email" id="mg-mail" placeholder="zanmi@imel.com" style="flex:1">'
-          + '<button class="zp-btn" id="mg-start">Kòmanse</button></div></div>'
-        + '<div style="font-size:.58rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4);margin:18px 0 10px">Konvèsasyon ou yo</div>'
-        + '<div id="mg-list" class="zp-empty">K ap chaje…</div>';
+          '<div class="hf"><input type="search" id="mg-q" placeholder="Chèche yon konvèsasyon…" aria-label="Chèche yon konvèsasyon" autocomplete="off"></div>'
+        + '<details class="mg-new" id="mg-newd"><summary>＋ Kòmanse yon nouvo konvèsasyon</summary>'
+        + '<div class="mg-newb"><input type="email" id="mg-mail" placeholder="zanmi@imel.com" aria-label="Imel zanmi w lan" autocapitalize="none">'
+        + '<button class="zp-btn go" id="mg-start" type="button">Kòmanse</button></div></details>'
+        + '<div id="mg-list">' + skeleton(3) + '</div>';
       $('#mg-start').addEventListener('click', async function(){
         var mail = ($('#mg-mail').value||'').trim().toLowerCase();
         if(!mail){ toast('Ekri imel zanmi w lan'); return; }
@@ -1183,9 +1785,6 @@ window.zQR=window.zQR||function(text){
       });
       var convs = await loadConversations();
       convCache = convs;
-      /* Mesaj mwen te voye bay yon moun ki poko gen kont — yo pa nan
-         Firestore ankò, yo nan kès datant lan. Nou montre yo tou, pou
-         yo pa disparèt nan lis la. */
       var pendingByEmail = {};
       if(sb && currentUser){
         try{
@@ -1197,30 +1796,36 @@ window.zQR=window.zQR||function(text){
           });
         }catch(e){}
       }
-      var list = $('#mg-list'); if(!list) return;
+      var list = $('#mg-list'); if(!list || tab !== 'msg') return;
+      var unreadTotal = 0;
       var items = convs.map(function(c){
-        var o = otherOf(c);
-        var unread = (c.unread && c.unread[currentUser.uid]) || 0;
-        return { key:o.uid, html: '<div class="zptx' + (unread?' out':'') + '" style="cursor:pointer" data-conv="' + esc(o.uid) + '|' + esc(o.name) + '|' + esc(o.email) + '">'
-          + '<div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
-          + '<div class="bd"><b>' + esc(o.name) + (unread ? ' · ' + unread + ' nouvo' : '') + '</b>'
-          + '<span>' + esc(c.lastMessage||'') + '</span></div></div>' };
+        var o = otherOf(c), unread = (c.unread && c.unread[currentUser.uid]) || 0; unreadTotal += Number(unread);
+        return { name:o.name, last:c.lastMessage || '', t:toMillis(c.lastAt), unread:unread, wait:false, data:(o.uid || '') + '|' + o.name + '|' + o.email };
       });
       Object.keys(pendingByEmail).forEach(function(k){
         var p = pendingByEmail[k];
-        items.push({ key:k, html: '<div class="zptx" style="cursor:pointer" data-conv="|' + esc(k) + '|' + esc(k) + '">'
-          + '<div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
-          + '<div class="bd"><b>' + esc(k) + '</b><span><span class="msdot grey" style="margin-right:5px"></span>' + esc(p.lastMessage) + '</span></div></div>' });
+        items.push({ name:k, last:p.lastMessage, t:ms(p.lastAt), unread:0, wait:true, data:'|' + k + '|' + k });
       });
-      list.innerHTML = items.length ? items.map(function(x){ return x.html; }).join('')
-        : '<div class="zp-empty">Ou poko gen konvèsasyon. Ekri yon imel anwo pou kòmanse.</div>';
-      $$('#mg-list [data-conv]').forEach(function(el){
-        el.addEventListener('click', function(){
-          var p = el.getAttribute('data-conv').split('|');
-          openThread(p[0]||null, p[1], p[2]);
+      setMsgBadge(unreadTotal);
+      var nd = $('#mg-newd'); if(nd && !items.length) nd.open = true;
+      function draw(){
+        var q = (($('#mg-q') || {}).value || '').trim().toLowerCase();
+        var rows = items.filter(function(x){ return !q || (x.name + ' ' + x.last).toLowerCase().indexOf(q) !== -1; });
+        list.innerHTML = rows.length ? rows.map(function(x){
+          return '<button class="hx ' + (x.unread ? 'out' : '') + '" type="button" data-conv="' + esc(x.data) + '"><span class="av">' + esc(initial(x.name)) + '</span>'
+            + '<span class="bd"><b>' + esc(x.name) + '</b><span>' + (x.wait ? '<span class="msdot grey" style="margin-right:6px"></span>' : '') + esc(x.last) + '</span></span>'
+            + '<span class="am" style="min-width:42px"><span style="display:block;font-size:.72rem;color:var(--ink-3,rgba(255,255,255,.5));margin-bottom:5px">' + esc(relTime(x.t)) + '</span>'
+            + (x.unread ? '<span class="un" style="margin-left:auto">' + x.unread + '</span>' : '') + '</span></button>';
+        }).join('') : (items.length ? '<div class="zp-empty2">Pa gen konvèsasyon ki matche.</div>'
+          : '<div class="zp-empty2"><div class="big">' + sv('chat') + '</div><b style="color:var(--ink-1,#fff);font-size:.95rem">Poko gen konvèsasyon</b><br>Ekri imel yon zanmi anwo a pou voye l yon mesaj, yon lyen oswa pwen.</div>');
+        qa('#mg-list [data-conv]').forEach(function(el){
+          el.addEventListener('click', function(){ var p = el.getAttribute('data-conv').split('|'); openThread(p[0]||null, p[1], p[2]); });
         });
-      });
+      }
+      draw();
+      var mq = $('#mg-q'); if(mq) mq.addEventListener('input', draw);
     }
+
     var convUnsub2 = null, threadRows = [], threadReadUpTo = {};
     function stopThreadListeners(){
       if(msgUnsub){ msgUnsub(); msgUnsub = null; }
@@ -1231,14 +1836,15 @@ window.zQR=window.zQR||function(text){
       msgOpenId = otherUid ? convId(currentUser.uid, otherUid) : null;
       var box = $('#zp-in'); if(!box) return;
       box.innerHTML =
-          '<button class="trk-back" id="mg-back" type="button" style="border:0;background:none;color:var(--ink-3);'
-          + 'cursor:pointer;font-family:var(--sans);font-size:.68rem;padding:0 0 14px">← Tounen nan lis la</button>'
-        + '<div style="font-weight:600;font-size:.9rem;margin-bottom:12px">' + esc(otherName) + '</div>'
-        + (otherUid ? '' : '<p class="zp-hint" style="margin-bottom:12px">' + esc(otherEmail) + ' poko gen kont sou Zetwal. Mesaj ou yo ap tann li konekte pou yo rive.</p>')
-        + '<div id="mg-thread" style="max-height:360px;overflow-y:auto;margin-bottom:14px"></div>'
-        + '<div style="display:flex;gap:8px"><input type="text" id="mg-input" placeholder="Ekri yon mesaj…" style="flex:1;padding:11px 13px;'
-          + 'border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--ink-1);font-family:var(--sans);font-size:.8rem">'
-        + '<button class="zp-btn go" id="mg-send" style="width:auto;padding:11px 16px">Voye</button></div>';
+          '<div class="mt-h"><button class="mt-back" id="mg-back" type="button" aria-label="Tounen nan lis la">' + sv('back') + '</button>'
+        + '<span class="av">' + esc(initial(otherName)) + '</span>'
+        + '<div class="mt-n"><b>' + esc(otherName) + '</b><small>' + (otherUid ? esc(otherEmail || '') : 'Poko gen kont — l ap resevwa l lè l konekte') + '</small></div>'
+        + (otherEmail ? '<button class="zp-btn mt-pay" id="mg-pay" type="button">' + sv('send').replace('<svg', '<svg width="15" height="15"') + 'Pwen</button>' : '') + '</div>'
+        + (otherUid ? '' : '<p class="zp-hint" style="margin:6px 0 4px">' + esc(otherEmail) + ' poko gen kont sou Zetwal. Mesaj ou yo ap tann li konekte pou yo rive.</p>')
+        + '<div id="mg-thread" class="mt-feed" aria-live="polite"></div>'
+        + '<div class="mt-in"><input type="text" id="mg-input" placeholder="Ekri yon mesaj…" aria-label="Mesaj" autocomplete="off" maxlength="1000">'
+        + '<button class="mt-send" id="mg-send" type="button" aria-label="Voye">' + sv('send') + '</button></div>';
+      var payb = $('#mg-pay'); if(payb) payb.addEventListener('click', function(){ prefillSend = { mail:otherEmail }; stopThreadListeners(); msgOpenId = null; selectTab('send'); });
       $('#mg-back').addEventListener('click', function(){ stopThreadListeners(); msgOpenId=null; renderMsgList(); });
       $('#mg-send').addEventListener('click', function(){ sendMessage(otherUid, otherName, otherEmail); });
       $('#mg-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage(otherUid, otherName, otherEmail); });
@@ -1278,27 +1884,33 @@ window.zQR=window.zQR||function(text){
       if(t.seconds) return t.seconds*1000;
       return new Date(t).getTime() || 0;
     }
+    function bubble(m, mine, tail){
+      var link = m.link ? '<a href="' + esc(m.link) + '" target="_blank" rel="noopener">' + esc(m.text || m.link) + '</a>' : esc(m.text || '');
+      return '<div class="mb ' + (mine ? 'me' : 'ot') + '">' + link + '<small>' + tail + '</small></div>';
+    }
+    function threadHtml(rows, mineOf, tailOf){
+      var html = '', lastDay = '';
+      rows.forEach(function(m){
+        var t = toMillis(m.created_at) || ms(m.created_at), d = t ? dayLabel(t) : '';
+        if(d && d !== lastDay){ html += '<div class="md">' + esc(d) + '</div>'; lastDay = d; }
+        html += bubble(m, mineOf(m), tailOf(m, t));
+      });
+      return html;
+    }
     function paintThread(otherUid){
       var thread = $('#mg-thread'); if(!thread) return;
       var otherRead = toMillis(threadReadUpTo[otherUid]);
-      thread.innerHTML = threadRows.length ? threadRows.map(function(m){
-        var mine = m.from === currentUser.uid;
-        var dot = '';
-        if(mine){
-          var mt = toMillis(m.created_at);
-          var cls = (otherRead && otherRead >= mt) ? 'blue' : 'yellow';
-          var lbl = cls === 'blue' ? 'Li li' : 'Resevwa';
-          dot = '<span class="msdot ' + cls + '" title="' + lbl + '"></span>';
-        }
-        return '<div style="display:flex;justify-content:' + (mine?'flex-end':'flex-start') + ';margin-bottom:8px;align-items:flex-end;gap:5px">'
-          + (mine ? dot : '')
-          + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;'
-          + (mine ? 'background:var(--gold);color:#0A0A0A' : 'background:rgba(255,255,255,.06);color:var(--ink-1)') + '">'
-          + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text||m.link) + '</a>' : esc(m.text||''))
-          + '</div></div>';
-      }).join('') : '<div class="zp-empty">Ekri premye mesaj la.</div>';
+      thread.innerHTML = threadRows.length ? threadHtml(threadRows,
+        function(m){ return m.from === currentUser.uid; },
+        function(m, t){
+          var tm = t ? esc(hhmm(t)) : '';
+          if(m.from !== currentUser.uid) return tm;
+          var blue = otherRead && otherRead >= t;
+          return tm + ' <span class="msdot ' + (blue ? 'blue' : 'yellow') + '" title="' + (blue ? 'Li li' : 'Resevwa') + '" style="margin:0"></span>';
+        }) : '<div class="zp-empty2">Ekri premye mesaj la — yon ti bonjou ase.</div>';
       thread.scrollTop = thread.scrollHeight;
     }
+
     async function renderPendingThread(otherEmail){
       var thread = $('#mg-thread'); if(!thread) return;
       thread.innerHTML = '<div class="zp-empty">K ap chaje…</div>';
@@ -1310,13 +1922,10 @@ window.zQR=window.zQR||function(text){
           rows = r.data || [];
         }catch(e){}
       }
-      thread.innerHTML = rows.length ? rows.map(function(m){
-        return '<div style="display:flex;justify-content:flex-end;margin-bottom:8px;align-items:flex-end;gap:5px">'
-          + '<span class="msdot grey" title="Ap tann li konekte"></span>'
-          + '<div style="max-width:78%;padding:9px 12px;border-radius:10px;font-size:.78rem;background:var(--gold);color:#0A0A0A">'
-          + (m.link ? '<a href="' + esc(m.link) + '" target="_blank" style="color:inherit;text-decoration:underline;display:block;margin-bottom:4px">' + esc(m.text_||m.link) + '</a>' : esc(m.text_||''))
-          + '</div></div>';
-      }).join('') : '<div class="zp-empty">Ekri premye mesaj la — l ap tann ' + esc(otherEmail) + ' konekte.</div>';
+      thread.innerHTML = rows.length ? threadHtml(rows.map(function(r){ return { text:r.text_, link:r.link, created_at:r.created_at }; }),
+        function(){ return true; },
+        function(m, t){ return (t ? esc(hhmm(t)) : '') + ' <span class="msdot grey" title="Ap tann li konekte" style="margin:0"></span>'; })
+        : '<div class="zp-empty2">Ekri premye mesaj la — l ap tann ' + esc(otherEmail) + ' konekte.</div>';
       thread.scrollTop = thread.scrollHeight;
     }
     async function deliverMessage(otherUid, otherEmail, text, link){
