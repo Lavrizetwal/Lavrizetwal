@@ -525,6 +525,7 @@
   --slow:640ms cubic-bezier(.19,1,.22,1);
   --nav:68px;
   color-scheme:light;
+  --shd-c:rgba(20,35,79,.22);
 }
 :root[data-theme="dark"]{
   --bg:#0A0D18; --bg-2:#0D1120; --bg-3:#12172A;
@@ -546,6 +547,7 @@
   --shadow-lg:0 30px 70px -20px rgba(0,0,0,.8);
   --star-rgb:212,175,55; --snow-rgb:255,255,255; --rain-rgb:190,205,225;
   color-scheme:dark;
+  --shd-c:rgba(0,0,0,.7);
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1198,6 +1200,7 @@ footer .zt-lg a{color:var(--on-band-2);font-size:.78rem;padding:6px 0}
   body{background:#fff;color:#000}
   .nav,.dock,.panel,.veil,.mask,.hero,.sec:not(#tarif),.contact,#sky,#guide,footer{display:none!important}
 }
+.panel{box-shadow:none}.panel.open{box-shadow:-30px 0 70px var(--shd-c)}
 
 </style>
 <style id="zt-legal-css">
@@ -1227,6 +1230,7 @@ footer .zt-lg a{color:var(--on-band-2);font-size:.78rem;padding:6px 0}
       <li><a href="shop.html">Shop</a></li>
       <li><a href="mall.html">Mall</a></li>
       <li><a href="games.html">Jwèt</a></li>
+      <li><a href="travay.html">Travay</a></li>
     </ul>
     <div class="nav-act">
       <button class="pill" id="login-btn" type="button">
@@ -1264,6 +1268,7 @@ footer .zt-lg a{color:var(--on-band-2);font-size:.78rem;padding:6px 0}
   <a class="dl" href="shop.html">Shop</a>
   <a class="dl" href="mall.html">Mall</a>
   <a class="dl" href="games.html">Jwèt</a>
+  <a class="dl" href="travay.html">Travay</a>
   <div id="dr-auth">
     <div class="who" id="dr-who" style="display:none">
       <span class="av" id="dr-av">Z</span>
