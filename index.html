@@ -1102,6 +1102,7 @@ footer .zt-lg a:hover,footer .zt-lg a:focus-visible{color:var(--gold-lt,#D4AF37)
       <li><a href="shop.html">Shop</a></li>
       <li><a href="mall.html">Mall</a></li>
       <li><a href="games.html">Jwèt</a></li>
+      <li><a href="travay.html">Travay</a></li>
     </ul>
 
     <div class="nav-act">
@@ -1147,6 +1148,7 @@ footer .zt-lg a:hover,footer .zt-lg a:focus-visible{color:var(--gold-lt,#D4AF37)
   <a href="shop.html">Shop</a>
   <a href="mall.html">Mall</a>
   <a href="games.html">Jwèt</a>
+  <a href="travay.html">Travay</a>
 
   <div id="dr-auth">
     <div class="who" id="dr-who" style="display:none">
@@ -1432,6 +1434,25 @@ footer .zt-lg a:hover,footer .zt-lg a:focus-visible{color:var(--gold-lt,#D4AF37)
         <div class="card-foot">
           <span class="chip">Pwen Zetwal</span>
           <span class="go">Antre nan Jwèt <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a href="travay.html" class="card w12">
+        <div class="card-top">
+          <span class="no">06</span>
+          <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M8 17h32a2 2 0 0 1 2 2v17a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V19a2 2 0 0 1 2-2Z" style="--l:118"/>
+            <path d="M17 17v-3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3" style="--l:38"/>
+            <path d="M6 27h36" style="--l:36"/><circle class="pt" cx="24" cy="27" r="1.6"/>
+          </svg>
+        </div>
+        <div class="mid">
+          <h3>Travay</h3>
+          <p>Si w ap chèche osinon ou vle bay travay, ou rive nan bon espas la.</p>
+        </div>
+        <div class="card-foot">
+          <span class="chip">Gonaïves</span>
+          <span class="go">Antre nan Travay <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
       </a>
 
@@ -2045,6 +2066,10 @@ $('#dr-login').addEventListener('click', function(){
   openAuth();
 });
 $('#m-x').addEventListener('click', shutAuth);
+/* Rive nan #konekte (soti nan lòt paj) : louvri modal la, epi retounen kote ou te ye apre koneksyon */
+function goNext(){ try{ var n=sessionStorage.getItem('zt-next'); if(n && /^[a-z0-9-]+\.html(#[a-z0-9-]*)?$/i.test(n)){ sessionStorage.removeItem('zt-next'); location.href=n; } }catch(e){} }
+if(location.hash === '#konekte') setTimeout(openAuth, 400);
+if(window.firebase && firebase.auth){ firebase.auth().onAuthStateChanged(function(u){ if(u) goNext(); }); }
 mask.addEventListener('click', function(e){ if(e.target === mask) shutAuth(); });
 addEventListener('keydown', function(e){ if(e.key === 'Escape') shutAuth(); });
 
