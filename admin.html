@@ -3871,7 +3871,7 @@ async function uploadSiteImage(file,prefix,maxW){
 }
 
 const MEDIA_PAGES={global:'Partout sur le site',akey:"Page d'accueil",lavri:'Page Lavri',
-  shop:'Page Shop',mall:'Page Mall',jwet:'Page Jwèt'};
+  shop:'Page Shop',mall:'Page Mall',jwet:'Page Jwèt',travay:'Page Travay'};
 
 /* Les emplacements connus du site. La console les affiche même si la
    ligne n'existe pas encore en base : elle la crée au premier envoi.
@@ -3884,6 +3884,7 @@ const KNOWN_SLOTS=[
   {slot:'home.card.shop',    label:'Carte Shop — accueil',           page:'akèy',   position:30},
   {slot:'home.card.mall',    label:'Carte Mall — accueil',           page:'akèy',   position:40},
   {slot:'home.card.jwet',    label:'Carte Jwèt — accueil',           page:'akèy',   position:50},
+  {slot:'home.card.travay',  label:'Carte Travay — accueil',         page:'akèy',   position:55},
   {slot:'home.quote',        label:'Portrait — citation du jour',    page:'akèy',   position:60},
   {slot:'lavri.hero',        label:'Fond du titre — Lavri',          page:'lavri',  position:10},
   {slot:'lavri.plan.petit',  label:'Carte tarif — Le Petit',         page:'lavri',  position:20},
@@ -3893,7 +3894,8 @@ const KNOWN_SLOTS=[
   {slot:'shop.hero',         label:'Fond du titre — Shop',           page:'shop',   position:10},
   {slot:'taxi.hero',         label:'Fond du titre — Kòmand',         page:'kòmand', position:10},
   {slot:'mall.hero',         label:'Fond du titre — Mall',           page:'mall',   position:10},
-  {slot:'jwet.hero',         label:'Fond du titre — Jwèt',           page:'jwèt',   position:10}
+  {slot:'jwet.hero',         label:'Fond du titre — Jwèt',           page:'jwèt',   position:10},
+  {slot:'travay.hero',       label:'Fond du titre — Travay',         page:'travay', position:10}
 ];
 function slotMeta(slot){
   const k=KNOWN_SLOTS.find(x=>x.slot===slot);
