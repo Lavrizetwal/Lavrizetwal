@@ -763,7 +763,7 @@ footer.foot .zt-lg a:hover,footer.foot .zt-lg a:focus-visible{color:var(--gold-l
 body.tv{background:var(--bg)}
 .tv main{padding-top:var(--nav)}
 .tv .wrap{max-width:1160px}
-.tv-hero{padding:76px 0 56px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-2),var(--bg))}
+.tv-hero{position:relative;isolation:isolate;overflow:hidden;padding:76px 0 56px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-2),var(--bg))}
 .tv-hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(2.5rem,6.4vw,4.6rem);line-height:1.04;letter-spacing:.003em;color:var(--ink);max-width:14ch;text-wrap:balance}
 .tv-hero .lead{margin-top:22px;max-width:56ch;font-size:1.06rem;line-height:1.7;color:var(--ink-2)}
 .tv-entries{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:44px}
@@ -925,6 +925,9 @@ body.tv{background:var(--bg)}
 }
 @media(prefers-reduced-motion:reduce){.tv-door,.tv-row{transition:none}.tv-door:hover{transform:none}}
 
+.tv-shot{position:absolute;inset:0;z-index:-1;opacity:0;background-size:cover;background-position:center;transition:opacity 1.2s ease}
+.tv-shot.on{opacity:.16}
+
 </style>
 </head>
 <body class="tv">
@@ -1006,6 +1009,7 @@ body.tv{background:var(--bg)}
 
 <main id="main">
   <header class="tv-hero">
+    <span class="tv-shot" data-media="travay.hero" aria-hidden="true"></span>
     <div class="wrap">
       <div class="eyebrow">Travay · Gonaïves</div>
       <h1>Jwenn travay. Bay travay.</h1>
@@ -1656,6 +1660,21 @@ if(auth) auth.onAuthStateChanged(function(user){
 
 renderList(); renderMe(); loadJobs();
 if(location.hash==='#espas') setTimeout(function(){ var e=$('#espas'); if(e) e.scrollIntoView(); },60);
+/* ═══ IMAJ (site_media, jere nan admin) — anplasman vid = aparans orijinal ═══ */
+(function(){
+  if(!sb) return;
+  sb.from('site_media').select('slot,url,alt').then(function(r){
+    if(r.error||!r.data) return;
+    var map={}; r.data.forEach(function(m){ if(m.url) map[m.slot]=m; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-media]'),function(el){
+      var m=map[el.getAttribute('data-media')]; if(!m) return;
+      if(el.tagName==='IMG'){ el.src=m.url; if(m.alt) el.alt=m.alt; return; }
+      var im=new Image();
+      im.onload=function(){ el.style.backgroundImage='url("'+m.url+'")'; el.classList.add('on'); };
+      im.src=m.url;
+    });
+  },function(){});
+})();
 window.__tv=S;
 })();
 
