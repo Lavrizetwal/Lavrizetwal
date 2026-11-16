@@ -10,7 +10,7 @@
 <meta name="description" content="Travay Zetwal : chèche travay oswa bay travay nan Gonaïves. Chak anons verifye pa yon administratè.">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/logo-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Zetwal">
 <meta name="mobile-web-app-capable" content="yes">
@@ -943,7 +943,6 @@ body.tv{background:var(--bg)}
       <li><a href="lavri.html">Lavri</a></li>
       <li><a href="taxi.html">Kòmand</a></li>
       <li><a href="shop.html">Shop</a></li>
-      <li><a href="mall.html">Mall</a></li>
       <li><a href="games.html">Jwèt</a></li>
       <li><a href="travay.html" class="on" aria-current="page">Travay</a></li>
     </ul>
@@ -989,7 +988,6 @@ body.tv{background:var(--bg)}
   <a href="lavri.html">Lavri</a>
   <a href="taxi.html">Kòmand</a>
   <a href="shop.html">Shop</a>
-  <a href="mall.html">Mall</a>
   <a href="games.html">Jwèt</a>
   <a href="travay.html">Travay</a>
 
@@ -1678,6 +1676,13 @@ if(location.hash==='#espas') setTimeout(function(){ var e=$('#espas'); if(e) e.s
 window.__tv=S;
 })();
 
+</script>
+<script>
+if('serviceWorker' in navigator){
+  addEventListener('load', function(){
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
