@@ -1078,6 +1078,24 @@ footer .zt-lg a:hover,footer .zt-lg a:focus-visible{color:var(--gold-lt,#D4AF37)
 .hero:has(.zm-ban){padding-bottom:120px}
 @media(max-width:480px){.zw{padding:12px 14px;gap:10px}.zw-ic{width:38px;height:38px}.zw-city{font-size:1.05rem}.zw-time{font-size:1.65rem}.zw-cond{font-size:.62rem;letter-spacing:1px}}
 </style>
+<style id="zi-css">
+.zi-btn{display:none;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 20px;border-radius:99px;border:1px solid var(--gold,#D4AF37);background:transparent;color:var(--gold-ink,#7C5C0A);font:600 .8rem/1 inherit;font-family:inherit;letter-spacing:.06em;cursor:pointer;touch-action:manipulation;transition:background .2s,color .2s}
+.zi-btn.on{display:inline-flex}
+.zi-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.zi-btn:hover{background:var(--g-08,rgba(212,175,55,.08))}
+.zi-btn:focus-visible{outline:2px solid var(--gold,#D4AF37);outline-offset:3px}
+footer.foot .zi-btn{color:var(--on-band,#F4F1E8);border-color:rgba(212,175,55,.6)}
+footer.foot .zi-btn:hover{background:rgba(212,175,55,.14)}
+#drawer .zi-btn{width:100%;margin:6px 0 14px}
+.zi-ov{position:fixed;inset:0;z-index:1200;display:none;align-items:flex-end;justify-content:center;background:rgba(5,8,20,.62);padding:0 0 env(safe-area-inset-bottom,0)}
+.zi-ov.on{display:flex}
+.zi-box{width:min(440px,100%);background:var(--surface,#fff);color:var(--ink,#14234F);border:1px solid var(--g-24,rgba(212,175,55,.24));border-radius:22px 22px 0 0;padding:24px max(22px,env(safe-area-inset-left,0px)) 26px;box-shadow:0 -18px 60px rgba(0,0,0,.35)}
+@media(min-width:700px){.zi-ov{align-items:center}.zi-box{border-radius:22px}}
+.zi-box h3{margin:0 0 14px;font-size:1.25rem;line-height:1.25}
+.zi-box ol{margin:0 0 20px;padding-left:1.2em;line-height:1.6;font-size:.95rem}
+.zi-box li{margin-bottom:8px}
+.zi-box .zi-btn{display:inline-flex;width:100%}
+</style>
 </head>
 <body>
 
@@ -1147,6 +1165,7 @@ footer .zt-lg a:hover,footer .zt-lg a:focus-visible{color:var(--gold-lt,#D4AF37)
   <a href="shop.html">Shop</a>
   <a href="games.html">Jwèt</a>
   <a href="travay.html">Travay</a>
+  <button class="zi-btn" type="button" data-zi aria-label="Enstale Zetwal sou telefòn ou"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Enstale Zetwal</button>
 
   <div id="dr-auth">
     <div class="who" id="dr-who" style="display:none">
@@ -1500,6 +1519,7 @@ footer .zt-lg a:hover,footer .zt-lg a:focus-visible{color:var(--gold-lt,#D4AF37)
       <div class="fb">ZETWAL <em>ORGANISATION</em></div>
       <small>© 2026 Zetwal Organisation — Tout dwa rezève</small>
       <nav class="zt-lg" aria-label="Dokiman legal"><a href="legal.html#cgu">Kondisyon itilizasyon</a><a href="legal.html#confidentialite">Konfidansyalite</a></nav>
+      <button class="zi-btn" type="button" data-zi aria-label="Enstale Zetwal sou telefòn ou"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Enstale Zetwal</button>
       <button id="top" type="button"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg> Tounen anwo</button>
   </div>
 </footer>
@@ -4810,6 +4830,39 @@ function zrBuild(rec){
   var n = 0, w = setInterval(function(){ n++; if(window.ZB && ZB.fnUrl()){ clearInterval(w); load(false); } else if(n > 60){ clearInterval(w); } }, 250);
   setInterval(function(){ if(!document.hidden) load(false); }, TTL);
   document.addEventListener('visibilitychange', function(){ if(!document.hidden){ clock(); load(false); } });
+})();
+</script>
+<div class="zi-ov" id="zi-ov" role="dialog" aria-modal="true" aria-labelledby="zi-t">
+  <div class="zi-box">
+    <h3 id="zi-t">Enstale Zetwal sou iPhone ou</h3>
+    <ol>
+      <li>Louvri paj sa a nan <b>Safari</b>.</li>
+      <li>Peze bouton <b>Pataje</b> (kare ak yon flèch anlè a).</li>
+      <li>Chwazi <b>« Ajoute sou ekran dakèy »</b>.</li>
+      <li>Peze <b>Ajoute</b>. Ikòn Zetwal la ap parèt sou telefòn ou.</li>
+    </ol>
+    <button class="zi-btn" type="button" id="zi-x">Konprann</button>
+  </div>
+</div>
+<script>
+(function(){
+  var btns = document.querySelectorAll('[data-zi]'), ov = document.getElementById('zi-ov');
+  var ev = null, ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function standalone(){ try{ return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }catch(e){ return false; } }
+  function show(on){ for(var i=0;i<btns.length;i++) btns[i].classList.toggle('on', !!on); }
+  if(standalone()) return;
+  /* iPhone : pas de fenêtre automatique, on montre les étapes (Safari seulement) */
+  if(ios && !/crios|fxios|edgios|gsa\//i.test(navigator.userAgent)) show(true);
+  addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); ev = e; show(true); });
+  addEventListener('appinstalled', function(){ ev = null; show(false); });
+  function close(){ ov.classList.remove('on'); }
+  for(var i=0;i<btns.length;i++) btns[i].addEventListener('click', function(){
+    if(ev){ var p = ev; ev = null; p.prompt(); p.userChoice.then(function(r){ if(r && r.outcome === 'accepted') show(false); else { ev = p; } }).catch(function(){}); }
+    else if(ios){ ov.classList.add('on'); document.getElementById('zi-x').focus(); }
+  });
+  document.getElementById('zi-x').addEventListener('click', close);
+  ov.addEventListener('click', function(e){ if(e.target === ov) close(); });
+  addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
 })();
 </script>
 </body>
