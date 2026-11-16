@@ -1,15 +1,15 @@
 {
   "name": "Zetwal Organisation",
   "short_name": "Zetwal",
-  "description": "Lavri, Shop, Mall ak Jwèt — tout Zetwal nan yon sèl aplikasyon.",
+  "description": "Lavri, Shop ak Jwèt — tout Zetwal nan yon sèl aplikasyon.",
   "lang": "ht",
   "dir": "ltr",
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#050505",
-  "theme_color": "#050505",
+  "background_color": "#0B1530",
+  "theme_color": "#FFFFFF",
   "categories": [
     "shopping",
     "games",
@@ -33,6 +33,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
@@ -80,5 +86,6 @@
         }
       ]
     }
-  ]
+  ],
+  "id": "/"
 }
