@@ -4,7 +4,7 @@
    move koneksyon. Li PA JANM kenbe done : pri, kòmand, pwen ak
    machin yo toujou soti dirèk nan sèvè a.
    ════════════════════════════════════════════════════════════════ */
-const VERSION = 'zetwal-v1';
+const VERSION = 'zetwal-v2';
 
 /* Paj ak fichye ki chaje depi telefòn nan */
 const SHELL = [
@@ -15,11 +15,11 @@ const SHELL = [
   '/shop.html',
   '/legal.html',
   '/games.html',
-  '/mall.html',
   '/manifest.json',
   '/logo.png',
   '/logo-192.png',
-  '/logo-512.png'
+  '/logo-512.png',
+  '/apple-touch-icon.png'
 ];
 
 /* Jwèt yo : yo antre nan kach la sèlman lè jwè a louvri yo yon fwa */
