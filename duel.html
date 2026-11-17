@@ -1701,7 +1701,8 @@ function ageModal(onOk){
 /* ── État du joueur ── */
 function refreshStatus(){
   if(!GM.user) { GM.st=null; return Promise.resolve(null); }
-  return rpc('zj_status').then(function(s){ GM.st=s; setBal(s.balance); return s; },function(e){ GM.st=null; if(e&&e.error==='login') return null; throw e; });
+  GM.loading=true;
+  return rpc('zj_status').then(function(s){ GM.loading=false; GM.st=s; setBal(s.balance); return s; },function(e){ GM.loading=false; GM.st=null; if(e&&e.error==='login') return null; throw e; });
 }
 /* Message d'état commun : retourne null si on peut jouer */
 function blocker(){
@@ -1760,6 +1761,7 @@ function bindSound(){
 /* Chaque page branche ici son démarrage une fois l'utilisateur connu */
 var onUser=[];
 if(auth) auth.onAuthStateChanged(function(user){
+  if(user&&GM.user&&GM.user.uid===user.uid&&(GM.st||GM.loading)) return;   /* même utilisateur : pas de redémarrage inutile */
   if(unsubPts){ unsubPts(); unsubPts=null; }
   GM.user=user||null; GM.st=null;
   if(!user){
@@ -1781,7 +1783,14 @@ if(auth) auth.onAuthStateChanged(function(user){
 });
 else { setTimeout(function(){ GM.ready=true; onUser.forEach(function(f){ f(null); }); },0); }
 
-addEventListener('zmfa:changed',function(e){ try{ if(e.detail&&e.detail.valid&&GM.user&&!GM.st) location.reload(); }catch(x){} });
+/* Reprise douce (jamais de rechargement de page, pour éviter toute boucle) : si le statut n'a pas pu être lu
+   avant que la clé d'accès soit validée, on relance le démarrage, au plus 2 fois. */
+var mfaRetry=0;
+addEventListener('zmfa:changed',function(e){ try{
+  if(!(e.detail&&e.detail.valid&&GM.user&&!GM.st&&!GM.loading)) return;
+  if(mfaRetry>=2) return; mfaRetry++;
+  setTimeout(function(){ if(GM.user&&!GM.st&&!GM.loading) onUser.forEach(function(f){ try{ f(GM.user); }catch(x){ console.error(x); } }); },400);
+}catch(x){} });
 
 </script>
 <script>
