@@ -1349,6 +1349,25 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
 
 .gm-hero{background:color-mix(in srgb,var(--bg) 48%,transparent)!important;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 </style>
+<style id="zj-shop-css">
+.hb-shop{margin-top:54px}
+.hb-shop h2{font-family:var(--serif);font-size:clamp(1.8rem,3.4vw,2.4rem);font-weight:600}
+.hb-shop .lead{color:var(--ink-2);max-width:62ch;line-height:1.65;margin:8px 0 18px}
+.sh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.sh-it{display:flex;flex-direction:column;gap:10px;padding:18px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);box-shadow:var(--shadow)}
+.sh-it .art{height:130px;border-radius:8px;display:grid;place-items:center;background:var(--bg-2);color:var(--gold-ink);overflow:hidden}
+.sh-it .art svg{width:70px;height:70px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.sh-it .art img{width:100%;height:100%;object-fit:contain}
+.sh-it h3{font-family:var(--serif);font-size:1.25rem;font-weight:600;line-height:1.2}
+.sh-it p{font-size:.84rem;color:var(--ink-2);line-height:1.5;flex:1}
+.sh-it .pr{display:flex;align-items:center;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
+.sh-it .pr b{font-size:1.1rem;color:var(--gold-ink)}
+.sh-it .pr small{color:var(--ink-3);font-size:.74rem}
+.sh-it .gm-btn{width:100%;justify-content:center}
+.sh-it.own{border-color:var(--gold)}
+.sh-it .gm-btn.ln{color:var(--gold-ink);border-color:var(--gold);background:transparent;opacity:1}.sh-it .gm-btn.ln:disabled{color:var(--ink-3);border-color:var(--line-2);opacity:.7}
+.sh-em{padding:30px 22px;border:1px dashed var(--line-2);border-radius:10px;color:var(--ink-3);text-align:center;line-height:1.7}
+</style>
 </head>
 <body class="gm" data-scene="games">
 <canvas id="zt-scene" aria-hidden="true"></canvas>
@@ -1461,6 +1480,16 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
     </div>
   </section>
 
+  <section class="gm-sec" style="padding-top:0;padding-bottom:10px" id="hb-shop-sec">
+    <div class="wrap">
+      <div class="hb-shop">
+        <h2>Boutik Zetwal</h2>
+        <p class="lead">Achte atik Zetwal (mayo, chapo, bòt…) ak jeton jwèt ou yo sèlman. Atik sa yo rete andedan jwèt la.</p>
+        <div id="hb-shop-grid" class="sh-grid" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="gm-sec" style="padding-top:0">
     <div class="wrap">
       <div class="hb-top">
@@ -1479,7 +1508,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
         <ul>
           <li>Jwèt yo rezève pou moun ki gen 18 an oswa plis. Nou mande dat nesans ou yon sèl fwa.</li>
           <li>Jeton jwèt yo se pwen espesyal pou jwèt yo. Yo pa menm bagay ak pwen regilye Zetwal yo.</li>
-          <li>Antre a pèdi toujou. Gany a vini anplis si ou genyen.</li>
+          <li>Antre a pèdi toujou. Gany a vini anplis si ou genyen. Ou ka pèdi jeton ou yo : gany ak pèt yo afiche aklè anvan ou jwe.</li>
+          <li>Anvan chak jwèt, ou dwe bay konsantman ou nan yon ekran ki rezime gany ak pèt posib yo.</li>
           <li>Gen yon limit gany chak jou, e Mythique a limite a yon pati pa jou.</li>
           <li>Yon pati ki fini twò vit pase limit nòmal la mete an verifikasyon anvan gany a peye.</li>
           <li>Si koneksyon an koupe, ou ka rekòmanse pati a, men tan an kontinye kouri.</li>
@@ -1737,7 +1767,7 @@ function blocker(){
   return null;
 }
 function noteHtml(b,cls){ return '<div class="gm-note'+(cls?' '+cls:'')+'"><b>'+esc(b.t)+'</b>'+esc(b.m)+(b.b?'<br><button class="gm-btn sm" type="button" id="gm-nb">'+esc(b.b)+'</button>':'')+'</div>'; }
-var ERRS={ ferme:'Les jeux sont fermés pour le moment.', age:'Confirmez votre âge pour jouer.', autre_partie:'Vous avez déjà une partie en cours.', niveau:'Niveau inconnu.', choix:'Choix invalide.',
+var ERRS={ deja:'Vous possédez déjà cet article.', rupture:'Cet article est épuisé.', introuvable:'Article introuvable.', non_possede:'Vous ne possédez pas cet article.', consentement:'Confirmez d’abord votre consentement pour jouer.', ferme:'Les jeux sont fermés pour le moment.', age:'Confirmez votre âge pour jouer.', autre_partie:'Vous avez déjà une partie en cours.', niveau:'Niveau inconnu.', choix:'Choix invalide.',
   plafond:'Plafond quotidien atteint : vous avez gagné le maximum autorisé aujourd’hui. Revenez demain.', mythique_jour:'Le niveau Mythique est limité à une partie par jour.',
   banque:'Aucune question disponible pour ce choix pour le moment. Choisissez-en un autre.', terminee:'Cette partie est terminée.', ordre:'Réponse déjà prise en compte.', session:'Partie introuvable.' };
 function errMsg(r){
@@ -1902,6 +1932,52 @@ function boot(){
   if(GM.st) setBal(GM.st.balance);
   hubNote(); loadTop();
 }
+
+/* ── Boutik (jetons de jeu uniquement) ── */
+var SHOP=[];
+var ART={maillot:'<path d="M8.5 3 3 6l2 4.2 2.2-1V21h9.6V9.2l2.2 1L21 6l-5.5-3a3.6 3.6 0 0 1-7 0z"/>',
+  chapeau:'<path d="M4 15a8 8 0 0 1 16 0z"/><path d="M3 15h18v2.2H3zM12 7V5"/>',
+  bottes:'<path d="M8 3h6v9l4 2.2V19H6V8z"/><path d="M6 15h8"/>',
+  autre:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>'};
+function shopArt(it){
+  var a=it.art||'';
+  if(/^(https?:|data:image\/)/.test(a)) return '<img src="'+esc(a)+'" alt="" loading="lazy">';
+  return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(ART[a]||ART[it.cat]||ART.autre)+'</svg>';
+}
+function renderShop(){
+  var g=$('#hb-shop-grid'); if(!g) return;
+  if(!SHOP.length){ g.innerHTML='<div class="sh-em" style="grid-column:1/-1">Boutik la ap louvri talè. Mayo, chapo ak bòt Zetwal ap parèt isit la.</div>'; return; }
+  g.innerHTML=SHOP.map(function(it){
+    var btn=it.owned?'<button class="gm-btn ln" type="button" data-eq="'+it.id+'">'+(it.equipped?'Retire l':'Mete l')+'</button>'
+      :(it.stock!==null&&it.stock<1?'<button class="gm-btn ln" type="button" disabled>Fini</button>':'<button class="gm-btn" type="button" data-buy="'+it.id+'">Achte</button>');
+    return '<article class="sh-it'+(it.owned?' own':'')+'"><div class="art">'+shopArt(it)+'</div><h3>'+esc(it.name)+'</h3><p>'+esc(it.descr||'')+'</p>'+
+      '<div class="pr"><b>'+fmt(it.price)+' jeton</b>'+(it.owned?'<small>'+(it.equipped?'Ou mete l':'Ou posede l')+'</small>':(it.stock!==null?'<small>'+it.stock+' rete</small>':''))+'</div>'+btn+'</article>';
+  }).join('');
+}
+function loadShop(){
+  rpc('zj_shop_list').then(function(r){ SHOP=(r&&r.items)||[]; renderShop(); },function(){ var g=$('#hb-shop-grid'); if(g) g.innerHTML='<div class="sh-em" style="grid-column:1/-1">Boutik la pa disponib pou kounye a. Eseye ankò talè.</div>'; });
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-buy]'), q=e.target.closest('[data-eq]');
+  if(b){
+    if(!GM.user){ loginModal('Konekte pou achte nan boutik la.'); return; }
+    var it=SHOP.filter(function(x){return x.id===+b.dataset.buy;})[0]; if(!it) return;
+    var bal=GM.st?GM.st.balance:0;
+    openModal('<h2>Konfime acha a</h2><p><b>'+esc(it.name)+'</b></p><p>Pri : <b>'+fmt(it.price)+' jeton</b>. Jeton ou yo kounye a : '+fmt(bal)+'. Apre acha a : '+fmt(Math.max(bal-it.price,0))+'.</p><p class="gm-err" id="sh-e" role="alert"></p><div class="row"><button class="gm-btn" type="button" id="sh-ok">Achte</button><button class="gm-btn q" type="button" data-close>Anile</button></div>');
+    $('#sh-ok').addEventListener('click',function(){
+      var k=this; k.disabled=true;
+      rpc('zj_shop_buy',{p_item:it.id}).then(function(r){
+        if(r&&r.ok){ closeModal(); setBal(r.balance); if(GM.st) GM.st.balance=r.balance; toast('Acha fèt : '+it.name); loadShop(); }
+        else { k.disabled=false; $('#sh-e').textContent=errMsg(r); }
+      },function(er){ k.disabled=false; $('#sh-e').textContent=errMsg(er); });
+    });
+  } else if(q){
+    var id=+q.dataset.eq, cur=SHOP.filter(function(x){return x.id===id;})[0]; if(!cur) return;
+    rpc('zj_shop_equip',{p_item:id,p_on:!cur.equipped}).then(function(){ loadShop(); },function(er){ toast(errMsg(er)); });
+  }
+});
+
+onUser.push(function(){ loadShop(); });
 onUser.push(function(){ refreshStatus().then(boot,function(){ boot(); }); });
 })();
 

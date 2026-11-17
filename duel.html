@@ -1337,6 +1337,16 @@ body.gm{background:var(--bg)}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 </style>
+<style id="zj-consent-css">
+.gm-chk{display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:.9rem;line-height:1.5;margin:14px 0 4px;padding:12px;border:1px solid var(--line-2,rgba(128,128,128,.4));border-radius:12px;cursor:pointer}
+.gm-chk input{margin-top:3px;width:20px;height:20px;flex:none;accent-color:#B8912A}
+.cs-rules{margin:10px 0;padding-left:0;list-style:none;display:grid;gap:6px;font-size:.92rem;line-height:1.5}
+.cs-rules li{padding:8px 12px;border-radius:10px;background:rgba(128,128,128,.1)}
+.cs-rules b.g{color:#2e8b57}.cs-rules b.b{color:#c0392b}
+.gm-chk span{font-weight:500;color:inherit}.gm-chk input{position:static;opacity:1}
+.cs-gen{font-size:.8rem;opacity:.8;line-height:1.55}
+.gm-consent{max-height:92vh;overflow:auto}
+</style>
 </head>
 <body class="gm">
 <nav class="nav" id="nav">
@@ -1717,7 +1727,7 @@ function blocker(){
   return null;
 }
 function noteHtml(b,cls){ return '<div class="gm-note'+(cls?' '+cls:'')+'"><b>'+esc(b.t)+'</b>'+esc(b.m)+(b.b?'<br><button class="gm-btn sm" type="button" id="gm-nb">'+esc(b.b)+'</button>':'')+'</div>'; }
-var ERRS={ ferme:'Les jeux sont fermés pour le moment.', age:'Confirmez votre âge pour jouer.', autre_partie:'Vous avez déjà une partie en cours.', niveau:'Niveau inconnu.', choix:'Choix invalide.',
+var ERRS={ consentement:'Confirmez d’abord votre consentement pour jouer.', ferme:'Les jeux sont fermés pour le moment.', age:'Confirmez votre âge pour jouer.', autre_partie:'Vous avez déjà une partie en cours.', niveau:'Niveau inconnu.', choix:'Choix invalide.',
   plafond:'Plafond quotidien atteint : vous avez gagné le maximum autorisé aujourd’hui. Revenez demain.', mythique_jour:'Le niveau Mythique est limité à une partie par jour.',
   banque:'Aucune question disponible pour ce choix pour le moment. Choisissez-en un autre.', terminee:'Cette partie est terminée.', ordre:'Réponse déjà prise en compte.', session:'Partie introuvable.' };
 function errMsg(r){
@@ -1833,10 +1843,38 @@ $('#dl-lv').addEventListener('click',function(e){ var b=e.target.closest('[data-
 $('#dl-ct').addEventListener('click',function(e){ var b=e.target.closest('[data-c]'); if(!b) return; var v=+b.dataset.c; S.ct=v?v:null; ZS.play('tap'); renderPick(); });
 $('#dl-sum').addEventListener('click',function(e){ if(e.target.closest('#dl-go')) start(); });
 
-function start(){
+
+/* ── Consentement avant de jouer (gains et pertes affichés clairement) ── */
+function gateConsent(game,rules,go){
+  var c=GM.st&&GM.st.consents&&GM.st.consents[game]&&(+GM.st.consents[game].v>=(+GM.st.consent_v||1));
+  if(c) return go();
+  openModal('<h2>Avant de jouer</h2>'+rules+
+    '<p class="cs-gen">Les jetons sont des points de jeu : ils s’utilisent uniquement dans l’univers Zetwal (jeux et boutique du hub) et ne sont pas convertibles en argent. Réservé aux personnes de 18 ans ou plus. Plafond de gain : '+(GM.st&&GM.st.cap_day?GM.st.cap_day:300)+' jetons par jour.</p>'+
+    '<label class="gm-chk"><input type="checkbox" id="cs-c"><span>J’ai lu et compris les gains et les pertes possibles, et je consens à jouer.</span></label>'+
+    '<p class="gm-err" id="cs-e" role="alert"></p><div class="row"><button class="gm-btn" type="button" id="cs-ok" disabled>Je consens et je joue</button><button class="gm-btn q" type="button" data-close>Annuler</button></div>','gm-consent');
+  $('#cs-c').addEventListener('change',function(){ $('#cs-ok').disabled=!this.checked; });
+  $('#cs-ok').addEventListener('click',function(){
+    var b=this; b.disabled=true;
+    rpc('zj_consent',{p_game:game}).then(function(r){
+      if(r&&r.ok){ if(GM.st){ GM.st.consents=GM.st.consents||{}; GM.st.consents[game]={v:GM.st.consent_v||1}; } closeModal(); go(); }
+      else { b.disabled=false; $('#cs-e').textContent=errMsg(r); }
+    },function(e){ b.disabled=false; $('#cs-e').textContent=errMsg(e); });
+  });
+}
+
+function dlRules(){
+  return '<p>Lisez bien : vous pouvez <b>perdre</b> des jetons.</p><ul class="cs-rules"><li>Mise : <b class="b">−10 jetons</b> par duel, prélevés dès le départ et toujours perdus.</li>'+
+   '<li>Chaque bonne réponse rapporte le niveau de la question : <b class="g">+1 à +10</b> jetons.</li>'+
+   '<li>Chaque mauvaise réponse (ou question sans réponse en 10 secondes) retire ce même niveau : <b class="b">−1 à −10</b> jetons.</li>'+
+   '<li>Dix sur dix : bonus égal au niveau moyen des questions.</li>'+
+   '<li>Le solde minimum exigé couvre la mise et les pertes possibles, il est affiché avant de jouer.</li></ul>';
+}
+function start(){ gateConsent('duel',dlRules(),doStart); }
+function doStart(){
   if(busy) return; busy=true; ZS.wake();
   rpc('zj_duel_start',{p_level:S.lv,p_cat:S.ct}).then(function(r){
     busy=false;
+    if(r&&r.error==='consentement'){ if(GM.st&&GM.st.consents) delete GM.st.consents.duel; return start(); }
     if(!r||!r.ok){ toast(errMsg(r)); if(r&&r.error==='autre_partie') showNote({k:'err',t:'Partie en cours',m:'Une partie de Sudoku est déjà ouverte.',b:'Reprendre le Sudoku',f:function(){ location.href='sudoku.html'; }}); return; }
     ZS.play('start'); enter(r,!!r.resumed);
   },function(e){ busy=false; if(e&&e.error==='login') return loginModal(); toast(errMsg(e)); });
