@@ -4,7 +4,7 @@
    move koneksyon. Li PA JANM kenbe done : pri, kòmand, pwen ak
    machin yo toujou soti dirèk nan sèvè a.
    ════════════════════════════════════════════════════════════════ */
-const VERSION = 'zetwal-v3';
+const VERSION = 'zetwal-v4';
 
 /* Paj ak fichye ki chaje depi telefòn nan */
 const SHELL = [
@@ -15,6 +15,7 @@ const SHELL = [
   '/shop.html',
   '/legal.html',
   '/games.html',
+  '/scenes.js',
   '/manifest.json',
   '/logo.png',
   '/logo-192.png',
