@@ -1404,7 +1404,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
 .sh-it .gm-btn.ln{color:var(--gold-ink);border-color:var(--gold);background:transparent;opacity:1}.sh-it .gm-btn.ln:disabled{color:var(--ink-3);border-color:var(--line-2);opacity:.7}
 .sh-em{padding:30px 22px;border:1px dashed var(--line-2);border-radius:10px;color:var(--ink-3);text-align:center;line-height:1.7}
 </style>
-</head>
+<style>.gm-chk{display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:.88rem;line-height:1.5;margin:14px 0 4px;padding:12px;border:1px solid var(--line-2,rgba(128,128,128,.4));border-radius:12px;cursor:pointer}.gm-chk input{margin-top:3px;width:20px;height:20px;flex:none;accent-color:#B8912A;position:static;opacity:1}.gm-chk span{font-weight:500}</style></head>
 <body class="gm" data-scene="games">
 <canvas id="zt-scene" aria-hidden="true"></canvas>
 <nav class="nav" id="nav">
@@ -1999,7 +1999,8 @@ document.addEventListener('click',function(e){
     if(!GM.user){ loginModal('Konekte pou achte nan boutik la.'); return; }
     var it=SHOP.filter(function(x){return x.id===+b.dataset.buy;})[0]; if(!it) return;
     var bal=GM.st?GM.st.balance:0;
-    openModal('<h2>Konfime acha a</h2><p><b>'+esc(it.name)+'</b></p><p>Pri : <b>'+fmt(it.price)+' jeton</b>. Jeton ou yo kounye a : '+fmt(bal)+'. Apre acha a : '+fmt(Math.max(bal-it.price,0))+'.</p><p class="gm-err" id="sh-e" role="alert"></p><div class="row"><button class="gm-btn" type="button" id="sh-ok">Achte</button><button class="gm-btn q" type="button" data-close>Anile</button></div>');
+    openModal('<h2>Konfime acha a</h2><p><b>'+esc(it.name)+'</b></p><p>Pri : <b>'+fmt(it.price)+' jeton</b>. Jeton ou yo kounye a : '+fmt(bal)+'. Apre acha a : '+fmt(Math.max(bal-it.price,0))+'.</p><label class="gm-chk"><input type="checkbox" id="sh-c"><span>Mwen konprann depans sa a epi mwen konsanti pou jeton yo retire nan kont jwèt mwen.</span></label><p class="gm-err" id="sh-e" role="alert"></p><div class="row"><button class="gm-btn" type="button" id="sh-ok" disabled>Achte</button><button class="gm-btn q" type="button" data-close>Anile</button></div>');
+    $('#sh-c').addEventListener('change',function(){ $('#sh-ok').disabled=!this.checked; });
     $('#sh-ok').addEventListener('click',function(){
       var k=this; k.disabled=true;
       rpc('zj_shop_buy',{p_item:it.id}).then(function(r){
