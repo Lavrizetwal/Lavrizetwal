@@ -1337,8 +1337,21 @@ body.gm{background:var(--bg)}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 </style>
+<style id="zt-scene-css">
+/* ══ FON ANIME — sèn dèyè paj la (scenes.js) ══════════════ */
+:root{--veil:0}
+#zt-scene{position:fixed;inset:0;z-index:-8;pointer-events:none;display:block}
+body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;background:var(--bg);opacity:var(--veil)}
+#sky,#spot,#grain,#ghost{display:none!important}
+.nav{background:color-mix(in srgb,var(--bg) 86%,transparent)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+#pwen,#tarif{background:color-mix(in srgb,var(--bg-2) 88%,transparent)!important}
+.contact{background:transparent!important}
+
+.gm-hero{background:color-mix(in srgb,var(--bg) 48%,transparent)!important;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+</style>
 </head>
-<body class="gm">
+<body class="gm" data-scene="games">
+<canvas id="zt-scene" aria-hidden="true"></canvas>
 <nav class="nav" id="nav">
   <div class="nav-in">
     <a class="brand" href="index.html" aria-label="Zetwal Organisation">
@@ -1884,5 +1897,6 @@ onUser.push(function(){ refreshStatus().then(boot,function(){ boot(); }); });
 })();
 
 </script>
+<script src="scenes.js" defer></script>
 </body>
 </html>

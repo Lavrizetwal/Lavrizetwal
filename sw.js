@@ -4,7 +4,7 @@
    move koneksyon. Li PA JANM kenbe done : pri, kòmand, pwen ak
    machin yo toujou soti dirèk nan sèvè a.
    ════════════════════════════════════════════════════════════════ */
-const VERSION = 'zetwal-v2';
+const VERSION = 'zetwal-v4';
 
 /* Paj ak fichye ki chaje depi telefòn nan */
 const SHELL = [
@@ -15,6 +15,7 @@ const SHELL = [
   '/shop.html',
   '/legal.html',
   '/games.html',
+  '/scenes.js',
   '/manifest.json',
   '/logo.png',
   '/logo-192.png',
@@ -23,11 +24,7 @@ const SHELL = [
 ];
 
 /* Jwèt yo : yo antre nan kach la sèlman lè jwè a louvri yo yon fwa */
-const GAMES = [
-  'snakezetwal.html','whackzetwal.html','flappyzetwal.html','memoryzetwal.html',
-  'mazezetwal.html','tetriszetwal.html','runnerzetwal.html','gomokuzetwal.html',
-  'candyzetwal.html'
-];
+const GAMES = ['sudoku.html','duel.html'];
 
 self.addEventListener('install', function(e){
   e.waitUntil(
