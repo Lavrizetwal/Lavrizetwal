@@ -1315,7 +1315,7 @@ body.gm{background:var(--bg)}
 .gm-modal h3{font-family:var(--serif);font-size:1.25rem;font-weight:600;margin:20px 0 4px}
 
 /* Hub */
-.hb-games{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:6px}
+.hb-games{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:6px}
 .hb-g{position:relative;display:flex;flex-direction:column;gap:14px;padding:30px 28px 26px;border-radius:8px;overflow:hidden;isolation:isolate;color:var(--on-band);border:1px solid rgba(212,175,55,.45);background:radial-gradient(500px 260px at 100% 0%,rgba(212,175,55,.2),transparent 60%),linear-gradient(180deg,#14234F,#0A1330);box-shadow:var(--shadow)}
 .hb-g .gl{width:64px;height:64px;color:var(--gold-lt)}
 .hb-g .gl svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
@@ -1328,7 +1328,7 @@ body.gm{background:var(--bg)}
 .hb-top{margin-top:54px}
 .hb-top h2{font-family:var(--serif);font-size:clamp(1.8rem,3.4vw,2.4rem);font-weight:600}
 .hb-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.hb-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.hb-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
 .hb-t{border:1px solid var(--line-2);border-radius:8px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
 .hb-t h3{font-family:var(--serif);font-size:1.5rem;font-weight:600;padding:18px 20px 6px}
 .hb-t table{width:100%;border-collapse:collapse;font-size:.88rem}
@@ -1488,7 +1488,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
     <div class="wrap">
       <div class="eyebrow">Jwèt · Zetwal</div>
       <h1>Jwèt pou lespri a</h1>
-      <p class="lead">Sudoku ak Duel Mental : de jwèt ki mande refleksyon, vitès ak memwa. Yo an fransè sèlman, e yo pou moun ki gen 18 an oswa plis.</p>
+      <p class="lead">Sudoku, Duel Mental ak La course vers la mort : jwèt ki mande refleksyon, vitès ak memwa. Yo an fransè sèlman, e yo pou moun ki gen 18 an oswa plis.</p>
       <div class="gm-bar">
         <span class="gm-chip" id="hb-wal" hidden>Jeton jwèt mwen <b data-bal>0</b><span id="hb-wal-ic"></span></span>
         <button class="gm-tool" type="button" id="hb-pseudo" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg><span>Siyati mwen</span></button>
@@ -1513,6 +1513,13 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
           <p>Dis kesyon a chwa miltip, dis segonn pou chak. Chwazi yon nivo, yon kategori, oswa tou de. Kalkil, Ayiti, Memwa, Konesans jeneral ak Filozofi.</p>
           <ul><li>10 jeton pou antre</li><li>10 nivo</li><li>5 kategori</li></ul>
           <div class="acts"><a class="gm-btn" href="duel.html">Jwe</a><button class="gm-btn ln" type="button" data-stats="duel">Statistik mwen</button></div>
+        </article>
+        <article class="hb-g" id="hb-cr">
+          <div class="gl"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="14" cy="4.5" r="2"/><path d="M13 8l-3 4 4 3-1 6M10 12l-4 1M14 15l4 1M13 8l4 3"/></svg></div>
+          <h2>La course vers la mort</h2><div class="tag">Courir, esquiver, arriver</div>
+          <p>Kouri jouk destinasyon ou chwazi a. Eskive, sote, bese : chak obstak gen repons li, epi kat la montre w bon wout la nan chak kalfou. Si enèji a tonbe a zewo, ou pèdi.</p>
+          <ul><li>5 destinasyon, 5 nivo</li><li>Antre : 25 a 50 jeton</li><li>Gany : antre a + 10 × nivo</li></ul>
+          <div class="acts"><a class="gm-btn" href="course.html">Jwe</a><button class="gm-btn ln" type="button" data-stats="course">Statistik mwen</button></div>
         </article>
       </div>
     </div>
@@ -1539,6 +1546,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
         <div class="hb-cols">
           <div class="hb-t" id="hb-t-sudoku"></div>
           <div class="hb-t" id="hb-t-duel"></div>
+          <div class="hb-t" id="hb-t-course"></div>
         </div>
       </div>
       <div class="hb-rules">
@@ -1798,7 +1806,7 @@ function blocker(){
   if(!GM.user) return {k:'login',t:'Connexion requise',m:'Connectez-vous pour jouer, suivre vos statistiques et entrer au classement.',b:'Se connecter',f:goLogin};
   if(!s) return {k:'err',t:'Jeux indisponibles',m:'Impossible de joindre le serveur. Si votre compte est protégé par une clé d’accès (empreinte ou visage), déverrouillez-le quand l’écran de sécurité s’affiche : la page se rechargera toute seule. Sinon, réessayez dans un instant.'};
   if(!s.can_play){
-    if(!s.open) return {k:'closed',t:'Les jeux ouvrent bientôt',m:'Le Sudoku et le Duel Mental sont en préparation. Ils ouvriront très prochainement sur Zetwal.'};
+    if(!s.open) return {k:'closed',t:'Les jeux ouvrent bientôt',m:'Le Sudoku, le Duel Mental et La course vers la mort sont en préparation. Ils ouvriront très prochainement sur Zetwal.'};
     return {k:'verify',t:'Adresse e-mail à vérifier',m:'Vérifiez votre adresse e-mail pour pouvoir jouer, puis rechargez la page.'};
   }
   if(!s.adult) return {k:'age',t:s.age_known?'Accès réservé aux adultes':'Un dernier contrôle',m:s.age_known?'Les jeux Zetwal sont réservés aux personnes de 18 ans ou plus.':'Confirmez votre âge : les jeux sont réservés aux personnes de 18 ans ou plus.',b:s.age_known?null:'Confirmer mon âge',f:function(){ ageModal(function(){ location.reload(); }); }};
@@ -1893,25 +1901,27 @@ function showNote(b){ var n=$('#hb-note'); if(!b){ n.innerHTML=''; return; } n.i
 /* ── Klasman ── */
 function lvLabel(g,x){
   if(g==='sudoku') return LVN[x.level]||'—';
+  if(g==='course') return (DN[x.mode]||'Course')+' · Nivo '+(x.level||1);
   var a=x.level?('Nivo '+x.level):'Nivo 1→10', b=x.cat?CATN[x.cat]:'Tout kategori'; return a+' · '+b;
 }
+var GN={sudoku:'Sudoku',duel:'Duel Mental',course:'La course vers la mort'}, DN={zetwal:'Zetwal',cejjd:'CEJJD',soldiers:'The Soldiers Studio',dadoute:'Dadoute',phada:'Phada Business'};
 function renderTop(g,rows){
-  var t=g==='sudoku'?'Sudoku':'Duel Mental', h='<h3>'+t+'</h3>';
+  var t=GN[g]||g, h='<h3>'+t+'</h3>';
   if(!rows||!rows.length){ $('#hb-t-'+g).innerHTML=h+'<div class="em">Poko gen pati nan klasman an. Premye a ka se ou.</div>'; return; }
   h+='<table><thead><tr><th>#</th><th>Jwè</th><th>Sko</th><th>Tan</th></tr></thead><tbody>';
   rows.forEach(function(r){ h+='<tr><td class="rk">'+r.rank+'</td><td><span class="pe">'+esc(r.pseudo)+'</span><span class="sm">'+esc(lvLabel(g,r))+' · '+dshort(r.at)+'</span></td><td>'+fmt(r.score)+'</td><td>'+dur(r.ms)+'</td></tr>'; });
   $('#hb-t-'+g).innerHTML=h+'</tbody></table>';
 }
 function loadTop(){
-  ['sudoku','duel'].forEach(function(g){
-    rpc('zj_top',{p_game:g,p_period:period}).then(function(r){ renderTop(g,r); },function(){ $('#hb-t-'+g).innerHTML='<h3>'+(g==='sudoku'?'Sudoku':'Duel Mental')+'</h3><div class="em">Klasman an pa disponib pou kounye a.</div>'; });
+  ['sudoku','duel','course'].forEach(function(g){
+    rpc('zj_top',{p_game:g,p_period:period}).then(function(r){ renderTop(g,r); },function(){ $('#hb-t-'+g).innerHTML='<h3>'+(GN[g]||g)+'</h3><div class="em">Klasman an pa disponib pou kounye a.</div>'; });
   });
 }
 $$('.hb-tabs [data-p]').forEach(function(b){ b.addEventListener('click',function(){ period=b.dataset.p; $$('.hb-tabs [data-p]').forEach(function(x){ x.setAttribute('aria-pressed',x===b); }); loadTop(); }); });
 
 /* ── Statistik mwen ── */
 function statsHtml(g,s){
-  var t=g==='sudoku'?'Sudoku':'Duel Mental';
+  var t=GN[g]||g;
   var h='<h2>'+t+' — statistik mwen</h2>';
   if(!s||!s.played){ return h+'<p>Ou poko jwe pati. Lè ou fini premye pati a, statistik ou yo ap parèt la a.</p><div class="row"><a class="gm-btn" href="'+g+'.html">Jwe</a></div>'; }
   h+='<div class="gm-st"><div><b>'+fmt(s.played)+'</b><span>Pati jwe</span></div><div><b>'+fmt(s.wins)+'</b><span>Viktwa</span></div><div><b>'+fmt(s.losses)+'</b><span>Defèt</span></div>'+
@@ -1959,10 +1969,10 @@ $('#hb-pseudo').addEventListener('click',function(){
 function hubNote(){
   var s=GM.st, b=blocker();
   if(b&&b.k==='login') b={k:b.k,t:'Konekte pou jwe',m:'Konekte ak kont Zetwal ou pou jwe, wè statistik ou yo epi antre nan klasman an.',b:'Konekte',f:goLogin};
-  else if(b&&b.k==='closed') b={k:b.k,t:'Jwèt yo ap louvri talè',m:'Sudoku ak Duel Mental ap louvri trè byento sou Zetwal. Ou ka deja wè klasman an anba a.'};
+  else if(b&&b.k==='closed') b={k:b.k,t:'Jwèt yo ap louvri talè',m:'Sudoku, Duel Mental ak La course vers la mort ap louvri trè byento sou Zetwal. Ou ka deja wè klasman an anba a.'};
   else if(b&&b.k==='age') b={k:b.k,t:s&&s.age_known?'Aksè rezève pou adilt':'Yon dènye verifikasyon',m:s&&s.age_known?'Jwèt Zetwal yo rezève pou moun ki gen 18 an oswa plis.':'Konfime laj ou : jwèt yo rezève pou moun ki gen 18 an oswa plis.',b:s&&s.age_known?null:'Konfime laj mwen',f:b.f};
   else if(b&&b.k==='verify') b={k:b.k,t:'Verifye adrès imèl ou',m:'Verifye adrès imèl ou pou ka jwe, apre sa rechaje paj la.'};
-  else if(!b&&s&&s.resume){ b={k:'resume',t:'Ou gen yon pati ki ap kouri',m:'Tan an kontinye kouri. Retounen nan pati a pou fini l.',b:'Reprann pati a',f:function(){ location.href=(s.resume.game==='duel'?'duel.html':'sudoku.html'); }}; }
+  else if(!b&&s&&s.resume){ b={k:'resume',t:'Ou gen yon pati ki ap kouri',m:'Tan an kontinye kouri. Retounen nan pati a pou fini l.',b:'Reprann pati a',f:function(){ location.href=(s.resume.game==='duel'?'duel.html':s.resume.game==='course'?'course.html':'sudoku.html'); }}; }
   showNote(b);
 }
 function boot(){

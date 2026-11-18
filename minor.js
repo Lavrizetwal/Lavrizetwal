@@ -16,7 +16,7 @@
   birthMinor = ls('g', 'zmin:b') === '1';
   function active(){ return !!devState() || birthMinor; }
   function pageKey(){ return (location.pathname.split('/').pop() || '').replace(/\.html$/i, '').toLowerCase() || 'index'; }
-  var GAME_PAGES = { games:1, sudoku:1, duel:1 };
+  var GAME_PAGES = { games:1, sudoku:1, duel:1, course:1 };
 
   /* ── Âge à partir de la date de naissance (AAAA-MM-JJ). Invalide / absente / future => null (= majeur) ── */
   function age(bd){
@@ -77,7 +77,7 @@
       var u = String((input && input.url) || input || ''), m = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
       if(m === 'GET' || m === 'HEAD' || m === 'OPTIONS') return null;
       if(/\/rest\/v1\/(move_orders|rides)(\?|$)/.test(u) && m === 'POST') return 'Kòmand sa a';
-      if(/\/rest\/v1\/rpc\/zj_/.test(u)) return 'Jwèt la';
+      if(/\/rest\/v1\/rpc\/z[jc]_/.test(u)) return 'Jwèt la';
       if(/\/functions\/v1\/zpoints/.test(u)){
         var body = init && init.body; if(typeof body === 'string'){ var o = JSON.parse(body); if(o && SPEND[o.op]) return o.op === 'charge' ? 'Peman sa a' : 'Don pwen sa a'; }
       }
