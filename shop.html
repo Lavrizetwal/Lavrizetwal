@@ -151,7 +151,43 @@
   /* pts(op, args) → réponse du serveur, ou null si le serveur de points
      n'est pas disponible (déploiement pas encore fait) → l'appelant
      retombe sur l'ancien comportement. */
+  /* Consentement obligatoire avant toute dépense de points (paiement, don à un proche) — avis juridique */
+  var cancelled = false;
+  var SPEND = { charge:1, transfer_qr:1, transfer_to:1, transfer_email:1 };
+  function askSpend(op, args){
+    return new Promise(function(resolve){
+      var a = Math.round((Number(args && args.amount) || 0) * 100) / 100;
+      var amt = a.toLocaleString('fr-FR', { maximumFractionDigits:2 }).replace(/[\u202f\u00a0]/g, ' ');
+      var give = op !== 'charge';
+      var reason = args && (args.reason || args.note) ? String(args.reason || args.note).slice(0, 80) : '';
+      var prev = document.activeElement;
+      var ov = document.createElement('div'); ov.id = 'zc-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'zc-t');
+      ov.style.cssText = 'position:fixed;inset:0;z-index:2147483200;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,16,32,.62);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);font-family:var(--sans,Montserrat,system-ui,sans-serif)';
+      var box = document.createElement('div');
+      box.style.cssText = 'width:100%;max-width:420px;max-height:92vh;overflow:auto;background:var(--surface,#fff);color:var(--ink,#13203f);border:1px solid var(--line,#ddd);border-top:2px solid var(--gold,#D4AF37);border-radius:14px;padding:24px 22px;box-shadow:0 24px 70px rgba(0,0,0,.35)';
+      function el(t, css, txt){ var e = document.createElement(t); if(css) e.style.cssText = css; if(txt != null) e.textContent = txt; return e; }
+      var h = el('h2', 'font-family:var(--serif,Georgia,serif);font-weight:600;font-size:1.5rem;margin:0 0 8px', give ? 'Konfime don an' : 'Konfime depans lan'); h.id = 'zc-t';
+      var p1 = el('p', 'margin:6px 0;font-size:.95rem;line-height:1.6', give ? 'Ou pral bay ' + amt + ' pwen bay yon lòt moun. Pwen sa yo ap soti nan kont ou.' : 'Ou pral depanse ' + amt + ' pwen' + (reason ? ' pou : ' + reason : '') + '. Pwen sa yo ap soti nan kont ou.');
+      var p2 = el('p', 'margin:6px 0;font-size:.8rem;line-height:1.55;color:var(--ink-3,#667)', 'Yon fwa konfime, ou pa ka anile l poukont ou.' + (give ? ' Pwen yo ale dirèkteman nan kont moun nan.' : ''));
+      var lab = el('label', 'display:flex;gap:10px;align-items:flex-start;margin:14px 0 4px;padding:12px;border:1px solid var(--line-2,#ccc);border-radius:12px;cursor:pointer;font-size:.86rem;line-height:1.5;font-weight:500');
+      var cb = el('input', 'margin-top:2px;width:20px;height:20px;flex:none;accent-color:#B8912A;position:static;opacity:1'); cb.type = 'checkbox';
+      lab.appendChild(cb); lab.appendChild(el('span', '', 'Mwen konprann ' + (give ? 'don sa a' : 'depans sa a') + ' epi mwen konsanti pou pwen yo retire nan kont mwen.'));
+      var ok = el('button', 'display:block;width:100%;margin-top:14px;padding:14px 16px;border-radius:99px;border:1px solid var(--gold,#D4AF37);background:var(--gold,#D4AF37);color:var(--on-gold,#13203f);font:600 .8rem var(--sans,Montserrat,system-ui,sans-serif);letter-spacing:1px;cursor:pointer;opacity:.45', give ? 'Konfime ak bay' : 'Konfime ak depanse'); ok.type = 'button'; ok.disabled = true;
+      var no = el('button', 'display:block;width:100%;margin-top:10px;padding:14px 16px;border-radius:99px;border:1px solid var(--line-2,#ccc);background:transparent;color:var(--ink,#13203f);font:600 .8rem var(--sans,Montserrat,system-ui,sans-serif);letter-spacing:1px;cursor:pointer', 'Anile'); no.type = 'button';
+      box.appendChild(h); box.appendChild(p1); box.appendChild(p2); box.appendChild(lab); box.appendChild(ok); box.appendChild(no); ov.appendChild(box);
+      function done(v){ document.removeEventListener('keydown', key, true); if(ov.parentNode) ov.parentNode.removeChild(ov); try{ if(prev && prev.focus) prev.focus(); }catch(e){} resolve(v); }
+      function key(e){ if(e.key === 'Escape'){ e.stopPropagation(); done(false); } }
+      cb.addEventListener('change', function(){ ok.disabled = !cb.checked; ok.style.opacity = cb.checked ? '1' : '.45'; });
+      ok.addEventListener('click', function(){ if(cb.checked) done(true); });
+      no.addEventListener('click', function(){ done(false); });
+      ov.addEventListener('click', function(e){ if(e.target === ov) done(false); });
+      document.addEventListener('keydown', key, true);
+      document.body.appendChild(ov); try{ cb.focus(); }catch(e){}
+    });
+  }
   async function pts(op, args){
+    cancelled = false;
+    if(SPEND[op] && !(await askSpend(op, args))){ cancelled = true; return { ok:false, error:'annule' }; }
     if(!(await available())) return null;
     var body = Object.assign({}, args || {}, { op:op });
     return call('zpoints', body);
@@ -193,7 +229,7 @@
   /* drop() : oublie le jeton en mémoire (verrouillage / déverrouillage de la seconde sécurité) */
   function drop(){ cache = null; inflight = null; failUntil = 0; probe = null; }
 
-  window.ZB = { drop:drop, token:bridgeToken, call:call, pts:pts, spend:spend, available:available, notice:notice,
+  window.ZB = { cancelled:function(){ return cancelled; }, drop:drop, token:bridgeToken, call:call, pts:pts, spend:spend, available:available, notice:notice,
     fnUrl:function(){ return FN; }, fnKey:function(){ return FNKEY; }, key:function(){ return KEY; } };
 })();
 </script>
@@ -2966,7 +3002,7 @@ $('#cart-go').addEventListener('click', async function(){
 
   if(method === 'points'){
     var okPts = await chargePointsShop(ptsNeeded);
-    if(!okPts){ toast('Ou pa gen ase pwen — peye kach, oswa achte pwen nan magazen an'); btn.disabled=false; paintPointsLine(); return; }
+    if(!okPts){ toast((window.ZB&&ZB.cancelled&&ZB.cancelled())?'Operasyon an anile — pa gen pwen ki retire.':'Ou pa gen ase pwen — peye kach, oswa achte pwen nan magazen an'); btn.disabled=false; paintPointsLine(); return; }
   }
   var row = {
     kind:'shop', partner_id:null, partner_name:'Zetwal Shop', order_mode: ckMode,
@@ -3137,7 +3173,7 @@ async function sendOrder(){
 
   if(method === 'points'){
     var okPts = await chargePointsShop(ptsNeeded);
-    if(!okPts){ toast('Ou pa gen ase pwen — peye kach, oswa achte pwen nan magazen an'); btn.disabled=false; oPaint(); return; }
+    if(!okPts){ toast((window.ZB&&ZB.cancelled&&ZB.cancelled())?'Operasyon an anile — pa gen pwen ki retire.':'Ou pa gen ase pwen — peye kach, oswa achte pwen nan magazen an'); btn.disabled=false; oPaint(); return; }
   }
   var row = {
     kind:'shop', partner_id:null, partner_name:'Zetwal Shop', order_mode: s.mode,
@@ -5126,7 +5162,7 @@ function zrBuild(rec){
           var zt = window.ZB ? await ZB.pts('transfer_to', { to:mail, amount:amt, note:note }) : null;
           if(zt !== null){
             if(!zt.ok){
-              toast(zt.error === 'insufficient' ? 'Ou pa gen ase pwen' : (zt.error === 'self' ? 'Ou pa ka voye pwen pou tèt ou' : (zt.error === 'destinataire' ? 'Imel oswa nimewo telefòn nan pa bon' : 'Nou pa ka voye pwen yo kounye a')));
+              toast(zt.error === 'annule' ? 'Operasyon an anile — pa gen pwen ki retire.' : zt.error === 'insufficient' ? 'Ou pa gen ase pwen' : (zt.error === 'self' ? 'Ou pa ka voye pwen pou tèt ou' : (zt.error === 'destinataire' ? 'Imel oswa nimewo telefòn nan pa bon' : 'Nou pa ka voye pwen yo kounye a')));
               btn.disabled=false; btn.textContent='Voye pwen yo'; return;
             }
             toast((zt.delivered ? ('Pwen voye bay ' + (zt.name||mail)) : ('Pwen voye — y ap antre sou kont ' + mail + ' lè l konekte'))
@@ -5137,7 +5173,7 @@ function zrBuild(rec){
           }
           if(mail.indexOf('@') < 0){ toast('Voye pa nimewo telefòn pa disponib kounye a — eseye pita oswa itilize imel la'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
           var ok = await chargePoints(amt);
-          if(!ok){ toast('Ou pa gen ase pwen'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
+          if(!ok){ toast((window.ZB&&ZB.cancelled&&ZB.cancelled())?'Operasyon an anile — pa gen pwen ki retire.':'Ou pa gen ase pwen'); btn.disabled=false; btn.textContent='Voye pwen yo'; return; }
           var dest = await findUserByEmail(mail);
           if(dest){
             /* Nou jwenn kont lan tousuit — antre pwen yo dirèkteman. */
@@ -5544,12 +5580,13 @@ function zrBuild(rec){
       var zq = window.ZB ? await ZB.pts('transfer_qr', { token:tok, amount:amt, note:note }) : null;
       if(zq !== null){
         if(zq.ok) return { ok:true, name:zq.name };
+        if(zq.error === 'annule') return { ok:false, msg:'Operasyon an anile — pa gen pwen ki retire.' };
         if(zq.error === 'insufficient') return { ok:false, msg:'Ou pa gen ase pwen' };
         if(zq.error === 'invalid_token') return { ok:false, msg:'Kòd la pa valid ankò — mande yon nouvo kòd' };
         return { ok:false, msg:'Nou pa ka voye pwen yo kounye a — verifye solid ou anvan ou eseye ankò' };
       }
       var debited = await chargePoints(amt);
-      if(!debited) return { ok:false, msg:'Ou pa gen ase pwen' };
+      if(!debited) return { ok:false, msg:(window.ZB&&ZB.cancelled&&ZB.cancelled())?'Operasyon an anile — pa gen pwen ki retire.':'Ou pa gen ase pwen' };
       async function refund(){
         try{ await fsUser().set({ points: firebase.firestore.FieldValue.increment(amt) }, { merge:true }); }catch(e){}
       }
