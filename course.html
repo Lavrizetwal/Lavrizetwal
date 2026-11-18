@@ -2642,6 +2642,58 @@ P.event = function(x, d, now, guided){
 })();
 /*PRO-WORLD-END*/
 
+/*PRO3D-START*/
+/* Personnages et animaux en vrai 3D (Three.js, chargé à la demande). Aucun changement de règles :
+   si le 3D n'est pas disponible (appareil faible, WebGL absent, trop lent), l'ancien dessin 2D reste en place. */
+(function(){
+var P = ZScene.prototype, SP = ZScene.SP, started = 0;
+function z(){ var Z = window.Z3D; return Z && !Z.R.off ? Z : null; }
+function load(){
+  if(started) return; started = 1;
+  try{
+    var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
+    if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
+  }catch(e){}
+  var s = document.createElement('script'); s.src = 'course3d.js?v=1'; s.async = true;
+  s.onload = function(){ try{ if(window.Z3D) Z3D.warm(); }catch(e){} };
+  document.head.appendChild(s);
+}
+ZScene.load3d = load; if(window.__Z3D_FORCE) window.__ZS = ZScene;
+if(document.readyState === 'complete') setTimeout(load, 400); else window.addEventListener('load', function(){ setTimeout(load, 400); });
+
+var _frame = P.frame;
+P.frame = function(f){
+  var Z = z(); if(Z) Z.frameStart(f.th);
+  this._jv = f.jump; this._f = f;
+  _frame.call(this, f);
+  if(Z) Z.frameEnd();
+};
+var _runner = P.runner;
+P.runner = function(x, y, u, st){
+  var Z = z();
+  if(Z && Z.draw(this.X, 'runner', x, y, u, st.now, { dpr: this.DPR, jump: st.jump, jv: this._jv, crouch: st.crouch, hit: st.hit, speed: this._f ? this._f.speed : 1, key: this.cv.id || 'main' })) return;
+  _runner.call(this, x, y, u, st);
+};
+['bandit_debout', 'bandit_saut', 'chien', 'taureau', 'cochon', 'serpent_sol', 'scorpion', 'abeilles'].forEach(function(k){
+  var orig = SP[k];
+  SP[k] = function(X, a){
+    var Z = z();
+    if(Z && Z.draw(X, k, a.cx, a.y, a.u, a.now, { dpr: X.getTransform().a, seed: Math.round(a.cx / 37) })) return;
+    orig(X, a);
+  };
+});
+var _arb = SP.serpent_arbre;
+SP.serpent_arbre = function(X, a){
+  var Z = z(); if(!Z){ _arb(X, a); return; }
+  var u = a.u; X.save(); X.translate(a.cx, a.y); X.scale(u, u);
+  var tg = X.createLinearGradient(-.09, 0, .09, 0); tg.addColorStop(0, '#6b4a2c'); tg.addColorStop(.5, '#5a3b22'); tg.addColorStop(1, '#3f2918'); X.fillStyle = tg; X.fillRect(-.09, -1.75, .18, 1.75);
+  X.fillStyle = '#1f6b2b'; X.beginPath(); X.arc(0, -1.85, .5, 0, 6.2832); X.arc(-.32, -1.7, .34, 0, 6.2832); X.arc(.32, -1.7, .34, 0, 6.2832); X.fill();
+  X.fillStyle = 'rgba(120,200,110,.25)'; X.beginPath(); X.arc(-.12, -1.98, .3, 0, 6.2832); X.fill(); X.restore();
+  if(!Z.draw(X, 'serpent_arbre', a.cx, a.y, u, a.now, { dpr: X.getTransform().a })) _arb(X, a);
+};
+})();
+/*PRO3D-END*/
+
 
 /* ═══ Libellés ═══ */
 var CTR = { L:'Changer de couloir', J:'Sauter', C:'Se baisser' };
