@@ -184,6 +184,7 @@
     if(SPEND[op] && !(await askSpend(op, args))){ cancelled = true; return { ok:false, error:'annule' }; }
     if(!(await available())) return null;
     var body = Object.assign({}, args || {}, { op:op });
+    if(SPEND[op]) body.consent = { ack:true, v:1, at:new Date().toISOString(), via:'web' };   /* preuve du consentement donné dans la fenêtre ci-dessus */
     return call('zpoints', body);
   }
 
