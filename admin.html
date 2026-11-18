@@ -2138,6 +2138,41 @@ tbody tr:last-child td{border-bottom:none}
     </section>
 
     <!-- ═════ IMAGES DU SITE ═════ -->
+
+    <section class="panel" id="tab-promo">
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="image"></span> Annonces — bandeau doré en haut des pages</h3>
+          <button class="btn btn-gold" type="button" onclick="pmEdit('ann')">Nouvelle annonce</button></div>
+        <p class="card-sub">Le bandeau passe tout en haut de chaque page choisie, sans gêner le menu. Vous décidez du texte, des dates (début / fin), de qui le voit et sur quelles pages. Une annonce programmée apparaît et disparaît toute seule.</p>
+        <div id="pm-ann-list" class="pm-list"></div>
+        <div id="pm-ann-form" class="pm-form" hidden></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="image"></span> Publicités — image ou vidéo de 15 secondes</h3>
+          <button class="btn btn-gold" type="button" onclick="pmEdit('ad')">Nouvelle publicité</button></div>
+        <p class="card-sub">Une carte monte depuis le bas de la page. Elle porte toujours la mention « Piblisite ». Vous réglez la durée d'affichage, le délai avant l'apparition, quand le visiteur peut la fermer, la fréquence et le public (tout le monde, connectés ou visiteurs).</p>
+        <div id="pm-ad-list" class="pm-list"></div>
+        <div id="pm-ad-form" class="pm-form" hidden></div>
+      </div>
+      <style>
+        .pm-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+        .pm-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2,transparent)}
+        .pm-row .pm-main{flex:1;min-width:200px}.pm-row .pm-main b{display:block;font-size:.9rem}
+        .pm-row .pm-main small{display:block;color:var(--muted);font-size:.76rem;margin-top:3px;line-height:1.5}
+        .pm-st{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--line-strong)}
+        .pm-st.on{color:#0a7d4a;border-color:#0a7d4a}.pm-st.wait{color:#9a6b00;border-color:#9a6b00}.pm-st.end,.pm-st.off{color:var(--muted)}
+        .pm-acts{display:flex;gap:6px;flex-wrap:wrap}.pm-acts .btn{min-height:38px;padding:0 12px;font-size:.76rem}
+        .pm-thumb{width:56px;height:56px;border-radius:10px;object-fit:cover;background:#000;flex:none}
+        .pm-form{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line-strong)}
+        .pm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+        .pm-grid .fld label{display:block;font-size:.74rem;margin-bottom:4px}
+        .pm-pages{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}.pm-pages label{display:flex;gap:6px;align-items:center;font-size:.8rem}
+        .pm-prev{margin-top:14px;padding:14px;border:1px dashed var(--line-strong);border-radius:12px;background:#10100c;min-height:80px}
+        .pm-prev h4{margin:0 0 10px;font-size:.7rem;letter-spacing:1.2px;text-transform:uppercase;color:#d4af37}
+        .pm-prev .pmv{display:flex;justify-content:center}
+      </style>
+    </section>
+
     <section class="panel" id="tab-media">
       <div class="card">
         <div class="card-head">
@@ -2602,6 +2637,7 @@ const NAV=[
     {id:'transfers',label:'Transactions de points',icon:'swap'},
     {id:'pointasks',label:'Demann pwen',icon:'send'},
     {id:'points',label:'Points clients',icon:'trophy'},
+    {id:'promo',label:'Annonces & publicités',icon:'image'},
     {id:'media',label:'Images du site',icon:'image'},
     {id:'settings',label:'Paramètres',icon:'settings'},
     {id:'access',label:'Accès temporaires',icon:'key'}
@@ -2635,6 +2671,7 @@ const TAB_META={
   moveprice:{t:'Tarifs Move',s:'Course, livraison, objets, enfants'},
   travay:{t:'Travay',s:'Modération des annonces à Gonaïves'},
   points:{t:'Points clients',s:'Ajouter ou retirer des points'},
+  promo:{t:'Annonces & publicités',s:'Bandeau doré, pubs image / vidéo, dates et public'},
   media:{t:'Images du site',s:'Visuels des pages publiques'},
   settings:{t:'Paramètres',s:'Magasin, taux et citations'},
   access:{t:'Accès temporaires',s:'Sessions limitées dans le temps'}
@@ -2703,6 +2740,7 @@ window.switchTab = (name)=>{
   if(name==='calculator')    initCalculator();
   if(name==='settings')      initSettings();
   if(name==='media')         loadMedia();
+  if(name==='promo')         loadPromo();
   if(name==='machines')      { loadMachinesAdmin(); loadLavriPrices(); }
   if(name==='move')          loadMove();
   if(name==='transfers')     loadTransfers();
@@ -3905,6 +3943,133 @@ async function uploadSiteImage(file,prefix,maxW){
     {cacheControl:'31536000',upsert:false,contentType:c.type});
   if(error) throw error;
   return {url:db.storage.from(SITE_BUCKET).getPublicUrl(path).data.publicUrl,size:c.blob.size};
+}
+
+
+/* ═══ ANNONCES & PUBLICITÉS ═══ (tables z_announcements / z_ads, écriture admin seulement) */
+const PM_PAGES=[['index','Accueil'],['lavri','Lavri'],['taxi','Kòmand'],['shop','Shop'],['mall','Mall'],['games','Jwèt (hub)'],['sudoku','Sudoku'],['duel','Duel'],['travay','Travay'],['tarifs','Tarifs']];
+const PM_AUD={all:'Tout le monde',auth:'Personnes connectées',anon:'Visiteurs non connectés'};
+const PM_SHAPE={rounded:'Rectangle arrondi (4:5)',square:'Petit carré',wide:'Large (16:9)',arch:'Arche'};
+const PM_POS={'bottom-right':'En bas à droite','bottom-left':'En bas à gauche','bottom-center':'En bas au centre'};
+const PM_FREQ={session:'Une fois par visite',day:'Une fois par jour',always:'À chaque page'};
+let pmAnn=[], pmAds=[], pmCur=null;
+function pmState(r){const n=Date.now(); if(!r.active) return ['Désactivée','off']; if(r.starts_at&&new Date(r.starts_at)>n) return ['Programmée','wait']; if(r.ends_at&&new Date(r.ends_at)<=n) return ['Terminée','end']; return ['En cours','on'];}
+function pmFmt(t){return t?new Date(t).toLocaleString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):null;}
+function pmPeriod(r){const a=pmFmt(r.starts_at), b=pmFmt(r.ends_at); return (a?'du '+a:'dès maintenant')+' '+(b?'au '+b:'sans date de fin');}
+function pmPagesTxt(r){return (r.pages&&r.pages.length)?r.pages.map(p=>(PM_PAGES.find(x=>x[0]===p)||[p,p])[1]).join(', '):'Toutes les pages';}
+function pmLocal(t){if(!t) return ''; const d=new Date(t), p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes());}
+async function loadPromo(){
+  try{
+    const [a,b]=await Promise.all([db.from('z_announcements').select('*').order('created_at',{ascending:false}), db.from('z_ads').select('*').order('created_at',{ascending:false})]);
+    if(a.error||b.error) throw (a.error||b.error);
+    pmAnn=a.data||[]; pmAds=b.data||[];
+  }catch(e){ toast('Lecture impossible : '+(e.message||e)+' — vérifiez la session Supabase (empreinte / visage)','error'); pmAnn=[]; pmAds=[]; }
+  pmRender();
+}
+function pmRender(){
+  const A=document.getElementById('pm-ann-list'), D=document.getElementById('pm-ad-list');
+  A.innerHTML=pmAnn.length?pmAnn.map(r=>{const st=pmState(r);return '<div class="pm-row"><div class="pm-main"><b>'+escH(r.text)+'</b><small>'+escH(pmPeriod(r))+' · '+escH(PM_AUD[r.audience])+' · '+escH(pmPagesTxt(r))+(r.link_url?' · lien : '+escH(r.link_url):'')+'<br>'+r.views+' vues · '+r.clicks+' clics</small></div><span class="pm-st '+st[1]+'">'+st[0]+'</span><div class="pm-acts"><button class="btn btn-ghost" onclick="pmEdit(\'ann\',\''+r.id+'\')">Modifier</button><button class="btn btn-ghost" onclick="pmToggle(\'ann\',\''+r.id+'\')">'+(r.active?'Désactiver':'Activer')+'</button><button class="btn btn-ghost" onclick="pmDel(\'ann\',\''+r.id+'\')">Supprimer</button></div></div>';}).join(''):'<p class="card-sub">Aucune annonce pour le moment.</p>';
+  D.innerHTML=pmAds.length?pmAds.map(r=>{const st=pmState(r);const th=r.kind==='video'?'<video class="pm-thumb" src="'+escH(r.media_url)+'" muted preload="metadata"></video>':'<img class="pm-thumb" src="'+escH(r.media_url)+'" alt="">';return '<div class="pm-row">'+th+'<div class="pm-main"><b>'+escH(r.title||(r.kind==='video'?'Vidéo':'Image'))+'</b><small>'+escH(pmPeriod(r))+' · '+escH(PM_AUD[r.audience])+' · '+escH(pmPagesTxt(r))+'<br>Affichée '+r.show_s+' s après '+r.delay_s+' s · '+escH(PM_FREQ[r.frequency])+' · '+r.views+' vues · '+r.clicks+' clics</small></div><span class="pm-st '+st[1]+'">'+st[0]+'</span><div class="pm-acts"><button class="btn btn-ghost" onclick="pmEdit(\'ad\',\''+r.id+'\')">Modifier</button><button class="btn btn-ghost" onclick="pmToggle(\'ad\',\''+r.id+'\')">'+(r.active?'Désactiver':'Activer')+'</button><button class="btn btn-ghost" onclick="pmDel(\'ad\',\''+r.id+'\')">Supprimer</button></div></div>';}).join(''):'<p class="card-sub">Aucune publicité pour le moment.</p>';
+}
+function pmClose(k){const f=document.getElementById('pm-'+k+'-form'); if(f){f.hidden=true; f.innerHTML='';} pmPrevUrl=null; pmBlob=null;}
+function pmTable(k){return k==='ann'?'z_announcements':'z_ads';}
+async function pmToggle(k,id){
+  const r=(k==='ann'?pmAnn:pmAds).find(x=>x.id===id); if(!r) return;
+  const {error}=await db.from(pmTable(k)).update({active:!r.active}).eq('id',id);
+  if(error) return toast('Échec : '+error.message,'error'); toast(r.active?'Désactivée':'Activée','success'); loadPromo();
+}
+async function pmDel(k,id){
+  if(!confirm('Supprimer définitivement ? Les compteurs de vues et de clics seront perdus.\nAstuce : « Désactiver » la retire du site sans rien effacer.')) return;
+  const {error}=await db.from(pmTable(k)).delete().eq('id',id);
+  if(error) return toast('Échec : '+error.message,'error'); toast('Supprimée','success'); pmClose(k); loadPromo();
+}
+function pmOpt(map,sel){return Object.keys(map).map(v=>'<option value="'+v+'"'+(v===sel?' selected':'')+'>'+escH(map[v])+'</option>').join('');}
+function pmPagesBox(sel){return '<div class="pm-pages">'+PM_PAGES.map(p=>'<label><input type="checkbox" name="pm-pg" value="'+p[0]+'"'+(sel.includes(p[0])?' checked':'')+'> '+p[1]+'</label>').join('')+'</div><small style="color:var(--muted)">Aucune case cochée = toutes les pages.</small>';}
+function pmEdit(k,id){
+  pmClose('ann'); pmClose('ad');
+  const r=id?(k==='ann'?pmAnn:pmAds).find(x=>x.id===id):null; pmCur={k,id:id||null,media:r?r.media_url:null,poster:r?r.poster_url:null,kind:r?r.kind:'image'};
+  const F=document.getElementById('pm-'+k+'-form'); F.hidden=false;
+  const v=r||{}; const per='<div class="pm-grid"><div class="fld"><label>Début (vide = tout de suite)</label><input type="datetime-local" id="pm-start" class="input" value="'+pmLocal(v.starts_at)+'"></div><div class="fld"><label>Fin (vide = jamais)</label><input type="datetime-local" id="pm-end" class="input" value="'+pmLocal(v.ends_at)+'"></div>'
+    +'<div class="fld"><label>Qui la voit</label><select id="pm-aud" class="input">'+pmOpt(PM_AUD,v.audience||'all')+'</select></div><div class="fld"><label>Priorité (la plus haute passe d\'abord)</label><input type="number" id="pm-prio" class="input" value="'+(v.priority||0)+'" min="-100" max="100"></div></div>'
+    +'<div class="fld" style="margin-top:12px"><label>Pages concernées</label>'+pmPagesBox(v.pages||[])+'</div>';
+  let body;
+  if(k==='ann'){
+    body='<div class="fld"><label for="pm-text">Texte de l\'annonce <span id="pm-cnt" style="color:var(--muted)"></span></label><input type="text" id="pm-text" class="input" maxlength="220" value="'+escH(v.text||'')+'" placeholder="Ex. : Lavri ouvre lundi — premier lavage à moitié prix"></div>'
+      +'<div class="pm-grid" style="margin-top:12px"><div class="fld"><label>Lien (facultatif : page ou https://…)</label><input type="text" id="pm-link" class="input" value="'+escH(v.link_url||'')+'" placeholder="lavri.html"></div><div class="fld"><label>Texte du bouton (facultatif)</label><input type="text" id="pm-linklbl" class="input" maxlength="40" value="'+escH(v.link_label||'')+'" placeholder="Wè plis"></div></div>'
+      +'<div style="margin-top:12px">'+per+'</div>'
+      +'<label style="display:flex;gap:8px;align-items:center;margin-top:12px;font-size:.84rem"><input type="checkbox" id="pm-dism"'+(v.dismissible===false?'':' checked')+'> Le visiteur peut fermer le bandeau (✕)</label>';
+  } else {
+    body='<div class="pm-grid"><div class="fld"><label>Type</label><select id="pm-kind" class="input" onchange="pmKind()"><option value="image"'+(pmCur.kind==='image'?' selected':'')+'>Image</option><option value="video"'+(pmCur.kind==='video'?' selected':'')+'>Vidéo (15 s conseillées)</option></select></div>'
+      +'<div class="fld"><label id="pm-filelbl">Fichier</label><input type="file" id="pm-file" class="input" accept="image/*,video/mp4,video/webm" onchange="pmFile()"><small id="pm-fileinfo" style="color:var(--muted)">'+(pmCur.media?'Fichier actuel conservé si vous n\'en choisissez pas un autre.':'Image JPG/PNG/WebP, ou vidéo MP4/WebM de 25 Mo maximum.')+'</small></div>'
+      +'<div class="fld" id="pm-posterbox"><label>Image d\'attente de la vidéo (facultatif)</label><input type="file" id="pm-poster" class="input" accept="image/*"></div></div>'
+      +'<div class="pm-grid" style="margin-top:12px"><div class="fld"><label>Titre (facultatif)</label><input type="text" id="pm-title" class="input" maxlength="80" value="'+escH(v.title||'')+'"></div><div class="fld"><label>Petit texte (facultatif)</label><input type="text" id="pm-body" class="input" maxlength="200" value="'+escH(v.body||'')+'"></div>'
+      +'<div class="fld"><label>Lien (page ou https://…)</label><input type="text" id="pm-link" class="input" value="'+escH(v.cta_url||'')+'" placeholder="shop.html"></div><div class="fld"><label>Texte du bouton</label><input type="text" id="pm-linklbl" class="input" maxlength="30" value="'+escH(v.cta_label||'')+'" placeholder="Achte"></div></div>'
+      +'<div class="pm-grid" style="margin-top:12px"><div class="fld"><label>Forme</label><select id="pm-shape" class="input" onchange="pmPrev()">'+pmOpt(PM_SHAPE,v.shape||'rounded')+'</select></div><div class="fld"><label>Position</label><select id="pm-pos" class="input">'+pmOpt(PM_POS,v.position||'bottom-right')+'</select></div>'
+      +'<div class="fld"><label>Apparaît après (secondes)</label><input type="number" id="pm-delay" class="input" min="0" max="120" value="'+(v.delay_s!=null?v.delay_s:3)+'"></div><div class="fld"><label>Reste affichée (secondes, 3 à 60)</label><input type="number" id="pm-show" class="input" min="3" max="60" value="'+(v.show_s||15)+'"></div>'
+      +'<div class="fld"><label>Fermable après (secondes)</label><input type="number" id="pm-skip" class="input" min="0" max="30" value="'+(v.skip_after_s!=null?v.skip_after_s:3)+'"></div><div class="fld"><label>Fréquence</label><select id="pm-freq" class="input">'+pmOpt(PM_FREQ,v.frequency||'session')+'</select></div></div>'
+      +'<div style="margin-top:12px">'+per+'</div>'
+      +'<label style="display:flex;gap:8px;align-items:center;margin-top:12px;font-size:.84rem" id="pm-soundbox"><input type="checkbox" id="pm-sound"'+(v.sound?' checked':'')+'> Afficher un bouton pour activer le son (la vidéo démarre toujours muette)</label>';
+  }
+  F.innerHTML='<h4 style="margin:0 0 12px">'+(id?'Modifier':'Nouvelle')+(k==='ann'?' annonce':' publicité')+'</h4>'+body
+    +'<label style="display:flex;gap:8px;align-items:center;margin-top:12px;font-size:.84rem"><input type="checkbox" id="pm-active"'+(v.active===false?'':' checked')+'> Active (décochez pour la garder sans l\'afficher)</label>'
+    +'<div class="pm-prev"><h4>Aperçu</h4><div class="pmv" id="pm-prev"></div></div>'
+    +'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn btn-gold" id="pm-save" onclick="pmSave()">Enregistrer</button><button class="btn btn-ghost" onclick="pmClose(\''+k+'\')">Annuler</button><span id="pm-msg" style="font-size:.8rem;color:var(--muted);align-self:center"></span></div>';
+  F.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',pmPrev));
+  if(k==='ad') pmKind(); pmPrev(); F.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function pmKind(){const f=document.getElementById('pm-kind'); if(!f) return; pmCur.kind=f.value; document.getElementById('pm-posterbox').style.display=f.value==='video'?'':'none'; document.getElementById('pm-soundbox').style.display=f.value==='video'?'':'none'; document.getElementById('pm-file').accept=f.value==='video'?'video/mp4,video/webm':'image/*'; pmPrev();}
+let pmBlob=null, pmPrevUrl=null;
+function pmFile(){
+  const f=document.getElementById('pm-file').files[0], info=document.getElementById('pm-fileinfo'); pmBlob=null; if(!f) return;
+  if(f.type.startsWith('video/')){
+    if(f.size>25*1024*1024){ info.textContent='Vidéo trop lourde ('+(f.size/1048576).toFixed(1)+' Mo) : 25 Mo maximum. Compressez-la (1080p ou moins, 15 s).'; document.getElementById('pm-file').value=''; return; }
+    const v=document.createElement('video'); v.preload='metadata'; const u=URL.createObjectURL(f);
+    v.onloadedmetadata=()=>{ URL.revokeObjectURL(u); const d=Math.round(v.duration); info.textContent='Vidéo '+d+' s, '+(f.size/1048576).toFixed(1)+' Mo'+(d>16?' — attention : plus de 15 s, elle sera coupée à la durée d\'affichage choisie.':''); if(d>16) document.getElementById('pm-show').value=Math.min(60,Math.max(3,d)); pmBlob=f; pmCur.kind='video'; document.getElementById('pm-kind').value='video'; pmKind(); pmPrevUrl=URL.createObjectURL(f); pmPrev(); };
+    v.onerror=()=>{ info.textContent='Vidéo illisible : utilisez un MP4 (H.264) ou WebM.'; }; v.src=u;
+  } else { pmBlob=f; pmCur.kind='image'; document.getElementById('pm-kind').value='image'; pmKind(); info.textContent='Image prête ('+(f.size/1024).toFixed(0)+' Ko avant compression)'; pmPrevUrl=URL.createObjectURL(f); pmPrev(); }
+}
+function pmVals(){
+  const g=id=>{const e=document.getElementById(id); return e?e.value.trim():'';}, k=pmCur.k;
+  const pages=[...document.querySelectorAll('input[name=pm-pg]:checked')].map(x=>x.value);
+  const base={starts_at:g('pm-start')?new Date(g('pm-start')).toISOString():null, ends_at:g('pm-end')?new Date(g('pm-end')).toISOString():null, audience:g('pm-aud')||'all', pages, priority:parseInt(g('pm-prio'))||0, active:document.getElementById('pm-active').checked};
+  if(k==='ann') return Object.assign(base,{text:g('pm-text'),link_url:g('pm-link')||null,link_label:g('pm-linklbl')||null,dismissible:document.getElementById('pm-dism').checked});
+  return Object.assign(base,{kind:pmCur.kind,title:g('pm-title')||null,body:g('pm-body')||null,cta_url:g('pm-link')||null,cta_label:g('pm-linklbl')||null,shape:g('pm-shape'),position:g('pm-pos'),delay_s:parseInt(g('pm-delay'))||0,show_s:Math.min(60,Math.max(3,parseInt(g('pm-show'))||15)),skip_after_s:Math.min(30,Math.max(0,parseInt(g('pm-skip'))||0)),frequency:g('pm-freq'),sound:document.getElementById('pm-sound').checked});
+}
+function pmPrev(){
+  if(!window.ZPromo||!pmCur) return; const host=document.getElementById('pm-prev'); if(!host) return; const v=pmVals();
+  try{
+    if(pmCur.k==='ann') ZPromo.previewAnn(host,{id:'x',text:v.text||'Votre annonce apparaîtra ici',link_url:v.link_url,link_label:v.link_label});
+    else { const url=pmPrevUrl&&pmBlob?pmPrevUrl:pmCur.media; if(!url||!/^(https:|blob:)/.test(url)){ host.innerHTML='<small style="color:#aaa">Choisissez un fichier pour voir l\'aperçu.</small>'; return; }
+      ZPromo.previewAd(host,Object.assign({id:'x',media_url:url.startsWith('blob:')?url:url},v)); }
+  }catch(e){}
+  const c=document.getElementById('pm-cnt'), t=document.getElementById('pm-text'); if(c&&t) c.textContent=t.value.length+' / 220';
+}
+async function pmSave(){
+  const btn=document.getElementById('pm-save'), msg=document.getElementById('pm-msg'), k=pmCur.k; let v;
+  try{ v=pmVals(); }catch(e){ return; }
+  if(v.starts_at&&v.ends_at&&new Date(v.ends_at)<=new Date(v.starts_at)) return toast('La fin doit être après le début','error');
+  if(v.link_url===null&&false) return;
+  const lnk=(k==='ann'?v.link_url:v.cta_url); if(lnk&&!/^(https?:\/\/\S+|[A-Za-z0-9_\-.\/?=&#%]+)$/.test(lnk)||/^(javascript|data|vbscript):/i.test(lnk||'')) return toast('Lien invalide : une page du site (shop.html) ou une adresse https://…','error');
+  if(k==='ann'&&!v.text) return toast("Écrivez le texte de l'annonce",'error');
+  btn.disabled=true; msg.textContent='Enregistrement…';
+  try{
+    if(k==='ad'){
+      if(pmBlob){
+        msg.textContent='Envoi du fichier…';
+        if(pmBlob.type.startsWith('video/')){
+          const ext=pmBlob.type==='video/webm'?'webm':'mp4', path='ads/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
+          const {error}=await db.storage.from(SITE_BUCKET).upload(path,pmBlob,{cacheControl:'31536000',upsert:false,contentType:pmBlob.type}); if(error) throw error;
+          v.media_url=db.storage.from(SITE_BUCKET).getPublicUrl(path).data.publicUrl;
+        } else { v.media_url=(await uploadSiteImage(pmBlob,'ads',1200)).url; }
+      } else v.media_url=pmCur.media;
+      if(!v.media_url) throw new Error('Choisissez une image ou une vidéo');
+      const pf=document.getElementById('pm-poster'); if(v.kind==='video'&&pf&&pf.files[0]) v.poster_url=(await uploadSiteImage(pf.files[0],'ads',1200)).url; else v.poster_url=v.kind==='video'?pmCur.poster:null;
+    }
+    const q=pmCur.id?db.from(pmTable(k)).update(v).eq('id',pmCur.id):db.from(pmTable(k)).insert(v);
+    const {error}=await q; if(error) throw error;
+    toast(pmCur.id?'Modifications enregistrées':'Créée','success'); pmClose(k); pmBlob=null; loadPromo();
+  }catch(e){ msg.textContent=''; toast('Échec : '+(e.message||e),'error'); }
+  finally{ btn.disabled=false; if(msg.textContent==='Enregistrement…'||msg.textContent==='Envoi du fichier…') msg.textContent=''; }
 }
 
 const MEDIA_PAGES={global:'Partout sur le site',akey:"Page d'accueil",lavri:'Page Lavri',
@@ -7006,5 +7171,7 @@ paintIcons();
 initColorPicker(); initWashTarifs();
 initAuth();
 </script>
+<script>window.ZPROMO_OFF=true;</script>
+<script src="promo.js" defer></script>
 </body>
 </html>
