@@ -190,6 +190,7 @@
     if(SPEND[op] && !(await askSpend(op, args))){ cancelled = true; return { ok:false, error:'annule' }; }
     if(!(await available())) return null;
     var body = Object.assign({}, args || {}, { op:op });
+    if(SPEND[op]) body.consent = { ack:true, v:1, at:new Date().toISOString(), via:'web' };   /* preuve du consentement donné dans la fenêtre ci-dessus */
     return call('zpoints', body);
   }
 
@@ -3066,7 +3067,7 @@ function zrBuild(rec){
       if(!user || switched){
         /* Chanje itilizatè (oswa dekonekte) nan menm paj la — jete kach
            ansyen an, li pa dwe rete sou kont ki fèk konekte a. */
-        histCache = null; transferCache = null; convCache = null;
+        histCache = null; ledCache = null; cartCache = null; transferCache = null; convCache = null;
       }
       if(panel.classList.contains('open')) render();
       if(user) claimPending(user);
@@ -3130,7 +3131,7 @@ function zrBuild(rec){
 
     var tab = 'hist';
     var role = { driver:null, partners:[] };
-    var histCache = null, transferCache = null;
+    var histCache = null, transferCache = null, ledCache = null, cartCache = null;
 
     function fsUser(){ return fs.collection('users').doc(currentUser.uid); }
 
@@ -3269,11 +3270,13 @@ function zrBuild(rec){
       if(o._d) return o;
       var t = o._t || (o._kind === 'Shop' ? 'shop' : 'x'); o._t = t;
       o._ts = ms(o.created_at);
-      var p = t === 'ride' ? 'K' : t === 'order' ? 'M' : t === 'transfer' ? 'P' : 'S';
+      var p = t === 'ride' ? 'K' : t === 'order' ? 'M' : t === 'transfer' ? 'P' : t === 'ledger' ? 'L' : 'S';
       var raw = String(o.id == null ? '' : o.id).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
       raw = ('00000000' + raw).slice(-8);
       o._ref = 'ZT-' + p + raw.slice(0, 4) + '-' + raw.slice(4);
-      if(t === 'transfer'){
+      if(t === 'ledger'){
+        o._cat = 'pts'; o._dir = o._out ? 'out' : 'in'; o._amt = (o._out ? '−' : '+') + pf(o._price); o._unit = 'pwen';
+      } else if(t === 'transfer'){
         o._cat = 'pts'; o._dir = o._out ? 'out' : 'in';
         o._icon = o.kind === 'store_sale' ? 'store' : o.kind === 'shop_payment' ? 'bag' : (o._out ? 'send' : 'recv');
         o._amt = (o._out ? '−' : '+') + Number(o._price || 0).toFixed(1); o._unit = 'pwen';
@@ -3292,22 +3295,24 @@ function zrBuild(rec){
       return histP;
     }
     function statusLabel(o){
+      if(o._t === 'ledger') return ledStatusKr(o);
       if(o._t === 'transfer') return o.status === 'pending' ? 'Ap tann' : (o._out ? 'Voye' : 'Resevwa');
       return STATUS_LABEL[o.status] || o.status || '';
     }
     function statusFr(o){
+      if(o._t === 'ledger') return ledStatusFr(o);
       if(o._t === 'transfer') return o.status === 'pending' ? 'En attente' : (o._out ? 'Envoyé' : 'Reçu');
       return STATUS_FR[o.status] || o.status || '';
     }
     function tone(o){ var s = o.status; return s === 'cancelled' ? 'bad' : (s === 'done' ? 'gold' : (s === 'requested' || s === 'pending') ? 'wait' : 'ok'); }
-    function chipStyle(o){ return o._t === 'transfer' ? (o.status === 'pending' ? STATUS_STYLE.pending : STATUS_STYLE.done) : (STATUS_STYLE[o.status] || STATUS_STYLE.requested); }
+    function chipStyle(o){ if(o._t === 'ledger') return (o.status === 'pending' && !o.claimed) ? STATUS_STYLE.pending : (o.status === 'error' ? STATUS_STYLE.cancelled || STATUS_STYLE.pending : STATUS_STYLE.done); return o._t === 'transfer' ? (o.status === 'pending' ? STATUS_STYLE.pending : STATUS_STYLE.done) : (STATUS_STYLE[o.status] || STATUS_STYLE.requested); }
     function itemsList(o){
       var it = o.items; if(typeof it === 'string'){ try{ it = JSON.parse(it); }catch(e){ it = null; } }
       if(!Array.isArray(it)) return [];
       return it.map(function(x){
-        var n = x && (x.name || x.nom || x.title || x.label), q = x && (x.qty || x.quantity || x.qte || 1), pr = x && (x.price != null ? x.price : (x.prix != null ? x.prix : null));
+        var n = x && (x.name || x.nom || x.title || x.label), q = x && (x.qty || x.quantity || x.qte || x.q || 1), pr = x && (x.price != null ? x.price : (x.prix != null ? x.prix : null));
         if(!n) return null;
-        return q + ' × ' + n + (pr != null && isFinite(Number(pr)) ? ' — ' + fmt(Number(pr) * Number(q)) + ' HTG' : '');
+        return q + ' × ' + n + (pr != null && isFinite(Number(pr)) ? ' — ' + fmt(Number(pr)) + ' HTG × ' + q + ' = ' + fmt(Number(pr) * Number(q)) + ' HTG' : '');
       }).filter(Boolean);
     }
     var PAY_ST = { paid:['Peye','Payé'], pending:['Ap tann peman','Paiement en attente'], accepted:['Peman aksepte','Paiement accepté'], rejected:['Peman refize','Paiement refusé'] };
@@ -3316,7 +3321,9 @@ function zrBuild(rec){
       var R = [];
       function add(k, f, v){ if(v !== null && v !== undefined && String(v).trim() !== '' && String(v) !== 'null') R.push([k, f, String(v)]); }
       var t = o._t;
-      if(t === 'transfer'){
+      if(t === 'ledger'){
+        ledRowsDetail(o, add);
+      } else if(t === 'transfer'){
         var other = o._out ? (o.to_name || '') : (o.from_name || '');
         var om = o._out ? o.to_email : o.from_email, op = o._out ? o.to_phone : null;
         add('Kalite', 'Type', o.kind === 'store_sale' ? 'Achte pwen nan boutik' : o.kind === 'shop_payment' ? 'Peman Shop ak pwen' : (o.kind === 'qr_transfer' ? 'Transfè pa kòd QR' : 'Transfè pwen'));
@@ -3347,6 +3354,9 @@ function zrBuild(rec){
         if(Number(o.wait_penalty_applied) > 0) add('Frè datant', 'Frais d\'attente', fmt(o.wait_penalty_applied) + ' HTG');
         add('Total', 'Total', fmt(o.total) + ' HTG');
         add('Adrès', 'Adresse', o.address);
+        add('Mòd', 'Mode', o.order_mode);
+        add('Dat peman', 'Date du paiement', o.payment_confirmed_at ? fullDate(ms(o.payment_confirmed_at)) : '');
+        add('Dat livrezon', 'Date de livraison', o.done_at ? fullDate(ms(o.done_at)) : '');
         add('Chofè', 'Chauffeur', o.driver_name);
         var v2 = [o.vehicle_make, o.vehicle_color, o.vehicle_plate].filter(Boolean).join(' · '); add('Machin', 'Véhicule', v2);
         var ps = PAY_ST[o.payment_status];
@@ -3377,6 +3387,11 @@ function zrBuild(rec){
           step(d[0], d[1], reached ? (i === lastReached && st !== 'done' && st !== 'cancelled' ? 'now' : 'done') : 'todo');
         });
         if(st === 'cancelled') step('Anile', o.updated_at, 'bad');
+      } else if(o._t === 'ledger'){
+        step('Mouvman an anrejistre', o.created_at, 'done');
+        if(o.status === 'pending' && o.ref_kind === 'pending'){ if(o.claimed) step('Moun nan reklame pwen yo', o.claimed_at, 'done'); else step('Ap tann moun nan kreye kont li', null, 'now'); }
+        else if(o.status === 'error') step('Mouvman an echwe', null, 'bad');
+        else step(Number(o.delta) < 0 ? 'Pwen yo retire sou kont ou' : 'Pwen yo antre sou kont ou', o.created_at, 'done');
       } else if(o._t === 'transfer'){
         step('Pwen yo soti', o.created_at, 'done');
         if(o._out && !o.to_uid) step('Ap tann moun nan konekte', null, 'now');
@@ -3386,6 +3401,163 @@ function zrBuild(rec){
         if(st && st !== 'pending') step(STATUS_LABEL[st] || st, o.updated_at, st === 'cancelled' ? 'bad' : (st === 'done' ? 'done' : 'now'));
       }
       return S;
+    }
+
+
+    /* ═══ Tranzaksyon pwen : rejis konplè chak ajout / retrè pwen (z_points_ledger) ═══ */
+    var LED_KIND = {
+      charge:['Depans pwen','Dépense de points','bag'],
+      refund:['Ranbousman pwen','Remboursement de points','redo'],
+      transfer_out:['Pwen voye','Points envoyés','send'],
+      transfer_in:['Pwen resevwa','Points reçus','recv'],
+      store_credit:['Pwen achte nan boutik','Points achetés en boutique','store'],
+      admin_credit:['Pwen Zetwal ajoute','Points ajoutés par Zetwal','gift'],
+      admin_debit:['Pwen Zetwal retire','Points retirés par Zetwal','lock'],
+      payout:['Peman chofè an pwen','Paiement chauffeur en points','car'],
+      habit:['Rekonpans chak jou','Récompense quotidienne','flame'],
+      referral:['Pwen parenaj','Points de parrainage','gift'],
+      mission:['Pwen misyon','Points de mission','trophy']
+    };
+    var ledState = { f:'all', q:'', n:20 };
+    function pf(n){ return (Math.round((Number(n) || 0) * 100) / 100).toString().replace('.', ','); }
+    function fullDateS(t){ var d = new Date(t); return isNaN(d.getTime()) ? '' : d.toLocaleString('fr-FR', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+    function prepLed(r){
+      var k = LED_KIND[r.kind] || [r.kind || 'Mouvman', r.kind || 'Mouvement', 'check'];
+      var cp = r.counter_name || maskMail(r.counter_email) || maskTel(r.counter_phone) || '';
+      var title = k[0];
+      if(r.kind === 'transfer_out' && cp) title += ' → ' + cp;
+      else if(r.kind === 'transfer_in' && cp) title += ' ← ' + cp;
+      else if(r.kind === 'charge' && r.reason) title += ' · ' + r.reason;
+      return Object.assign({ _t:'ledger', _kind:'Pwen' }, r, { _out:Number(r.delta) < 0, _icon:k[2], _price:Math.abs(Number(r.delta) || 0), _title:title, updated_at:r.created_at });
+    }
+    async function loadLedger(){
+      if(!sb || !currentUser) return { rows:[], failed:true };
+      try{
+        var r = await sb.rpc('z_my_ledger', { p_limit:300 });
+        if(r.error) return { rows:[], failed:true };
+        return { rows:Array.isArray(r.data) ? r.data : [], failed:false };
+      }catch(e){ return { rows:[], failed:true }; }
+    }
+    async function getLed(){
+      if(ledCache) return ledCache;
+      var L = await loadLedger();
+      var a = L.rows.map(prepLed).map(decorate); a.failed = L.failed;
+      if(!a.failed) ledCache = a;
+      return a;
+    }
+    function ledStatusKr(o){ return o.status === 'error' ? 'Echwe' : (o.status === 'pending' ? (o.claimed ? 'Reklame' : 'Ap tann') : 'Fini'); }
+    function ledStatusFr(o){ return o.status === 'error' ? 'Échoué' : (o.status === 'pending' ? (o.claimed ? 'Réclamé' : 'En attente') : 'Terminé'); }
+    function ledRowsDetail(o, add){
+      var kd = LED_KIND[o.kind] || [o.kind, o.kind], neg = Number(o.delta) < 0, abs = Math.abs(Number(o.delta) || 0);
+      add('Kalite', 'Type', kd[0] + ' · ' + kd[1]);
+      add(neg ? 'Pwen retire' : 'Pwen ajoute', neg ? 'Points retirés' : 'Points ajoutés', (neg ? '−' : '+') + pf(abs) + ' pwen');
+      if(o.balance_before != null) add('Solid avan', 'Solde avant', pf(o.balance_before) + ' pwen');
+      if(o.balance_after != null) add('Solid apre', 'Solde après', pf(o.balance_after) + ' pwen');
+      add(neg ? 'Pou' : 'De', neg ? 'Vers' : 'De', o.counter_name);
+      add('Imel', 'E-mail', maskMail(o.counter_email));
+      add('Telefòn', 'Téléphone', maskTel(o.counter_phone));
+      add('Rezon', 'Motif', o.reason);
+      add('Nòt', 'Note', o.note);
+      if(o.order_id){
+        var lk = (histCache || []).filter(function(x){ return String(x.id) === String(o.order_id); })[0];
+        add('Kòmand ki lye', 'Commande liée', lk ? lk._title + ' · ' + lk._ref : (o.order_kind === 'ride' ? 'Kous' : 'Kòmand') + ' ' + String(o.order_id).slice(0, 8).toUpperCase());
+      }
+      var spend = o.kind === 'charge' || o.kind === 'transfer_out';
+      var cn = o.consent;
+      if(cn && cn.ack){
+        add('Konsantman', 'Consentement', 'Ou te konfime sou aparèy ou a ' + (cn.at ? fullDateS(cn.at) : '') + (cn.server_at ? ' · sèvè a anrejistre l ' + fullDateS(cn.server_at) : ''));
+      } else if(spend){
+        add('Konsantman', 'Consentement', o.legacy ? 'Anrejistreman ansyen — pa gen prèv konsantman ki anrejistre' : 'Pa gen prèv konsantman anrejistre pou mouvman sa a');
+      }
+      add('Eta', 'Statut', ledStatusKr(o) + ' / ' + ledStatusFr(o));
+      add('Dat egzak', 'Date exacte', fullDateS(o.created_at));
+      add('Nimewo mouvman', 'N° de mouvement', o.id);
+      if(o.legacy) add('Remak', 'Remarque', 'Anrejistreman ansyen (avan nouvo rejis la) — solid avan ak apre pa disponib');
+    }
+    function ledSummaryHtml(a){
+      var inn = 0, out = 0; a.forEach(function(o){ var d = Number(o.delta) || 0; if(o.status === 'error') return; if(d > 0) inn += d; else out += -d; });
+      return '<div class="zc" style="border-style:solid"><b>Tout mouvman pwen kont ou</b>'
+        + '<p>Chak ajout ak chak retrè pwen sou kont ou ekri isit la ak dat, kantite, solid avan ak apre, moun ki konsène a, rezon an ak prèv konsantman an. Anyen pa efase.</p>'
+        + '<div class="zf-row"><span>Antre (' + a.length + ' dènye mouvman)</span><b style="color:var(--ok)">+' + esc(pf(inn)) + ' pwen</b></div>'
+        + '<div class="zf-row"><span>Soti</span><b>−' + esc(pf(out)) + ' pwen</b></div></div>';
+    }
+    function ledErrorHtml(){
+      return '<div class="zp-empty2"><div class="big">' + sv('flag') + '</div><b style="color:var(--ink-1,#fff);font-size:.95rem">Nou pa t ka chaje tranzaksyon pwen ou yo</b><br>Verifye koneksyon w oswa debloke kont ou, epi eseye ankò.'
+        + '<div class="row"><button class="zp-btn go" style="width:auto" type="button" id="lg-retry">Eseye ankò</button></div></div>';
+    }
+    function paintLedList(){
+      var list = $('#lg-list'); if(!list) return;
+      var h = ledCache || [], f = ledState.f, q = ledState.q.trim().toLowerCase();
+      var rows = h.filter(function(o){
+        if(f === 'in' && !(Number(o.delta) > 0)) return false;
+        if(f === 'out' && !(Number(o.delta) < 0)) return false;
+        if(f === 'wait' && !(o.status === 'pending' && !o.claimed)) return false;
+        if(!q) return true;
+        return (o._title + ' ' + o._ref + ' ' + (o.reason || '') + ' ' + (o.note || '') + ' ' + (o.counter_name || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      var sum = $('#lg-sum'); if(sum) sum.textContent = rows.length + ' mouvman' + (f !== 'all' || q ? ' (filtre)' : '');
+      if(!rows.length){ list.innerHTML = '<div class="zp-empty2"><div class="big">' + sv('hist') + '</div>' + (h.length ? 'Pa gen anyen ki matche filt sa a.' : 'Pa gen mouvman pwen ankò. Chak fwa pwen antre oswa soti sou kont ou, l ap parèt isit la.') + '</div>'; return; }
+      var shown = rows.slice(0, ledState.n), html = '', lastDay = '';
+      shown.forEach(function(o){
+        var d = dayLabel(o._ts); if(d !== lastDay){ html += '<div class="hd">' + esc(d) + '</div>'; lastDay = d; }
+        html += rowHtml(o);
+      });
+      if(rows.length > shown.length) html += '<button class="zp-btn hx-more" type="button" id="lg-more">Wè plis (' + (rows.length - shown.length) + ')</button>';
+      list.innerHTML = html; bindRows(list);
+      var more = $('#lg-more'); if(more) more.addEventListener('click', function(){ ledState.n += 20; paintLedList(); });
+    }
+    async function renderLedger(){
+      var box = $('#zp-in'); if(!box) return;
+      box.innerHTML = skeleton(4);
+      var h = await getLed(); try{ await getHist(); }catch(e){}
+      if(tab !== 'led' || !$('#zp-in')) return;
+      if(h.failed){ box.innerHTML = ledErrorHtml(); $('#lg-retry').addEventListener('click', function(){ ledCache = null; renderLedger(); }); return; }
+      var chips = [['all','Tout'],['in','Antre +'],['out','Soti −'],['wait','Ap tann']];
+      box.innerHTML = ledSummaryHtml(h)
+        + '<div class="hf"><input type="search" id="lg-q" placeholder="Chèche (non, rezon, referans…)" autocomplete="off" aria-label="Chèche nan mouvman pwen" value="' + esc(ledState.q) + '"></div>'
+        + '<div class="hch" role="group" aria-label="Filt">' + chips.map(function(c){ return '<button type="button" data-f="' + c[0] + '" class="' + (ledState.f === c[0] ? 'on' : '') + '">' + c[1] + '</button>'; }).join('') + '</div>'
+        + '<div class="hx-sum" id="lg-sum"></div><div id="lg-list"></div>';
+      var tmr = 0;
+      $('#lg-q').addEventListener('input', function(){ var v = this.value; clearTimeout(tmr); tmr = setTimeout(function(){ ledState.q = v; ledState.n = 20; paintLedList(); }, 160); });
+      qa('.hch button', box).forEach(function(b){ b.addEventListener('click', function(){ ledState.f = b.getAttribute('data-f'); ledState.n = 20; qa('.hch button', box).forEach(function(x){ x.classList.toggle('on', x === b); }); paintLedList(); }); });
+      paintLedList();
+    }
+
+    /* ── Panye Shop la (poko peye) : chak liy ekri klèman ── */
+    async function loadCart(){
+      if(cartCache) return cartCache;
+      var out = { lines:[], total:0, at:null, failed:false };
+      if(!sb || !currentUser) return out;
+      try{
+        var r = await sb.from('cart_items').select('cart_data,updated_at').eq('user_id', currentUser.uid).limit(1);
+        if(r.error){ out.failed = true; return out; }
+        var row = (r.data || [])[0]; var data = row && row.cart_data;
+        if(typeof data === 'string'){ try{ data = JSON.parse(data); }catch(e){ data = []; } }
+        if(!Array.isArray(data) || !data.length){ cartCache = out; return out; }
+        out.at = row.updated_at;
+        var ids = data.map(function(x){ return x && x.id; }).filter(Boolean);
+        var p = await sb.from('products').select('id,name,price').in('id', ids);
+        if(p.error){ out.failed = true; return out; }
+        var by = {}; (p.data || []).forEach(function(x){ by[x.id] = x; });
+        data.forEach(function(x){
+          var pr = x && by[x.id]; if(!pr) return;
+          var q = Math.max(1, parseInt(x.qty, 10) || 1), u = Number(pr.price) || 0;
+          out.lines.push({ name:pr.name || 'Pwodwi', q:q, unit:u, total:u * q }); out.total += u * q;
+        });
+      }catch(e){ out.failed = true; return out; }
+      cartCache = out; return out;
+    }
+    async function paintCart(){
+      var box = $('#hx-cart'); if(!box) return;
+      if(histState.f !== 'all' && histState.f !== 'shop'){ box.innerHTML = ''; return; }
+      var c = await loadCart(); box = $('#hx-cart'); if(!box) return;
+      if(c.failed){ box.innerHTML = '<p class="hx-sum">Nou pa t ka li panye Shop ou a kounye a.</p>'; return; }
+      if(!c.lines.length){ box.innerHTML = ''; return; }
+      box.innerHTML = '<div class="zc" style="border-style:solid"><b>Panye ou nan Shop (poko peye)</b>'
+        + '<p>Sa yo se pwodwi ki nan panye ou kounye a. Anyen pa pran sou kont ou toutotan ou pa konfime kòmand lan.' + (c.at ? ' Dènye modifikasyon : ' + esc(fullDate(c.at)) + '.' : '') + '</p>'
+        + c.lines.map(function(l){ return '<div class="zf-row"><span>' + esc(l.q + ' × ' + l.name) + '</span><b>' + esc(fmt(l.unit) + ' HTG × ' + l.q + ' = ' + fmt(l.total) + ' HTG') + '</b></div>'; }).join('')
+        + '<div class="zf-row"><span>Total panye a</span><b>' + esc(fmt(c.total)) + ' HTG</b></div>'
+        + '<div class="zc-l" style="margin-top:10px"><a class="zp-btn" href="shop.html" style="width:auto;padding:0 16px">Louvri Shop</a></div></div>';
     }
 
     /* ── PDF ── */
@@ -3489,7 +3661,7 @@ function zrBuild(rec){
       var inn = o._dir === 'in';
       return '<button class="hx ' + (inn ? 'in' : 'out') + '" type="button" data-ref="' + esc(o._ref) + '">'
         + '<span class="ic">' + sv(o._icon) + '</span>'
-        + '<span class="bd"><b>' + esc(o._title) + '</b><span>' + esc(hhmm(o._ts)) + ' · ' + esc(o._ref) + '</span></span>'
+        + '<span class="bd"><b>' + esc(o._title) + '</b><span>' + esc(hhmm(o._ts)) + ' · ' + esc(o._ref) + (o._t === 'ledger' && o.balance_after != null ? ' · Solid ' + esc(pf(o.balance_after)) : '') + '</span></span>'
         + '<span class="am"><b>' + esc(o._amt) + ' <small style="font-size:.62rem;font-family:var(--sans,system-ui);font-weight:600;color:var(--ink-3,rgba(255,255,255,.5))">' + esc(o._unit) + '</small></b>'
         + '<i style="' + chipStyle(o) + '">' + esc(statusLabel(o)) + '</i></span></button>';
     }
@@ -3497,7 +3669,7 @@ function zrBuild(rec){
       qa('.hx[data-ref]', root).forEach(function(b){
         b.addEventListener('click', function(){
           var ref = b.getAttribute('data-ref');
-          var o = (histCache || []).filter(function(x){ return x._ref === ref; })[0];
+          var o = (histCache || []).concat(ledCache || []).filter(function(x){ return x._ref === ref; })[0];
           if(o) openFiche(o);
         });
       });
@@ -3544,13 +3716,13 @@ function zrBuild(rec){
       var chips = [['all','Tout'],['pts','Pwen'],['cmd','Kòmand'],['shop','Shop']];
       box.innerHTML = '<div class="hf"><input type="search" id="hx-q" placeholder="Chèche (non, nimewo referans…)" autocomplete="off" aria-label="Chèche nan istwa" value="' + esc(histState.q) + '"></div>'
         + '<div class="hch" role="group" aria-label="Filt">' + chips.map(function(c){ return '<button type="button" data-f="' + c[0] + '" class="' + (histState.f === c[0] ? 'on' : '') + '">' + c[1] + '</button>'; }).join('') + '</div>'
-        + '<div class="hx-sum" id="hx-sum"></div><div id="hx-list"></div>';
+        + '<div id="hx-cart"></div><div class="hx-sum" id="hx-sum"></div><div id="hx-list"></div>';
       var tmr = 0;
       $('#hx-q').addEventListener('input', function(){ var v = this.value; clearTimeout(tmr); tmr = setTimeout(function(){ histState.q = v; histState.n = 15; paintHistList(); }, 160); });
       qa('.hch button', box).forEach(function(b){ b.addEventListener('click', function(){
         histState.f = b.getAttribute('data-f'); histState.n = 15;
-        qa('.hch button', box).forEach(function(x){ x.classList.toggle('on', x === b); }); paintHistList(); }); });
-      paintHistList();
+        qa('.hch button', box).forEach(function(x){ x.classList.toggle('on', x === b); }); paintHistList(); paintCart(); }); });
+      paintHistList(); paintCart();
     }
     async function renderNotif(){
       var box = $('#zp-in'); if(!box) return;
@@ -3765,7 +3937,7 @@ function zrBuild(rec){
     }
 
     /* ── Antèt, onglè, kont (render) ── */
-    var TABS = [['hist','Istwa','hist'],['miss','Misyon','trophy'],['msg','Mesaj','chat'],['notif','Nouvèl','bell'],['info','Enfo','user'],['qr','Kòd QR','qr'],['send','Voye','send'],['ask','Mande','ask']];
+    var TABS = [['hist','Istwa','hist'],['led','Tranzaksyon pwen','gift'],['miss','Misyon','trophy'],['msg','Mesaj','chat'],['notif','Nouvèl','bell'],['info','Enfo','user'],['qr','Kòd QR','qr'],['send','Voye','send'],['ask','Mande','ask']];
     var LEVELS = [[0,'Nouvo manm'],[3,'Manm aktif'],[10,'Fidèl'],[25,'Eklèr'],[60,'Zetwal Vedèt']];
     function levelOf(n){ var i = 0; LEVELS.forEach(function(l, k){ if(n >= l[0]) i = k; }); return { i:i, name:LEVELS[i][1], next:LEVELS[i + 1] || null, base:LEVELS[i][0] }; }
     function countUp(el, to){
@@ -3815,6 +3987,7 @@ function zrBuild(rec){
       if(tab === 'info') renderInfo();
       else if(tab === 'msg') renderMsgList();
       else if(tab === 'hist') renderHist();
+      else if(tab === 'led') renderLedger();
       else if(tab === 'miss') renderMiss();
       else if(tab === 'notif') renderNotif();
       else if(tab === 'ask') renderAsk();
@@ -4206,7 +4379,7 @@ function zrBuild(rec){
         ptsUnsub = fs.collection('users').doc(user.uid).onSnapshot(function(s){
           var p = Number((s.exists ? s.data().points : 0) || 0) || 0;
           if(lastPts !== null && p > lastPts + 0.0001){
-            histCache = null; transferCache = null;
+            histCache = null; ledCache = null; cartCache = null; transferCache = null;
             mounts = mounts.filter(function(m){ return document.body.contains(m.el); });
             if(mounts.length){ toast('Ou resevwa ' + (p - lastPts).toFixed(1) + ' pwen !'); refreshQR(); }
           }
@@ -4237,7 +4410,7 @@ function zrBuild(rec){
         + '<button class="zp-x" type="button" data-r="x" aria-label="Fèmen"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>';
     }
     function afterMoney(){
-      histCache = null; transferCache = null;
+      histCache = null; ledCache = null; cartCache = null; transferCache = null;
       if(panel.classList.contains('open')) render();
     }
 
