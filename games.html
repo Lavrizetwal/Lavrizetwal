@@ -1406,7 +1406,93 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
 .sh-it .gm-btn.ln{color:var(--gold-ink);border-color:var(--gold);background:transparent;opacity:1}.sh-it .gm-btn.ln:disabled{color:var(--ink-3);border-color:var(--line-2);opacity:.7}
 .sh-em{padding:30px 22px;border:1px dashed var(--line-2);border-radius:10px;color:var(--ink-3);text-align:center;line-height:1.7}
 </style>
-<style>.gm-chk{display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:.88rem;line-height:1.5;margin:14px 0 4px;padding:12px;border:1px solid var(--line-2,rgba(128,128,128,.4));border-radius:12px;cursor:pointer}.gm-chk input{margin-top:3px;width:20px;height:20px;flex:none;accent-color:#B8912A;position:static;opacity:1}.gm-chk span{font-weight:500}</style></head>
+<style>.gm-chk{display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:.88rem;line-height:1.5;margin:14px 0 4px;padding:12px;border:1px solid var(--line-2,rgba(128,128,128,.4));border-radius:12px;cursor:pointer}.gm-chk input{margin-top:3px;width:20px;height:20px;flex:none;accent-color:#B8912A;position:static;opacity:1}.gm-chk span{font-weight:500}</style>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style id="hub-pro">
+/* ══ Salle de jeux — même univers que la course ══ */
+.hb-pg{--ink:#f4f1e8;--ink-2:#cdd3e8;--ink-3:#9aa4c6;--line:rgba(240,217,138,.16);--line-2:rgba(240,217,138,.3);--surface:rgba(255,255,255,.05);--bg:#08102a;--bg-2:#0d1a42;--gold-ink:#F0D98A;--g-08:rgba(212,175,55,.1);--g-45:rgba(212,175,55,.5);--gold-dp:#D4AF37;--shadow:0 18px 50px -24px rgba(0,0,0,.7);--c-cond:'Barlow Condensed','Inter',system-ui,sans-serif;position:relative;background:#08102a;color:var(--ink);isolation:isolate}
+.hb-pg h1,.hb-pg h2,.hb-pg h3{color:#fff}
+.hb-hero{position:relative;overflow:hidden;isolation:isolate;min-height:min(70vh,560px);display:flex;align-items:flex-end;background:radial-gradient(900px 420px at 78% 12%,rgba(240,160,90,.32),transparent 62%),linear-gradient(180deg,#0a1436 0%,#101c4c 58%,#08102a 100%)}
+#hb-fx{position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:block}
+.hb-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;z-index:-1;background:linear-gradient(0deg,#08102a,transparent)}
+.hb-hero-in{width:100%;padding-block:clamp(70px,13vh,130px) 30px}
+.hb-hero h1{font:600 clamp(3rem,9vw,6.8rem)/.94 var(--serif);letter-spacing:-.015em;margin:0;text-wrap:balance;text-shadow:0 4px 40px rgba(0,0,0,.45)}
+.hb-hero h1 span{display:block}
+.hb-hero h1 span+span{color:#F0D98A;font-style:italic}
+.hb-hero .lead{margin:18px 0 0;max-width:50ch;font-size:clamp(1rem,2.2vw,1.16rem);line-height:1.65;color:#dfe4f3}
+.hb-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:26px}
+.hb-pg .gm-chip{background:rgba(8,14,38,.62);border-color:rgba(240,217,138,.4);color:#F0D98A;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.hb-pg .gm-chip b{color:#fff}
+.hb-pg .gm-tool{background:rgba(8,14,38,.62);border-color:rgba(240,217,138,.3);color:#e9ecf7;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.hb-pg .gm-tool:hover{border-color:#D4AF37;color:#F0D98A}
+.hb-pg .gm-tool[aria-pressed=true]{background:rgba(212,175,55,.2);border-color:#D4AF37;color:#F0D98A}
+.hb-pg .gm-note{background:rgba(212,175,55,.08);color:var(--ink-2)}
+.hb-pg .gm-note b{color:#fff}
+.hb-nw{background:#08102a;padding-top:0}
+.hb-pg .gm-sec{background:#08102a;padding:40px 0 20px}
+.hb-games{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px;margin-top:-6px}
+.hb-g{position:relative;display:flex;flex-direction:column;gap:12px;padding:0 0 24px;border-radius:20px;overflow:hidden;isolation:isolate;color:var(--ink);border:1px solid rgba(240,217,138,.28);background:linear-gradient(170deg,rgba(255,255,255,.07),rgba(255,255,255,.02));box-shadow:0 30px 60px -34px #000;transition:transform .25s,border-color .25s,box-shadow .25s}
+.hb-g:hover{transform:translateY(-4px);border-color:#D4AF37;box-shadow:0 36px 70px -30px rgba(212,175,55,.35)}
+.hb-g>*:not(.pv){margin-inline:26px}
+.hb-g .pv{position:relative;aspect-ratio:240/190;overflow:hidden;border-bottom:1px solid rgba(240,217,138,.22);background:#0d1a42}
+.hb-g .pv svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hb-g .gl{display:none}
+.hb-g h2{font:600 clamp(1.9rem,3vw,2.35rem)/1.05 var(--serif);margin-top:6px}
+.hb-g .tag{font:italic 500 1.15rem var(--serif);color:#F0D98A}
+.hb-g p{color:var(--ink-2);line-height:1.65;font-size:.95rem}
+.hb-g ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px;padding:0}
+.hb-g li{padding:4px 12px;border-radius:99px;border:1px solid rgba(240,217,138,.35);font:600 .86rem var(--c-cond);letter-spacing:.04em;color:#F0D98A;background:rgba(212,175,55,.08)}
+.hb-g .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.hb-pg .gm-btn{background:linear-gradient(180deg,#F0D98A,#D4AF37);border-color:#D4AF37;color:#14234F}
+.hb-pg .gm-btn:hover{background:linear-gradient(180deg,#fff0b8,#e6c14c)}
+.hb-pg .gm-btn.ln{background:transparent;color:#F0D98A;border-color:rgba(240,217,138,.5)}
+.hb-pg .gm-btn.ln:hover{background:rgba(212,175,55,.14)}
+/* aperçus animés */
+.pv .sd-n{font:600 15px var(--serif);fill:#F0D98A;opacity:0;animation:hbn 9s ease-in-out infinite;animation-delay:var(--d);text-anchor:middle}
+@keyframes hbn{0%,6%{opacity:0;transform:scale(.6)}12%,70%{opacity:1;transform:scale(1)}82%,100%{opacity:0}}
+.pv .sd-n{transform-box:fill-box;transform-origin:center}
+.pv .ring{stroke-dasharray:238;animation:hbring 6s linear infinite}
+@keyframes hbring{from{stroke-dashoffset:0}to{stroke-dashoffset:238}}
+.pv .opt{animation:hbopt 6s steps(1) infinite}
+.pv .opt.ok{animation:hbok 6s steps(1) infinite}
+@keyframes hbok{0%,70%{fill:rgba(255,255,255,.06)}71%,100%{fill:rgba(111,208,140,.55)}}
+@keyframes hbopt{0%,100%{fill:rgba(255,255,255,.06)}}
+.pv .dash{transform-box:view-box;transform-origin:120px 74px;animation:hbrun 1.4s linear infinite;animation-delay:var(--d);opacity:0}
+@keyframes hbrun{0%{transform:scale(1);opacity:0}15%{opacity:.9}100%{transform:scale(11);opacity:.9}}
+.pv .rn{animation:hbbob .42s ease-in-out infinite alternate}
+@keyframes hbbob{to{transform:translateY(-3px)}}
+.hb-top{margin-top:44px}
+.hb-top h2,.hb-shop h2,.hb-rules h2{font:600 clamp(2rem,5vw,3rem)/1.05 var(--serif)}
+.hb-pg .hb-shop,.hb-pg .hb-top,.hb-pg .hb-rules{margin-top:36px}
+.hb-t{border:1px solid rgba(240,217,138,.26);border-radius:18px;background:linear-gradient(170deg,rgba(255,255,255,.06),rgba(255,255,255,.02));box-shadow:var(--shadow);overflow:hidden}
+.hb-t h3{font:700 1.7rem/1 var(--c-cond);letter-spacing:.04em;padding:20px 22px 10px;color:#F0D98A}
+.hb-t ol{list-style:none;margin:0;padding:0 0 8px}
+.hb-t li{display:grid;grid-template-columns:38px 1fr auto;gap:2px 12px;align-items:center;padding:12px 22px;border-top:1px solid rgba(240,217,138,.12)}
+.hb-t li .rk{grid-row:1/3;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:700 1.1rem var(--c-cond);color:#F0D98A;border:1px solid rgba(240,217,138,.4)}
+.hb-t li.r1 .rk{background:linear-gradient(160deg,#fff0b8,#D4AF37);color:#14234F;border-color:#F0D98A;box-shadow:0 0 18px rgba(212,175,55,.5)}
+.hb-t li.r2 .rk{background:linear-gradient(160deg,#f1f3f8,#aab3c6);color:#14234F;border-color:#dfe4ee}
+.hb-t li.r3 .rk{background:linear-gradient(160deg,#f3c9a2,#b9794a);color:#14234F;border-color:#e5b48a}
+.hb-t li.r1{background:linear-gradient(90deg,rgba(212,175,55,.14),transparent);padding-block:16px}
+.hb-t li .pe{font-weight:700;color:#fff;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb-t li.r1 .pe{font-size:1.14rem}
+.hb-t li .sm{grid-column:2;font-size:.76rem;color:var(--ink-3)}
+.hb-t li .sc{grid-column:3;grid-row:1;text-align:right;font:700 1.35rem var(--c-cond);color:#F0D98A;font-variant-numeric:tabular-nums}
+.hb-t li .tm{grid-column:3;grid-row:2;text-align:right;font-size:.76rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.hb-t .em{padding:26px 22px;color:var(--ink-3);text-align:center;line-height:1.6}
+.hb-pg .sh-it{background:linear-gradient(170deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border-color:rgba(240,217,138,.26);border-radius:16px}
+.hb-pg .sh-it .art{background:radial-gradient(circle at 50% 40%,rgba(212,175,55,.2),rgba(255,255,255,.03))}
+.hb-pg .sh-it h3{color:#fff}
+.hb-pg .sh-it.own{border-color:#D4AF37}
+.hb-pg .sh-it .gm-btn.ln:disabled{color:var(--ink-3);border-color:rgba(255,255,255,.2)}
+.hb-pg .sh-em{border-color:rgba(240,217,138,.3)}
+.hb-rules{padding:28px 30px;border:1px solid rgba(240,217,138,.26);border-radius:18px;background:rgba(255,255,255,.04);margin-bottom:30px}
+.hb-rules li{color:var(--ink-2)}
+.hb-rules li::before{background:#D4AF37}
+.hb-pg .gm-sec:last-of-type{padding-bottom:60px}
+@media (prefers-reduced-motion:reduce){.pv .sd-n{animation:none;opacity:1}.pv .ring,.pv .dash,.pv .rn{animation:none}.pv .dash{opacity:.7}}
+@media (max-width:640px){.hb-pg .gm-sec{padding:28px 0 12px}.hb-g>*:not(.pv){margin-inline:20px}.hb-rules{padding:22px 20px}}
+</style>
+</head>
 <body class="gm" data-scene="games">
 <canvas id="zt-scene" aria-hidden="true"></canvas>
 <nav class="nav" id="nav">
@@ -1483,13 +1569,13 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
   </div>
 </div>
 
-<main id="main">
-  <header class="gm-hero">
-    <div class="wrap">
-      <div class="eyebrow">Jwèt · Zetwal</div>
-      <h1>Jwèt pou lespri a</h1>
+<main id="main" class="hb-pg">
+  <header class="hb-hero">
+    <canvas id="hb-fx" aria-hidden="true"></canvas>
+    <div class="hb-hero-in wrap">
+      <h1><span>Jwèt pou</span><span>lespri a</span></h1>
       <p class="lead">Sudoku, Duel Mental ak La course vers la mort : jwèt ki mande refleksyon, vitès ak memwa. Yo an fransè sèlman, e yo pou moun ki gen 18 an oswa plis.</p>
-      <div class="gm-bar">
+      <div class="hb-bar">
         <span class="gm-chip" id="hb-wal" hidden>Jeton jwèt mwen <b data-bal>0</b><span id="hb-wal-ic"></span></span>
         <button class="gm-tool" type="button" id="hb-pseudo" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg><span>Siyati mwen</span></button>
       </div>
@@ -1497,25 +1583,72 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
     </div>
   </header>
 
-  <section class="gm-sec" style="padding-bottom:10px">
+  <section class="gm-sec">
     <div class="wrap">
       <div class="hb-games">
         <article class="hb-g" id="hb-sd">
-          <div class="gl"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1.5"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg></div>
+          <div class="pv" aria-hidden="true">
+            <svg viewBox="0 0 240 190" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="pvs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14234F"/><stop offset="1" stop-color="#0a1230"/></linearGradient></defs>
+              <rect width="240" height="190" fill="url(#pvs)"/>
+              <g transform="translate(36 8)">
+                <rect width="168" height="168" rx="6" fill="rgba(255,255,255,.04)" stroke="#F0D98A" stroke-width="2"/>
+                <path d="M18.67 0v168M37.33 0v168M74.67 0v168M93.33 0v168M130.67 0v168M149.33 0v168M0 18.67h168M0 37.33h168M0 74.67h168M0 93.33h168M0 130.67h168M0 149.33h168" stroke="rgba(240,217,138,.22)" stroke-width="1"/>
+                <path d="M56 0v168M112 0v168M0 56h168M0 112h168" stroke="#F0D98A" stroke-width="2" opacity=".7"/>
+                <text class="sd-n" x="9" y="14" style="--d:-.2s">5</text><text class="sd-n" x="28" y="33" style="--d:-1.6s">3</text><text class="sd-n" x="65" y="14" style="--d:-3s">7</text><text class="sd-n" x="84" y="52" style="--d:-4.4s">6</text><text class="sd-n" x="103" y="33" style="--d:-5.8s">1</text><text class="sd-n" x="140" y="14" style="--d:-7.2s">9</text><text class="sd-n" x="159" y="52" style="--d:-.9s">8</text><text class="sd-n" x="9" y="70" style="--d:-2.3s">6</text><text class="sd-n" x="65" y="89" style="--d:-3.7s">8</text><text class="sd-n" x="121" y="70" style="--d:-5.1s">3</text><text class="sd-n" x="159" y="108" style="--d:-6.5s">6</text><text class="sd-n" x="28" y="126" style="--d:-7.9s">2</text><text class="sd-n" x="84" y="145" style="--d:-1.2s">4</text><text class="sd-n" x="140" y="126" style="--d:-2.8s">2</text><text class="sd-n" x="103" y="164" style="--d:-4.1s">5</text><text class="sd-n" x="9" y="164" style="--d:-5.5s">8</text>
+              </g>
+            </svg>
+          </div>
           <h2>Sudoku</h2><div class="tag">De l’intelligence des chiffres</div>
           <p>Yon grij 9×9 pou ranpli anvan tan an fini. Twa erè e pati a pèdi. Senk nivo : Facile, Moyen, Difficile, Légendaire ak Mythique.</p>
           <ul><li>1 jeton pou antre</li><li>De 1 a 100 jeton gany</li><li>Pa gen poz</li></ul>
           <div class="acts"><a class="gm-btn" href="sudoku.html">Jwe</a><button class="gm-btn ln" type="button" data-stats="sudoku">Statistik mwen</button></div>
         </article>
         <article class="hb-g" id="hb-dl">
-          <div class="gl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L5 14h6l-1 8 9-13h-6z"/></svg></div>
+          <div class="pv" aria-hidden="true">
+            <svg viewBox="0 0 240 190" preserveAspectRatio="xMidYMid slice">
+              <defs><radialGradient id="pvd" cx=".5" cy=".3" r=".9"><stop offset="0" stop-color="#2b2f7a"/><stop offset="1" stop-color="#0a1230"/></radialGradient></defs>
+              <rect width="240" height="190" fill="url(#pvd)"/>
+              <g transform="translate(120 62)">
+                <circle r="38" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="7"/>
+                <circle class="ring" r="38" fill="none" stroke="#F0D98A" stroke-width="7" stroke-linecap="round" transform="rotate(-90)"/>
+                <path d="M4 -20 -12 4h10l-3 17 17-26H1z" fill="#F0D98A"/>
+              </g>
+              <g stroke="rgba(240,217,138,.5)" stroke-width="1.2">
+                <rect class="opt" x="22" y="118" width="94" height="26" rx="13" fill="rgba(255,255,255,.06)"/>
+                <rect class="opt ok" x="124" y="118" width="94" height="26" rx="13" fill="rgba(255,255,255,.06)"/>
+                <rect class="opt" x="22" y="150" width="94" height="26" rx="13" fill="rgba(255,255,255,.06)"/>
+                <rect class="opt" x="124" y="150" width="94" height="26" rx="13" fill="rgba(255,255,255,.06)"/>
+              </g>
+              <g fill="#e9ecf7" font-family="Barlow Condensed,Inter,sans-serif" font-weight="700" font-size="14"><text x="38" y="136">A</text><text x="140" y="136">B</text><text x="38" y="168">C</text><text x="140" y="168">D</text></g>
+            </svg>
+          </div>
           <h2>Duel Mental</h2><div class="tag">Le jeu des grands maîtres</div>
           <p>Dis kesyon a chwa miltip, dis segonn pou chak. Chwazi yon nivo, yon kategori, oswa tou de. Kalkil, Ayiti, Memwa, Konesans jeneral ak Filozofi.</p>
           <ul><li>10 jeton pou antre</li><li>10 nivo</li><li>5 kategori</li></ul>
           <div class="acts"><a class="gm-btn" href="duel.html">Jwe</a><button class="gm-btn ln" type="button" data-stats="duel">Statistik mwen</button></div>
         </article>
         <article class="hb-g" id="hb-cr">
-          <div class="gl"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="14" cy="4.5" r="2"/><path d="M13 8l-3 4 4 3-1 6M10 12l-4 1M14 15l4 1M13 8l4 3"/></svg></div>
+          <div class="pv" aria-hidden="true">
+            <svg viewBox="0 0 240 190" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <linearGradient id="pvc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16224f"/><stop offset=".55" stop-color="#c8636a"/><stop offset="1" stop-color="#f7b977"/></linearGradient>
+                <linearGradient id="pvr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a5a68"/><stop offset="1" stop-color="#2d2d38"/></linearGradient>
+              </defs>
+              <rect width="240" height="190" fill="url(#pvc)"/>
+              <circle cx="150" cy="70" r="20" fill="#ffe3b0" opacity=".95"/>
+              <path d="M0 74V58h14V50h12v10h10V44h16v16h12V52h14v22zM150 74V56h16V46h12v12h14V50h10v10h10V54h28v20z" fill="#2a2f63"/>
+              <rect y="74" width="240" height="116" fill="#33463a"/>
+              <path d="M120 74 L-40 190H280z" fill="url(#pvr)"/>
+              <path d="M120 74 L8 190M120 74 L232 190" stroke="#ecebe2" stroke-width="2" opacity=".85"/>
+              <g fill="#ecebe2">
+                <rect class="dash" x="118.6" y="76" width="1.1" height="1.6" style="--d:0s"/><rect class="dash" x="118.6" y="76" width="1.1" height="1.6" style="--d:-.47s"/><rect class="dash" x="118.6" y="76" width="1.1" height="1.6" style="--d:-.93s"/>
+                
+                
+              </g>
+              <g class="rn"><ellipse cx="120" cy="178" rx="15" ry="3.5" fill="rgba(0,0,0,.4)"/><rect x="109" y="140" width="22" height="22" rx="7" fill="#f2c230"/><circle cx="120" cy="134" r="8" fill="#8a5a3a"/><rect x="111" y="130" width="18" height="3" fill="#14234F"/><rect x="110" y="160" width="7" height="17" rx="3" fill="#8a5a3a"/><rect x="123" y="160" width="7" height="17" rx="3" fill="#8a5a3a"/><rect x="108" y="159" width="24" height="7" rx="2" fill="#14234F"/></g>
+            </svg>
+          </div>
           <h2>La course vers la mort</h2><div class="tag">Courir, esquiver, arriver</div>
           <p>Kouri jouk destinasyon ou chwazi a. Eskive, sote, bese : chak obstak gen repons li, epi kat la montre w bon wout la nan chak kalfou. Si enèji a tonbe a zewo, ou pèdi.</p>
           <ul><li>5 destinasyon, 5 nivo</li><li>Antre : 25 a 50 jeton</li><li>Gany : antre a + 10 × nivo</li></ul>
@@ -1908,9 +2041,9 @@ var GN={sudoku:'Sudoku',duel:'Duel Mental',course:'La course vers la mort'}, DN=
 function renderTop(g,rows){
   var t=GN[g]||g, h='<h3>'+t+'</h3>';
   if(!rows||!rows.length){ $('#hb-t-'+g).innerHTML=h+'<div class="em">Poko gen pati nan klasman an. Premye a ka se ou.</div>'; return; }
-  h+='<table><thead><tr><th>#</th><th>Jwè</th><th>Sko</th><th>Tan</th></tr></thead><tbody>';
-  rows.forEach(function(r){ h+='<tr><td class="rk">'+r.rank+'</td><td><span class="pe">'+esc(r.pseudo)+'</span><span class="sm">'+esc(lvLabel(g,r))+' · '+dshort(r.at)+'</span></td><td>'+fmt(r.score)+'</td><td>'+dur(r.ms)+'</td></tr>'; });
-  $('#hb-t-'+g).innerHTML=h+'</tbody></table>';
+  h+='<ol>';
+  rows.forEach(function(r){ h+='<li class="r'+r.rank+'"><span class="rk">'+r.rank+'</span><span class="pe">'+esc(r.pseudo)+'</span><span class="sc">'+fmt(r.score)+'</span><span class="sm">'+esc(lvLabel(g,r))+' · '+dshort(r.at)+'</span><span class="tm">'+dur(r.ms)+'</span></li>'; });
+  $('#hb-t-'+g).innerHTML=h+'</ol>';
 }
 function loadTop(){
   ['sudoku','duel','course'].forEach(function(g){
@@ -2033,5 +2166,26 @@ onUser.push(function(){ refreshStatus().then(boot,function(){ boot(); }); });
 </script>
 <script src="scenes.js" defer></script>
 <script src="promo.js" defer></script>
+<script>/* hub : fond animé de la salle de jeux (chiffres, éclairs, chevrons) */
+(function(){
+  var cv=document.getElementById('hb-fx'); if(!cv||!cv.getContext) return; var X=cv.getContext('2d'), W=0,H=0,dpr=1, P=[], raf=0, vis=true;
+  var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function rs(){ var r=cv.getBoundingClientRect(); dpr=Math.min(2,window.devicePixelRatio||1); W=Math.max(200,r.width); H=Math.max(200,r.height); cv.width=W*dpr; cv.height=H*dpr; X.setTransform(dpr,0,0,dpr,0,0); P=[]; var n=Math.round(W/38); for(var i=0;i<n;i++) P.push({x:Math.random()*W,y:Math.random()*H,v:6+Math.random()*16,s:14+Math.random()*30,t:i%3,a:.05+Math.random()*.12,ch:String(1+Math.floor(Math.random()*9)),r:(Math.random()-.5)*.6}); }
+  function bolt(s){ X.beginPath(); X.moveTo(s*.2,-s*.6); X.lineTo(-s*.35,s*.1); X.lineTo(-s*.02,s*.1); X.lineTo(-s*.2,s*.6); X.lineTo(s*.35,-s*.15); X.lineTo(s*.04,-s*.15); X.closePath(); X.fill(); }
+  function chev(s){ X.beginPath(); X.moveTo(-s*.5,s*.25); X.lineTo(0,-s*.25); X.lineTo(s*.5,s*.25); X.lineWidth=s*.12; X.stroke(); }
+  var last=0;
+  function draw(ts){
+    raf=0; var dt=Math.min(50,ts-last)/1000; last=ts; X.clearRect(0,0,W,H);
+    P.forEach(function(p){ if(!rm){ p.y-=p.v*dt; if(p.y<-60){ p.y=H+60; p.x=Math.random()*W; } }
+      X.save(); X.translate(p.x,p.y); X.rotate(p.r); X.globalAlpha=p.a; X.fillStyle='#F0D98A'; X.strokeStyle='#F0D98A';
+      if(p.t===0){ X.font='600 '+p.s+'px Cormorant Garamond,serif'; X.textAlign='center'; X.fillText(p.ch,0,0); } else if(p.t===1) bolt(p.s); else chev(p.s*1.2);
+      X.restore(); });
+    if(!rm&&vis) raf=requestAnimationFrame(draw);
+  }
+  rs(); raf=requestAnimationFrame(draw);
+  window.addEventListener('resize',function(){ rs(); if(!raf) raf=requestAnimationFrame(draw); });
+  if('IntersectionObserver' in window) new IntersectionObserver(function(e){ vis=e[0].isIntersecting; if(vis&&!raf&&!rm){ last=performance.now(); raf=requestAnimationFrame(draw); } }).observe(cv);
+})();
+</script>
 </body>
 </html>
