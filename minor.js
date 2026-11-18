@@ -31,7 +31,7 @@
   var GOLD = '#D4AF37', INK = '#13203f';
   function modal(build){
     var prev = document.activeElement, ov = el('div', 'position:fixed;inset:0;z-index:2147483300;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,10,20,.72);backdrop-filter:blur(3px)');
-    ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+    ov.className = 'zmin-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
     var box = el('div', 'width:100%;max-width:420px;max-height:92vh;overflow:auto;background:#fff;color:' + INK + ';border:1px solid ' + GOLD + ';border-radius:22px;padding:22px 20px;box-shadow:0 24px 70px rgba(0,0,0,.5);font-family:var(--sans,Montserrat,system-ui,sans-serif)');
     ov.appendChild(box);
     function close(){ if(ov.parentNode) ov.parentNode.removeChild(ov); document.removeEventListener('keydown', onKey, true); try{ if(prev && prev.focus) prev.focus(); }catch(e){} }
