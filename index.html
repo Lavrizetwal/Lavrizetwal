@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ht">
 <head>
+<script src="minor.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
@@ -4090,7 +4091,7 @@ function zrBuild(rec){
             + (prof.photo_url ? '<img src="' + esc(prof.photo_url) + '" alt="">' : initial(u.displayName||u.email))
           + '</div><label class="zp-btn" style="cursor:pointer;min-height:46px">Chanje foto<input type="file" id="zp-photo" accept="image/*" style="display:none"></label></div>'
         + '<div class="zp-fld"><label for="zp-name">Non</label><input type="text" id="zp-name" value="' + esc(u.displayName||'') + '"></div>'
-        + '<div class="zp-fld"><label for="zp-bday">Dat nesans</label><input type="date" id="zp-bday" value="' + esc(prof.birthdate||'') + '"></div>'
+        + '<div class="zp-fld"><label for="zp-bday">Dat nesans</label><input type="date" id="zp-bday" value="' + esc(prof.birthdate||'') + '"' + (window.ZMinor&&ZMinor.active()?' disabled title="Mòd timoun aktif"':'') + '></div>'
         + '<div class="zp-fld"><label for="zp-bio">Byografi</label><textarea id="zp-bio" placeholder="Kèk mo sou ou…">' + esc(prof.bio||'') + '</textarea></div>'
         + '<button class="zp-btn go" id="zp-save" style="min-height:50px">Anrejistre chanjman yo</button>'
         + '<p class="zp-hint" style="font-size:.76rem">Enfo sa yo parèt lè w pataje pwofil ou ak yon zanmi.</p>';

@@ -275,10 +275,10 @@
       var d = await load(); if(!d) return;
       var anns = (d.announcements || []).filter(function(a){ return !sget('sessionStorage', 'zpa:' + a.id + ':' + a.v); });
       if(anns.length) api.showAnn(anns);
-      var ad = (d.ads || []).filter(eligibleAd)[0];
+      var ad = (window.ZMinor && ZMinor.active()) ? null : (d.ads || []).filter(eligibleAd)[0];
       if(ad) setTimeout(function(){
         if(document.hidden){ document.addEventListener('visibilitychange', function f(){ if(!document.hidden){ document.removeEventListener('visibilitychange', f); go(); } }); } else go();
-        function go(){ if(adEl) return; var ok = true; api.showAd(Object.assign({}, ad)); if(adEl){ markAd(ad); } }
+        function go(){ if(adEl || (window.ZMinor && ZMinor.active())) return; var ok = true; api.showAd(Object.assign({}, ad)); if(adEl){ markAd(ad); } }
       }, Math.max(0, Number(ad.delay_s) || 0) * 1000);
     }catch(e){}
   }
