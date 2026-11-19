@@ -2528,10 +2528,28 @@ function makeTex(th){
     blot(g, R, 270, 750, 6, ['rgba(8,8,8,.45)'], 30);
     for(var k = 0; k < 8; k++){ [276, 734].forEach(function(ex){ g.fillStyle = (k & 1) ? '#ecebe4' : '#3e3d3a'; g.fillRect(ex, k * 128 + 20, 22, 36); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(ex + 14, k * 128 + 20, 8, 36); }); }
   }
+  if(PHOTO[th]) photoRoad(g, th);
   /* fondu des bords : le sol de la scène prend le relais */
   var ed = g.createLinearGradient(0, 0, 1024, 0); ed.addColorStop(0, 'rgba(0,0,0,1)'); ed.addColorStop(.06, 'rgba(0,0,0,0)'); ed.addColorStop(.94, 'rgba(0,0,0,0)'); ed.addColorStop(1, 'rgba(0,0,0,1)');
   g.globalCompositeOperation = 'destination-out'; g.fillStyle = ed; g.fillRect(0, 0, 1024, 1024); g.globalCompositeOperation = 'source-over';
   TEXC[th] = cv; return cv;
+}
+
+/* ── Textures photographiques (fournies par Mike) : superposées à la chaussée, rechargées à la demande ── */
+var PHOTO = {}, PHU = { ville:'textures/route-ville.jpg?v=1', foret:'textures/route-foret.jpg?v=1', montagne:'textures/route-montagne.jpg?v=1' }, PHT = { ville:2, foret:2, montagne:2 };
+function lowEnd(){ if(window.__Z3D_FORCE) return false; try{ if(/[?&]q3d=off/.test(location.search)) return true; var m = navigator.deviceMemory, c = navigator.hardwareConcurrency; if((m && m <= 1) || (c && c <= 2)) return true; if(navigator.connection && navigator.connection.saveData) return true; }catch(e){} return false; }
+function photoRoad(g, th){
+  var im = PHOTO[th], n = PHT[th], hh = 1024 / n, tmp = document.createElement('canvas'); tmp.width = 512; tmp.height = 1024; var q = tmp.getContext('2d');
+  for(var k = 0; k < n; k++) q.drawImage(im, 0, 0, im.width, im.height, 0, k * hh, 512, hh);
+  if(th !== 'ville'){ var m = q.createLinearGradient(0, 0, 512, 0); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(.06, 'rgba(0,0,0,1)'); m.addColorStop(.94, 'rgba(0,0,0,1)'); m.addColorStop(1, 'rgba(0,0,0,0)'); q.globalCompositeOperation = 'destination-in'; q.fillStyle = m; q.fillRect(0, 0, 512, 1024); }
+  g.drawImage(tmp, 256, 0);
+  if(th === 'ville'){
+    g.save(); g.globalAlpha = .8; g.fillStyle = '#ecebe2';
+    for(var d = 0; d < 4; d++){ g.fillRect(423, d * 256 + 40, 8, 150); g.fillRect(593, d * 256 + 40, 8, 150); }
+    g.fillRect(278, 0, 7, 1024); g.fillRect(740, 0, 7, 1024); g.restore();
+    [[0, 0, 0], [1, 0, 0]].forEach(function(){});
+    [[768, 1], [205, -1]].forEach(function(b){ g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(b[1] > 0 ? 768 : 250, 0, 6, 1024); });
+  }
 }
 function grainPat(X){
   if(GRAIN) return GRAIN; var c = document.createElement('canvas'); c.width = c.height = 160; var g = c.getContext('2d'), im = g.createImageData(160, 160), R = mul(5);
@@ -2539,6 +2557,8 @@ function grainPat(X){
   g.putImageData(im, 0, 0); GRAIN = c; return c;
 }
 ZScene.warm = function(){ try{ ['ville', 'foret', 'montagne'].forEach(makeTex); }catch(e){} };
+ZScene.loadPhotos = function(){ if(ZScene._ph || lowEnd()) return; ZScene._ph = 1; Object.keys(PHU).forEach(function(th){ var im = new Image(); im.onload = function(){ PHOTO[th] = im; delete TEXC[th]; }; im.src = PHU[th]; }); };
+setTimeout(function(){ ZScene.loadPhotos(); }, 1200);
 
 /* ── Sol en perspective ── */
 P.ground = function(th, now){
@@ -2990,7 +3010,7 @@ function loop(ts){
 
 /* ═══ Entrée en jeu ═══ */
 function enter(r){
-  SID = r.sid; C = r.course; OBS = r.obs || {}; LOG = []; ENG = new Eng(C); ENG.vjend = -1; ENG.vcend = -1; FORKS = forkIdxs();
+  SID = r.sid; C = r.course; if(C.lead) C.lead = Math.round(C.lead * (window.ZPRESS || .8)); OBS = r.obs || {}; LOG = []; ENG = new Eng(C); ENG.vjend = -1; ENG.vcend = -1; FORKS = forkIdxs();
   V = { theme:'ville', prev:null, tchg:-9999, lane:1, vx:1, flash:0, shake:0, forkRec:null, lastDec:-9999, decOpt:null };
   SC.lead = C.lead; SC.parts = []; SC.lastT = 0; lastTm = -1; stopHero();
   setBal(r.balance); lastRes = null; showNote(null);
