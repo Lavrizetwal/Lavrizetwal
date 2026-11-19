@@ -2439,7 +2439,7 @@ Scene.prototype.drawRunnerNow = function(f){
   if(f.jump != null && f.jump >= 0){ h = Math.sin(Math.PI * clamp(f.jump, 0, 1)) * .95; }
   var u = this.U, y = this.PY;
   X.fillStyle = 'rgba(0,0,0,' + (.34 - h * .16) + ')'; ell(X, x, y + 2, u * (.34 - h * .1), u * .075);
-  if(f.speed !== 0 && h === 0 && f.now - (this._dust || 0) > 90){ this._dust = f.now; this.emit('dust', x + (Math.random() - .5) * u * .3, y - 2, 1, { a:-1.9 + Math.random() * .7, spread:.5, v:26, g:-12, life:520, r:u * .06, c:TH[f.th].dust, k:'dust' }); }
+  if(f.speed !== 0 && h === 0 && f.now - (this._dust || 0) > 55){ this._dust = f.now; this.emit('dust', x + (Math.random() - .5) * u * .3, y - 2, 1, { a:-1.9 + Math.random() * .7, spread:.5, v:26, g:-12, life:520, r:u * .06, c:TH[f.th].dust, k:'dust' }); }
   this.runner(x, y - h * u, u * 1.18, { ph:f.now / 78, jump:f.jump != null && f.jump >= 0, crouch:!!f.crouchOn, hit:f.hitT > 0, now:f.now });
 };
 Scene.SP = SP; Scene.TH = TH; Scene.person = person;
@@ -2595,7 +2595,7 @@ P.decor = function(th, now){
 P.frame = function(f){
   var X = this.X, W = this.W, H = this.H, dt = this.lastT ? Math.min(60, f.ts - this.lastT) : 16; this.lastT = f.ts;
   this.sway = (f.vx - 1) * this.RW * .26; this.bend = Math.sin(f.now / 4600) * this.RW * .17 * (f.bend == null ? 1 : f.bend);
-  var bob = f.speed !== 0 ? Math.sin(f.now / 78) * H * .0016 : 0;
+  var bob = f.speed !== 0 ? Math.sin(f.now / 37) * H * .0028 : 0;
   X.save();
   if(f.shake > 0){ var m = f.shake * 8; X.translate((Math.random() - .5) * m, (Math.random() - .5) * m); }
   X.translate(0, bob);
@@ -2618,8 +2618,8 @@ P.frame = function(f){
   }
   if(!pl) this.drawRunnerNow(f);
   this.drawParts(dt);
-  if(f.speed !== 0){ X.strokeStyle = 'rgba(255,255,255,.075)'; X.lineWidth = 1.2; var vx0 = this.cxAt(0), vy0 = this.HY; X.beginPath();
-    for(var l = 0; l < 12; l++){ var ph = (f.now / 380 + (((l * 2654435761) >>> 0) % 1000) / 333) % 1, ang2 = ((l & 1) ? -1 : 1) * (.45 + (((l * 40503) >>> 0) % 100) / 160) + 1.57, r0 = (.35 + .75 * ph) * H, r1 = r0 + H * .2 * (ph + .2);
+  if(f.speed !== 0){ X.strokeStyle = 'rgba(255,255,255,.14)'; X.lineWidth = 1.5; var vx0 = this.cxAt(0), vy0 = this.HY; X.beginPath();
+    for(var l = 0; l < 26; l++){ var ph = (f.now / 220 + (((l * 2654435761) >>> 0) % 1000) / 333) % 1, ang2 = ((l & 1) ? -1 : 1) * (.45 + (((l * 40503) >>> 0) % 100) / 160) + 1.57, r0 = (.35 + .75 * ph) * H, r1 = r0 + H * .2 * (ph + .2);
       X.moveTo(vx0 + Math.cos(ang2) * r0, vy0 + Math.sin(ang2) * r0 * .9); X.lineTo(vx0 + Math.cos(ang2) * r1, vy0 + Math.sin(ang2) * r1 * .9); } X.stroke(); }
   X.restore();
   /* étalonnage et grain */
@@ -2654,7 +2654,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=3'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=4'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); Z3D.loadWho('fille1', function(ok){ if(ok) mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }

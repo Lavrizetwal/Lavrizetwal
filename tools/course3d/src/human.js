@@ -130,8 +130,8 @@ function kneeCurve(ph){ const w = wrapA(ph - .3); return .3 + 1.15 * Math.exp(-(
 export function poseRun(ph, amp){
   amp = amp == null ? 1 : amp; const s = Math.sin(ph), s2 = Math.sin(ph + PI);
   return P({ hL: .1 + .98 * s * amp, hR: .1 + .98 * s2 * amp, kL: kneeCurve(ph) * amp * 1.3 + .1, kR: kneeCurve(ph + PI) * amp * 1.3 + .1, pL: .2 - .55 * s, pR: .2 - .55 * s2,
-    sL: -1.2 * s * amp, sR: -1.2 * s2 * amp, eL: 1.6 + .35 * Math.sin(ph + PI + .6), eR: 1.6 + .35 * Math.sin(ph + .6),
-    lean: .34, tw: .22 * s, ctw: -.4 * s, hp: -.2, hy: 0, roll: .05 * s, ab: .1, bnk: 0 });
+    sL: -1.35 * s * amp, sR: -1.35 * s2 * amp, eL: 1.6 + .35 * Math.sin(ph + PI + .6), eR: 1.6 + .35 * Math.sin(ph + .6),
+    lean: .42, tw: .25 * s, ctw: -.45 * s, hp: -.26, hy: 0, roll: .05 * s, ab: .1, bnk: 0 });
 }
 export function poseCrouch(ph){
   const s = Math.sin(ph), s2 = Math.sin(ph + PI);
