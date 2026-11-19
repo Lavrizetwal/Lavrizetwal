@@ -2654,12 +2654,41 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=1'; s.async = true;
-  s.onload = function(){ try{ if(window.Z3D) Z3D.warm(); }catch(e){} };
+  var s = document.createElement('script'); s.src = 'course3d.js?v=2'; s.async = true;
+  s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); Z3D.loadWho('fille1', function(ok){ if(ok) mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
 ZScene.load3d = load; if(window.__Z3D_FORCE) window.__ZS = ZScene;
 if(document.readyState === 'complete') setTimeout(load, 400); else window.addEventListener('load', function(){ setTimeout(load, 400); });
+
+
+/* choix du coureur (visible seulement quand le 3D et le second personnage sont prêts) */
+try{ window.ZRUN = localStorage.getItem('zc-runner') === 'fille1' ? 'fille1' : 'man'; }catch(e){ window.ZRUN = 'man'; }
+function mountPicker(){
+  var sum = document.getElementById('cs-sum'); if(!sum || document.getElementById('cs-whog')) return;
+  var st = document.createElement('style');
+  st.textContent = '.cs-who{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:520px}'
+    + '.cs-who button{display:flex;align-items:center;gap:12px;text-align:left;padding:10px 14px 10px 10px;border-radius:16px;border:1px solid rgba(240,217,138,.28);background:rgba(255,255,255,.05);color:#e9ecf7;cursor:pointer;font:inherit;transition:border-color .2s,background .2s,transform .2s}'
+    + '.cs-who button:hover{border-color:#D4AF37;transform:translateY(-2px)}'
+    + '.cs-who button[aria-checked=true]{border-color:#F0D98A;background:rgba(212,175,55,.16);box-shadow:0 0 0 1px #F0D98A inset}'
+    + '.cs-who canvas{width:56px;height:70px;flex:none;border-radius:10px;background:radial-gradient(circle at 50% 30%,rgba(240,217,138,.28),rgba(8,16,42,.6))}'
+    + '.cs-who b{display:block;font:700 1.2rem/1.1 "Barlow Condensed",Inter,sans-serif;letter-spacing:.02em;color:#fff}.cs-who span{display:block;font-size:.78rem;line-height:1.3;color:#aab2d0;margin-top:3px}'
+    + '@media (max-width:520px){.cs-who{gap:8px}.cs-who button{flex-direction:column;text-align:center;padding:10px 8px}.cs-who canvas{width:64px;height:80px}}';
+  document.head.appendChild(st);
+  var g = document.createElement('div'); g.className = 'cs-grp'; g.id = 'cs-whog';
+  g.innerHTML = '<h3>Coureur</h3><div class="cs-who" role="radiogroup" aria-label="Coureur">'
+    + '<button type="button" role="radio" data-w="man"><canvas width="112" height="140"></canvas><div><b>Le coureur</b><span>Gilet or, chemise blanche, pantalon bleu</span></div></button>'
+    + '<button type="button" role="radio" data-w="fille1"><canvas width="112" height="140"></canvas><div><b>La coureuse</b><span>Chemisier rouge, jupe noire, bottes</span></div></button></div>';
+  sum.parentNode.insertBefore(g, sum);
+  function paint(){ g.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-checked', b.dataset.w === window.ZRUN ? 'true' : 'false'); }); }
+  g.addEventListener('click', function(e){ var b = e.target.closest('[data-w]'); if(!b) return; window.ZRUN = b.dataset.w; try{ localStorage.setItem('zc-runner', window.ZRUN); }catch(e2){} paint(); });
+  paint();
+  var Z = z(); if(!Z) return;
+  g.querySelectorAll('button').forEach(function(b){
+    var cv = b.querySelector('canvas'), X = cv.getContext('2d'); X.setTransform(2, 0, 0, 2, 0, 0);
+    Z.frameStart('ville'); Z.draw(X, 'runner', 28, 66, 40, 0, { dpr: 2, key: 'thumb', who: b.dataset.w === 'fille1' ? 'fille1' : undefined, freeze: 1.1 });
+  });
+}
 
 var _frame = P.frame;
 P.frame = function(f){
@@ -2671,7 +2700,7 @@ P.frame = function(f){
 var _runner = P.runner;
 P.runner = function(x, y, u, st){
   var Z = z();
-  if(Z && Z.draw(this.X, 'runner', x, y, u, st.now, { dpr: this.DPR, jump: st.jump, jv: this._jv, crouch: st.crouch, hit: st.hit, speed: this._f ? this._f.speed : 1, key: this.cv.id || 'main' })) return;
+  if(Z && Z.draw(this.X, 'runner', x, y, u, st.now, { dpr: this.DPR, jump: st.jump, jv: this._jv, crouch: st.crouch, hit: st.hit, speed: this._f ? this._f.speed : 1, key: this.cv.id || 'main', who: window.ZRUN === 'fille1' && Z.whoReady('fille1') ? 'fille1' : undefined })) return;
   _runner.call(this, x, y, u, st);
 };
 ['bandit_debout', 'bandit_saut', 'chien', 'taureau', 'cochon', 'serpent_sol', 'scorpion', 'abeilles'].forEach(function(k){

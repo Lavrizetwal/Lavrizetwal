@@ -163,13 +163,13 @@ export function poseLeap(t){
 
 export function applyPose(h, p){
   const hL = p[0], hR = p[1], kL = p[2], kR = p[3], pL = p[4], pR = p[5], sL = p[6], sR = p[7], eL = p[8], eR = p[9], lean = p[10], tw = p[11], ctw = p[12], hp = p[13], hy = p[14], roll = p[15], ab = p[16], bnk = p[17];
-  const L = h.legs, A = h.arms;
+  const L = h.legs, A = h.arms, K = h.k || { th0: .02, L1: .44, L2: .43 };
   h.spine.rotation.set(lean, ctw, 0); h.hips.rotation.set(0, tw, roll); h.root.rotation.z = bnk;
   const hf = [hL, hR], kf2 = [kL, kR], pf = [pL, pR];
   let low = 1e9;
   for(let i = 0; i < 2; i++){
     const l = L[i]; l.th.rotation.x = -hf[i]; l.th.rotation.z = (i ? -1 : 1) * .02; l.kn.rotation.x = kf2[i]; l.an.rotation.x = pf[i] + hf[i] - kf2[i];
-    const a1 = hf[i], a2 = hf[i] - kf2[i], ay = -.02 - .44 * Math.cos(a1) - .43 * Math.cos(a2), psi = pf[i];
+    const a1 = hf[i], a2 = hf[i] - kf2[i], ay = -K.th0 - K.L1 * Math.cos(a1) - K.L2 * Math.cos(a2), psi = pf[i];
     const heel = ay + (-.07) * Math.cos(psi) - (-.06) * Math.sin(psi), toe = ay + (-.045) * Math.cos(psi) - (.17) * Math.sin(psi);
     low = Math.min(low, heel, toe);
   }
