@@ -107,9 +107,9 @@ function ctlFor(key, who){
   return c;
 }
 function runnerUpdate(c, now, cx, st, u){
-  const dt = c.last == null ? 16 : clamp(now - c.last, 1, 60); c.last = now;
+  const dt = c.last == null ? 16 : clamp(now - c.last, 1, 100); c.last = now;
   const run = st.speed === 0 ? 0 : 1;
-  c.ph += dt / 92 * (run ? 1 : 0);
+  c.ph += dt / 58 * (run ? 1 : 0);
   const k = d => 1 - Math.exp(-dt / 1000 * d);
   const jv = st.jump ? clamp(st.jv == null ? .5 : st.jv, 0, 1) : 0;
   c.w.j += ((st.jump ? 1 : 0) - c.w.j) * k(st.jump ? 26 : 16);

@@ -129,9 +129,9 @@ function wrapA(a){ a = a % TAU; if(a > PI) a -= TAU; if(a < -PI) a += TAU; retur
 function kneeCurve(ph){ const w = wrapA(ph - .3); return .3 + 1.15 * Math.exp(-(w * w) / (2 * .85 * .85)); }
 export function poseRun(ph, amp){
   amp = amp == null ? 1 : amp; const s = Math.sin(ph), s2 = Math.sin(ph + PI);
-  return P({ hL: .14 + .66 * s * amp, hR: .14 + .66 * s2 * amp, kL: kneeCurve(ph) * amp + .1, kR: kneeCurve(ph + PI) * amp + .1, pL: .2 - .45 * s, pR: .2 - .45 * s2,
-    sL: -.85 * s * amp, sR: -.85 * s2 * amp, eL: 1.4 + .3 * Math.sin(ph + PI + .6), eR: 1.4 + .3 * Math.sin(ph + .6),
-    lean: .2, tw: .17 * s, ctw: -.32 * s, hp: -.12, hy: 0, roll: .05 * s, ab: .1, bnk: 0 });
+  return P({ hL: .1 + .98 * s * amp, hR: .1 + .98 * s2 * amp, kL: kneeCurve(ph) * amp * 1.3 + .1, kR: kneeCurve(ph + PI) * amp * 1.3 + .1, pL: .2 - .55 * s, pR: .2 - .55 * s2,
+    sL: -1.2 * s * amp, sR: -1.2 * s2 * amp, eL: 1.6 + .35 * Math.sin(ph + PI + .6), eR: 1.6 + .35 * Math.sin(ph + .6),
+    lean: .34, tw: .22 * s, ctw: -.4 * s, hp: -.2, hy: 0, roll: .05 * s, ab: .1, bnk: 0 });
 }
 export function poseCrouch(ph){
   const s = Math.sin(ph), s2 = Math.sin(ph + PI);
