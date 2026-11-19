@@ -2439,7 +2439,7 @@ Scene.prototype.drawRunnerNow = function(f){
   if(f.jump != null && f.jump >= 0){ h = Math.sin(Math.PI * clamp(f.jump, 0, 1)) * .95; }
   var u = this.U, y = this.PY;
   X.fillStyle = 'rgba(0,0,0,' + (.34 - h * .16) + ')'; ell(X, x, y + 2, u * (.34 - h * .1), u * .075);
-  if(f.speed !== 0 && h === 0 && f.now - (this._dust || 0) > 90){ this._dust = f.now; this.emit('dust', x + (Math.random() - .5) * u * .3, y - 2, 1, { a:-1.9 + Math.random() * .7, spread:.5, v:26, g:-12, life:520, r:u * .06, c:TH[f.th].dust, k:'dust' }); }
+  if(f.speed !== 0 && h === 0 && f.now - (this._dust || 0) > 55){ this._dust = f.now; this.emit('dust', x + (Math.random() - .5) * u * .3, y - 2, 1, { a:-1.9 + Math.random() * .7, spread:.5, v:26, g:-12, life:520, r:u * .06, c:TH[f.th].dust, k:'dust' }); }
   this.runner(x, y - h * u, u * 1.18, { ph:f.now / 78, jump:f.jump != null && f.jump >= 0, crouch:!!f.crouchOn, hit:f.hitT > 0, now:f.now });
 };
 Scene.SP = SP; Scene.TH = TH; Scene.person = person;
@@ -2528,10 +2528,28 @@ function makeTex(th){
     blot(g, R, 270, 750, 6, ['rgba(8,8,8,.45)'], 30);
     for(var k = 0; k < 8; k++){ [276, 734].forEach(function(ex){ g.fillStyle = (k & 1) ? '#ecebe4' : '#3e3d3a'; g.fillRect(ex, k * 128 + 20, 22, 36); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(ex + 14, k * 128 + 20, 8, 36); }); }
   }
+  if(PHOTO[th]) photoRoad(g, th);
   /* fondu des bords : le sol de la scène prend le relais */
   var ed = g.createLinearGradient(0, 0, 1024, 0); ed.addColorStop(0, 'rgba(0,0,0,1)'); ed.addColorStop(.06, 'rgba(0,0,0,0)'); ed.addColorStop(.94, 'rgba(0,0,0,0)'); ed.addColorStop(1, 'rgba(0,0,0,1)');
   g.globalCompositeOperation = 'destination-out'; g.fillStyle = ed; g.fillRect(0, 0, 1024, 1024); g.globalCompositeOperation = 'source-over';
   TEXC[th] = cv; return cv;
+}
+
+/* ── Textures photographiques (fournies par Mike) : superposées à la chaussée, rechargées à la demande ── */
+var PHOTO = {}, PHU = { ville:'textures/route-ville.jpg?v=1', foret:'textures/route-foret.jpg?v=1', montagne:'textures/route-montagne.jpg?v=1' }, PHT = { ville:2, foret:2, montagne:2 };
+function lowEnd(){ if(window.__Z3D_FORCE) return false; try{ if(/[?&]q3d=off/.test(location.search)) return true; var m = navigator.deviceMemory, c = navigator.hardwareConcurrency; if((m && m <= 1) || (c && c <= 2)) return true; if(navigator.connection && navigator.connection.saveData) return true; }catch(e){} return false; }
+function photoRoad(g, th){
+  var im = PHOTO[th], n = PHT[th], hh = 1024 / n, tmp = document.createElement('canvas'); tmp.width = 512; tmp.height = 1024; var q = tmp.getContext('2d');
+  for(var k = 0; k < n; k++) q.drawImage(im, 0, 0, im.width, im.height, 0, k * hh, 512, hh);
+  if(th !== 'ville'){ var m = q.createLinearGradient(0, 0, 512, 0); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(.06, 'rgba(0,0,0,1)'); m.addColorStop(.94, 'rgba(0,0,0,1)'); m.addColorStop(1, 'rgba(0,0,0,0)'); q.globalCompositeOperation = 'destination-in'; q.fillStyle = m; q.fillRect(0, 0, 512, 1024); }
+  g.drawImage(tmp, 256, 0);
+  if(th === 'ville'){
+    g.save(); g.globalAlpha = .8; g.fillStyle = '#ecebe2';
+    for(var d = 0; d < 4; d++){ g.fillRect(423, d * 256 + 40, 8, 150); g.fillRect(593, d * 256 + 40, 8, 150); }
+    g.fillRect(278, 0, 7, 1024); g.fillRect(740, 0, 7, 1024); g.restore();
+    [[0, 0, 0], [1, 0, 0]].forEach(function(){});
+    [[768, 1], [205, -1]].forEach(function(b){ g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(b[1] > 0 ? 768 : 250, 0, 6, 1024); });
+  }
 }
 function grainPat(X){
   if(GRAIN) return GRAIN; var c = document.createElement('canvas'); c.width = c.height = 160; var g = c.getContext('2d'), im = g.createImageData(160, 160), R = mul(5);
@@ -2539,6 +2557,8 @@ function grainPat(X){
   g.putImageData(im, 0, 0); GRAIN = c; return c;
 }
 ZScene.warm = function(){ try{ ['ville', 'foret', 'montagne'].forEach(makeTex); }catch(e){} };
+ZScene.loadPhotos = function(){ if(ZScene._ph || lowEnd()) return; ZScene._ph = 1; Object.keys(PHU).forEach(function(th){ var im = new Image(); im.onload = function(){ PHOTO[th] = im; delete TEXC[th]; }; im.src = PHU[th]; }); };
+setTimeout(function(){ ZScene.loadPhotos(); }, 1200);
 
 /* ── Sol en perspective ── */
 P.ground = function(th, now){
@@ -2595,7 +2615,7 @@ P.decor = function(th, now){
 P.frame = function(f){
   var X = this.X, W = this.W, H = this.H, dt = this.lastT ? Math.min(60, f.ts - this.lastT) : 16; this.lastT = f.ts;
   this.sway = (f.vx - 1) * this.RW * .26; this.bend = Math.sin(f.now / 4600) * this.RW * .17 * (f.bend == null ? 1 : f.bend);
-  var bob = f.speed !== 0 ? Math.sin(f.now / 78) * H * .0016 : 0;
+  var bob = f.speed !== 0 ? Math.sin(f.now / 37) * H * .0028 : 0;
   X.save();
   if(f.shake > 0){ var m = f.shake * 8; X.translate((Math.random() - .5) * m, (Math.random() - .5) * m); }
   X.translate(0, bob);
@@ -2618,8 +2638,8 @@ P.frame = function(f){
   }
   if(!pl) this.drawRunnerNow(f);
   this.drawParts(dt);
-  if(f.speed !== 0){ X.strokeStyle = 'rgba(255,255,255,.075)'; X.lineWidth = 1.2; var vx0 = this.cxAt(0), vy0 = this.HY; X.beginPath();
-    for(var l = 0; l < 12; l++){ var ph = (f.now / 380 + (((l * 2654435761) >>> 0) % 1000) / 333) % 1, ang2 = ((l & 1) ? -1 : 1) * (.45 + (((l * 40503) >>> 0) % 100) / 160) + 1.57, r0 = (.35 + .75 * ph) * H, r1 = r0 + H * .2 * (ph + .2);
+  if(f.speed !== 0){ X.strokeStyle = 'rgba(255,255,255,.14)'; X.lineWidth = 1.5; var vx0 = this.cxAt(0), vy0 = this.HY; X.beginPath();
+    for(var l = 0; l < 26; l++){ var ph = (f.now / 220 + (((l * 2654435761) >>> 0) % 1000) / 333) % 1, ang2 = ((l & 1) ? -1 : 1) * (.45 + (((l * 40503) >>> 0) % 100) / 160) + 1.57, r0 = (.35 + .75 * ph) * H, r1 = r0 + H * .2 * (ph + .2);
       X.moveTo(vx0 + Math.cos(ang2) * r0, vy0 + Math.sin(ang2) * r0 * .9); X.lineTo(vx0 + Math.cos(ang2) * r1, vy0 + Math.sin(ang2) * r1 * .9); } X.stroke(); }
   X.restore();
   /* étalonnage et grain */
@@ -2654,7 +2674,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=2'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=4'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); Z3D.loadWho('fille1', function(ok){ if(ok) mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
@@ -2990,7 +3010,7 @@ function loop(ts){
 
 /* ═══ Entrée en jeu ═══ */
 function enter(r){
-  SID = r.sid; C = r.course; OBS = r.obs || {}; LOG = []; ENG = new Eng(C); ENG.vjend = -1; ENG.vcend = -1; FORKS = forkIdxs();
+  SID = r.sid; C = r.course; if(C.lead) C.lead = Math.round(C.lead * (window.ZPRESS || .8)); OBS = r.obs || {}; LOG = []; ENG = new Eng(C); ENG.vjend = -1; ENG.vcend = -1; FORKS = forkIdxs();
   V = { theme:'ville', prev:null, tchg:-9999, lane:1, vx:1, flash:0, shake:0, forkRec:null, lastDec:-9999, decOpt:null };
   SC.lead = C.lead; SC.parts = []; SC.lastT = 0; lastTm = -1; stopHero();
   setBal(r.balance); lastRes = null; showNote(null);
