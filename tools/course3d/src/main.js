@@ -1,5 +1,7 @@
 import * as T from 'three';
 import { PI, clamp, mix } from './util.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { rigFromMesh, SPEC_FILLE1 } from './rig.js';
 import { buildHuman, applyPose, poseRun, poseCrouch, poseJump, poseHit, poseStand, poseLeap } from './human.js';
 import { buildDog, buildBull, buildPig, buildSnake, snakeGround, snakeHang, buildScorpion, updScorpion, buildBees, updBees } from './animals.js';
 
@@ -83,10 +85,25 @@ function getModel(k){
   else if(k === 'abeilles'){ const a = buildBees(); m = reg({ root: a.root, a }); }
   R.models[k] = m; return m;
 }
-function ctlFor(key){
-  let c = R.ctl[key]; if(c) return c;
-  const h = buildHuman('runner'); h.root.rotation.y = PI; const o = reg({ root: h.root, h });
-  c = R.ctl[key] = { o, h, w: { j: 0, c: 0, h: 0 }, last: null, lcx: null, vx: 0, ph: 0, mats: [h.M.shirt, h.M.skin, h.M.vest, h.M.pants], hitT0: 0, wasHit: false };
+const WHO = { fille1: { url: 'models/fille1.glb?v=1', state: 0, cbs: [], gltf: null, spec: SPEC_FILLE1 } };
+function loadWho(name, cb){
+  const w = WHO[name]; if(!w){ cb && cb(false); return; }
+  if(w.state === 2){ cb && cb(true); return; } if(w.state === 3){ cb && cb(false); return; }
+  w.cbs.push(cb); if(w.state === 1) return; w.state = 1;
+  try{ new GLTFLoader().load(w.url, g => { w.gltf = g; w.state = 2; w.cbs.forEach(f => f && f(true)); w.cbs = []; }, undefined, () => { w.state = 3; w.cbs.forEach(f => f && f(false)); w.cbs = []; }); }
+  catch(e){ w.state = 3; w.cbs.forEach(f => f && f(false)); }
+}
+function whoReady(name){ return !!(WHO[name] && WHO[name].state === 2); }
+function ctlFor(key, who){
+  const kk = key + '|' + (who || 'man');
+  let c = R.ctl[kk]; if(c) return c;
+  let h, mats, fille = false;
+  if(who && whoReady(who)){
+    let mesh; WHO[who].gltf.scene.traverse(n => { if(n.isMesh && !mesh) mesh = n; });
+    h = rigFromMesh(mesh, WHO[who].spec); mats = [h.mat]; fille = true;
+  } else { h = buildHuman('runner'); mats = [h.M.shirt, h.M.skin, h.M.vest, h.M.pants]; }
+  h.root.rotation.y = PI; const o = reg({ root: h.root, h });
+  c = R.ctl[kk] = { o, h, w: { j: 0, c: 0, h: 0 }, last: null, lcx: null, vx: 0, ph: 0, mats, fille, hitT0: 0, wasHit: false };
   return c;
 }
 function runnerUpdate(c, now, cx, st, u){
@@ -106,7 +123,9 @@ function runnerUpdate(c, now, cx, st, u){
   const vx = c.lcx == null ? 0 : (cx - c.lcx) / dt * 1000 / Math.max(1, u); c.lcx = cx; c.vx += (clamp(vx, -3, 3) - c.vx) * k(10);
   p[17] += -c.vx * .09; p[15] += -c.vx * .05; p[10] += Math.abs(c.vx) * .02;
   applyPose(c.h, p); c.h.root.rotation.y = PI + clamp(c.vx * .22, -.4, .4);
-  const red = clamp(wh, 0, 1) * .2; c.mats.forEach(m => { if(m.emissive){ if(m === c.h.M.vest) return; m.emissive.setRGB(red, red * .08, red * .06); } });
+  const red = clamp(wh, 0, 1) * .2;
+  if(c.fille) c.mats[0].color.setRGB(1, 1 - red * 1.8, 1 - red * 1.8);
+  else c.mats.forEach(m => { if(m.emissive){ if(m === c.h.M.vest) return; m.emissive.setRGB(red, red * .08, red * .06); } });
   /* respiration/souplesse quand le jeu est en pause */
   if(!run) c.h.chest.scale.y = 1 + .012 * Math.sin(now / 500);
 }
@@ -121,7 +140,7 @@ function draw(X, kind, cx, gy, u, now, o){
   const dpr = o.dpr || 1, px = clamp(Math.round(wd * dpr), 40, R.BUF), t0 = performance.now();
   fit(kind);
   let m, h;
-  if(kind === 'runner'){ const c = ctlFor(o.key || 'main'); m = c.o; runnerUpdate(c, now, cx, o, u); h = c.h; }
+  if(kind === 'runner'){ const c = ctlFor(o.key || 'main', o.who); m = c.o; if(o.freeze != null) c.ph = o.freeze; runnerUpdate(c, o.freeze != null ? c.last == null ? now : c.last + 1 : now, cx, o, u); h = c.h; }
   else {
     m = getModel(kind);
     const ph = now / 95 + (o.seed || 0) * 1.7;
@@ -162,4 +181,4 @@ function frameEnd(){
 }
 function warm(){ if(R.off) return; if(!R.ready && !init()) return; const ks = Object.keys(CFG).filter(k => k !== 'runner'); let i = 0; (function step(){ if(i === 0) ctlFor('main'); else if(i <= ks.length) getModel(ks[i - 1]); else return; i++; setTimeout(step, 30); })(); }
 
-window.Z3D = { R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit };
+window.Z3D = { loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit };
