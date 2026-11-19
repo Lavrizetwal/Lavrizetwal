@@ -2291,6 +2291,21 @@ tbody tr:last-child td{border-bottom:none}
         <div id="jt-confirm" style="margin-top:var(--s5)"></div>
         <button class="btn btn-gold btn-block" id="jt-go" style="margin-top:var(--s5)" onclick="jtAsk()"><span data-icon="check" data-size="sm"></span> Vérifier avant de valider</button>
       </div>
+      <div class="card" id="jt-testers-card">
+        <div class="card-head"><h3><span data-icon="user"></span> Testeurs de jeux</h3>
+          <button class="btn btn-ghost btn-sm" onclick="jtTesters()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
+        <p class="card-sub">Un testeur peut jouer à Sudoku, Duel et La course vers la mort même quand les jeux sont fermés au public. L'accès temporaire s'arrête tout seul à la date indiquée. La personne doit se connecter avec cette adresse e-mail (vérifiée).</p>
+        <div class="form-grid">
+          <div class="field"><label for="jt-t-mail">Adresse e-mail du testeur</label>
+            <input type="email" id="jt-t-mail" class="input" placeholder="testeur@gmail.com" autocomplete="off"></div>
+          <div class="field"><label for="jt-t-days">Durée de l'accès</label>
+            <select id="jt-t-days" class="input"><option value="7">7 jours</option><option value="14" selected>14 jours</option><option value="30">30 jours</option><option value="60">60 jours</option><option value="90">90 jours</option></select></div>
+          <div class="field span2"><label for="jt-t-note">Note (facultatif)</label>
+            <input type="text" id="jt-t-note" class="input" maxlength="120" placeholder="Ex : teste le Duel sur Android"></div>
+        </div>
+        <button class="btn btn-gold btn-block" id="jt-t-add" style="margin-top:var(--s4)" onclick="jtTesterAdd()"><span data-icon="plus" data-size="sm"></span> Donner l'accès</button>
+        <div id="jt-testers" style="margin-top:var(--s5)"></div>
+      </div>
       <div class="card">
         <div class="card-head"><h3><span data-icon="history"></span> Derniers mouvements d'administration</h3>
           <button class="btn btn-ghost btn-sm" onclick="jtRecent()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
@@ -4498,7 +4513,7 @@ function jtErr(e){
   if(/interdit/i.test(m)) return "Réservé à l'administrateur principal (session admin requise)";
   return rlsHint(e);
 }
-window.initJetons=()=>{ jtRecent(); };
+window.initJetons=()=>{ jtRecent(); jtTesters(); };
 window.jtQuick=v=>{ const i=document.getElementById('jt-amt'); if(i){ i.value=v; jtReset(); } };
 function jtReset(){ JT.pending=null; const c=document.getElementById('jt-confirm'); if(c) c.innerHTML=''; const g=document.getElementById('jt-go'); if(g){ g.hidden=false; g.disabled=false; } }
 window.jtFind=async()=>{
@@ -4567,6 +4582,56 @@ window.jtGrant=async()=>{
     toast('Opération impossible : '+jtErr(e)+' — vérifiez le solde avant de recommencer','error'); jtReset();
   }finally{ JT.busy=false; }
 };
+
+/* ── Testeurs de jeux (accès temporaire) ── */
+JT.testers=[]; JT.delAsk=null;
+const jtUntil=t=>{ if(!t.until) return 'Permanent'; const d=new Date(t.until), left=Math.ceil((d-Date.now())/86400000); return t.active?('Jusqu\'au '+d.toLocaleDateString('fr-FR')+' ('+left+' j)'):('Expiré le '+d.toLocaleDateString('fr-FR')); };
+window.jtTesters=async()=>{
+  const el=document.getElementById('jt-testers'); if(!el) return;
+  try{
+    const {data,error}=await db.rpc('zj_admin_testers'); if(error) throw error;
+    JT.testers=data||[]; JT.delAsk=null; jtTestersDraw();
+  }catch(e){ el.innerHTML=emptyState('alert','Liste indisponible',jtErr(e)); }
+};
+function jtTestersDraw(){
+  const el=document.getElementById('jt-testers'); if(!el) return;
+  const rows=JT.testers;
+  el.innerHTML=rows.length?'<table class="table stack"><thead><tr><th>Testeur</th><th>Accès</th><th>Jetons</th><th></th></tr></thead><tbody>'
+    +rows.map((t,i)=>'<tr><td data-l="Testeur">'+escH(t.name||t.email)+'<div style="color:var(--muted);font-size:.8rem">'+escH(t.email)+(t.note?' · '+escH(t.note):'')+(t.has_account?'':' · pas encore connecté')+'</div></td>'
+      +'<td data-l="Accès"><span style="color:'+(t.active?'var(--ok)':'var(--bad)')+';font-weight:600">'+(t.active?'Actif':'Expiré')+'</span><div style="color:var(--muted);font-size:.8rem">'+escH(jtUntil(t))+'</div></td>'
+      +'<td data-l="Jetons">'+(t.has_account?jtN(t.balance):'—')+'</td>'
+      +'<td data-l=""><div style="display:flex;gap:6px;flex-wrap:wrap">'
+      +(t.kind==='temporaire'?'<button class="btn btn-quiet btn-sm" onclick="jtTesterRenew('+i+')">Renouveler</button>':'')
+      +(t.has_account?'<button class="btn btn-quiet btn-sm" onclick="jtTesterTokens('+i+')">Jetons</button>':'')
+      +'<button class="btn btn-quiet btn-sm" onclick="jtTesterDel('+i+')">'+(JT.delAsk===i?'Confirmer le retrait':'Retirer')+'</button></div></td></tr>').join('')
+    +'</tbody></table>':emptyState('user','Aucun testeur','Ajoutez une adresse e-mail ci-dessus pour donner un accès temporaire.');
+}
+window.jtTesterAdd=async(email,days,note)=>{
+  const mail=(email||document.getElementById('jt-t-mail').value||'').trim().toLowerCase();
+  const d=Number(days||document.getElementById('jt-t-days').value), n=note!==undefined?note:(document.getElementById('jt-t-note').value||'').trim();
+  if(!mail||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){ toast("Entrez une adresse e-mail valide",'error'); return; }
+  const b=document.getElementById('jt-t-add'); if(b) b.disabled=true;
+  try{
+    const {data,error}=await db.rpc('zj_admin_tester_set',{p_email:mail,p_days:d,p_note:n||null}); if(error) throw error;
+    if(!data||!data.ok){ toast({permanent:'Cette personne est déjà testeur permanent',email:'Adresse e-mail invalide',duree:'Durée refusée (1 à 90 jours)'}[data&&data.error]||'Opération refusée','error'); return; }
+    toast('Accès accordé à '+mail+' jusqu\'au '+new Date(data.until).toLocaleDateString('fr-FR'),'success');
+    if(!email){ document.getElementById('jt-t-mail').value=''; document.getElementById('jt-t-note').value=''; }
+    jtTesters();
+  }catch(e){ toast('Opération impossible : '+jtErr(e),'error'); }
+  finally{ if(b) b.disabled=false; }
+};
+window.jtTesterRenew=i=>{ const t=JT.testers[i]; if(!t) return; jtTesterAdd(t.email,Number(document.getElementById('jt-t-days').value),t.note||''); };
+window.jtTesterTokens=i=>{ const t=JT.testers[i]; if(!t) return; document.getElementById('jt-mail').value=t.email; jtFind(); window.scrollTo({top:0,behavior:'smooth'}); };
+window.jtTesterDel=async i=>{
+  const t=JT.testers[i]; if(!t) return;
+  if(JT.delAsk!==i){ JT.delAsk=i; jtTestersDraw(); return; }
+  JT.delAsk=null;
+  try{
+    const {data,error}=await db.rpc('zj_admin_tester_remove',{p_email:t.email}); if(error) throw error;
+    toast(data&&data.ok?'Accès retiré à '+t.email:'Rien à retirer','success'); jtTesters();
+  }catch(e){ toast('Opération impossible : '+jtErr(e),'error'); jtTestersDraw(); }
+};
+
 window.jtRecent=async()=>{
   const el=document.getElementById('jt-recent'); if(!el) return;
   try{

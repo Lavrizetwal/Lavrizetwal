@@ -4,3 +4,8 @@
 -- Les deux exigent is_admin() et ne sont pas exécutables par anon.
 -- (Voir la définition complète dans la base : pg_get_functiondef('public.zj_admin_lookup(text)'::regprocedure)
 --  et pg_get_functiondef('public.zj_admin_recent(integer)'::regprocedure).)
+
+-- Migration zj_testeurs_temporaires (déjà appliquée) : testeurs de jeux à accès temporaire.
+--  * table zj_tester(email, until, note, added_by) — RLS sans policy, aucun droit anon/authenticated
+--  * zj_can_play() accepte aussi un testeur dont `until` n'est pas passé (en plus de site_settings.zj_testers = liste permanente)
+--  * RPC admin : zj_admin_testers(), zj_admin_tester_set(email, jours 1–90, note), zj_admin_tester_remove(email)
