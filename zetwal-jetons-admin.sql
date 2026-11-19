@@ -1,0 +1,6 @@
+-- Écran admin « Jetons de jeu » (migration zj_admin_jetons_ecran, déjà appliquée sur Supabase).
+-- zj_admin_grant_email(email, montant, note) existait déjà (admin seulement, registre zj_ledger kind='admin').
+-- Ajouts : recherche d'un client (solde + 10 derniers mouvements) et liste des mouvements d'administration.
+-- Les deux exigent is_admin() et ne sont pas exécutables par anon.
+-- (Voir la définition complète dans la base : pg_get_functiondef('public.zj_admin_lookup(text)'::regprocedure)
+--  et pg_get_functiondef('public.zj_admin_recent(integer)'::regprocedure).)
