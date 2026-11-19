@@ -2259,6 +2259,45 @@ tbody tr:last-child td{border-bottom:none}
     </section>
 
     <!-- ═════ TRAVAY ═════ -->
+    <!-- ═════ JETONS DE JEU ═════ -->
+    <section class="panel" id="tab-jetons">
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="coins"></span> Ajouter ou retirer des jetons de jeu</h3></div>
+        <p class="card-sub">Les jetons servent uniquement aux jeux Zetwal (Sudoku, Duel, La course vers la mort). Le client ne peut pas les retirer en argent. Chaque mouvement est inscrit dans le registre avec votre adresse, le motif et le solde après.</p>
+        <div class="form-grid">
+          <div class="field span2"><label for="jt-mail">Adresse e-mail du client</label>
+            <div style="display:flex;gap:var(--s3);flex-wrap:wrap">
+              <input type="email" id="jt-mail" class="input" style="flex:1 1 220px" placeholder="kliyan@gmail.com" autocomplete="off" onkeydown="if(event.key==='Enter'){jtFind();}">
+              <button class="btn btn-quiet" id="jt-find" onclick="jtFind()"><span data-icon="search" data-size="sm"></span> Chercher</button>
+            </div></div>
+        </div>
+        <div id="jt-client" style="margin-top:var(--s5)"></div>
+      </div>
+      <div class="card" id="jt-form-card" hidden>
+        <div class="card-head"><h3><span data-icon="plus"></span> Mouvement</h3></div>
+        <div class="form-grid">
+          <div class="field"><label for="jt-amt">Jetons</label>
+            <input type="number" id="jt-amt" class="input" step="1" inputmode="numeric" placeholder="Ex : 100 pour ajouter, -50 pour retirer"></div>
+          <div class="field"><label for="jt-why">Motif (obligatoire, gardé dans le registre)</label>
+            <input type="text" id="jt-why" class="input" maxlength="120" placeholder="Ex : achat de jetons en magasin, geste commercial…"></div>
+        </div>
+        <div class="quick-row" style="margin-top:var(--s4)">
+          <button class="btn btn-quiet btn-sm" onclick="jtQuick(50)">+50</button>
+          <button class="btn btn-quiet btn-sm" onclick="jtQuick(100)">+100</button>
+          <button class="btn btn-quiet btn-sm" onclick="jtQuick(500)">+500</button>
+          <button class="btn btn-quiet btn-sm" onclick="jtQuick(-50)">−50</button>
+          <button class="btn btn-quiet btn-sm" onclick="jtQuick(-100)">−100</button>
+        </div>
+        <div id="jt-confirm" style="margin-top:var(--s5)"></div>
+        <button class="btn btn-gold btn-block" id="jt-go" style="margin-top:var(--s5)" onclick="jtAsk()"><span data-icon="check" data-size="sm"></span> Vérifier avant de valider</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="history"></span> Derniers mouvements d'administration</h3>
+          <button class="btn btn-ghost btn-sm" onclick="jtRecent()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
+        <div id="jt-recent"></div>
+      </div>
+    </section>
+
     <section class="panel" id="tab-travay">
       <div class="card">
         <div class="card-head">
@@ -2630,6 +2669,9 @@ const NAV=[
   {g:'Travay', items:[
     {id:'travay',label:'Annonces & emplois',icon:'briefcase'}
   ]},
+  {g:'Jeux', items:[
+    {id:'jetons',label:'Jetons de jeu',icon:'coins'}
+  ]},
   {g:'Réglages', items:[
     {id:'profils',label:'Pwofil & Mesaj',icon:'user'},
     {id:'broadcast',label:'Messages e-mail / SMS',icon:'send'},
@@ -2669,6 +2711,7 @@ const TAB_META={
   drivers:{t:'Chofè yo',s:'Véhicule, photo et certification'},
   partners:{t:'Partenaires',s:'Restaurants, magasins et leurs articles'},
   moveprice:{t:'Tarifs Move',s:'Course, livraison, objets, enfants'},
+  jetons:{t:'Jetons de jeu',s:'Ajouter ou retirer des jetons à un client'},
   travay:{t:'Travay',s:'Modération des annonces à Gonaïves'},
   points:{t:'Points clients',s:'Ajouter ou retirer des points'},
   promo:{t:'Annonces & publicités',s:'Bandeau doré, pubs image / vidéo, dates et public'},
@@ -2754,6 +2797,7 @@ window.switchTab = (name)=>{
   if(name==='partners')      loadPartners();
   if(name==='moveprice')     loadMovePrice();
   if(name==='travay')        loadTravay();
+  if(name==='jetons')        initJetons();
   if(name==='points')        initPoints();
   if(name==='wash')          initWashTarifs();
   if(name==='add')           initColorPicker();
@@ -4443,6 +4487,98 @@ window.ptQuick=(n)=>{
   el.focus();
 };
 function code6(){ return String(Math.floor(100000+Math.random()*900000)); }
+
+
+/* ═════ JETONS DE JEU : ajout / retrait par l'administrateur ═════ */
+const JT={client:null,busy:false,pending:null};
+const jtN=n=>Number(n||0).toLocaleString('fr-FR');
+const jtD=d=>{ try{ return new Date(d).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}); }catch(e){ return ''; } };
+function jtErr(e){
+  const m=String((e&&e.message)||e||'');
+  if(/interdit/i.test(m)) return "Réservé à l'administrateur principal (session admin requise)";
+  return rlsHint(e);
+}
+window.initJetons=()=>{ jtRecent(); };
+window.jtQuick=v=>{ const i=document.getElementById('jt-amt'); if(i){ i.value=v; jtReset(); } };
+function jtReset(){ JT.pending=null; const c=document.getElementById('jt-confirm'); if(c) c.innerHTML=''; const g=document.getElementById('jt-go'); if(g){ g.hidden=false; g.disabled=false; } }
+window.jtFind=async()=>{
+  const mail=(document.getElementById('jt-mail').value||'').trim().toLowerCase();
+  const box=document.getElementById('jt-client'), fc=document.getElementById('jt-form-card');
+  JT.client=null; fc.hidden=true; jtReset();
+  if(!mail||mail.indexOf('@')<0){ toast("Entrez l'adresse e-mail du client",'error'); return; }
+  const b=document.getElementById('jt-find'); b.disabled=true;
+  try{
+    const {data,error}=await db.rpc('zj_admin_lookup',{p_email:mail});
+    if(error) throw error;
+    if(!data||!data.ok){
+      box.innerHTML=emptyState('alert','Client introuvable',"Aucun compte Zetwal avec cette adresse. Le client doit d'abord s'être connecté au site avec cet e-mail.");
+      return;
+    }
+    JT.client=data;
+    jtRenderClient();
+    fc.hidden=false;
+  }catch(e){ box.innerHTML=''; toast('Recherche impossible : '+jtErr(e),'error'); }
+  finally{ b.disabled=false; }
+};
+function jtRenderClient(){
+  const c=JT.client, box=document.getElementById('jt-client'); if(!c) return;
+  const last=(c.last||[]);
+  box.innerHTML='<div style="display:flex;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;align-items:flex-end">'
+    +'<div><div style="font-weight:600;font-size:1.05rem">'+escH(c.name||c.pseudo||c.email)+'</div>'
+    +'<div style="color:var(--muted)">'+escH(c.email)+(c.pseudo?' · pseudo « '+escH(c.pseudo)+' »':'')+'</div>'
+    +(c.adult?'':'<div style="color:var(--warn,#b7791f);margin-top:4px">Ce client n\'a pas encore confirmé sa majorité dans les jeux : il verra ses jetons dès qu\'il le fera.</div>')+'</div>'
+    +'<div style="text-align:right"><div style="color:var(--muted);font-size:.82rem">Solde actuel</div><div style="font-size:1.6rem;font-weight:700">'+jtN(c.balance)+' <span style="font-size:.9rem;font-weight:500">jetons</span></div></div></div>'
+    +(last.length?'<table class="table stack" style="margin-top:var(--s4)"><thead><tr><th>Date</th><th>Type</th><th>Jetons</th><th>Solde après</th><th>Note</th></tr></thead><tbody>'
+      +last.map(r=>'<tr><td data-l="Date">'+jtD(r.at)+'</td><td data-l="Type">'+escH(r.kind||'')+'</td><td data-l="Jetons" style="font-weight:600;color:'+(r.delta>=0?'var(--ok)':'var(--bad)')+'">'+(r.delta>0?'+':'')+jtN(r.delta)+'</td><td data-l="Solde après">'+jtN(r.after)+'</td><td data-l="Note">'+escH(r.note||'—')+'</td></tr>').join('')
+      +'</tbody></table>':'<p class="card-sub" style="margin-top:var(--s4)">Aucun mouvement pour ce client.</p>');
+}
+window.jtAsk=()=>{
+  const c=JT.client; if(!c){ toast("Cherchez d'abord un client",'error'); return; }
+  const raw=document.getElementById('jt-amt').value.trim(), amt=Number(raw);
+  const why=(document.getElementById('jt-why').value||'').trim();
+  if(!/^-?\d+$/.test(raw)||amt===0){ toast('Entrez un nombre entier de jetons (négatif pour retirer)','error'); return; }
+  if(Math.abs(amt)>100000){ toast('Maximum 100 000 jetons par opération','error'); return; }
+  if(why.length<3){ toast('Indiquez le motif (3 caractères minimum)','error'); return; }
+  const after=Math.max(0,c.balance+amt), real=after-c.balance;
+  JT.pending={email:c.email,amt:amt,why:why,uid:c.uid};
+  document.getElementById('jt-go').hidden=true;
+  document.getElementById('jt-confirm').innerHTML='<div class="card" style="margin:0;border:1px solid var(--gold,#c9a227)">'
+    +'<div style="font-weight:600;margin-bottom:6px">'+(amt>0?'Ajouter ':'Retirer ')+jtN(Math.abs(amt))+' jetons à '+escH(c.name||c.email)+' ?</div>'
+    +'<div style="color:var(--muted)">'+escH(c.email)+' · solde '+jtN(c.balance)+' → <b>'+jtN(after)+'</b>'+(real!==amt?' (le solde ne peut pas passer sous 0 : '+jtN(real)+' effectivement retirés)':'')+'</div>'
+    +'<div style="color:var(--muted);margin-top:4px">Motif : '+escH(why)+'</div>'
+    +'<div style="display:flex;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4)"><button class="btn btn-gold" id="jt-ok" onclick="jtGrant()">Confirmer</button><button class="btn btn-quiet" onclick="jtReset()">Annuler</button></div></div>';
+};
+window.jtGrant=async()=>{
+  const p=JT.pending; if(!p||JT.busy) return;
+  JT.busy=true; const ok=document.getElementById('jt-ok'); if(ok) ok.disabled=true;
+  try{
+    const {data,error}=await db.rpc('zj_admin_grant_email',{p_email:p.email,p_amount:p.amt,p_note:p.why});
+    if(error) throw error;
+    if(!data||!data.ok){
+      const m={montant:'Montant refusé (entier, 100 000 maximum)',introuvable:'Client introuvable'}[data&&data.error]||'Opération refusée';
+      toast(m,'error'); jtReset(); return;
+    }
+    toast((p.amt>0?'+':'')+jtN(p.amt)+' jetons — nouveau solde '+jtN(data.balance),'success');
+    document.getElementById('jt-amt').value=''; document.getElementById('jt-why').value=''; jtReset();
+    JT.pending=null;
+    const r=await db.rpc('zj_admin_lookup',{p_email:p.email}); if(r.data&&r.data.ok){ JT.client=r.data; jtRenderClient(); }
+    jtRecent();
+  }catch(e){
+    toast('Opération impossible : '+jtErr(e)+' — vérifiez le solde avant de recommencer','error'); jtReset();
+  }finally{ JT.busy=false; }
+};
+window.jtRecent=async()=>{
+  const el=document.getElementById('jt-recent'); if(!el) return;
+  try{
+    const {data,error}=await db.rpc('zj_admin_recent',{p_limit:50});
+    if(error) throw error;
+    const rows=data||[];
+    el.innerHTML=rows.length?'<table class="table stack"><thead><tr><th>Date</th><th>Client</th><th>Jetons</th><th>Solde après</th><th>Motif</th><th>Par</th></tr></thead><tbody>'
+      +rows.map(r=>'<tr><td data-l="Date">'+jtD(r.at)+'</td><td data-l="Client">'+escH(r.name||r.email||'—')+(r.name&&r.email?'<div style="color:var(--muted);font-size:.8rem">'+escH(r.email)+'</div>':'')+'</td>'
+        +'<td data-l="Jetons" style="font-weight:600;color:'+(r.delta>=0?'var(--ok)':'var(--bad)')+'">'+(r.delta>0?'+':'')+jtN(r.delta)+'</td><td data-l="Solde après">'+jtN(r.after)+'</td><td data-l="Motif">'+escH(r.note||'—')+'</td><td data-l="Par">'+escH(r.admin||'—')+'</td></tr>').join('')
+      +'</tbody></table>':emptyState('history','Aucun mouvement','Les ajouts et retraits faits ici apparaîtront dans cette liste.');
+  }catch(e){ el.innerHTML=emptyState('alert','Liste indisponible',jtErr(e)); }
+};
 
 window.createPointRequest=async()=>{
   const mail=(document.getElementById('pt-mail').value||'').trim().toLowerCase();
