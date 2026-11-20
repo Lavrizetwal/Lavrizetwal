@@ -7215,8 +7215,44 @@ window.aiSend=()=>{
   const input=document.getElementById('ai-input');
   const q=input.value.trim(); if(!q) return;
   aiPush(escH(q),'me'); input.value='';
-  setTimeout(()=>aiPush(aiAnswer(q)),260);
+  aiRespond(q);
 };
+/* IA réelle (Claude) : utilisée seulement quand le moteur local n'est pas sûr, ou sur demande. */
+let aiRealState='unknown', aiHist=[];
+function aiFmt(t){ return escH(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>'); }
+async function aiReal(q){
+  if(aiRealState==='off') return null;
+  try{
+    const {data}=await db.auth.getSession(); const tok=data&&data.session&&data.session.access_token; if(!tok) return null;
+    const ctx=AI2.context(q);
+    const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),28000);
+    const r=await fetch(SUPABASE_URL+'/functions/v1/zassist',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+tok},
+      body:JSON.stringify({messages:aiHist.concat([{role:'user',content:q}]).slice(-8),tab:(TAB_META[currentTab]||{}).t||currentTab,context:ctx.text})});
+    clearTimeout(to);
+    if(r.status===503||r.status===403){ aiRealState='off'; return null; }
+    if(r.status===429) return {cap:true};
+    if(!r.ok) return null;
+    const j=await r.json(); if(!j.text) return null; aiRealState='ok'; return {text:j.text};
+  }catch(e){ return null; }
+}
+window.aiAskReal=async(q)=>{
+  const w=document.createElement('div'); w.className='msg bot'; w.textContent='…'; document.getElementById('ai-chat').appendChild(w);
+  const r=await aiReal(q);
+  if(r&&r.text){ w.innerHTML=aiFmt(r.text)+'<br><span style="opacity:.6;font-size:.8em">Réponse de l\'IA — vérifiez avant d\'agir.</span>'; aiHist.push({role:'user',content:q},{role:'assistant',content:r.text}); aiHist=aiHist.slice(-8); }
+  else w.innerHTML=r&&r.cap?"La limite quotidienne de l'IA est atteinte ; le moteur intégré reste disponible.":"L'IA n'est pas disponible pour le moment ; le moteur intégré reste disponible.";
+  const c=document.getElementById('ai-chat'); c.scrollTop=c.scrollHeight;
+};
+async function aiRespond(q){
+  const r=AI2.explain(q), sure=(r.kind==='answer'||r.kind==='nav'||r.kind==='where'||r.kind==='greet');
+  if(!sure && aiRealState!=='off'){
+    const w=document.createElement('div'); w.className='msg bot'; w.textContent='…'; const c=document.getElementById('ai-chat'); c.appendChild(w); c.scrollTop=c.scrollHeight;
+    const rr=await aiReal(q);
+    if(rr&&rr.text){ w.innerHTML=aiFmt(rr.text)+'<br><span style="opacity:.6;font-size:.8em">Réponse de l\'IA — vérifiez avant d\'agir.</span>'; aiHist.push({role:'user',content:q},{role:'assistant',content:rr.text}); aiHist=aiHist.slice(-8); c.scrollTop=c.scrollHeight; return; }
+    w.remove();
+  }
+  const html=AI2.answer(q);
+  aiPush(html+((r.kind==='answer'&&aiRealState!=='off')?'<br><button class="sug" style="margin-top:8px" onclick="aiAskReal('+JSON.stringify(q).replace(/"/g,'&quot;')+')">Demander à l\'IA</button>':''));
+}
 const AI_STOP=['comment','quoi','faire','peux','servent','viennent','marche','ici','apres','sert'];
 const KW_W={};
 (function(){
@@ -7368,7 +7404,16 @@ const AI2=(function(){
     const kb=AI_KB[currentTab], sug=(kb?kb.sug:[]).slice(0,3).map(s=>'• '+s).join('\n');
     return "Je n'ai rien trouvé là-dessus dans la console, et je préfère ne pas inventer.\n"+(sug?"Voici ce que je peux traiter ici :\n"+sug:"Essayez avec le nom d'une section ou d'une action.");
   }
-  return {answer:answer,explain:explain,rebuild:()=>{ DOCS=null; },stats:()=>({docs:DOCS&&DOCS.length,voc:VOC&&VOC.length})};
+  function plain(h){ const d=document.createElement('div'); d.innerHTML=String(h).replace(/<br>/g,' '); return d.textContent.replace(/\s+/g,' ').trim(); }
+  function context(question){
+    const r=explain(question), seen={}, out=[];
+    (r.cands||[]).forEach(c=>{ const d=c.d, k=d.tab+'|'+(d.title||d.kind)+'|'+(d.e?d.e.k[0]:''); if(seen[k]||out.length>=8) return; seen[k]=1;
+      let t='['+tabTitle(d.tab)+'] ';
+      if(d.kind==='kb') t+=plain(d.e.a()); else if(d.kind==='tab') t+=d.title+' — '+(d.sub||''); else t+=d.title+(d.sub?' — '+d.sub:'')+(d.labs&&d.labs.length?' | Champs : '+d.labs.join(', '):'')+(d.btns&&d.btns.length?' | Boutons : '+d.btns.join(', '):'');
+      out.push(t.slice(0,900)); });
+    return {text:out.join('\n'),res:r};
+  }
+  return {context:context,answer:answer,explain:explain,rebuild:()=>{ DOCS=null; },stats:()=>({docs:DOCS&&DOCS.length,voc:VOC&&VOC.length})};
 })();
 function aiAnswer(question){ return AI2.answer(question); }
 document.getElementById('ai-input').addEventListener('keydown',e=>{ if(e.key==='Enter') aiSend(); });
