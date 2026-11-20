@@ -7116,12 +7116,59 @@ const AI_KB={
     ]},
   access:{ sug:['Comment fonctionne un accès temporaire ?','Puis-je couper un accès ?'],
     qa:[
-      {k:['fonctionne','comment','temporaire','creer','ouvrir'],a:()=>"Vous indiquez une adresse e-mail, une durée et les sections autorisées. La personne se connecte avec son propre compte et ne voit que ces sections. À l'échéance, l'accès expire tout seul."},
+      {k:['fonctionne','comment','temporaire','creer','ouvrir','donner','employe','assistant','delegue','droit','acces'],a:()=>"Vous indiquez une adresse e-mail, une durée et les sections autorisées. La personne se connecte avec son propre compte et ne voit que ces sections. À l'échéance, l'accès expire tout seul."},
       {k:['couper','revoquer','arreter','annuler'],a:()=>"Le bouton « Révoquer » coupe l'accès immédiatement, sans attendre la fin de la durée."},
       {k:['qui','peut','droit','admin'],a:()=>"Seuls les administrateurs principaux voient cette section et peuvent créer ou révoquer des accès."},
       {k:['duree','temps','expire'],a:()=>"Les durées vont de 30 minutes à 9 heures. Le compte à rebours de chaque carte indique le temps restant."}
     ]}
 };
+
+/* Réponses rédigées pour les sections sans fiche — fidèles aux textes affichés à l'écran */
+Object.assign(AI_KB,{
+  jetons:{sug:['Comment ajouter des jetons à un client ?','Comment donner un accès testeur ?','Où voir ce qui a été fait ?'],qa:[
+    {k:['ajouter','retirer','enlever','donner','crediter','debiter','jeton','client','solde','recharger'],a:()=>"Saisissez l'adresse e-mail du client puis « Chercher ». Sur sa fiche, indiquez le nombre de jetons (positif pour ajouter, négatif pour retirer : boutons rapides +50, +100, +500, −50, −100) et un motif obligatoire, puis « Vérifier avant de valider » : vous voyez le solde avant et après, et rien n'est modifié tant que vous n'avez pas confirmé."},
+    {k:['testeur','tester','acces','temporaire','jeux','jouer','fermes','donner','duree'],a:()=>"Dans « Testeurs de jeux » : adresse e-mail, durée de l'accès, note facultative, puis « Donner l'accès ». Un testeur peut jouer à Sudoku, Duel et La course vers la mort même quand les jeux sont fermés au public. L'accès temporaire s'arrête tout seul à la date indiquée, et la personne doit se connecter avec cette adresse e-mail."},
+    {k:['registre','historique','mouvement','trace','dernier','qui','verifier'],a:()=>"Chaque mouvement est inscrit dans le registre avec votre adresse, le motif et le solde. La liste « Derniers mouvements d'administration » en bas de la section montre les plus récents."},
+    {k:['argent','convertir','rembourser','euro','gourde','vendre','cash','encaisser'],a:()=>"Les jetons servent uniquement aux jeux Zetwal (Sudoku, Duel, La course vers la mort). Le client ne peut pas les retirer en argent."}]},
+  machines:{sug:['Que change le mode manuel ?','Où régler les tarifs Lavri ?'],qa:[
+    {k:['mode','automatique','manuel','affichage','machine','panne','etat','lavri'],a:()=>"En mode <b>automatique</b>, la page Lavri fait tourner les cycles toute seule pendant les heures d'ouverture et affiche tout fermé quand le magasin est fermé. En mode <b>manuel</b>, elle affiche exactement l'état que vous réglez."},
+    {k:['tarif','prix','public','calculateur'],a:()=>"Les tarifs publics se règlent en bas de cette section. Ils s'affichent sur la page Lavri et dans le calculateur des clients, et remplacent les valeurs par défaut dès l'enregistrement."}]},
+  points:{sug:['Comment ajouter des points à un client ?','Pourquoi un code à 6 chiffres ?'],qa:[
+    {k:['ajouter','retirer','donner','enlever','points','pwen','client','crediter'],a:()=>"Dans « Nouvelle demande » : e-mail du client, nombre de points (boutons rapides +10, +50, +100, −10, −50), motif visible par le client, puis « Créer la demande et générer le code »."},
+    {k:['code','six','6','chiffres','valider','securite'],a:()=>"Le client reçoit un code à 6 chiffres. Il vous le donne, vous le saisissez, et seulement là ses points changent. Sans le code, rien ne bouge."}]},
+  move:{sug:['Comment traiter une course ?'],qa:[
+    {k:['traiter','accepter','course','commande','chauffeur','livraison'],a:()=>"Les demandes arrivent dans « À traiter » dès que le client valide. Acceptez, nommez le chauffeur, puis faites avancer la course jusqu'à la livraison."}]},
+  transfers:{sug:['Que montre cette liste ?','Puis-je exporter ?'],qa:[
+    {k:['transaction','mouvement','envoi','vente','magasin','encaisse'],a:()=>"Chaque mouvement de points : envoyeur, receveur et, pour les points vendus en magasin, le compte admin ou employé (accès temporaire) qui a encaissé."},
+    {k:['exporter','csv','telecharger','excel'],a:()=>"Le bouton « Exporter CSV » en haut de la liste télécharge les transactions affichées."}]},
+  broadcast:{sug:['Comment écrire à un groupe ?','Les SMS sont-ils payants ?'],qa:[
+    {k:['envoyer','ecrire','message','email','sms','groupe','tous','personne'],a:()=>"Choisissez la personne ou le groupe, remplissez l'objet et le message (600 caractères maximum), cliquez « Compter les destinataires » pour vérifier, puis « Envoyer ». Chaque personne reçoit un e-mail si elle en a un, sinon un SMS."},
+    {k:['payant','cout','prix','sms'],a:()=>"Oui, les SMS sont payants : comptez les destinataires avant d'envoyer."}]},
+  secu:{sug:['Un client a perdu son téléphone, que faire ?'],qa:[
+    {k:['perdu','change','telephone','debloquer','empreinte','visage','reinitialiser','seconde','securite','connecter','connexion','bloque','acces'],a:()=>"Si un utilisateur a perdu ou changé de téléphone et ne peut plus se débloquer, utilisez « Réinitialiser sa seconde sécurité ». Vérifiez d'abord son identité (appel, pièce d'identité, historique de ses achats) avant de le faire."}]},
+  cashpay:{sug:['Comment valider un paiement en liquide ?'],qa:[
+    {k:['liquide','cash','kach','payer','paiement','accepte','valider','argent'],a:()=>"Le client choisit « Peye kach » sur le Shop : sa commande reste en attente jusqu'à ce que vous receviez l'argent et touchiez « Paiement accepté »."}]},
+  qrlabels:{sug:['Comment imprimer des étiquettes ?'],qa:[
+    {k:['imprimer','etiquette','qr','selection','exemplaire','autocollant','telecharger'],a:()=>"Cochez les produits voulus, choisissez le nombre d'exemplaires, puis « Imprimer la sélection » (A4, 2 colonnes, pointillés de découpe). « Télécharger la page (HTML) » enregistre la planche. Le QR ouvre la fiche du produit."}]},
+  pointasks:{sug:['Que se passe-t-il si j\'accepte ?'],qa:[
+    {k:['accepter','refuser','demande','points','pwen','client'],a:()=>"Chaque client peut demander des points depuis son profil. Vous acceptez ou refusez : les points n'entrent sur son compte que si vous acceptez."}]},
+  profils:{sug:['À quoi sert cette page ?'],qa:[
+    {k:['profil','pwofil','message','conversation','consulter','chercher','securite','utilisateur','lire'],a:()=>"Pour des raisons de sécurité, les administrateurs peuvent consulter un profil et ses conversations si nécessaire. Cherchez la personne, puis ouvrez son profil. À utiliser uniquement en cas de besoin réel."}]},
+  apply:{sug:['Que se passe-t-il si j\'accepte un commerce ?'],qa:[
+    {k:['candidature','demande','livreur','chauffeur','restaurant','magasin','accepter','valider','inscrire'],a:()=>"Les personnes qui veulent devenir livreur, ou inscrire leur restaurant ou leur magasin, arrivent ici avec leurs pièces. Accepter un commerce crée sa fiche automatiquement : il ne reste qu'à saisir ses articles."}]},
+  drivers:{sug:['Que dois-je compléter ?'],qa:[
+    {k:['machin','vehicule','photo','chauffeur','chofe','certification'],a:()=>"Complétez le véhicule et la photo de chaque chauffeur actif : le client les voit après que le chauffeur a accepté une course."}]},
+  partners:{sug:['Pourquoi un partenaire est invisible ?'],qa:[
+    {k:['invisible','article','partenaire','restaurant','magasin','ajouter','indisponible','epuise'],a:()=>"Tout ce qui s'affiche sur la page Move vient d'ici. Un partenaire sans article reste invisible pour le client. Un article indisponible reste visible mais ne peut plus être commandé (plat épuisé, par exemple)."}]},
+  moveprice:{sug:['Comment est calculé le prix d\'une course ?'],qa:[
+    {k:['prix','tarif','course','taxi','livraison','calcul','distance'],a:()=>"Les tarifs de la plateforme alimentent directement la page Move. Le prix d'une course se calcule sur la distance et la durée réelles du trajet. « Recharger » reprend les valeurs enregistrées."}]},
+  promo:{sug:['Comment programmer une annonce ?','Comment mettre une pub vidéo ?'],qa:[
+    {k:['annonce','bandeau','dore','programmer','dates','public','pages'],a:()=>"« Nouvelle annonce » : vous décidez du texte, des dates (début / fin), de qui la voit et sur quelles pages. Une annonce programmée apparaît et disparaît toute seule."},
+    {k:['publicite','pub','video','image','piblisite','duree','frequence'],a:()=>"« Nouvelle publicité » : image ou vidéo de 15 secondes. Elle monte depuis le bas de la page avec la mention « Piblisite ». Vous réglez la durée, le délai d'apparition, quand le visiteur peut la fermer et la fréquence."}]},
+  travay:{sug:['Comment modérer une annonce ?','Déléguer la modération ?'],qa:[
+    {k:['moderer','annonce','offre','emploi','publier','valider','accepter'],a:()=>"Chaque annonce arrive ici avant d'être visible : vous la vérifiez puis l'acceptez ou la refusez. Gonaïves uniquement ; les offres à l'étranger ne sont pas acceptées."},
+    {k:['deleguer','confier','employe','acces','temporaire'],a:()=>"Vous pouvez confier cette tâche à quelqu'un pour un temps limité : Accès temporaires → section « Travay »."}]}
+});
 const AI_GREET=[
   {k:['bonjour','bonsoir','salut','hello','coucou','hey'],a:()=>"Bonjour. Posez-moi une question sur cette page et je vous réponds."},
   {k:['merci','super','parfait','ok'],a:()=>"Avec plaisir."},
@@ -7181,31 +7228,149 @@ function aiScore(entry,text){
   let s=0; entry.k.forEach(k=>{ if(text.includes(k)) s+=(KW_W[k]!==undefined?KW_W[k]:1); });
   return s;
 }
-function aiAnswer(question){
-  const t=norm(question);
-  for(const g of AI_GREET){ if(g.a && aiScore(g,t)>0) return g.a(); }
-  const kb=AI_KB[currentTab];
-  const meta=TAB_META[currentTab]||{t:currentTab};
-  if(kb){
-    let best=null,bs=0;
-    kb.qa.forEach(e=>{ const s=aiScore(e,t); if(s>bs){bs=s;best=e;} });
-    if(best && bs>=0.2) return best.a();
+/* ═════ ASSISTANT v2 : recherche dans toute la console ═════
+   Index = les textes réels de chaque section de la page (titres, explications, champs, boutons)
+   + les réponses rédigées (AI_KB). Tolère fautes de frappe, pluriels, synonymes ; répond aussi
+   aux questions d'une autre section (avec un bouton pour l'ouvrir) et retient le sujet précédent. */
+const AI2=(function(){
+  const rawStop='le la les un une des de du d l au aux a et ou en dans sur pour par avec sans que qui quoi quel quelle quels quelles est sont ete etre ai as avons avez ont je tu il elle on nous vous ils elles me te se mon ma mes ton ta tes son sa ses ce cet cette ces y ne pas ca cela ceci moi toi lui leur leurs comment faut faire peux peut puis veux voudrais dois doit si mais donc car aussi tres bien meme tout tous toute plus moins svp stp merci modifier changer voir mois jour jours liste veut aimerais souhaite besoin pouvoir ici la ou est-ce c qu j m t s n'.split(' ');
+  const STOP=new Set(rawStop.map(norm));
+  const SYN={ argent:['cash','liquide','especes','espece','encaisse','encaisser','monnaie'], client:['kliyan','acheteur','utilisateur','usager','membre','compte','personne','gens'],
+    enlever:['supprimer','effacer','retirer','oter','deleter','delete','virer'], ajouter:['creer','nouveau','nouvelle','inserer','rajouter','mettre','enregistrer'],
+    donner:['accorder','attribuer','offrir','octroyer','crediter','autoriser'], modifier:['changer','editer','corriger','ajuster','remplacer','actualiser'],
+    point:['pwen','pts','pt'], jeton:['token','jetons','tokens','mises'], testeur:['tester','beta','essai','testeurs','testeuse'], chauffeur:['chofe','livreur','conducteur','pilote','driver'],
+    commande:['kommand','order','achat','commandes'], prix:['tarif','cout','tarifs','combien','facturation'], publicite:['pub','piblisite','reclame','sponsor','pubs'],
+    sms:['texto','whatsapp','email','mail','courriel'], securite:['empreinte','biometrie','biometrique','visage','deverrouiller','verrou','faceid'],
+    acces:['autorisation','permission','droit','droits','delegue','delegation','employe','assistant','temporaire','acces'], emploi:['travay','job','jobs','travail','offre','recrutement','recruter'],
+    machine:['lessive','laverie','lavri','sechage','panne','pann'], annonce:['bandeau','banniere','message'], image:['photo','visuel','visuels','illustration','media','logo'],
+    liquide:['kach','cash'], profil:['pwofil','profils','itilizatè','itilizate'], message:['mesaj','konvèsasyon','konvesasyon','conversation','conversations','discussion','chat'], demande:['demann','demandes','candidature','candidatures'], accepter:['valider','approuver','accepte','accepter','refuser','refize','confirmer','verifier'], stock:['rupture','inventaire','reappro','reapprovisionnement','epuise'], vente:['ventes','vendu','encaissement','revenu','revenus','recette','chiffre'],
+    transfert:['transferts','envoi','envois','virement','transaction','transactions'], course:['taxi','trajet','livraison','courses'], partenaire:['restaurant','magasin','boutique','marchand','patnè','patne'],
+    scan:['scanner','qr','code','codebarre','flasher'], note:['motif','raison','commentaire'], solde:['balance','reste','total'], etiquette:['etiquettes','imprimer','impression','autocollant'],
+    notification:['notifications','alerte','alertes','sonnerie','cloche'], theme:['sombre','clair','nuit','mode'], taux:['dollar','usd','htg','gourdes','gourde','change','devise'] };
+  const SYNMAP={}; Object.keys(SYN).forEach(c=>{ SYNMAP[c]=c; SYN[c].forEach(w=>{ SYNMAP[norm(w)]=c; }); });
+  function stem(w){
+    for(let i=0;i<2;i++){ if(w.length>5){ const n=w.replace(/(ement|ations?|issent|aient|erait|eront|ions|er|ez|ent|es|e|s|x)$/,''); if(n.length>=4) w=n; else break; } else if(w.length>3 && /[sx]$/.test(w)) w=w.slice(0,-1); }
+    return w;
   }
-  /* La question relève-t-elle d'une autre section ? */
-  let other=null,os=0;
-  Object.keys(AI_KB).forEach(tab=>{
-    if(tab===currentTab) return;
-    AI_KB[tab].qa.forEach(e=>{ const s=aiScore(e,t); if(s>os){os=s;other=tab;} });
-  });
-  if(other && os>=0.8){
-    const om=TAB_META[other];
-    return "Votre question porte plutôt sur <b>"+escH(om.t)+"</b>, et je préfère ne pas répondre à côté du sujet de cette page. "
-      +'<br><button class="sug" style="margin-top:8px" onclick="switchTab(\''+other+'\');setTimeout(()=>aiAsk(\''+escH(question.replace(/'/g,'')) +'\'),400)">Ouvrir '+escH(om.t)+' et poser la question là-bas</button>';
+  function canon(w){ const c=SYNMAP[w]||SYNMAP[stem(w)]; return c?c:stem(w); }
+  function toks(s,keepStop){ return norm(s).split(' ').filter(w=>w&&(keepStop||!STOP.has(w))&&(w.length>1)).map(canon); }
+  function dl(a,b){ /* Damerau-Levenshtein */
+    const n=a.length,m=b.length,d=[]; for(let i=0;i<=n;i++){ d[i]=[i]; } for(let j=0;j<=m;j++) d[0][j]=j;
+    for(let i=1;i<=n;i++) for(let j=1;j<=m;j++){ const c=a[i-1]===b[j-1]?0:1; d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c); if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1]) d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1); }
+    return d[n][m];
   }
-  const sug=(kb?kb.sug:[]).slice(0,3).map(s=>'• '+s).join('\n');
-  return "Je ne sais pas répondre à cela : je me limite à la section <b>"+escH(meta.t)+"</b> pour rester fiable.\n"
-    +(sug?"Voici ce que je peux traiter ici :\n"+sug:"Changez de section et je répondrai sur son contenu.");
-}
+  let DOCS=null, DF=null, AVG=1, VOC=null, TABS=null;
+  const K1=1.3,B=.6;
+  function tabTitle(id){ return (TAB_META[id]&&TAB_META[id].t)||id; }
+  function build(){
+    DOCS=[]; DF={};
+    const add=(d)=>{ d.len=d.t.length||1; DOCS.push(d); const seen={}; d.t.forEach(w=>{ d.tf=d.tf||{}; d.tf[w]=(d.tf[w]||0)+1; if(!seen[w]){ seen[w]=1; DF[w]=(DF[w]||0)+1; } }); };
+    /* 1. réponses rédigées */
+    Object.keys(AI_KB).forEach(tab=>AI_KB[tab].qa.forEach(e=>{ const t=[]; e.k.forEach(k=>{ const c=canon(norm(k)); for(let i=0;i<3;i++) t.push(c); }); add({tab:tab,kind:'kb',e:e,t:t,prior:1.25,keys:e.k.map(k=>norm(k))}); }));
+    /* 2. textes des sections de la page */
+    document.querySelectorAll('section.panel').forEach(pn=>{
+      const tab=pn.id.replace('tab-',''), m=TAB_META[tab]||{t:tab,s:''};
+      add({tab:tab,kind:'tab',title:m.t,sub:m.s,t:[].concat(toks(m.t),toks(m.t),toks(m.t),toks(m.s),toks(m.s)),prior:.9});
+      pn.querySelectorAll(':scope > .card, :scope > div > .card, :scope .card').forEach(c=>{
+        if(c.querySelector('.card .card')) return;
+        const h=c.querySelector('h2,h3'), sub=c.querySelector('.card-sub'), title=h?h.textContent.replace(/\s+/g,' ').trim():'';
+        const subT=sub?sub.textContent.replace(/\s+/g,' ').trim():'';
+        const labs=[].map.call(c.querySelectorAll('label,th'),x=>x.textContent.replace(/\s+/g,' ').trim()).filter(Boolean).slice(0,10);
+        const btns=[].map.call(c.querySelectorAll('button'),x=>x.textContent.replace(/\s+/g,' ').trim()).filter(x=>x&&x.length<46).slice(0,10);
+        const phs=[].map.call(c.querySelectorAll('input[placeholder],textarea[placeholder]'),x=>x.getAttribute('placeholder')).filter(Boolean).slice(0,6);
+        if(!title&&!subT&&!labs.length) return;
+        const t=[].concat(toks(title),toks(title),toks(title),toks(subT),toks(labs.join(' ')),toks(btns.join(' ')),toks(phs.join(' ')));
+        if(t.length<2) return;
+        add({tab:tab,kind:'dom',title:title||m.t,sub:subT,labs:labs,btns:btns,t:t,prior:1});
+      });
+    });
+    let tot=0; DOCS.forEach(d=>{ tot+=d.len; }); AVG=tot/DOCS.length;
+    VOC=Object.keys(DF);
+    TABS=Object.keys(TAB_META).map(id=>({id:id,raw:norm(tabTitle(id)).split(' '),tt:toks(tabTitle(id)),st:toks((TAB_META[id]||{}).s||''),title:tabTitle(id)}));
+  }
+  /* mot de la question → mots connus de l'index (identique, préfixe, ou faute de frappe) */
+  function expand(w){
+    if(DF[w]) return [[w,1]];
+    const out=[];
+    if(w.length>=4) VOC.forEach(v=>{ if(v.length>=4&&(v.startsWith(w)||w.startsWith(v))&&Math.abs(v.length-w.length)<=(w.length>=5&&v.startsWith(w)?9:4)) out.push([v,.8]); });
+    if(!out.length&&w.length>=4){ const lim=w.length>=9?2:1; VOC.forEach(v=>{ if(Math.abs(v.length-w.length)<=lim&&dl(w,v)<=lim) out.push([v,.7]); }); }
+    return out.slice(0,4);
+  }
+  function titleHits(tab,qw){ const T=TABS.find(t=>t.id===tab); if(!T) return 0; let n=0; qw.forEach(w=>{ if(T.tt.indexOf(w)>=0) n++; }); return n; }
+  function score(qw,tab){
+    const N=DOCS.length, res=[];
+    const ex=qw.map(w=>expand(w));
+    DOCS.forEach(d=>{
+      let s=0,hit=0;
+      ex.forEach(list=>{ let best=0; list.forEach(([v,wt])=>{ const f=d.tf[v]; if(!f) return; const idf=Math.log(1+(N-DF[v]+.5)/(DF[v]+.5)); const x=idf*f*(K1+1)/(f+K1*(1-B+B*d.len/AVG))*wt; if(x>best) best=x; }); if(best>0) hit++; s+=best; });
+      if(!hit) return;
+      s*= (.6+.4*hit/Math.max(1,qw.length))*d.prior*(d.tab===tab&&tab!=='home'?1.2:1)*(1+.6*titleHits(d.tab,qw));
+      res.push({d:d,s:s,hit:hit});
+    });
+    return res.sort((a,b)=>b.s-a.s);
+  }
+  /* intentions simples */
+  function findTab(text){
+    const q=toks(text); if(!q.length) return null; let best=null,bs=0,two=0; const rawq=norm(text).split(' ').filter(w=>w.length>2&&!STOP.has(w));
+    TABS.forEach(t=>{ let s=0; q.forEach(w=>{ if(t.tt.indexOf(w)>=0) s+=2; else if(t.st.indexOf(w)>=0) s+=1; else if(w.length>=4&&t.tt.concat(t.st).some(v=>v.length>=4&&(v.startsWith(w)||w.startsWith(v)))) s+=.6; });
+      rawq.forEach(r=>{ if(t.raw.some(x=>x===r||stem(x)===stem(r))) s+=.5; });
+      s=s/q.length; if(s>bs){ two=bs; bs=s; best=t; } else if(s>two) two=s; });
+    return bs>=1&&bs>two?best:null;
+  }
+  const NAVRE=/^(?:peux tu |pouvez vous |tu peux |vous pouvez )?(?:ouvre|ouvrir|ouvrez|va |aller |allez |affiche|afficher|montre|montrer|emmene|amene|passe |basculer|bascule)/;
+  const WHERERE=/\b(?:ou (?:est|se trouve|sont|trouver|voir|puis je voir|je vois)|ou voir|quelle section|quel onglet|dans quelle)\b/;
+  let ctx={tokens:[],tab:null,at:0};
+  function esc2(s){ return escH(s); }
+  function openBtn(tab,label){ return '<br><button class="sug" style="margin-top:8px" onclick="switchTab(\''+tab+'\')">'+esc2(label||('Ouvrir « '+tabTitle(tab)+' »'))+'</button>'; }
+  function render(h,cur){
+    const d=h.d;
+    if(d.kind==='kb'){ return d.e.a()+(d.tab!==cur?'<br><span style="opacity:.7;font-size:.85em">Réponse tirée de la section « '+esc2(tabTitle(d.tab))+' ».</span>'+openBtn(d.tab):''); }
+    if(d.kind==='tab'){ return '<b>'+esc2(d.title)+'</b> — '+esc2(d.sub||'')+(d.tab!==cur?openBtn(d.tab):''); }
+    let h2='<b>'+esc2(d.title)+'</b>'+(d.tab!==cur?' <span style="opacity:.7">(section « '+esc2(tabTitle(d.tab))+' »)</span>':'')+(d.sub?'<br>'+esc2(d.sub):'');
+    const extra=[]; if(d.labs&&d.labs.length) extra.push('Champs : '+d.labs.slice(0,6).map(esc2).join(' · ')); if(d.btns&&d.btns.length) extra.push('Actions : '+d.btns.slice(0,5).map(esc2).join(' · '));
+    if(!d.sub&&!extra.length) h2+='<br>Voir cette partie de la page.';
+    if(extra.length) h2+='<br><span style="opacity:.75;font-size:.88em">'+extra.join('<br>')+'</span>';
+    return h2+(d.tab!==cur?openBtn(d.tab):'');
+  }
+  function explain(question,tabNow){
+    if(!DOCS) build();
+    const cur=tabNow||currentTab, t=norm(question);
+    const tw=t.split(' ');
+    for(const g of AI_GREET){ if(g.a && tw.length<=3 && g.k.some(k=>tw.indexOf(k)>=0)) return {kind:'greet',html:g.a(),tab:cur,s:99}; }
+    /* navigation directe */
+    if(NAVRE.test(t)){ const tb=findTab(t.replace(NAVRE,'')); if(tb&&TAB_META[tb.id]) return {kind:'nav',tab:tb.id,html:'Je vous ouvre « '+esc2(tb.title)+' ».',go:tb.id,s:50}; }
+    let qw=toks(question).filter((w,i,arr)=>arr.indexOf(w)===i);
+    const shortQ=/^(et |pareil|aussi|alors|idem|et si|et pour|et en)/.test(t);
+    if(shortQ&&ctx.tokens.length&&Date.now()-ctx.at<5*60000) qw=qw.concat(ctx.tokens).slice(0,8);
+    if(!qw.length) return {kind:'none',html:null,tab:cur,s:0};
+    if(WHERERE.test(t)){ const tb=findTab(t); if(tb&&TAB_META[tb.id]) return {kind:'where',tab:tb.id,html:'Vous trouverez cela dans la section <b>'+esc2(tb.title)+'</b> ('+esc2((TAB_META[tb.id]||{}).s||'')+').'+openBtn(tb.id),s:40}; }
+    const r=score(qw,cur);
+    if(!r.length) return {kind:'none',html:null,tab:cur,s:0,qw:qw};
+    const top=r[0], second=r.find(x=>x.d!==top.d&&!(x.d.tab===top.d.tab&&x.d.kind===top.d.kind&&x.d.title===top.d.title));
+    const agg={}; r.forEach(x=>{ const g=agg[x.d.tab]||(agg[x.d.tab]={m:0,n:0}); if(x.s>g.m){ g.n=g.m*0+g.n; g.m=x.s; } });
+    const tabsS=Object.keys(agg).map(k=>[k,agg[k].m]).sort((x,y)=>y[1]-x[1]), cov=top.hit/Math.max(1,qw.length);
+    const conf=top.s>=2&&cov>=.6&&(tabsS.length<2||tabsS[0][1]>=tabsS[1][1]*1.05);
+    return {kind:conf?'answer':'weak',cov:cov,tab:top.d.tab,top:top,html:conf?render(top,cur):null,s:top.s,cands:r.slice(0,6),qw:qw};
+  }
+  function answer(question){
+    const r=explain(question);
+    if(r.kind==='nav'){ setTimeout(()=>switchTab(r.go),150); ctx={tokens:[],tab:r.go,at:Date.now()}; return r.html; }
+    if(r.kind==='greet'||r.kind==='where'){ return r.html; }
+    if(r.kind==='answer'){ ctx={tokens:(r.qw||[]).slice(0,6),tab:r.tab,at:Date.now()}; return r.html; }
+    /* pas assez sûr : proposer les parties les plus proches plutôt que répondre à côté */
+    const seen={}, opts=[];
+    (r.cands||[]).forEach(c=>{ const key=c.d.tab+'|'+(c.d.title&&c.d.title!==tabTitle(c.d.tab)?c.d.title:''); if(seen[key]||opts.length>=3) return; seen[key]=1; opts.push(c); });
+    if(opts.length&&(r.cov||0)>.5){
+      ctx={tokens:(r.qw||[]).slice(0,6),tab:r.tab,at:Date.now()};
+      return "Je ne suis pas certain de bien comprendre. Parlez-vous de l'une de ces parties ?"+opts.map(c=>'<br><button class="sug" style="margin-top:6px" onclick="switchTab(\''+c.d.tab+'\')">'+esc2((c.d.title&&c.d.title!==tabTitle(c.d.tab)?c.d.title+' ('+tabTitle(c.d.tab)+')':tabTitle(c.d.tab)))+'</button>').join('')
+        +'<br><span style="opacity:.75;font-size:.88em">Reformulez avec le nom de la section ou de l\'action (ex. « ajouter des jetons », « imprimer les étiquettes »).</span>';
+    }
+    const kb=AI_KB[currentTab], sug=(kb?kb.sug:[]).slice(0,3).map(s=>'• '+s).join('\n');
+    return "Je n'ai rien trouvé là-dessus dans la console, et je préfère ne pas inventer.\n"+(sug?"Voici ce que je peux traiter ici :\n"+sug:"Essayez avec le nom d'une section ou d'une action.");
+  }
+  return {answer:answer,explain:explain,rebuild:()=>{ DOCS=null; },stats:()=>({docs:DOCS&&DOCS.length,voc:VOC&&VOC.length})};
+})();
+function aiAnswer(question){ return AI2.answer(question); }
 document.getElementById('ai-input').addEventListener('keydown',e=>{ if(e.key==='Enter') aiSend(); });
 
 /* ════════════════════════════════════════════════════════════
