@@ -6,10 +6,12 @@
    (enveloppe sin², cap net = 0) ; routes de départ/arrivée et approches de fourche = ligne droite. */
 (function(){
 'use strict';
-var ON = false;
+var ON = false, KEYR = 'zc-road';
 try{
   var q = /[?&]road=(\w+)/.exec(location.search);
-  if(q) ON = q[1] === 'curves' || q[1] === 'on'; else ON = localStorage.getItem('zc-road') === '1';
+  if(q) ON = q[1] === 'curves' || q[1] === 'on';
+  else if(/curves/.test(location.hash)) ON = true;
+  else ON = localStorage.getItem(KEYR) === '1';
 }catch(e){}
 var LOCK = 350;                          /* ms avant la fourche : la voie est verrouillée */
 var N = 40, D = 12, K = 3.2;           /* échantillons, profondeur max (unités de « lead »), perspective du jeu */
@@ -45,7 +47,7 @@ function curv(t){
 function sync(eng, c, now, scene){
   if(!ON || !eng || !c || !scene) { api.on = false; return; }
   var tl = eng.timeline, key = tl.length + ':' + (tl.length ? tl[tl.length - 1].base : 0);
-  if(api._eng !== eng){ api._eng = eng; planKey = ''; plan = []; env = ENVP[DT[c.dest]] || { a:1, k:0 }; }
+  if(api._eng !== eng){ api._eng = eng; showBadge(); planKey = ''; plan = []; env = ENVP[DT[c.dest]] || { a:1, k:0 }; }
   if(key !== planKey){ planKey = key; plan = []; tl.forEach(function(en, i){ var s = segFor(en, i); if(s) plan.push(s); }); }
   var lead = c.lead || 1800, du = D / N, dt = du * lead, X = 0, V = 0;
   tab[0] = 0;
@@ -79,6 +81,28 @@ var api = { on:false, locked:function(now){ return api.on && lockOn && now >= lo
   /* pour les tests : courbure à l'instant t pour un tracé donné */
   _plan:function(){ return plan; }, _curv:curv };
 window.ZRoad = api;
+api.set = function(v){ ON = !!v; try{ localStorage.setItem(KEYR, ON ? '1' : '0'); }catch(e){} };
+
+function mountSwitch(){
+  var sum = document.getElementById('cs-sum'); if(!sum || document.getElementById('cs-roadg')) return;
+  var g = document.createElement('div'); g.className = 'cs-grp'; g.id = 'cs-roadg';
+  g.innerHTML = '<h3>Route</h3><div style="display:grid;gap:10px;max-width:560px"><button type="button" id="cs-roadsw" role="switch" style="min-height:48px;padding:0 18px;border-radius:14px;border:1px solid rgba(240,217,138,.35);background:rgba(255,255,255,.05);color:#f4f1e8;font:600 .95rem Inter,system-ui,sans-serif;cursor:pointer;text-align:left"></button>'
+    + '<p style="margin:0;font-size:.85rem;line-height:1.5;color:#aab2d0">Essai : la route tourne en S après chaque carrefour et le coureur se penche. Les voies, les obstacles et les gains ne changent pas. Les premiers virages arrivent environ 8 secondes après le départ.</p></div>';
+  sum.parentNode.insertBefore(g, sum);
+  var b = g.querySelector('#cs-roadsw');
+  function paint(){ b.setAttribute('aria-checked', ON ? 'true' : 'false'); b.textContent = ON ? 'Route en courbes : activée (toucher pour couper)' : 'Route en courbes : coupée (toucher pour activer)'; b.style.borderColor = ON ? '#F0D98A' : 'rgba(240,217,138,.35)'; b.style.background = ON ? 'rgba(212,175,55,.18)' : 'rgba(255,255,255,.05)'; }
+  b.addEventListener('click', function(){ api.set(!ON); paint(); });
+  paint();
+}
+var badge = null;
+function showBadge(){
+  var stg = document.querySelector('.cs-stage'); if(!stg || !ON) return;
+  if(!badge){ badge = document.createElement('div'); badge.setAttribute('aria-live', 'polite'); badge.textContent = 'Route en courbes activée';
+    badge.style.cssText = 'position:absolute;left:50%;bottom:48px;transform:translateX(-50%);z-index:4;padding:6px 14px;border-radius:99px;background:rgba(8,16,42,.82);border:1px solid #F0D98A;color:#F0D98A;font:700 .85rem Inter,system-ui,sans-serif;pointer-events:none;transition:opacity .6s'; stg.appendChild(badge); }
+  badge.style.opacity = '1'; clearTimeout(badge._h); badge._h = setTimeout(function(){ badge.style.opacity = '0'; }, 4500);
+}
+api._badge = showBadge;
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountSwitch); else mountSwitch();
 
 function patch(){
   var Z = window.ZScene; if(!Z || !Z.prototype || Z.prototype.__zroad) return !!(Z && Z.prototype && Z.prototype.__zroad);
