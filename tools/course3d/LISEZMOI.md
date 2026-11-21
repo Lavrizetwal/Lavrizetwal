@@ -10,3 +10,7 @@ Le jeu charge ce fichier à la demande ; sans lui (appareil faible, WebGL absent
    (id : minuscules, chiffres, - ou _ ; si les membres sont mal placés, ajouter `"spec": { ... }` pour corriger les proportions comme dans `SPEC_FILLE1` de `src/rig.js`).
 3. Le sélecteur « Coureur » de course.html l'affiche tout seul. Le hub utilise `hub/runner-<id>-0.png` et `-1.png` (deux poses de course) ; sans ces images, il montre le coureur par défaut.
 4. Incrémenter la version dans `sw.js`.
+
+## Route 3D réelle (road3d.js)
+`src/road3d.js` dessine la route en vrai 3D (second rendu WebGL plein écran recopié dans le canvas 2D) : tracé en droites + quarts de cercle (vrais coudes à 90°), caméra qui suit le tracé, créatures, obstacles, portique de carrefour et coureur posés sur la route.
+Tout est calculé à partir de l'instant de course (vitesse fixe 16 m/s) : le moteur de jeu et le serveur ne changent pas. Activé par défaut ; `?road3d=off` ou l'interrupteur « Route en 3D » du résumé coupent ; si le 3D est lent ou indisponible, l'ancien rendu 2D reprend automatiquement.

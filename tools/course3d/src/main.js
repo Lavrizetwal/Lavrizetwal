@@ -2,6 +2,7 @@ import * as T from 'three';
 import { PI, clamp, mix } from './util.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { rigFromMesh, SPEC_FILLE1 } from './rig.js';
+import { installRoad } from './road3d.js';
 import { buildHuman, applyPose, poseRun, poseCrouch, poseSlide, poseJump, poseHit, poseStand, poseLeap } from './human.js';
 import { buildDog, buildBull, buildPig, buildSnake, snakeGround, snakeHang, buildScorpion, updScorpion, buildBees, updBees } from './animals.js';
 
@@ -96,14 +97,14 @@ const CRE = {
   roi_scorpion:{ f:'roi-scorpion', Fu:2.7, an:'scuttle' }, ver_geant:{ f:'ver-geant', Fu:2.6, an:'worm' }
 };
 for(const k in CRE){ CFG[k] = CFG[k] || (CRE[k].hu ? { Fm: 2.4, Fu: CRE[k].Fu, pitch: .2 } : { Fm: 1.25, Fu: CRE[k].Fu, pitch: .22 }); }
-R.creS = {};
+R.creS = {}; R.creMesh = {};
 function loadCre(k, cb){
   const cf = CRE[k]; if(!cf) return; if(R.creS[k]){ if(cb) (R.creS[k] === 2 ? cb(true) : (R.creW = R.creW || []).push(cb)); return; } R.creS[k] = 1;
   const done = ok => { R.creS[k] = ok ? 2 : 3; if(cb) cb(ok); };
   try{ new GLTFLoader().load('bestiaire/' + cf.f + '.glb?v=1', g => {
     try{
       let m;
-      if(cf.hu){ let mesh; g.scene.traverse(n => { if(n.isMesh && !mesh) mesh = n; }); const h = rigFromMesh(mesh, SPEC_FILLE1); m = { root: h.root, h }; }
+      if(cf.hu){ let mesh; g.scene.traverse(n => { if(n.isMesh && !mesh) mesh = n; }); R.creMesh[k] = mesh; const h = rigFromMesh(mesh, SPEC_FILLE1); m = { root: h.root, h }; }
       else {
         const obj = g.scene, bb = new T.Box3().setFromObject(obj), sz = bb.getSize(new T.Vector3()), c = bb.getCenter(new T.Vector3()), sc = 1 / Math.max(sz.x, sz.y, sz.z);
         obj.scale.setScalar(sc); obj.position.set(-c.x * sc, -bb.min.y * sc, -c.z * sc);
@@ -242,4 +243,4 @@ function frameEnd(){
 }
 function warm(){ if(R.off) return; if(!R.ready && !init()) return; const ks = Object.keys(CFG).filter(k => k !== 'runner'); let i = 0; (function step(){ if(i === 0) ctlFor('main'); else if(i <= ks.length) getModel(ks[i - 1]); else return; i++; setTimeout(step, 30); })(); }
 
-window.Z3D = { preload, creKinds: Object.keys(CRE), registerWho, loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };
+window.Z3D = { road: null, makeRoad(){ return this.road || (this.road = installRoad({ R, CRE, loadCre, creAnim, ctlFor, runnerUpdate, rigFromMesh, SPEC_FILLE1, init })); }, preload, creKinds: Object.keys(CRE), registerWho, loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };
