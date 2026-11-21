@@ -138,6 +138,12 @@ export function poseCrouch(ph){
   return P({ hL: 1.0 + .28 * s, hR: 1.0 + .28 * s2, kL: 1.65 + .18 * s, kR: 1.65 + .18 * s2, pL: .3, pR: .3, sL: .45 - .2 * s, sR: .45 - .2 * s2, eL: 1.3, eR: 1.3,
     lean: .95, tw: .1 * s, ctw: -.2 * s, hp: -.75, hy: 0, roll: .04 * s, ab: .2, bnk: 0 });
 }
+/* glissade : le coureur se jette en arrière, jambes tendues devant, bras en arrière, pour passer sous l'obstacle */
+export function poseSlide(ph){
+  const s = Math.sin(ph * .5);
+  return P({ hL: 1.5, hR: 1.38, kL: .12, kR: .2, pL: .5, pR: .5, sL: -1.1, sR: -.95, eL: .25, eR: .3,
+    lean: -.55, tw: .04 * s, ctw: 0, hp: -.88, hy: 0, roll: .03 * s, ab: .1, bnk: 0 });
+}
 function kfr(j, A){
   if(j <= A[0][0]) return A[0][1].slice(); if(j >= A[A.length - 1][0]) return A[A.length - 1][1].slice();
   for(let i = 0; i < A.length - 1; i++) if(j <= A[i + 1][0]){ const t = sstep((j - A[i][0]) / (A[i + 1][0] - A[i][0])); return A[i][1].map((v, k) => mix(v, A[i + 1][1][k], t)); }

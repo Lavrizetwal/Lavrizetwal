@@ -21,7 +21,7 @@ var DATA = [
 "e": "Ville abandonnée",
 "d": "Homme brun en blouson de cuir beige et gilet noir, ceinture à étuis, foulard au cou et bottes. Allure de pillard des routes.",
 "r": "Guette les voyageurs dans les rues désertes et leur barre le passage.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "bandit-femme",
@@ -30,7 +30,7 @@ var DATA = [
 "e": "Ville abandonnée",
 "d": "Femme aux cheveux relevés, gilet beige à poches, foulard, sac à dos et gants. Équipement léger de pillarde.",
 "r": "Surgit des ruelles pour couper la route aux coureurs trop lents.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "colosse",
@@ -39,7 +39,7 @@ var DATA = [
 "e": "Ville abandonnée",
 "d": "Homme massif aux épaulières métalliques, ceinturon chargé et gants de cuir. Bien plus large que les autres bandits.",
 "r": "Occupe presque toute la route : il faut l’éviter ou sauter à temps.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "zombie",
@@ -48,7 +48,7 @@ var DATA = [
 "e": "Ville abandonnée",
 "d": "Homme maigre à la peau grise, débardeur déchiré, short en lambeaux, pieds nus, bras pendants.",
 "r": "Avance lentement mais en nombre dans les rues de la ville.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "tigre",
@@ -57,7 +57,7 @@ var DATA = [
 "e": "Jungle ancienne",
 "d": "Tigre du Bengale : fourrure orange rayée de noir, poitrail blanc. Rendu très naturel.",
 "r": "Prédateur rapide qui bondit sur le sentier.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "crocodile",
@@ -66,7 +66,7 @@ var DATA = [
 "e": "Jungle ancienne",
 "d": "Crocodile couleur sable, gueule fermée, longue queue. Le modèle le plus léger du lot (4 364 triangles).",
 "r": "Rôde au bord des rivières et traverse la route sans prévenir.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "loup",
@@ -75,7 +75,7 @@ var DATA = [
 "e": "Région glaciale",
 "d": "Loup au pelage gris et beige, queue touffue, posture alerte.",
 "r": "Court en meute derrière le coureur.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "grand-loup",
@@ -84,7 +84,7 @@ var DATA = [
 "e": "Région glaciale",
 "d": "Grand loup blanc au pelage épais, tête basse et gueule entrouverte. Plus massif et plus menaçant que le loup gris.",
 "r": "Plus grand et plus rapide que la meute : ne le laisse pas approcher.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "ours",
@@ -93,7 +93,7 @@ var DATA = [
 "e": "Région glaciale",
 "d": "Grizzly à fourrure brune, démarche lourde, tête arrondie. Proportions réussies.",
 "r": "Lent mais puissant, il se plante au milieu du chemin.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "serpent",
@@ -102,7 +102,7 @@ var DATA = [
 "e": "Canyon désertique",
 "d": "Serpent enroulé en spirale, motifs beige et brun, sonnette au bout de la queue, tête dressée.",
 "r": "Enroulé au sol : saute-le dès que la sonnette retentit.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "araignee-noire",
@@ -111,7 +111,7 @@ var DATA = [
 "e": "Jungle ancienne",
 "d": "Grosse araignée à pattes fines et abdomen bombé. Sa texture est presque entièrement noire.",
 "r": "Tisse ses pièges entre les arbres et sous les ponts.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "araignee-monstre",
@@ -120,7 +120,7 @@ var DATA = [
 "e": "Ville abandonnée",
 "d": "Araignée noire rayée de jaune, crocs blancs et yeux rouges. Plus détaillée et plus agressive que l'araignée noire.",
 "r": "Agressive et rapide, elle sort des bâtiments en ruine.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "dimon",
@@ -128,8 +128,8 @@ var DATA = [
 "k": "creature",
 "e": "Zone volcanique",
 "d": "Petit démon ailé : grandes ailes de chauve-souris, cornes, queue fine. Ailes écartées.",
-"r": "Démon ailé qui attaque en piqué : baisse-toi au bon moment.",
-"s": "bientot"
+"r": "Démon ailé qui attaque en piqué : glisse-toi dessous au bon moment.",
+"s": "jeu"
 },
 {
 "id": "manon-fire",
@@ -138,7 +138,7 @@ var DATA = [
 "e": "Zone volcanique",
 "d": "Géant de roche noire hérissé de pointes, avec des fissures rougeoyantes sur le torse et les bras.",
 "r": "Golem de roche et de lave qui barre la route.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "roi-scorpion",
@@ -147,7 +147,7 @@ var DATA = [
 "e": "Canyon désertique",
 "d": "Scorpion géant brun et doré : grandes pinces, queue recourbée terminée par un dard.",
 "r": "Ses pinces et son dard bloquent le passage dans le canyon.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "ver-geant",
@@ -156,7 +156,7 @@ var DATA = [
 "e": "Canyon désertique",
 "d": "Ver de sable géant : corps annelé et piquants, gueule ronde garnie de crocs, pinces.",
 "r": "Surgit du sable devant le coureur et ouvre une brèche dans la route.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "cerbere",
