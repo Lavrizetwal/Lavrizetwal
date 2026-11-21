@@ -11,10 +11,11 @@ try{
   var q = /[?&]road=(\w+)/.exec(location.search);
   if(q) ON = q[1] === 'curves' || q[1] === 'on'; else ON = localStorage.getItem('zc-road') === '1';
 }catch(e){}
+var LOCK = 350;                          /* ms avant la fourche : la voie est verrouillée */
 var N = 40, D = 12, K = 3.2;           /* échantillons, profondeur max (unités de « lead »), perspective du jeu */
 var AMP = { montagne:1, foret:.85, ville:.6, desert:.9, glace:.8, volcan:1, jungle:.9, ruines:.7 };
 var tab = new Float32Array(N + 1);      /* décalage latéral X(d), en fraction de la demi-largeur de route */
-var head = 0, plan = [], planKey = '', GAIN = 6;
+var head = 0, lean = 0, lockOn = false, lockT = 0, plan = [], planKey = '', GAIN = 6;
 try{ var g = /[?&]roadgain=([\d.]+)/.exec(location.search); if(g) GAIN = +g[1]; }catch(e){}
 
 function hash(s){ var h = 2166136261 >>> 0; for(var i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
@@ -48,6 +49,12 @@ function sync(eng, c, now, scene){
     V += curv(t) * du; X += V * du; tab[i] = X * GAIN / 2;   /* double intégrale de la courbure : cap puis écart latéral */
   }
   head = tab[Math.round(N / 2)];
+  lean += (curv(now + lead * .12) - lean) * .12;      /* le coureur se penche dans le virage (lissé) */
+  /* carrefour : dans les dernières LOCK ms avant la fourche, le choix de voie est verrouillé */
+  var was = lockOn; lockOn = false;
+  if(!eng.loaded && eng.si < c.stages.length && c.stages[eng.si].k === 'fork'){ var b = eng.tcur + c.stages[eng.si].appr; lockOn = now >= b - LOCK && now < b + 600; lockT = b; }
+  if(lockOn && !was){ try{ if(navigator.vibrate) navigator.vibrate(18); }catch(e){} }
+  paintLock(lockOn);
   api.on = true; api.scene = scene;
 }
 function off(s){ /* décalage latéral (fraction de RW) à l'écran pour une profondeur d'écran s */
@@ -55,7 +62,15 @@ function off(s){ /* décalage latéral (fraction de RW) à l'écran pour une pro
   var f = d / D * N, i = f | 0, w = f - i; return tab[i] * (1 - w) + tab[i + 1] * w;
 }
 
-var api = { on:false, _eng:null, scene:null, sync:sync, head:function(){ return head; }, off:off, enabled:function(){ return ON; },
+var chip = null;
+function paintLock(on){
+  if(!chip){ var stg = document.querySelector('.cs-stage'); if(!stg) return;
+    chip = document.createElement('div'); chip.id = 'cs-lock'; chip.setAttribute('aria-live', 'polite'); chip.textContent = 'Choix verrouillé';
+    chip.style.cssText = 'position:absolute;left:50%;top:34%;transform:translateX(-50%);z-index:4;padding:7px 16px;border-radius:99px;background:rgba(8,16,42,.82);border:1px solid #F0D98A;color:#F0D98A;font:700 .95rem Inter,system-ui,sans-serif;pointer-events:none;display:none';
+    stg.appendChild(chip); }
+  chip.style.display = on ? 'block' : 'none';
+}
+var api = { on:false, locked:function(now){ return api.on && lockOn && now >= lockT - LOCK; }, lean:function(){ return lean; }, _eng:null, scene:null, sync:sync, head:function(){ return head; }, off:off, enabled:function(){ return ON; },
   /* pour les tests : courbure à l'instant t pour un tracé donné */
   _plan:function(){ return plan; }, _curv:curv };
 window.ZRoad = api;
@@ -67,6 +82,13 @@ function patch(){
   P.cxAt = function(s){
     if(api.on && api.scene === this) return this.CX + off(s) * this.RW * s - this.sway * s;
     return cx0.call(this, s);
+  };
+  var dr0 = P.drawRunnerNow;
+  if(typeof dr0 === 'function') P.drawRunnerNow = function(f){
+    if(!(api.on && api.scene === this)) return dr0.call(this, f);
+    var X = this.X, x = this.laneX(f.vx, 1), y = this.PY;
+    X.save(); X.translate(x, y); X.rotate(Math.max(-1, Math.min(1, lean)) * .1); X.translate(-x, -y);
+    try{ return dr0.call(this, f); } finally { X.restore(); }
   };
   /* fond et soleil : suivent le cap de la route (à la place du balancement sinusoïdal) */
   ['sky', 'layer'].forEach(function(n){

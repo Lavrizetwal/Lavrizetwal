@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <script src="minor.js"></script>
-<script src="roadgraph.js?v=1" defer></script>
+<script src="roadgraph.js?v=2" defer></script>
 <script src="controls.js?v=1" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -3061,6 +3061,7 @@ function onEng(type, data){
 }
 function act(code, ts){
   if(STATE !== 'run') return;
+  if(code < 2 && window.ZRoad && ZRoad.locked(performance.now() - T0)) return;   /* carrefour : voie verrouillée (mode courbes) */
   var now = performance.now() - T0, t = (typeof ts === 'number' && isFinite(ts) && Math.abs(ts - T0 - now) < 120) ? ts - T0 : now;
   t = Math.floor(t); var last = LOG.length ? LOG[LOG.length - 1][0] : -1000;
   if(t < last) t = last;
