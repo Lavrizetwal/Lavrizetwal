@@ -4,7 +4,7 @@
    move koneksyon. Li PA JANM kenbe done : pri, kòmand, pwen ak
    machin yo toujou soti dirèk nan sèvè a.
    ════════════════════════════════════════════════════════════════ */
-const VERSION = 'zetwal-v14';
+const VERSION = 'zetwal-v15';
 
 /* Paj ak fichye ki chaje depi telefòn nan */
 const SHELL = [
