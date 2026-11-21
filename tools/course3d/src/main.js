@@ -181,4 +181,4 @@ function frameEnd(){
 }
 function warm(){ if(R.off) return; if(!R.ready && !init()) return; const ks = Object.keys(CFG).filter(k => k !== 'runner'); let i = 0; (function step(){ if(i === 0) ctlFor('main'); else if(i <= ks.length) getModel(ks[i - 1]); else return; i++; setTimeout(step, 30); })(); }
 
-window.Z3D = { loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit };
+window.Z3D = { loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };

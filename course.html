@@ -1635,6 +1635,7 @@ body.cs-play #zmin-fab,body.cs-play .zt-wal,body.cs-play #promo-bar{display:none
         <span class="cs-chip" id="cs-wal" hidden>Solde <b data-bal>0</b><span id="cs-wal-ic"></span></span>
         <button class="cs-tool" type="button" id="gm-snd" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span>Son activé</span></button>
         <button class="cs-tool" type="button" id="cs-help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1.1.9-1.1 1.7M12 17h.01"/></svg><span>Règles et dangers</span></button>
+        <button class="cs-tool" type="button" id="cs-best"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.4-3.6 3-5.6 6-5.6s5.6 2 6 5.6M16 5.2a3 3 0 0 1 0 5.6M18 14.6c1.8.7 3 2.5 3.2 5.4"/></svg><span>Personnages</span></button>
         <a class="cs-tool" href="games.html">Tous les jeux</a>
       </div>
     </div>
@@ -2757,7 +2758,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=5'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=6'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); Z3D.loadWho('fille1', function(ok){ if(ok) mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
@@ -2905,6 +2906,16 @@ function help(){
     '<div class="row"><button class="gm-btn" type="button" data-close>Compris</button></div></div>');
 }
 $('#cs-help').addEventListener('click', help);
+/* Bestiaire : module chargé seulement au clic (aucun effet sur la course) */
+$('#cs-best').addEventListener('click', function(){
+  var go = function(){ if(window.ZBest) ZBest.open(); };
+  if(window.ZBest){ go(); return; }
+  var b = $('#cs-best'); b.disabled = true;
+  var s = document.createElement('script'); s.src = 'bestiary.js?v=1';
+  s.onload = function(){ b.disabled = false; go(); };
+  s.onerror = function(){ b.disabled = false; try{ openModal('<h2>Personnages</h2><p>Impossible de charger les fiches pour le moment. Vérifiez la connexion et réessayez.</p><div class="row"><button class="gm-btn" type="button" data-close>Fermer</button></div>'); }catch(e){} };
+  document.head.appendChild(s);
+});
 
 /* ═══ Consentement et démarrage ═══ */
 function gateConsent(go){
