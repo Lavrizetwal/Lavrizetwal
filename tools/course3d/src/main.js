@@ -93,6 +93,12 @@ function loadWho(name, cb){
   try{ new GLTFLoader().load(w.url, g => { w.gltf = g; w.state = 2; w.cbs.forEach(f => f && f(true)); w.cbs = []; }, undefined, () => { w.state = 3; w.cbs.forEach(f => f && f(false)); w.cbs = []; }); }
   catch(e){ w.state = 3; w.cbs.forEach(f => f && f(false)); }
 }
+/* ajoute un coureur depuis runners.json : modèle GLB humanoïde en T-pose, proportions par défaut = SPEC_FILLE1 (ajustables champ par champ) */
+function registerWho(id, url, spec){
+  if(!id || id === 'man' || !url) return false;
+  if(WHO[id]){ if(spec) Object.assign(WHO[id].spec, spec); return true; }
+  WHO[id] = { url: url, state: 0, cbs: [], gltf: null, spec: Object.assign({}, SPEC_FILLE1, spec || {}) }; return true;
+}
 function whoReady(name){ return !!(WHO[name] && WHO[name].state === 2); }
 function ctlFor(key, who){
   const kk = key + '|' + (who || 'man');
@@ -181,4 +187,4 @@ function frameEnd(){
 }
 function warm(){ if(R.off) return; if(!R.ready && !init()) return; const ks = Object.keys(CFG).filter(k => k !== 'runner'); let i = 0; (function step(){ if(i === 0) ctlFor('main'); else if(i <= ks.length) getModel(ks[i - 1]); else return; i++; setTimeout(step, 30); })(); }
 
-window.Z3D = { loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };
+window.Z3D = { registerWho, loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };
