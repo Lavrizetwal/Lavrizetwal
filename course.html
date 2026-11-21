@@ -2917,6 +2917,7 @@ $('#cs-best').addEventListener('click', function(){
   s.onerror = function(){ b.disabled = false; try{ openModal('<h2>Personnages</h2><p>Impossible de charger les fiches pour le moment. Vérifiez la connexion et réessayez.</p><div class="row"><button class="gm-btn" type="button" data-close>Fermer</button></div>'); }catch(e){} };
   document.head.appendChild(s);
 });
+try{ if(/[?&]best=1/.test(location.search)) setTimeout(function(){ var b = $('#cs-best'); if(b) b.click(); }, 600); }catch(e){}
 
 /* ═══ Consentement et démarrage ═══ */
 function gateConsent(go){
