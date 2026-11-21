@@ -1489,14 +1489,29 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
 .hb-rules li{color:var(--ink-2)}
 .hb-rules li::before{background:#D4AF37}
 .hb-pg .gm-sec:last-of-type{padding-bottom:60px}
-/* Pastille « mise à jour » de La course vers la mort */
-.hb-new{position:absolute;z-index:3;top:12px;left:12px;display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 14px 0 10px;border-radius:99px;border:1px solid rgba(240,217,138,.7);background:rgba(8,16,42,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;text-decoration:none;font:700 .8rem/1 Inter,system-ui,sans-serif;overflow:hidden}
-.hb-new i{width:9px;height:9px;border-radius:50%;background:#F0D98A;box-shadow:0 0 0 0 rgba(240,217,138,.7)}
-.hb-new b{color:#F0D98A;letter-spacing:.02em}.hb-new span{color:#dfe4f3;font-weight:600}
-.hb-new:hover{border-color:#F0D98A}.hb-new:focus-visible{outline:2px solid #F0D98A;outline-offset:3px}
-@keyframes hb-ping{0%{box-shadow:0 0 0 0 rgba(240,217,138,.75)}80%,100%{box-shadow:0 0 0 9px rgba(240,217,138,0)}}
-@keyframes hb-shine{0%,70%{transform:translateX(-120%)}100%{transform:translateX(220%)}}
-@media (prefers-reduced-motion:no-preference){.hb-new i{animation:hb-ping 1.8s ease-out infinite}.hb-new::after{content:"";position:absolute;inset:0;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);animation:hb-shine 4.2s ease-in-out infinite;pointer-events:none}}
+/* Aperçu dynamique : dernier coureur choisi qui court sur la dernière route choisie */
+.pvd{position:absolute;inset:0;overflow:hidden;background:var(--g,#33463a)}
+.pvd-sky{position:absolute;left:0;right:0;top:0;height:46%;background:var(--sky) center bottom/cover no-repeat}
+.pvd-sky::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:34%;background:linear-gradient(0deg,var(--g),transparent)}
+.pvd-gr{position:absolute;left:0;right:0;top:44%;bottom:0;perspective:220px;perspective-origin:50% 0;overflow:hidden}
+.pvd-rd{position:absolute;left:-30%;right:-30%;top:0;height:260%;transform-origin:50% 0;transform:rotateX(64deg);background:var(--road) center top/58% auto repeat-y;background-position:50% 0}
+.pvd-gr::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--g) 0,transparent 28%)}
+.pvd-run{position:absolute;left:50%;bottom:7%;height:60%;aspect-ratio:var(--ar,.45);transform:translateX(-50%)}
+.pvd-run img{position:absolute;left:0;bottom:0;width:100%;height:100%;object-fit:contain}
+.pvd-run::before{content:"";position:absolute;left:8%;right:8%;bottom:-3%;height:7%;border-radius:50%;background:rgba(0,0,0,.4);filter:blur(2px)}
+.pvd-cap{position:absolute;left:10px;bottom:10px;z-index:2;display:inline-flex;gap:6px;align-items:center;max-width:calc(100% - 20px);padding:5px 11px;border-radius:99px;background:rgba(8,16,42,.78);color:#f4f1e8;font:600 .74rem/1.2 Inter,system-ui,sans-serif;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.pvd-cap b{color:#F0D98A;font-weight:700}
+@media (prefers-reduced-motion:no-preference){
+  @keyframes pvd-road{to{background-position:50% 100%}}
+  @keyframes pvd-f0{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @keyframes pvd-f1{0%,49%{opacity:0}50%,100%{opacity:1}}
+  @keyframes pvd-bob{to{transform:translateX(-50%) translateY(-2.5%)}}
+  .pvd-rd{animation:pvd-road 1.1s linear infinite}
+  .pvd-run{animation:pvd-bob .42s ease-in-out infinite alternate}
+  .pvd-run img:nth-child(1){animation:pvd-f0 .42s steps(1) infinite}
+  .pvd-run img:nth-child(2){animation:pvd-f1 .42s steps(1) infinite}
+}
+@media (prefers-reduced-motion:reduce){.pvd-run img:nth-child(2){opacity:0}}
 @media (prefers-reduced-motion:reduce){.pv .sd-n{animation:none;opacity:1}.pv .ring,.pv .dash,.pv .rn{animation:none}.pv .dash{opacity:.7}}
 @media (max-width:640px){.hb-pg .gm-sec{padding:28px 0 12px}.hb-g>*:not(.pv){margin-inline:20px}.hb-rules{padding:22px 20px}}
 </style>
@@ -1637,7 +1652,6 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
           <div class="acts"><a class="gm-btn" href="duel.html">Jwe</a><button class="gm-btn ln" type="button" data-stats="duel">Statistik mwen</button></div>
         </article>
         <article class="hb-g" id="hb-cr">
-          <a class="hb-new" href="course.html?best=1" aria-label="Nouvo mizajou : wè pèsonaj yo nan jwèt la"><i aria-hidden="true"></i><b>Mizajou</b><span>Wè 22 pèsonaj yo</span></a>
           <div class="pv" aria-hidden="true">
             <svg viewBox="0 0 240 190" preserveAspectRatio="xMidYMid slice">
               <defs>
@@ -2194,6 +2208,33 @@ onUser.push(function(){ refreshStatus().then(boot,function(){ boot(); }); });
   rs(); raf=requestAnimationFrame(draw);
   window.addEventListener('resize',function(){ rs(); if(!raf) raf=requestAnimationFrame(draw); });
   if('IntersectionObserver' in window) new IntersectionObserver(function(e){ vis=e[0].isIntersecting; if(vis&&!raf&&!rm){ last=performance.now(); raf=requestAnimationFrame(draw); } }).observe(cv);
+})();
+</script>
+<script>
+/* Hub : la carte de « La course vers la mort » montre le dernier coureur choisi sur la dernière route choisie */
+(function(){
+  var DT = { zetwal:'jungle', cejjd:'glace', soldiers:'ruines', dadoute:'volcan', phada:'desert' };
+  var GR = { jungle:'#1e2a1b', glace:'#d9e6ef', ruines:'#4a4a46', volcan:'#1d1512', desert:'#c9a066' };
+  var NM = { zetwal:'Zetwal', cejjd:'CEJJD', soldiers:'The Soldiers Studio', dadoute:'Dadoute', phada:'Phada Business' };
+  var AR = { man:.4, fille1:.5 };
+  function paint(){
+    var pv = document.querySelector('#hb-cr .pv'); if(!pv) return;
+    var pick = null, who = null;
+    try{ pick = JSON.parse(localStorage.getItem('zc-pick') || 'null'); who = localStorage.getItem('zc-runner'); }catch(e){}
+    var dest = pick && DT[pick.dest] ? pick.dest : null;
+    if(!dest && !who) return;                         /* aucun historique : l'aperçu d'origine reste */
+    dest = dest || 'zetwal'; who = who === 'fille1' ? 'fille1' : 'man';
+    var th = DT[dest], old = pv.querySelector('.pvd'); if(old) old.remove();
+    var d = document.createElement('div'); d.className = 'pvd'; d.setAttribute('aria-hidden', 'true');
+    d.style.setProperty('--sky', 'url(textures/sky-' + th + '.jpg)'); d.style.setProperty('--road', 'url(textures/road-' + th + '.jpg)');
+    d.style.setProperty('--g', GR[th]); d.style.setProperty('--ar', AR[who]);
+    d.innerHTML = '<div class="pvd-sky"></div><div class="pvd-gr"><div class="pvd-rd"></div></div>'
+      + '<div class="pvd-run"><img src="hub/runner-' + who + '-0.png" alt="" decoding="async"><img src="hub/runner-' + who + '-1.png" alt="" decoding="async"></div>'
+      + '<span class="pvd-cap">' + (who === 'fille1' ? 'La coureuse' : 'Le coureur') + ' · <b>' + NM[dest] + '</b></span>';
+    pv.appendChild(d); var sv = pv.querySelector('svg'); if(sv) sv.style.visibility = 'hidden';
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint); else paint();
+  window.addEventListener('pageshow', function(e){ if(e.persisted) paint(); });
 })();
 </script>
 </body>
