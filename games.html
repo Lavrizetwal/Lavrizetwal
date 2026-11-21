@@ -1501,6 +1501,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
 .pvd-run::before{content:"";position:absolute;left:8%;right:8%;bottom:-3%;height:7%;border-radius:50%;background:rgba(0,0,0,.4);filter:blur(2px)}
 .pvd-cap{position:absolute;left:10px;bottom:10px;z-index:2;display:inline-flex;gap:6px;align-items:center;max-width:calc(100% - 20px);padding:5px 11px;border-radius:99px;background:rgba(8,16,42,.78);color:#f4f1e8;font:600 .74rem/1.2 Inter,system-ui,sans-serif;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .pvd-cap b{color:#F0D98A;font-weight:700}
+.pvd-cap i{font-style:normal}
 @media (prefers-reduced-motion:no-preference){
   @keyframes pvd-road{to{background-position:50% 100%}}
   @keyframes pvd-f0{0%,49%{opacity:1}50%,100%{opacity:0}}
@@ -2216,21 +2217,23 @@ onUser.push(function(){ refreshStatus().then(boot,function(){ boot(); }); });
   var DT = { zetwal:'jungle', cejjd:'glace', soldiers:'ruines', dadoute:'volcan', phada:'desert' };
   var GR = { jungle:'#1e2a1b', glace:'#d9e6ef', ruines:'#4a4a46', volcan:'#1d1512', desert:'#c9a066' };
   var NM = { zetwal:'Zetwal', cejjd:'CEJJD', soldiers:'The Soldiers Studio', dadoute:'Dadoute', phada:'Phada Business' };
-  var AR = { man:.4, fille1:.5 };
+  var AR = { man:.4, fille1:.5 }, WN = {};
+  try{ fetch('runners.json?v=1').then(function(r){ return r.json(); }).then(function(j){ (j.runners || []).forEach(function(r){ WN[r.id] = r.name; }); paint(); }).catch(function(){}); }catch(e){}
   function paint(){
     var pv = document.querySelector('#hb-cr .pv'); if(!pv) return;
     var pick = null, who = null;
     try{ pick = JSON.parse(localStorage.getItem('zc-pick') || 'null'); who = localStorage.getItem('zc-runner'); }catch(e){}
     var dest = pick && DT[pick.dest] ? pick.dest : null;
     if(!dest && !who) return;                         /* aucun historique : l'aperçu d'origine reste */
-    dest = dest || 'zetwal'; who = who === 'fille1' ? 'fille1' : 'man';
+    dest = dest || 'zetwal'; who = /^[a-z0-9_-]{1,24}$/.test(who || '') ? who : 'man';
     var th = DT[dest], old = pv.querySelector('.pvd'); if(old) old.remove();
     var d = document.createElement('div'); d.className = 'pvd'; d.setAttribute('aria-hidden', 'true');
     d.style.setProperty('--sky', 'url(textures/sky-' + th + '.jpg)'); d.style.setProperty('--road', 'url(textures/road-' + th + '.jpg)');
-    d.style.setProperty('--g', GR[th]); d.style.setProperty('--ar', AR[who]);
+    d.style.setProperty('--g', GR[th]); d.style.setProperty('--ar', AR[who] || .45);
     d.innerHTML = '<div class="pvd-sky"></div><div class="pvd-gr"><div class="pvd-rd"></div></div>'
       + '<div class="pvd-run"><img src="hub/runner-' + who + '-0.png" alt="" decoding="async"><img src="hub/runner-' + who + '-1.png" alt="" decoding="async"></div>'
-      + '<span class="pvd-cap">' + (who === 'fille1' ? 'La coureuse' : 'Le coureur') + ' · <b>' + NM[dest] + '</b></span>';
+      + '<span class="pvd-cap"><i>' + (WN[who] || (who === 'fille1' ? 'La coureuse' : 'Le coureur')) + '</i> · <b>' + NM[dest] + '</b></span>';
+    d.querySelectorAll('img').forEach(function(im, k){ im.onerror = function(){ im.onerror = null; im.src = 'hub/runner-man-' + k + '.png'; d.style.setProperty('--ar', AR.man); }; });
     pv.appendChild(d); var sv = pv.querySelector('svg'); if(sv) sv.style.visibility = 'hidden';
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint); else paint();

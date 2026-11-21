@@ -2760,8 +2760,8 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=6'; s.async = true;
-  s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); Z3D.loadWho('fille1', function(ok){ if(ok) mountPicker(); }); } }catch(e){} };
+  var s = document.createElement('script'); s.src = 'course3d.js?v=7'; s.async = true;
+  s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); loadRunners(function(){ mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
 ZScene.load3d = load; if(window.__Z3D_FORCE) window.__ZS = ZScene;
@@ -2769,7 +2769,20 @@ if(document.readyState === 'complete') setTimeout(load, 400); else window.addEve
 
 
 /* choix du coureur (visible seulement quand le 3D et le second personnage sont prêts) */
-try{ window.ZRUN = localStorage.getItem('zc-runner') === 'fille1' ? 'fille1' : 'man'; }catch(e){ window.ZRUN = 'man'; }
+var RUNNERS = [{ id:'man', name:'Le coureur', desc:'Gilet or, chemise blanche, pantalon bleu' }, { id:'fille1', name:'La coureuse', desc:'Chemisier rouge, jupe noire, bottes', url:'models/fille1.glb?v=1' }];
+try{ window.ZRUN = localStorage.getItem('zc-runner') || 'man'; }catch(e){ window.ZRUN = 'man'; }
+/* liste des coureurs : runners.json (ajouter un coureur = ajouter son .glb et une ligne dans ce fichier) */
+function loadRunners(done){
+  function go(list){
+    RUNNERS = list.filter(function(r){ return r && /^[a-z0-9_-]{1,24}$/.test(r.id) && (r.id === 'man' || r.url); });
+    if(!RUNNERS.some(function(r){ return r.id === 'man'; })) RUNNERS.unshift({ id:'man', name:'Le coureur', desc:'' });
+    var left = 0, Z = z(); if(!Z){ done(); return; }
+    RUNNERS.forEach(function(r){ if(r.id === 'man') return; if(Z.registerWho(r.id, r.url, r.spec)){ left++; Z.loadWho(r.id, function(){ if(--left === 0) fin(); }); } });
+    if(left === 0) fin();
+    function fin(){ if(!RUNNERS.some(function(r){ return r.id === window.ZRUN && (r.id === 'man' || Z.whoReady(r.id)); })) window.ZRUN = 'man'; done(); }
+  }
+  try{ fetch('runners.json?v=1').then(function(r){ return r.json(); }).then(function(j){ go(j && j.runners ? j.runners : RUNNERS); }).catch(function(){ go(RUNNERS); }); }catch(e){ go(RUNNERS); }
+}
 function mountPicker(){
   var sum = document.getElementById('cs-sum'); if(!sum || document.getElementById('cs-whog')) return;
   var st = document.createElement('style');
@@ -2782,9 +2795,11 @@ function mountPicker(){
     + '@media (max-width:520px){.cs-who{gap:8px}.cs-who button{flex-direction:column;text-align:center;padding:10px 8px}.cs-who canvas{width:64px;height:80px}}';
   document.head.appendChild(st);
   var g = document.createElement('div'); g.className = 'cs-grp'; g.id = 'cs-whog';
-  g.innerHTML = '<h3>Coureur</h3><div class="cs-who" role="radiogroup" aria-label="Coureur">'
-    + '<button type="button" role="radio" data-w="man"><canvas width="112" height="140"></canvas><div><b>Le coureur</b><span>Gilet or, chemise blanche, pantalon bleu</span></div></button>'
-    + '<button type="button" role="radio" data-w="fille1"><canvas width="112" height="140"></canvas><div><b>La coureuse</b><span>Chemisier rouge, jupe noire, bottes</span></div></button></div>';
+  var Zr = z();
+  g.innerHTML = '<h3>Coureur</h3><div class="cs-who" role="radiogroup" aria-label="Coureur">' + RUNNERS.filter(function(r){ return r.id === 'man' || (Zr && Zr.whoReady(r.id)); }).map(function(r){
+    return '<button type="button" role="radio" data-w="' + r.id + '"><canvas width="112" height="140"></canvas><div><b></b><span></span></div></button>'; }).join('') + '</div>';
+  g.querySelectorAll('button').forEach(function(b){ var r = RUNNERS.filter(function(x){ return x.id === b.dataset.w; })[0]; b.querySelector('b').textContent = r.name || r.id; b.querySelector('span').textContent = r.desc || ''; });
+  if(g.querySelectorAll('button').length < 2) return;
   sum.parentNode.insertBefore(g, sum);
   function paint(){ g.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-checked', b.dataset.w === window.ZRUN ? 'true' : 'false'); }); }
   g.addEventListener('click', function(e){ var b = e.target.closest('[data-w]'); if(!b) return; window.ZRUN = b.dataset.w; try{ localStorage.setItem('zc-runner', window.ZRUN); }catch(e2){} paint(); });
@@ -2792,7 +2807,7 @@ function mountPicker(){
   var Z = z(); if(!Z) return;
   g.querySelectorAll('button').forEach(function(b){
     var cv = b.querySelector('canvas'), X = cv.getContext('2d'); X.setTransform(2, 0, 0, 2, 0, 0);
-    Z.frameStart('ville'); Z.draw(X, 'runner', 28, 66, 40, 0, { dpr: 2, key: 'thumb', who: b.dataset.w === 'fille1' ? 'fille1' : undefined, freeze: 1.1 });
+    Z.frameStart('ville'); Z.draw(X, 'runner', 28, 66, 40, 0, { dpr: 2, key: 'thumb', who: b.dataset.w === 'man' ? undefined : b.dataset.w, freeze: 1.1 });
   });
 }
 
@@ -2806,7 +2821,7 @@ P.frame = function(f){
 var _runner = P.runner;
 P.runner = function(x, y, u, st){
   var Z = z();
-  if(Z && Z.draw(this.X, 'runner', x, y, u, st.now, { dpr: this.DPR, jump: st.jump, jv: this._jv, crouch: st.crouch, hit: st.hit, speed: this._f ? this._f.speed : 1, key: this.cv.id || 'main', who: window.ZRUN === 'fille1' && Z.whoReady('fille1') ? 'fille1' : undefined })) return;
+  if(Z && Z.draw(this.X, 'runner', x, y, u, st.now, { dpr: this.DPR, jump: st.jump, jv: this._jv, crouch: st.crouch, hit: st.hit, speed: this._f ? this._f.speed : 1, key: this.cv.id || 'main', who: window.ZRUN !== 'man' && Z.whoReady(window.ZRUN) ? window.ZRUN : undefined })) return;
   _runner.call(this, x, y, u, st);
 };
 ['bandit_debout', 'bandit_saut', 'chien', 'taureau', 'cochon', 'serpent_sol', 'scorpion', 'abeilles'].forEach(function(k){
