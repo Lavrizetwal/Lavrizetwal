@@ -10,7 +10,7 @@
 <meta name="color-scheme" content="light dark">
 <script>try{var __t=localStorage.getItem("zt-theme");if(__t==="light"||__t==="dark")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
 <title>La course vers la mort — ZETWAL ORGANISATION</title>
-<meta name="description" content="La course vers la mort : courez jusqu'à votre destination, esquivez, sautez, baissez-vous. Jeu Zetwal réservé aux adultes.">
+<meta name="description" content="La course vers la mort : courez jusqu'à votre destination, esquivez, sautez, glissez-vous dessous. Jeu Zetwal réservé aux adultes.">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -1632,7 +1632,7 @@ body.cs-play #zmin-fab,body.cs-play .zt-wal,body.cs-play #promo-bar{display:none
     <div class="cs-hero-in wrap">
       <div class="cs-sign"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 9h-5v11H9V11H4z"/></svg>Jeu Zetwal · 18 ans et plus</div>
       <h1><span>La course</span><span>vers la mort</span></h1>
-      <p class="lead">Courez jusqu’à votre destination sans perdre toute votre énergie. Esquivez, sautez, baissez-vous : chaque obstacle a sa réponse, et la carte vous montre la bonne route à chaque carrefour.</p>
+      <p class="lead">Courez jusqu’à votre destination sans perdre toute votre énergie. Esquivez, sautez, glissez-vous dessous : chaque obstacle a sa réponse, et la carte vous montre la bonne route à chaque carrefour.</p>
       <div class="cs-tools">
         <span class="cs-chip" id="cs-wal" hidden>Solde <b data-bal>0</b><span id="cs-wal-ic"></span></span>
         <button class="cs-tool" type="button" id="gm-snd" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span>Son activé</span></button>
@@ -1676,7 +1676,7 @@ body.cs-play #zmin-fab,body.cs-play .zt-wal,body.cs-play #promo-bar{display:none
     </div>
   </div>
   <div class="cs-stage">
-    <canvas id="cs-cv" aria-label="Route : esquivez, sautez ou baissez-vous"></canvas>
+    <canvas id="cs-cv" aria-label="Route : esquivez, sautez ou glissez-vous dessous"></canvas>
     <canvas id="cs-mp" aria-hidden="true"></canvas>
     <div class="cs-cd" id="cs-cd" aria-live="assertive"></div>
     <div class="cs-ft" id="cs-ft" aria-live="polite"></div>
@@ -1684,7 +1684,7 @@ body.cs-play #zmin-fab,body.cs-play .zt-wal,body.cs-play #promo-bar{display:none
   <div class="cs-ctl" id="cs-ctl">
     <button type="button" data-a="0" aria-label="Aller à gauche"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
     <button type="button" data-a="2" aria-label="Sauter"><svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></svg><span>Saut</span></button>
-    <button type="button" data-a="3" aria-label="Se baisser"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></svg><span>Baisser</span></button>
+    <button type="button" data-a="3" aria-label="Se glisser dessous"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></svg><span>Glisser</span></button>
     <button type="button" data-a="1" aria-label="Aller à droite"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
   </div>
 </section>
@@ -2025,7 +2025,7 @@ ERRS.en_cours = 'Une course précédente est encore ouverte.'; ERRS.session = 'P
 
 /*ENGINE-START*/
 /* Moteur déterministe : mêmes règles que la fonction serveur zc_sim.
-   journal : [[t_ms, code], ...]  code 0 = gauche, 1 = droite, 2 = saut, 3 = se baisser */
+   journal : [[t_ms, code], ...]  code 0 = gauche, 1 = droite, 2 = saut, 3 = se glisser dessous */
 var DELAY = 90;   /* le client attend 90 ms après l'instant d'un obstacle pour tenir compte des dernières touches (n'affecte pas le résultat) */
 function Eng(course){
   this.c = course; this.jd = course.jd; this.cd = course.cd; this.dr = course.dr; this.e = course.e0; this.emax = course.e0;
@@ -2760,7 +2760,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=7'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=8'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); loadRunners(function(){ mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
@@ -2841,12 +2841,31 @@ SP.serpent_arbre = function(X, a){
   X.fillStyle = 'rgba(120,200,110,.25)'; X.beginPath(); X.arc(-.12, -1.98, .3, 0, 6.2832); X.fill(); X.restore();
   if(!Z.draw(X, 'serpent_arbre', a.cx, a.y, u, a.now, { dpr: X.getTransform().a })) _arb(X, a);
 };
+/* créatures-obstacles : rendu 3D (bestiaire) ; sans 3D, silhouette 2D selon le geste attendu */
+var CRC = { tigre:['L','#c9772b'], crocodile:['J','#8a8a5a'], araignee_noire:['J','#1c1c1f'], serpent:['J','#a88c5a'], araignee_monstre:['C','#2a2118'], loup:['L','#7a7a80'], grand_loup:['L','#d8d8d4'], ours:['L','#5a3b24'],
+  bandit_homme:['L','#6b5238'], bandit_femme:['L','#8a7a5a'], colosse:['L','#4a4038'], zombie:['L','#9aa49a'], dimon:['C','#3a1f2a'], manon_fire:['L','#2a1a16'], roi_scorpion:['L','#8a6a2a'], ver_geant:['J','#a89868'] };
+function creFallback(X, k, a){
+  var d = CRC[k], u = a.u, cx = a.cx, y = a.y, cl = d[0], col = d[1], hang = cl === 'C';
+  X.save(); X.fillStyle = 'rgba(0,0,0,.28)'; X.beginPath(); X.ellipse(cx, y, u * .55, u * .09, 0, 0, 6.2832); X.fill();
+  var cy = hang ? y - u * 1.25 : y, rw = cl === 'J' ? u * .62 : u * .5, rh = cl === 'J' ? u * .32 : u * 1.15;
+  if(hang){ X.strokeStyle = 'rgba(230,230,225,.5)'; X.lineWidth = Math.max(1, u * .02); X.beginPath(); X.moveTo(cx, cy - u * .5); X.lineTo(cx, y - u * 4); X.stroke(); rh = u * .5; rw = u * .6; }
+  X.fillStyle = col; X.beginPath(); X.ellipse(cx, cy - rh * (hang ? .1 : .5), rw, rh * (hang ? 1 : .55), 0, 0, 6.2832); X.fill();
+  X.fillStyle = '#ff4b3a'; var ey = cy - rh * (hang ? .1 : cl === 'J' ? .5 : .9), er = Math.max(1.2, u * .05); X.beginPath(); X.arc(cx - u * .13, ey, er, 0, 6.2832); X.arc(cx + u * .13, ey, er, 0, 6.2832); X.fill();
+  X.restore();
+}
+Object.keys(CRC).forEach(function(k){
+  SP[k] = function(X, a){
+    var Z = z();
+    if(Z && Z.draw(X, k, a.cx, a.y, a.u, a.now, { dpr: X.getTransform().a, seed: Math.round(a.cx / 37) })) return;
+    creFallback(X, k, a);
+  };
+});
 })();
 /*PRO3D-END*/
 
 
 /* ═══ Libellés ═══ */
-var CTR = { L:'Changer de couloir', J:'Sauter', C:'Se baisser' };
+var CTR = { L:'Changer de couloir', J:'Sauter', C:'Se glisser dessous' };
 var THEME_N = { ville:'Ville', foret:'Forêt', montagne:'Montagne' };
 function lv1(n){ return (Math.round(n / 100) / 10).toFixed(1).replace('.', ','); }
 function mmssl(ms){ var s = Math.round(ms / 1000); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
@@ -2978,7 +2997,7 @@ function help(){
   var rows = INFO && INFO.obs ? INFO.obs.map(function(o){ return '<tr><td>' + esc(o.label) + '</td><td>' + CTR[o.ctr] + '</td><td>−' + lv1(o.dmg) + '</td></tr>'; }).join('') : '';
   openModal('<div class="cs-help"><h2>Règles et dangers</h2>' +
     '<p>Vous courez vers la destination choisie. Votre énergie compte <b>5 niveaux</b>, du rouge au vert. La course elle-même en use un peu ; chaque obstacle mal géré en retire davantage. À zéro, la course est perdue.</p>' +
-    '<p><b>Commandes.</b> Ordinateur : flèches gauche et droite pour changer de couloir, flèche haut ou espace pour sauter, flèche bas pour se baisser. Téléphone : glissez le doigt dans la direction voulue ou utilisez les boutons.</p>' +
+    '<p><b>Commandes.</b> Ordinateur : flèches gauche et droite pour changer de couloir, flèche haut ou espace pour sauter, flèche bas pour se glisser sous les obstacles. Téléphone : glissez le doigt dans la direction voulue ou utilisez les boutons.</p>' +
     '<p><b>Carrefours.</b> La route se sépare en trois. La carte indique quelle voie mène à la destination et laquelle est un détour (plus long et plus dangereux). Le couloir où vous êtes au carrefour décide de la route prise. Les deux bonnes voies n’ont pas les mêmes obstacles : choisissez celle que vous maîtrisez le mieux.</p>' +
     '<p><b>Trou :</b> tomber dans un trou fait toujours perdre un niveau entier. <b>Eau et mangue :</b> elles redonnent un peu d’énergie.</p>' +
     '<p><b>Gains.</b> Arrivée à destination : mise + 10 × le niveau. Sinon, la mise est perdue. Plafond de gain : ' + (GM.st && GM.st.cap_day ? GM.st.cap_day : 300) + ' jetons par jour.</p>' +
@@ -2993,7 +3012,7 @@ $('#cs-best').addEventListener('click', function(){
   var go = function(){ if(window.ZBest) ZBest.open(); };
   if(window.ZBest){ go(); return; }
   var b = $('#cs-best'); b.disabled = true;
-  var s = document.createElement('script'); s.src = 'bestiary.js?v=1';
+  var s = document.createElement('script'); s.src = 'bestiary.js?v=2';
   s.onload = function(){ b.disabled = false; go(); };
   s.onerror = function(){ b.disabled = false; try{ openModal('<h2>Personnages</h2><p>Impossible de charger les fiches pour le moment. Vérifiez la connexion et réessayez.</p><div class="row"><button class="gm-btn" type="button" data-close>Fermer</button></div>'); }catch(e){} };
   document.head.appendChild(s);
@@ -3190,7 +3209,7 @@ function loop(ts){
 
 /* ═══ Entrée en jeu ═══ */
 function enter(r){
-  SID = r.sid; C = r.course; if(C.lead) C.lead = Math.round(C.lead * (window.ZPRESS || 1)); OBS = r.obs || {}; LOG = []; ENG = new Eng(C); ENG.vjend = -1; ENG.vcend = -1; FORKS = forkIdxs();
+  SID = r.sid; C = r.course; try{ var _ks = {}; C.stages.forEach(function(s){ (s.k === 'fork' ? s.opts.reduce(function(a, o){ return a.concat(o.ev); }, []) : s.ev || []).forEach(function(e){ _ks[e[1]] = 1; }); }); if(window.Z3D && Z3D.preload) Z3D.preload(Object.keys(_ks)); }catch(e){}  if(C.lead) C.lead = Math.round(C.lead * (window.ZPRESS || 1)); OBS = r.obs || {}; LOG = []; ENG = new Eng(C); ENG.vjend = -1; ENG.vcend = -1; FORKS = forkIdxs();
   V = { theme:DT[SEL.dest] || 'ville', prev:null, tchg:-9999, lane:1, vx:1, flash:0, shake:0, forkRec:null, lastDec:-9999, decOpt:null };
   SC.lead = C.lead; SC.parts = []; SC.lastT = 0; lastTm = -1; stopHero();
   setBal(r.balance); lastRes = null; showNote(null);

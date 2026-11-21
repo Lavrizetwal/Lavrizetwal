@@ -2,7 +2,7 @@ import * as T from 'three';
 import { PI, clamp, mix } from './util.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { rigFromMesh, SPEC_FILLE1 } from './rig.js';
-import { buildHuman, applyPose, poseRun, poseCrouch, poseJump, poseHit, poseStand, poseLeap } from './human.js';
+import { buildHuman, applyPose, poseRun, poseCrouch, poseSlide, poseJump, poseHit, poseStand, poseLeap } from './human.js';
 import { buildDog, buildBull, buildPig, buildSnake, snakeGround, snakeHang, buildScorpion, updScorpion, buildBees, updBees } from './animals.js';
 
 const FOV = 22;
@@ -85,6 +85,53 @@ function getModel(k){
   else if(k === 'abeilles'){ const a = buildBees(); m = reg({ root: a.root, a }); }
   R.models[k] = m; return m;
 }
+
+/* ── créatures-obstacles : modèles GLB du bestiaire (sans squelette → animation par le code) ── */
+const CRE = {
+  tigre:{ f:'tigre', Fu:2.1, an:'walk' }, crocodile:{ f:'crocodile', Fu:3.3, an:'crawl' }, araignee_noire:{ f:'araignee-noire', Fu:1.8, an:'scuttle' },
+  serpent:{ f:'serpent', Fu:1.6, an:'coil' }, araignee_monstre:{ f:'araignee-monstre', Fu:2.0, an:'hang', lift:1.2, thread:1 },
+  loup:{ f:'loup', Fu:1.95, an:'walk' }, grand_loup:{ f:'grand-loup', Fu:2.1, an:'walk' }, ours:{ f:'ours', Fu:2.2, an:'stomp' },
+  bandit_homme:{ f:'bandit-homme', Fu:1.85, hu:1 }, bandit_femme:{ f:'bandit-femme', Fu:1.75, hu:1 }, colosse:{ f:'colosse', Fu:2.5, hu:1, wide:1.3 },
+  zombie:{ f:'zombie', Fu:1.85, hu:1, an:'zomb' }, dimon:{ f:'dimon', Fu:2.0, an:'fly', lift:1.0 }, manon_fire:{ f:'manon-fire', Fu:2.7, an:'stomp' },
+  roi_scorpion:{ f:'roi-scorpion', Fu:2.7, an:'scuttle' }, ver_geant:{ f:'ver-geant', Fu:2.6, an:'worm' }
+};
+for(const k in CRE){ CFG[k] = CFG[k] || (CRE[k].hu ? { Fm: 2.4, Fu: CRE[k].Fu, pitch: .2 } : { Fm: 1.25, Fu: CRE[k].Fu, pitch: .22 }); }
+R.creS = {};
+function loadCre(k, cb){
+  const cf = CRE[k]; if(!cf) return; if(R.creS[k]){ if(cb) (R.creS[k] === 2 ? cb(true) : (R.creW = R.creW || []).push(cb)); return; } R.creS[k] = 1;
+  const done = ok => { R.creS[k] = ok ? 2 : 3; if(cb) cb(ok); };
+  try{ new GLTFLoader().load('bestiaire/' + cf.f + '.glb?v=1', g => {
+    try{
+      let m;
+      if(cf.hu){ let mesh; g.scene.traverse(n => { if(n.isMesh && !mesh) mesh = n; }); const h = rigFromMesh(mesh, SPEC_FILLE1); m = { root: h.root, h }; }
+      else {
+        const obj = g.scene, bb = new T.Box3().setFromObject(obj), sz = bb.getSize(new T.Vector3()), c = bb.getCenter(new T.Vector3()), sc = 1 / Math.max(sz.x, sz.y, sz.z);
+        obj.scale.setScalar(sc); obj.position.set(-c.x * sc, -bb.min.y * sc, -c.z * sc);
+        const pv = new T.Group(); pv.add(obj); const root = new T.Group(); root.add(pv); m = { root, pv };
+      }
+      R.models[k] = reg(m); done(true);
+    }catch(e){ done(false); }
+  }, undefined, () => done(false)); }catch(e){ done(false); }
+}
+function preload(list){ list.forEach(k => { if(CRE[k]) loadCre(k); }); }
+function creAnim(m, cf, now, seed){
+  const t = now + seed * 400, r = m.root;
+  if(cf.hu){
+    applyPose(m.h, poseStand(cf.an === 'zomb' ? t * .55 : t)); r.rotation.set(0, .15, cf.an === 'zomb' ? .08 * Math.sin(now / 420) : 0);
+    r.position.y = 0; if(cf.wide) r.scale.set(cf.wide, 1.04, cf.wide); return;
+  }
+  const pv = m.pv; pv.rotation.set(0, 0, 0); r.position.set(0, 0, 0); r.rotation.set(0, .3, 0); r.scale.setScalar(1);
+  const a = cf.an;
+  if(a === 'walk'){ const ph = t / 190; r.position.y = Math.abs(Math.sin(ph)) * .035; pv.rotation.z = Math.sin(ph) * .05; pv.rotation.x = Math.sin(ph * 2) * .035; }
+  else if(a === 'stomp'){ const ph = t / 330; r.position.y = Math.abs(Math.sin(ph)) * .03; pv.rotation.z = Math.sin(ph) * .07; r.scale.setScalar(1 + .012 * Math.sin(ph * 2)); }
+  else if(a === 'crawl'){ r.rotation.y = .3 + Math.sin(t / 300) * .22; r.position.x = Math.sin(t / 300) * .03; }
+  else if(a === 'scuttle'){ r.rotation.y = .3 + Math.sin(t / 90) * .06; r.position.x = Math.sin(t / 70) * .012; r.position.y = Math.abs(Math.sin(t / 60)) * .012; }
+  else if(a === 'coil'){ r.rotation.y = .3 + Math.sin(t / 500) * .35; pv.scale.y = 1 + .06 * Math.sin(t / 380); }
+  else if(a === 'worm'){ r.position.y = .06 * (1 + Math.sin(t / 340)); pv.rotation.x = Math.sin(t / 340) * .1; pv.rotation.z = Math.sin(t / 560) * .05; }
+  else if(a === 'fly'){ r.position.y = .1 * Math.sin(t / 250); pv.rotation.z = Math.sin(t / 170) * .16; pv.scale.x = 1 + .07 * Math.sin(t / 105); }
+  else if(a === 'hang'){ pv.rotation.z = Math.sin(t / 520) * .1; r.position.y = .03 * Math.sin(t / 380); }
+}
+
 const WHO = { fille1: { url: 'models/fille1.glb?v=1', state: 0, cbs: [], gltf: null, spec: SPEC_FILLE1 } };
 function loadWho(name, cb){
   const w = WHO[name]; if(!w){ cb && cb(false); return; }
@@ -122,7 +169,7 @@ function runnerUpdate(c, now, cx, st, u){
   c.w.c += ((st.crouch ? 1 : 0) - c.w.c) * k(14);
   c.w.h += ((st.hit ? 1 : 0) - c.w.h) * k(st.hit ? 30 : 9);
   if(st.hit && !c.wasHit) c.hitT0 = now; c.wasHit = !!st.hit;
-  const pr = poseRun(c.ph, run ? 1 : .2), pc = poseCrouch(c.ph), pj = poseJump(jv), ph = poseHit(now - c.hitT0);
+  const pr = poseRun(c.ph, run ? 1 : .2), pc = poseSlide(c.ph), pj = poseJump(jv), ph = poseHit(now - c.hitT0);
   const wj = c.w.j, wc = c.w.c * (1 - wj), wh = c.w.h;
   const p = pr.map((v, i) => { let x = v + wj * (pj[i] - v) + wc * (pc[i] - v); x += wh * (ph[i] - x); return x; });
   /* inertie latérale : le corps s'incline dans les changements de couloir */
@@ -147,7 +194,10 @@ function draw(X, kind, cx, gy, u, now, o){
   fit(kind);
   let m, h;
   if(kind === 'runner'){ const c = ctlFor(o.key || 'main', o.who); m = c.o; if(o.freeze != null) c.ph = o.freeze; runnerUpdate(c, o.freeze != null ? c.last == null ? now : c.last + 1 : now, cx, o, u); h = c.h; }
-  else {
+  else if(CRE[kind]){
+    m = R.models[kind]; if(!m){ loadCre(kind); return false; }
+    creAnim(m, CRE[kind], now, o.seed || 0); h = m.h;
+  } else {
     m = getModel(kind);
     const ph = now / 95 + (o.seed || 0) * 1.7;
     if(kind === 'bandit_debout' || kind === 'bandit_saut'){
@@ -170,6 +220,11 @@ function draw(X, kind, cx, gy, u, now, o){
   m.root.visible = true;
   renderer.setViewport(0, 0, px, px); renderer.setScissor(0, 0, px, px); renderer.setScissorTest(true);
   renderer.clear(true, true, false); renderer.render(scene, camera);
+  const cf = CRE[kind];
+  if(cf){
+    X.save(); X.fillStyle = 'rgba(0,0,0,.30)'; X.beginPath(); X.ellipse(cx, gy, wd * .30, Math.max(2, wd * .06), 0, 0, 6.2832); X.fill(); X.restore();
+    if(cf.lift){ gy -= cf.lift * u; if(cf.thread){ X.save(); X.strokeStyle = 'rgba(230,230,225,.55)'; X.lineWidth = Math.max(1, u * .02); X.beginPath(); X.moveTo(cx, gy - wd * .6); X.lineTo(cx, gy - u * 4.2); X.stroke(); X.restore(); } }
+  }
   X.drawImage(canvas, 0, R.BUF - px, px, px, cx - wd / 2, gy - wd * .89, wd, wd);
   R.acc += performance.now() - t0; return true;
 }
@@ -187,4 +242,4 @@ function frameEnd(){
 }
 function warm(){ if(R.off) return; if(!R.ready && !init()) return; const ks = Object.keys(CFG).filter(k => k !== 'runner'); let i = 0; (function step(){ if(i === 0) ctlFor('main'); else if(i <= ks.length) getModel(ks[i - 1]); else return; i++; setTimeout(step, 30); })(); }
 
-window.Z3D = { registerWho, loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };
+window.Z3D = { preload, creKinds: Object.keys(CRE), registerWho, loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };

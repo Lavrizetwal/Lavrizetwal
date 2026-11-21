@@ -74,7 +74,7 @@ function note(){
   else if(!got && sensor === 'none') t = 'Aucun capteur d’inclinaison détecté sur cet appareil : le jeu reste en mode tactile.';
   else if(!got && perm === 'denied') t = 'L’accès à l’inclinaison est refusé : le jeu reste en mode tactile. Vous pouvez l’autoriser dans les réglages du navigateur.';
   else if(needAsk) t = 'Autorisez l’inclinaison pour l’utiliser (l’appareil vous le demandera).';
-  else t = 'Tenez le téléphone comme vous le souhaitez : la position de départ sert de neutre. Inclinez à gauche ou à droite pour changer de voie' + (S.m === 'both' ? ' ; le doigt reste actif.' : ' ; sauter et se baisser restent au doigt.');
+  else t = 'Tenez le téléphone comme vous le souhaitez : la position de départ sert de neutre. Inclinez à gauche ou à droite pour changer de voie' + (S.m === 'both' ? ' ; le doigt reste actif.' : ' ; sauter et se glisser dessous restent au doigt.');
   n.textContent = t; if(b) b.hidden = !needAsk;
 }
 function mount(){
