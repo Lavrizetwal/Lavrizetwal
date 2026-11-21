@@ -3,6 +3,7 @@
 <head>
 <script src="minor.js"></script>
 <script src="roadgraph.js?v=1" defer></script>
+<script src="controls.js?v=1" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
@@ -2907,6 +2908,8 @@ function help(){
     '<div class="row"><button class="gm-btn" type="button" data-close>Compris</button></div></div>');
 }
 $('#cs-help').addEventListener('click', help);
+/* Commandes (inclinaison) : le module appelle la même act() que le doigt */
+(function(){ function go(){ try{ if(window.ZCtl) ZCtl.init({ act:act, state:function(){ return STATE; } }); }catch(e){} } if(window.ZCtl) go(); else window.addEventListener('load', go); })();
 /* Bestiaire : module chargé seulement au clic (aucun effet sur la course) */
 $('#cs-best').addEventListener('click', function(){
   var go = function(){ if(window.ZBest) ZBest.open(); };
@@ -3139,14 +3142,14 @@ addEventListener('keydown', function(e){
   else if(k === 'ArrowUp' || k === 'w' || k === 'W' || k === 'z' || k === 'Z' || k === ' ') c = 2; else if(k === 'ArrowDown' || k === 's' || k === 'S') c = 3;
   if(c < 0) return; e.preventDefault(); act(c, e.timeStamp);
 });
-$('#cs-ctl').addEventListener('pointerdown', function(e){ var b = e.target.closest('[data-a]'); if(!b) return; e.preventDefault(); act(+b.dataset.a, e.timeStamp); });
+$('#cs-ctl').addEventListener('pointerdown', function(e){ var b = e.target.closest('[data-a]'); if(!b) return; e.preventDefault(); if(window.ZCtl && !ZCtl.touchOk(+b.dataset.a)) return; act(+b.dataset.a, e.timeStamp); });
 var sw = null;
 CV.addEventListener('pointerdown', function(e){ if(STATE === 'run') sw = { x:e.clientX, y:e.clientY, id:e.pointerId, t:e.timeStamp }; });
 CV.addEventListener('pointermove', function(e){
   if(!sw || e.pointerId !== sw.id || STATE !== 'run') return;
   var dx = e.clientX - sw.x, dy = e.clientY - sw.y, ax = Math.abs(dx), ay = Math.abs(dy);
   if(Math.max(ax, ay) < 26) return;
-  var c = ax > ay ? (dx < 0 ? 0 : 1) : (dy < 0 ? 2 : 3); act(c, e.timeStamp); sw.x = e.clientX; sw.y = e.clientY;
+  var c = ax > ay ? (dx < 0 ? 0 : 1) : (dy < 0 ? 2 : 3); sw.x = e.clientX; sw.y = e.clientY; if(window.ZCtl && !ZCtl.touchOk(c)) return; act(c, e.timeStamp);
 });
 CV.addEventListener('pointerup', function(){ sw = null; }); CV.addEventListener('pointercancel', function(){ sw = null; });
 CV.addEventListener('contextmenu', function(e){ e.preventDefault(); });
