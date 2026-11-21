@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <script src="minor.js"></script>
+<script src="roadgraph.js?v=1" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
@@ -3090,6 +3091,7 @@ function render(now, ts){
   tl.forEach(function(seg){ seg.evs.forEach(function(x){ var d = (seg.base + x[0] - now) / C.lead; if(d < 1.06 && d > -.14) items.push([x, d]); }); });
   if(rec && rec.preview){ var po = rec.stage.opts[rec.stage.map[Math.round(V.vx)]]; po.ev.forEach(function(x){ var d = (rec.base + x[0] - now) / C.lead; if(d < 1.06 && d > -.14) items.push([x, d]); }); }
   var pn = performance.now();
+  if(window.ZRoad) ZRoad.sync(ENG, C, now, SC);
   SC.frame({ now:now, ts:ts, th:V.theme, prev:V.prev, tchg:V.tchg, vx:V.vx, jump:now < ENG.vjend ? clampv(1 - (ENG.vjend - now) / C.jd, 0, 1) : -1, crouchOn:now < ENG.vcend,
     hitT:pn - V.flash < 260 ? 1 : 0, items:items, gantry:rec, guided:C.level <= 2, lowE:ENG.e < 1000 && STATE === 'run', flash:Math.max(0, 1 - (pn - V.flash) / 260), shake:Math.max(0, (V.shake - pn) / 360), speed:STATE === 'run' ? 1 : 0 });
 }
