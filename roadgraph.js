@@ -14,6 +14,10 @@ try{
 var LOCK = 350;                          /* ms avant la fourche : la voie est verrouillée */
 var N = 40, D = 12, K = 3.2;           /* échantillons, profondeur max (unités de « lead »), perspective du jeu */
 var AMP = { montagne:1, foret:.85, ville:.6, desert:.9, glace:.8, volcan:1, jungle:.9, ruines:.7 };
+/* style de virages par environnement (destination) : a = amplitude, k = périodes en plus (virages plus serrés) */
+var DT = { zetwal:'jungle', cejjd:'glace', soldiers:'ruines', dadoute:'volcan', phada:'desert' };
+var ENVP = { jungle:{ a:1.05, k:1 }, volcan:{ a:1.2, k:1 }, desert:{ a:1.0, k:0 }, glace:{ a:.7, k:0 }, ruines:{ a:.6, k:0 } };
+var env = { a:1, k:0 };
 var tab = new Float32Array(N + 1);      /* décalage latéral X(d), en fraction de la demi-largeur de route */
 var head = 0, lean = 0, lockOn = false, lockT = 0, plan = [], planKey = '', GAIN = 6;
 try{ var g = /[?&]roadgain=([\d.]+)/.exec(location.search); if(g) GAIN = +g[1]; }catch(e){}
@@ -25,8 +29,9 @@ function r01(h, k){ h = Math.imul(h ^ (k * 2654435761 >>> 0), 2246822519) >>> 0;
 function segFor(entry, idx){
   var o = entry.opt; if(!entry.fork || !o) return null;
   var h = hash((o.label || '') + '|' + (o.theme || '') + '|' + Math.round(o.dur) + '|' + idx);
-  var a = (AMP[o.theme] || .8) * (o.ok ? 1 : 1.25);
-  return { t0: entry.base, t1: entry.base + entry.dur, a: a, k: (o.dur > 12000 || r01(h, 2) > .55) ? 2 : 1, sg: r01(h, 1) > .5 ? 1 : -1 };
+  var a = (AMP[o.theme] || .8) * (o.ok ? 1 : 1.25) * env.a;
+  var k = Math.min(3, ((o.dur > 12000 || r01(h, 2) > .55) ? 2 : 1) + env.k);
+  return { t0: entry.base, t1: entry.base + entry.dur, a: a, k: k, sg: r01(h, 1) > .5 ? 1 : -1 };
 }
 function curv(t){
   for(var i = plan.length - 1; i >= 0; i--){
@@ -40,7 +45,7 @@ function curv(t){
 function sync(eng, c, now, scene){
   if(!ON || !eng || !c || !scene) { api.on = false; return; }
   var tl = eng.timeline, key = tl.length + ':' + (tl.length ? tl[tl.length - 1].base : 0);
-  if(api._eng !== eng){ api._eng = eng; planKey = ''; plan = []; }
+  if(api._eng !== eng){ api._eng = eng; planKey = ''; plan = []; env = ENVP[DT[c.dest]] || { a:1, k:0 }; }
   if(key !== planKey){ planKey = key; plan = []; tl.forEach(function(en, i){ var s = segFor(en, i); if(s) plan.push(s); }); }
   var lead = c.lead || 1800, du = D / N, dt = du * lead, X = 0, V = 0;
   tab[0] = 0;
