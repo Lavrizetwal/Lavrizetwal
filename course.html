@@ -2889,11 +2889,74 @@ function renderSum(force){
     '<button class="gm-btn" type="button" id="cs-go"' + (lack ? ' disabled' : '') + '>' + (lack ? 'Solde insuffisant' : 'Prendre la route') + '</button><button class="gm-btn q" type="button" id="cs-help2">Règles et dangers</button></div>';
   if(sumBuilt && !force){ var g = $('#cs-gn'); g.dataset.v = SEL._lastWin || 0; g.textContent = SEL._lastWin || 0; tween(g, win, 380); }
   SEL._lastWin = win; sumBuilt = true;
+  try{ infMount(); infRefresh(); }catch(e){}
 }
 $('#cs-routes').addEventListener('click', function(e){ var b = e.target.closest('[data-d]'); if(!b) return; SEL.dest = b.dataset.d; saveSel(); renderSum(); ZS.play('sel'); });
 $('#cs-lvs').addEventListener('click', function(e){ var b = e.target.closest('[data-l]'); if(!b) return; SEL.lv = +b.dataset.l; saveSel(); renderSum(); ZS.play('sel'); });
 $('#cs-sum').addEventListener('click', function(e){ if(e.target.closest('#cs-go')) start(); else if(e.target.closest('#cs-help2')) help(); });
 function saveSel(){ try{ localStorage.setItem('zc-pick', JSON.stringify({ dest:SEL.dest, lv:SEL.lv })); }catch(e){} }
+
+/* ═══ Mode Infini : sans mise ni gain, un record séparé ═══ */
+var INFD = null;
+function infMount(){
+  if($('#cs-infg')) return; var sum = $('#cs-sum'); if(!sum) return;
+  var st = document.createElement('style'); st.textContent = '.cs-inf{display:grid;gap:12px;max-width:560px}.cs-inf p{margin:0;line-height:1.6;color:var(--c-dim,#b9c1da)}.cs-inf-top{display:grid;gap:4px;font-size:.9rem;color:#dfe4f3;min-height:1.4em}.cs-inf-top div{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px solid rgba(240,217,138,.16)}.cs-inf-top b{color:#F0D98A;font-variant-numeric:tabular-nums}.cs-inf .gm-btn{justify-self:start}';
+  document.head.appendChild(st);
+  var g = document.createElement('div'); g.className = 'cs-grp'; g.id = 'cs-infg';
+  g.innerHTML = '<h3>Mode Infini</h3><div class="cs-inf"><p>Sans mise et sans gain : courez le plus longtemps possible sur la route choisie. Les obstacles se rapprochent peu à peu. Seul votre record est enregistré.</p><div class="cs-inf-top" id="cs-inf-top" aria-live="polite"></div><button class="gm-btn ln" type="button" id="cs-inf-go">Lancer le mode Infini</button></div>';
+  sum.parentNode.insertBefore(g, sum.nextSibling);
+  $('#cs-inf-go').addEventListener('click', startInf);
+}
+function infRefresh(){
+  var box = $('#cs-inf-top'); if(!box) return; var d = SEL.dest; if(INFD === d) return; INFD = d;
+  rpc('zc_inf_top', { p_dest:d }).then(function(l){
+    if(INFD !== d) return;
+    box.innerHTML = (l && l.length) ? '<small>Meilleurs temps sur cette route</small>' + l.map(function(x){ return '<div><span>' + x.rank + '. ' + esc(x.pseudo) + '</span><b>' + mmssl(x.ms) + '</b></div>'; }).join('') : '<small>Aucun record pour l’instant : soyez le premier.</small>';
+  }, function(){ INFD = null; });
+}
+function startInf(){
+  if(window.ZMinor && ZMinor.active()){ ZMinor.notice('Ce jeu'); return; }
+  gateConsent(doStartInf);
+}
+function doStartInf(){
+  if(busy) return; busy = true; ZS.wake();
+  rpc('zc_start_inf', { p_dest:SEL.dest }).then(function(r){
+    busy = false;
+    if(r && r.error === 'consentement'){ if(GM.st && GM.st.consents) delete GM.st.consents.course; return startInf(); }
+    if(r && r.error === 'en_cours'){
+      openModal('<h2>Course en cours</h2><p>Une course précédente est encore ouverte. Pour en lancer une nouvelle, abandonnez-la.</p><div class="row"><button class="gm-btn" type="button" id="cs-ab">Abandonner et repartir</button><button class="gm-btn q" type="button" data-close>Annuler</button></div>');
+      $('#cs-ab').addEventListener('click', function(){ this.disabled = true; rpc('zc_forfeit', { p_sid:r.sid }).then(function(){ closeModal(); refreshStatus().then(function(){ doStartInf(); }); }, function(e){ closeModal(); toast(errMsg(e)); }); });
+      return;
+    }
+    if(!r || !r.ok){
+      if(r && r.error === 'autre_partie'){ showNote({ k:'err', t:'Partie en cours', m:'Un autre jeu est déjà ouvert. Terminez-le avant de courir.', b:'Aller aux jeux', f:function(){ location.href = 'games.html'; } }); return; }
+      toast(errMsg(r)); return;
+    }
+    ZS.play('start'); enter(r);
+  }, function(e){ busy = false; if(e && e.error === 'login') return loginModal(); toast(errMsg(e)); });
+}
+function showEndInf(r){
+  STATE = 'idle'; cancelAnimationFrame(RAF); lastRes = r; clearTimeout($('#cs-ft')._h);
+  $('#cs-game').hidden = true; document.body.classList.remove('cs-play'); $('#cs-cd').textContent = ''; $('#cs-cd').className = 'cs-cd';
+  var rt = route(r.dest) || { name:r.dest || '' }, h = '';
+  if(r.status === 'forfeit'){ h = '<div class="cs-endsign neu"><small>Mode Infini</small>' + esc(rt.name) + '</div><h2>Course abandonnée</h2><p>Aucun jeton en jeu : rien n’est perdu. Ce parcours n’est pas enregistré.</p>'; ZS.play('lose'); }
+  else if(r.status === 'timeout'){ h = '<div class="cs-endsign neu"><small>Mode Infini</small>Temps écoulé</div><h2>Le temps est écoulé</h2><p>Le parcours n’a pas été terminé à temps : il n’est pas enregistré.</p>'; ZS.play('lose'); }
+  else if(r.status === 'error'){ h = '<div class="cs-endsign neu"><small>Mode Infini</small>Résultat en attente</div><h2>Résultat non confirmé</h2><p>Votre résultat n’a pas pu être enregistré. Aucun jeton n’est concerné.</p>'; }
+  else if(r.flagged){ h = '<div class="cs-endsign neu"><small>Mode Infini</small>Non validé</div><h2>Résultat non validé</h2><p>Ce parcours n’a pas pu être vérifié : il ne compte pas pour le classement.</p>'; ZS.play('lose'); }
+  else {
+    var rec = r.score_ms > 0 && r.score_ms >= r.best_ms;
+    h = '<div class="cs-endsign' + (rec ? '' : ' bad') + '"><small>Mode Infini</small>' + esc(rt.name) + '</div><h2>' + (r.won ? 'Route terminée !' : (rec ? 'Nouveau record !' : 'Route interrompue')) + '</h2><p>Vous avez tenu <b>' + mmssl(r.score_ms) + '</b> sur la route' + (r.won ? ', jusqu’au bout du parcours.' : '.') + '</p><div class="big">' + mmssl(r.score_ms) + '</div>';
+    if(rec || r.won){ ZS.play('win'); setTimeout(function(){ FX.confetti(true); }, 120); } else { ZS.play('lose'); }
+    h += '<table><tbody><tr><td>Votre record sur cette route</td><td>' + mmssl(r.best_ms) + '</td></tr>' + (r.rank ? '<tr><td>Votre rang</td><td>' + r.rank + '</td></tr>' : '') +
+      '<tr><td>Obstacles rencontrés</td><td>' + fmt(r.nobs) + '</td></tr><tr><td>Obstacles mal gérés</td><td>' + fmt(r.nhit) + '</td></tr></tbody></table>';
+  }
+  h += '<p class="muted">Mode Infini : aucun jeton n’est gagné ni perdu.</p><div class="btns"><button class="gm-btn" type="button" id="cs-again">Rejouer en Infini</button><button class="gm-btn ln" type="button" id="cs-change">Changer de route</button><a class="gm-btn ln" href="games.html">Classement</a></div>';
+  $('#cs-endbox').innerHTML = h; $('#cs-end').hidden = false; try{ $('#cs-end').scrollIntoView({ block:'start' }); }catch(e){ window.scrollTo({ top:0 }); }
+  INFD = null;
+  $('#cs-again').onclick = function(){ refreshStatus().then(function(){ $('#cs-end').hidden = true; $('#cs-pick').hidden = false; renderPick(); window.scrollTo({ top:0 }); startInf(); }, function(){ location.reload(); }); };
+  $('#cs-change').onclick = function(){ again(false); };
+  startHero();
+}
 
 /* ═══ Règles ═══ */
 function help(){
@@ -3117,7 +3180,7 @@ function enter(r){
   SC.lead = C.lead; SC.parts = []; SC.lastT = 0; lastTm = -1; stopHero();
   setBal(r.balance); lastRes = null; showNote(null);
   $('#cs-pick').hidden = true; $('#cs-end').hidden = true; $('#cs-game').hidden = false; document.body.classList.add('cs-play');
-  $('#cs-dst').textContent = r.name + ' · niv. ' + r.level; $('#cs-ft').textContent = ''; $('#cs-ft').style.opacity = 0; $('#cs-tm').textContent = '0:00';
+  $('#cs-dst').textContent = r.name + (r.inf ? ' · Infini' : ' · niv. ' + r.level); $('#cs-ft').textContent = ''; $('#cs-ft').style.opacity = 0; $('#cs-tm').textContent = '0:00';
   /* repères de carrefours sur la piste */
   $$('#cs-rail s').forEach(function(n){ n.remove(); });
   var cum = 0, rail = $('#cs-rail');
@@ -3158,10 +3221,10 @@ CV.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 /* ═══ Abandon ═══ */
 $('#cs-quit').addEventListener('click', function(){
   if(STATE !== 'run' && STATE !== 'count') return;
-  openModal('<h2>Abandonner la course ?</h2><p>La mise est perdue si vous abandonnez.</p><div class="row"><button class="gm-btn" type="button" id="cs-qy">Abandonner</button><button class="gm-btn q" type="button" data-close>Continuer à courir</button></div>');
+  openModal('<h2>Abandonner la course ?</h2><p>' + (C && C.inf ? 'Aucun jeton en jeu, mais ce parcours ne sera pas enregistré.' : 'La mise est perdue si vous abandonnez.') + '</p><div class="row"><button class="gm-btn" type="button" id="cs-qy">Abandonner</button><button class="gm-btn q" type="button" data-close>Continuer à courir</button></div>');
   $('#cs-qy').addEventListener('click', function(){
     this.disabled = true; if(STATE === 'run' || STATE === 'count') STATE = 'over'; closeModal();
-    rpc('zc_forfeit', { p_sid:SID }).then(function(r){ showEnd(r && r.over ? r : { over:true, status:'forfeit', won:false, entry:0, gain:0, net:0, nhit:0, nobs:0, hits:[] }); }, function(e){ toast(errMsg(e)); showEnd({ over:true, status:'forfeit', won:false, entry:0, gain:0, net:0, nhit:0, nobs:0, hits:[], balance:GM.st ? GM.st.balance : 0 }); });
+    rpc('zc_forfeit', { p_sid:SID }).then(function(r){ showEnd(r && r.over ? r : { over:true, status:'forfeit', won:false, entry:0, gain:0, net:0, nhit:0, nobs:0, hits:[] }); }, function(e){ toast(errMsg(e)); showEnd({ inf:!!(C && C.inf), over:true, status:'forfeit', won:false, entry:0, gain:0, net:0, nhit:0, nobs:0, hits:[], balance:GM.st ? GM.st.balance : 0 }); });
   });
 });
 
@@ -3174,7 +3237,7 @@ function sendResult(n){
   rpc('zc_finish', { p_sid:SID, p_log:LOG }).then(function(r){
     if(r && r.over){ showEnd(r); return; }
     openModal('<h2>Résultat non enregistré</h2><p>' + esc(errMsg(r)) + '</p><div class="row"><button class="gm-btn" type="button" data-close>Fermer</button></div>');
-    showEnd({ over:true, status:'error', won:false, entry:0, gain:0, net:0, nhit:ENG.nhit, nobs:ENG.nobs, hits:ENG.hits, balance:GM.st ? GM.st.balance : 0 });
+    showEnd({ inf:!!(C && C.inf), over:true, status:'error', won:false, entry:0, gain:0, net:0, nhit:ENG.nhit, nobs:ENG.nobs, hits:ENG.hits, balance:GM.st ? GM.st.balance : 0 });
   }, function(e){
     if(n < 4 && e && e.error === 'offline'){ $('#cs-cd').textContent = 'Connexion… nouvel essai'; setTimeout(function(){ sendResult(n + 1); }, 1500 * n); return; }
     if(e && e.error === 'login'){ openModal('<h2>Session expirée</h2><p>Reconnectez-vous : votre résultat sera enregistré.</p><div class="row"><button class="gm-btn" type="button" id="cs-rt">Réessayer</button></div>'); $('#cs-rt').addEventListener('click', function(){ closeModal(); sendResult(1); }); return; }
@@ -3182,6 +3245,7 @@ function sendResult(n){
   });
 }
 function showEnd(r){
+  if(r && r.inf) return showEndInf(r);
   STATE = 'idle'; cancelAnimationFrame(RAF); lastRes = r; clearTimeout($('#cs-ft')._h);
   $('#cs-game').hidden = true; document.body.classList.remove('cs-play'); $('#cs-cd').textContent = ''; $('#cs-cd').className = 'cs-cd';
   if(typeof r.balance === 'number') setBal(r.balance);
