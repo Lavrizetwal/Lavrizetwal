@@ -426,7 +426,7 @@
       '<p>Apre ou konekte, w ap oblije verifye idantite w yon dezyèm fwa ak anprent dwèt oswa vizaj ou, epi chak fwa ou pa aktif pandan 5 minit.</p>' +
       '<div class="zm-opts" role="radiogroup" aria-label="Chwa verifikasyon"><label class="zm-opt"><input type="radio" name="zm-pref" value="fingerprint" checked><b>Anprent dwèt</b>Mwen pito anprent dwèt</label>' +
       '<label class="zm-opt"><input type="radio" name="zm-pref" value="face"><b>Rekonesans vizaj</b>Mwen pito vizaj mwen</label></div>' +
-      '<p class="zm-small">Se telefòn (oswa òdinatè) ou ki fè verifikasyon an ak sa li sipòte. Si ou chwazi yon bagay aparèy la pa genyen, l ap mande w sa li gen.</p>' +
+      '<p class="zm-small">Se telefòn (oswa òdinatè) ou ki fè verifikasyon an ak sa li sipòte. Si aparèy ou a pa gen opsyon ou chwazi a, l ap mande w sa li genyen an.</p>' +
       '<label class="zm-chk"><input type="checkbox" id="zm-cons"><span>Mwen konprann ke <b>anprent dwèt oswa vizaj mwen pa janm kite aparèy mwen</b>: Zetwal sere sèlman yon kle piblik, dat ak vèsyon konsantman mwen. Mwen dakò pou done sa yo trete jan sa eksplike nan <a href="' + PRIV + '" target="_blank" rel="noopener">Politik konfidansyalite</a> a. Mwen ka dezaktive sa nenpòt ki lè.</span></label>' +
       '<button type="button" class="zm-btn" id="zm-act" disabled>Aktive sekirite a</button>' +
       '<button type="button" class="zm-btn o" id="zm-cancel">Pita</button><div class="zm-err" id="zm-me" role="alert"></div></div>';
@@ -3895,7 +3895,7 @@ function zrBuild(rec){
       var bg = h.badges.map(function(b){
         return '<div class="zb' + (b.got ? ' on' : '') + '" title="' + esc(b.name) + '"><div class="zb-i">' + sv(BADGE_IC[b.id] || 'star') + '</div><span>' + esc(b.name) + '</span></div>';
       }).join('');
-      var refHtml = '<div class="zr"><div class="zr-h"><div class="zk-fl">' + sv('gift') + '</div><div><b>Envite yon zanmi</b><span>Ou resevwa +' + fmtP(rf.referrer_reward) + ' pwen epi zanmi ou +' + fmtP(rf.referee_reward) + ', apre premye kous oswa komand li fin fè.</span></div></div>'
+      var refHtml = '<div class="zr"><div class="zr-h"><div class="zk-fl">' + sv('gift') + '</div><div><b>Envite yon zanmi</b><span>Ou resevwa +' + fmtP(rf.referrer_reward) + ' pwen, zanmi ou resevwa +' + fmtP(rf.referee_reward) + ', lè li fin fè premye kous oswa premye kòmand li.</span></div></div>'
         + '<button type="button" class="zr-code" id="zr-copy" aria-label="Kopye kòd la"><b>' + esc(rf.code || '') + '</b>' + sv('copy') + '</button>'
         + '<div class="zr-acts"><button type="button" class="zp-btn go" id="zr-share">' + sv('send') + ' Pataje</button><a class="zp-btn" id="zr-wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(refMessage(rf.code || '')) + '">WhatsApp</a></div>'
         + '<div class="zr-s">' + (rf.invited ? rf.invited + ' zanmi envite · ' + rf.rewarded + ' fin fè premye aksyon yo' : 'Pèsonn poko itilize kòd ou.') + '</div>'
@@ -4037,7 +4037,7 @@ function zrBuild(rec){
             return '<button type="button" class="zh-act" data-go="' + a[0] + '">' + sv(a[2]) + a[1] + (a[0] === 'msg' ? '<span class="zt-n" data-badge="msg" style="display:none"></span>' : '') + '</button>'; }).join('') + '</div></div>';
       var notices = (isAdmin ? '<a class="zp-btn go" href="admin.html" style="width:100%;margin-bottom:12px">Aksè Administrasyon</a>' : '')
         + ((u.email && u.emailVerified === false && (u.providerData || []).some(function(p){ return p.providerId === 'password'; }))
-            ? '<div class="zp-hint" style="margin:0 0 12px;padding:12px 14px;border:1px solid var(--line,#333);border-radius:12px;font-size:.78rem">Imel ou poko verifye — verifikasyon an nesesè pou reklame pwen ki ap tann ou. <a id="zp-ver" style="cursor:pointer;text-decoration:underline">Voye lyen an ankò</a></div>' : '');
+            ? '<div class="zp-hint" style="margin:0 0 12px;padding:12px 14px;border:1px solid var(--line,#333);border-radius:12px;font-size:.78rem">Imel ou poko verifye. Ou dwe verifye l pou\'w ka pran pwen ki ap tann ou yo. <a id="zp-ver" style="cursor:pointer;text-decoration:underline">Voye lyen an ankò</a></div>' : '');
       var comp = completion(prof, u), left = comp.filter(function(c){ return !c.ok; }), pct = Math.round((comp.length - left.length) / comp.length * 100);
       var compHtml = left.length ? '<div class="zc"><b>Pwofil ou ' + pct + '% konplè</b><p>Kèk ti etap pou kont ou vin pi solid epi pi fasil pou zanmi w jwenn ou.</p>'
         + '<div class="zc-bar"><i style="width:' + pct + '%"></i></div><div class="zc-l">' + left.map(function(c, i){ return '<button type="button" data-c="' + i + '">+ ' + esc(c.l) + '</button>'; }).join('') + '</div></div>' : '';

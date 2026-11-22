@@ -426,7 +426,7 @@
       '<p>Apre ou konekte, w ap oblije verifye idantite w yon dezyèm fwa ak anprent dwèt oswa vizaj ou, epi chak fwa ou pa aktif pandan 5 minit.</p>' +
       '<div class="zm-opts" role="radiogroup" aria-label="Chwa verifikasyon"><label class="zm-opt"><input type="radio" name="zm-pref" value="fingerprint" checked><b>Anprent dwèt</b>Mwen pito anprent dwèt</label>' +
       '<label class="zm-opt"><input type="radio" name="zm-pref" value="face"><b>Rekonesans vizaj</b>Mwen pito vizaj mwen</label></div>' +
-      '<p class="zm-small">Se telefòn (oswa òdinatè) ou ki fè verifikasyon an ak sa li sipòte. Si ou chwazi yon bagay aparèy la pa genyen, l ap mande w sa li gen.</p>' +
+      '<p class="zm-small">Se telefòn (oswa òdinatè) ou ki fè verifikasyon an ak sa li sipòte. Si aparèy ou a pa gen opsyon ou chwazi a, l ap mande w sa li genyen an.</p>' +
       '<label class="zm-chk"><input type="checkbox" id="zm-cons"><span>Mwen konprann ke <b>anprent dwèt oswa vizaj mwen pa janm kite aparèy mwen</b>: Zetwal sere sèlman yon kle piblik, dat ak vèsyon konsantman mwen. Mwen dakò pou done sa yo trete jan sa eksplike nan <a href="' + PRIV + '" target="_blank" rel="noopener">Politik konfidansyalite</a> a. Mwen ka dezaktive sa nenpòt ki lè.</span></label>' +
       '<button type="button" class="zm-btn" id="zm-act" disabled>Aktive sekirite a</button>' +
       '<button type="button" class="zm-btn o" id="zm-cancel">Pita</button><div class="zm-err" id="zm-me" role="alert"></div></div>';
@@ -2126,7 +2126,7 @@ $('#hb-pseudo').addEventListener('click',function(){
 function hubNote(){
   var s=GM.st, b=blocker();
   if(b&&b.k==='login') b={k:b.k,t:'Konekte pou jwe',m:'Konekte ak kont Zetwal ou pou jwe, wè statistik ou yo epi antre nan klasman an.',b:'Konekte',f:goLogin};
-  else if(b&&b.k==='closed') b={k:b.k,t:'Jwèt yo ap louvri talè',m:'Sudoku, Duel Mental ak La course vers la mort ap louvri trè byento sou Zetwal. Ou ka deja wè klasman an anba a.'};
+  else if(b&&b.k==='closed') b={k:b.k,t:'Jwèt yo ap louvri talè',m:'Sudoku, Duel Mental ak La course vers la mort pral louvri talè sou Zetwal. Ou ka deja wè klasman an anba a.'};
   else if(b&&b.k==='age') b={k:b.k,t:s&&s.age_known?'Aksè rezève pou adilt':'Yon dènye verifikasyon',m:s&&s.age_known?'Jwèt Zetwal yo rezève pou moun ki gen 18 an oswa plis.':'Konfime laj ou : jwèt yo rezève pou moun ki gen 18 an oswa plis.',b:s&&s.age_known?null:'Konfime laj mwen',f:b.f};
   else if(b&&b.k==='verify') b={k:b.k,t:'Verifye adrès imèl ou',m:'Verifye adrès imèl ou pou ka jwe, apre sa rechaje paj la.'};
   else if(!b&&s&&s.resume){ b={k:'resume',t:'Ou gen yon pati ki ap kouri',m:'Tan an kontinye kouri. Retounen nan pati a pou fini l.',b:'Reprann pati a',f:function(){ location.href=(s.resume.game==='duel'?'duel.html':s.resume.game==='course'?'course.html':'sudoku.html'); }}; }
