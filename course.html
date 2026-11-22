@@ -434,7 +434,7 @@
       '<button type="button" class="zm-btn o" id="zm-cancel">Pita</button><div class="zm-err" id="zm-me" role="alert"></div></div>';
     document.body.appendChild(m);
     var cons = $('#zm-cons'), act = $('#zm-act');
-    if(!ok){ setErr('#zm-me', 'Aparèy oswa navigatè sa a pa sipòte anprent/vizaj. Eseye ak yon telefòn ki gen yon kwochè ekran oswa bayometri.'); cons.disabled = true; }
+    if(!ok){ setErr('#zm-me', 'Aparèy oswa navigatè sa a pa sipòte anprent/vizaj. Eseye ak yon telefòn ki gen yon kwochè ekran oswa biyometri.'); cons.disabled = true; }
     cons.addEventListener('change', function(){ act.disabled = !cons.checked || !ok; });
     $('#zm-cancel').addEventListener('click', function(){ removeEl('zm-md'); });
     act.addEventListener('click', async function(){

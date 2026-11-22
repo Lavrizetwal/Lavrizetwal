@@ -432,7 +432,7 @@
       '<button type="button" class="zm-btn o" id="zm-cancel">Pita</button><div class="zm-err" id="zm-me" role="alert"></div></div>';
     document.body.appendChild(m);
     var cons = $('#zm-cons'), act = $('#zm-act');
-    if(!ok){ setErr('#zm-me', 'Aparèy oswa navigatè sa a pa sipòte anprent/vizaj. Eseye ak yon telefòn ki gen yon kwochè ekran oswa bayometri.'); cons.disabled = true; }
+    if(!ok){ setErr('#zm-me', 'Aparèy oswa navigatè sa a pa sipòte anprent/vizaj. Eseye ak yon telefòn ki gen yon kwochè ekran oswa biyometri.'); cons.disabled = true; }
     cons.addEventListener('change', function(){ act.disabled = !cons.checked || !ok; });
     $('#zm-cancel').addEventListener('click', function(){ removeEl('zm-md'); });
     act.addEventListener('click', async function(){
@@ -6344,7 +6344,7 @@ async function pfSaveInfo(){
 function renderPfAsk(){
   var box = $('#pf-in'); if(!box) return;
   box.innerHTML =
-      '<div class="fld"><label for="ask-amt">Konbe pwen ou ta renmen</label>'
+      '<div class="fld"><label for="ask-amt">Konbyen pwen ou ta renmen</label>'
       + '<input type="number" id="ask-amt" min="1" step="0.1" placeholder="20"></div>'
     + '<div class="fld"><label for="ask-why">Poukisa</label>'
       + '<textarea id="ask-why" placeholder="Yon ti mo pou administratè a konprann demann lan…"></textarea></div>'
@@ -6352,7 +6352,7 @@ function renderPfAsk(){
     + '<p class="hintline">Yon administratè ap gade demann lan epi deside.</p>';
   $('#ask-go').addEventListener('click', async function(){
     var amt = parseFloat($('#ask-amt').value)||0, why = ($('#ask-why').value||'').trim();
-    if(amt <= 0){ toast('Konbe pwen ou ta renmen?'); return; }
+    if(amt <= 0){ toast('Konbyen pwen ou ta renmen?'); return; }
     var btn = this; btn.disabled = true;
     try{
       await sb.from('point_asks').insert({
@@ -6669,7 +6669,7 @@ function renderPfSend(){
   box.innerHTML =
      '<div class="fld"><label for="sd-mail">Imel OSWA nimewo telefòn moun w ap voye a</label>'
      + '<input type="text" id="sd-mail" autocomplete="off" autocapitalize="none" placeholder="egzanp@imel.com oswa +509 3712 3456"></div>'
-     + '<div class="fld"><label for="sd-amt">Konbe pwen</label>'
+     + '<div class="fld"><label for="sd-amt">Konbyen pwen</label>'
      + '<input type="number" id="sd-amt" min="1" step="0.1" placeholder="10"></div>'
      + '<div class="fld"><label for="sd-note">Yon ti mo (fakiltatif)</label>'
      + '<input type="text" id="sd-note" placeholder="Pou bòdwo lekòl la…"></div>'
@@ -6705,7 +6705,7 @@ async function sendPoints(){
   var amt = parseFloat($('#sd-amt').value) || 0;
   var note = ($('#sd-note').value||'').trim();
   if(!mail){ toast('Ekri imel oswa nimewo telefòn moun nan'); return; }
-  if(amt <= 0){ toast('Konbe pwen ou vle voye ?'); return; }
+  if(amt <= 0){ toast('Konbyen pwen ou vle voye ?'); return; }
   if(mail === (window._me.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
   if(amt > (window._pts||0)){ toast('Ou pa gen ase pwen'); return; }
 
@@ -6790,7 +6790,7 @@ var KB = [
       + "• <b>Pake</b> — magazen patnè nou yo, ak livrezon.\n\n"
       + "Klike sou youn nan twa kat yo anwo a."; } },
 
-  { k:['pri','konbe','koute','tarif','kalkile'],
+  { k:['pri','konbyen','koute','tarif','kalkile'],
     a:function(){ return "Pou yon kous, pri a kalkile sou <b>vre distans</b> lan ak <b>vre tan</b> an :\n\n"
       + "• Depa : " + fmt(MV.ride.base) + " HTG\n• Chak kilomèt : " + fmt(MV.ride.perKm) + " HTG\n"
       + "• Chak minit : " + fmt(MV.ride.perMin) + " HTG\n• Minimòm : " + fmt(MV.ride.minFare) + " HTG\n"
@@ -6817,7 +6817,7 @@ var KB = [
       if(!v.length) return "Magazen patnè yo poko antre nan sistèm nan.";
       return "Gen <b>" + v.length + " magazen</b> patnè. Chèche yon pwodwi nan bar rechèch la epi konpare pri, distans ak tan livrezon."; } },
 
-  { k:['livrezon','frè livrezon','konbe livrezon'],
+  { k:['livrezon','frè livrezon','konbyen livrezon'],
     a:function(){ return "Livrezon an : <b>" + fmt(MV.deliv.base) + " HTG</b> pou kòmanse, plis <b>"
       + fmt(MV.deliv.perKm) + " HTG</b> chak kilomèt ant patnè a ak ou.\n\nPri a parèt sou chak kat, anvan ou chwazi."; } },
 
@@ -6842,7 +6842,7 @@ var KB = [
   { k:['kontak','whatsapp','telefon','rele','telegram'],
     a:function(){ return "• <b>WhatsApp</b> : +7 996 110 35 06\n• <b>Telegram</b> : @MikeNestor14\n• <b>Baz nou</b> : 5, 3ème Imp, Ruelle Yamoul"; } }
 ];
-var SUGG = ["Konbe yon kous koute ?","Kijan pou m voye yon objè ?","Ki restoran nou genyen ?","Kote kòmand mwen an ye ?"];
+var SUGG = ["Konbyen yon kous koute ?","Kijan pou m voye yon objè ?","Ki restoran nou genyen ?","Kote kòmand mwen an ye ?"];
 
 function norm(t){ return (t||'').toLowerCase().normalize('NFD')
   .replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' '); }
@@ -6860,7 +6860,7 @@ function answer(q){
     if(sc > bs){ bs = sc; best = e; }
   });
   if(best && bs >= 0.25) return best.a();
-  return "Padon — mwen konnen sèlman sa ki gen rapò ak Zetwal Kòmand, kidonk mwen p ap eseye reponn sa.\n\nMen sa mwen ka esplike w :\n• Konbe yon kous koute\n• Kijan pou w voye yon objè\n• Ki restoran ak magazen nou genyen\n• Kote kòmand ou a ye";
+  return "Padon — mwen konnen sèlman sa ki gen rapò ak Zetwal Kòmand, kidonk mwen p ap eseye reponn sa.\n\nMen sa mwen ka esplike w :\n• Konbyen yon kous koute\n• Kijan pou w voye yon objè\n• Ki restoran ak magazen nou genyen\n• Kote kòmand ou a ye";
 }
 (function(){
   var pan = $('#panel'), veil = $('#veil'), body = $('#p-body'), chips = $('#p-chips'), inp = $('#p-in');
@@ -6966,7 +6966,7 @@ function openJoin(kind){
       + jField('j-vp','Nimewo plak',  'AA-12345')
       + jField('j-lic','Nimewo lisans','Sou lisans kondwi w')
       + '</div>'
-      + jField('j-exp','Konbe tan w ap kondwi', 'Egzanp : 4 an', 'text', true)
+      + jField('j-exp','Konbyen tan w ap kondwi', 'Egzanp : 4 an', 'text', true)
       + '<label class="ptline" id="j-child" style="margin-top:4px">'
         + '<span class="bx"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>'
         + '<span class="tx">Mwen vle abilite pou <b>transpò timoun</b>.<br>'
