@@ -12,7 +12,7 @@ const ENV = {
   jungle: { fog: 0x8fb08a, gnd: 0x2c5a2a, sun: 0xfff2cf, si: 2.6, sky: 0xc4e8ff, hg: 0x2d5c2c, hi: 1.1, prop: 'tree', pc: [0x2a6a30, 0x3f8a3a, 0x1f5524] },
   glace: { fog: 0xc9d8e6, gnd: 0xdce6f0, sun: 0xf3f6ff, si: 2.7, sky: 0xa5bde6, hg: 0x8a98ac, hi: 1.1, prop: 'pine', pc: [0x3a6a58, 0x2c5546, 0xe8f0f8] },
   ruines: { fog: 0x9a8f9c, gnd: 0x4a4540, sun: 0xffb27a, si: 2.4, sky: 0x7d6a9a, hg: 0x3a2a30, hi: .9, prop: 'pillar', pc: [0x8a8478, 0x6a655c, 0x9c968a] },
-  volcan: { fog: 0x6e3a2a, gnd: 0x2a1a16, sun: 0xff8a4a, si: 2.4, sky: 0x7a3a2a, hg: 0x3a1a10, hi: .95, prop: 'rock', pc: [0x3a2a26, 0x55372a, 0x2a1d1a] },
+  volcan: { fog: 0xa07868, gnd: 0x5a463e, sun: 0xffe2c4, si: 3.2, sky: 0xd8b8a8, hg: 0x7a5e52, hi: 1.55, ex: 1.6, prop: 'rock', pc: [0x6e564c, 0x85665a, 0x5a463e] },
   desert: { fog: 0xe2c394, gnd: 0xc9a36a, sun: 0xffe2b0, si: 3.0, sky: 0xcfe0f0, hg: 0xa8864e, hi: 1.1, prop: 'rock', pc: [0xb08a5a, 0x9c7a4c, 0xc4a070] },
   ville: { fog: 0x8d7aa0, gnd: 0x2a3a2a, sun: 0xffb27a, si: 2.6, sky: 0x7d6a9a, hg: 0x3a2a30, hi: .9, prop: 'pillar', pc: [0x6a6a78, 0x585866, 0x7a7a88] },
   foret: { fog: 0x9cc8a0, gnd: 0x2d5c2c, sun: 0xfff2cf, si: 2.8, sky: 0xc4e8ff, hg: 0x2d5c2c, hi: 1.1, prop: 'tree', pc: [0x2a6a30, 0x3f8a3a, 0x1f5524] },
@@ -24,6 +24,9 @@ const hash = n => { n = (n ^ 61) ^ (n >>> 16); n = n + (n << 3); n = n ^ (n >>> 
 const PROP = {
   tree: () => new T.ConeGeometry(1.7, 6, 7), pine: () => new T.ConeGeometry(1.5, 7, 7), pillar: () => new T.BoxGeometry(1.2, 4, 1.2), rock: () => new T.DodecahedronGeometry(1.6, 0)
 };
+/* PNJ vivants : ils courent vers le coureur (à ~45 % de leur vitesse avant le contact), puis le poursuivent par derrière
+   à cette fraction de VEL ; le coureur les distance peu à peu. Les obstacles fixes (trou, tronc…) restent en place. */
+const CHASE = { tigre: .97, loup: .97, grand_loup: .95, ours: .86, crocodile: .72, bandit_homme: .94, bandit_femme: .94, bandit_debout: .94, zombie: .82, colosse: .76, dimon: .9, manon_fire: .9, roi_scorpion: .86, scorpion: .72, chien: .96, taureau: .92, cochon: .78, araignee_noire: .9, araignee_monstre: .86, serpent: .66, serpent_sol: .66, abeilles: .95 };
 const WIDEK = { trou: 1, fil_elec: 1, branche: 1, tronc: 1, bandit_saut: 1 };
 
 export function installRoad(X){
@@ -37,7 +40,7 @@ export function installRoad(X){
       const rd = new T.WebGLRenderer({ canvas, alpha: false, antialias: R.tier === 'high', powerPreference: 'high-performance', preserveDrawingBuffer: false });
       rd.outputColorSpace = T.SRGBColorSpace; rd.toneMapping = T.ACESFilmicToneMapping; rd.toneMappingExposure = 1.1;
       canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); S.ok = false; S.lost = true; });
-      const sc = new T.Scene(); sc.fog = new T.Fog(0x9cb0c8, 22, 62);
+      const sc = new T.Scene(); sc.fog = new T.Fog(0x9cb0c8, 26, 76);
       const cam = new T.PerspectiveCamera(60, 1, .15, 520);
       S.hemi = new T.HemisphereLight(0xffffff, 0x444444, 1); sc.add(S.hemi);
       S.sun = new T.DirectionalLight(0xffffff, 2.5); S.sun.position.set(-8, 14, 6); sc.add(S.sun); sc.add(S.sun.target);
@@ -127,7 +130,7 @@ export function installRoad(X){
   function setTheme(th){
     if(S.th === th) return; S.th = th; const e = ENV[th] || ENV.jungle;
     S.sc.fog.color.setHex(e.fog); S.sc.background = new T.Color(e.fog); S.gnd.material.color.setHex(e.gnd);
-    S.sun.color.setHex(e.sun); S.sun.intensity = e.si; S.hemi.color.setHex(e.sky); S.hemi.groundColor.setHex(e.hg); S.hemi.intensity = e.hi;
+    S.rd.toneMappingExposure = e.ex || 1.1; S.sun.color.setHex(e.sun); S.sun.intensity = e.si; S.hemi.color.setHex(e.sky); S.hemi.groundColor.setHex(e.hg); S.hemi.intensity = e.hi;
     if(SKYTEX[th]){ const sk = tex('sky-' + th); sk.wrapS = T.MirroredRepeatWrapping; sk.repeat.set(2, 1); S.sky.material.map = sk; S.sky.material.color.setHex(0xffffff); }
     else { S.sky.material.map = null; S.sky.material.color.setHex(e.sky); }
     S.sky.material.needsUpdate = true; S.win = -1e9;
@@ -174,6 +177,7 @@ export function installRoad(X){
   function placeObjs(Sx){
     const seen = new Set(), now = Sx.now;
     Sx.items.forEach(e => {
+      if(!CHASE[e.k] ? e.t < now - 500 : e.t < now - 9000) return;
       const kind = e.k, occ = e.occ, wide = !!WIDEK[kind], runs = []; let cur = null;
       for(let l = 0; l < 3; l++){ if(occ & (1 << l)){ if(cur && cur.b === l - 1) cur.b = l; else { cur = { a: l, b: l }; runs.push(cur); } } }
       runs.forEach(r => {
@@ -181,8 +185,15 @@ export function installRoad(X){
         ls.forEach(([ln, w]) => {
           const key = kind + '@' + e.t + '#' + ln; seen.add(key); let it = S.objs.get(key);
           if(!it){ it = inst(kind, wide ? Math.round(w * 10) / 10 : 0); if(!it) return; S.objs.set(key, it); S.objG.add(it.grp); S.objG.add(it.sh); it.seed = ((e.t / 97) | 0) + ln * 3; }
-          const o = at(VEL * e.t / 1000, (ln - 1) * LW);
-          it.grp.position.set(o.x, 0, o.z); it.grp.rotation.y = o.h + Math.PI; it.sh.position.set(o.x, .04, o.z);
+          let sx = VEL * e.t / 1000, lat = (ln - 1) * LW, back = false;
+          const cf = CHASE[kind];
+          if(cf){
+            const dtm = (now - e.t) / 1000, vc = cf * VEL;
+            if(dtm < 0) sx -= dtm * vc * .45;
+            else { back = true; sx += vc * dtm - 2.2 * (1 - Math.exp(-dtm / .4)) - ln * .6; lat += (((Sx.vx - 1) * LW + (ln - 1) * .9) - lat) * (1 - Math.exp(-dtm / 1.6)); if(sx < Sx.sr - 5.4) return; }
+          }
+          const o = at(sx, lat);
+          it.grp.position.set(o.x, 0, o.z); it.grp.rotation.y = back ? o.h : o.h + Math.PI; it.sh.position.set(o.x, .04, o.z);
           if(it.cf){ creAnim(it.m, it.cf, now, it.seed); it.sh.scale.setScalar((it.cf.Fu || 1.6) * .55); it.sh.visible = true; if(it.cf.lift) it.grp.position.y = it.cf.lift * 1.05; }
           else if(it.r){ if(it.r.upd) it.r.upd(now + it.seed * 300); if(it.r.pick){ it.grp.rotation.y = now / 380; it.grp.position.y = .12 * Math.sin(now / 260); } it.sh.visible = !it.r.flat; it.sh.scale.setScalar(wide ? w * .5 : .8); }
         });
@@ -228,7 +239,7 @@ export function installRoad(X){
     }
     S.forks.forEach(f => { f.Jc = S.fkJ[f.tb]; });
     if(S.win < -1e8 || sr < S.win + CH * .6 || sr > S.win + CH * 2.4) rebuild(Sx.th, sr);
-    placeGantries(); placeObjs(Sx);
+    Sx.sr = sr; placeGantries(); placeObjs(Sx);
     /* coureur */
     const c = ctlFor('road', Sx.who); if(c.o.root.parent !== S.sc) S.sc.add(c.o.root); c.o.root.visible = true;
     const lat = (Sx.vx - 1) * LW;
