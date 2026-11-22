@@ -2108,7 +2108,7 @@ var TH = {
   montagne: { sky:['#3d5b8c', '#9db6d6', '#eef2f8'], sun:{ x:.76, y:.58, r:.055, c:'#ffffff', g:'255,255,255' }, fog:'#d5dce8', ground:['#8f8e84', '#85847b'], road:['#6e6d69', '#64635f'], kerb:['#f3f0e6', '#b9b5a8'], far:['#92a5bf', '#71869f', '#55698a'], cloud:'255,255,255', dust:'200,196,186' },
   glace:    { sky:['#8fb4d8', '#c3daee', '#eaf3fa'], sun:{ x:.7, y:.6, r:.05, c:'#ffffff', g:'255,255,255' }, fog:'#dbe7f1', ground:['#d9e6ef', '#cfdde8'], road:['#a9c6dc', '#9fbed6'], kerb:['#f4f8fb', '#b9c9d6'], far:['#a9bfd6', '#8aa3bf', '#6f88a6'], cloud:'255,255,255', dust:'230,240,250' },
   desert:   { sky:['#e08a4a', '#f2b97a', '#f9dca8'], sun:{ x:.3, y:.8, r:.07, c:'#fff0c4', g:'255,190,110' }, fog:'#f0c99a', ground:['#c9a066', '#bf9660'], road:['#c79a5a', '#bb8f52'], kerb:['#e9d3a5', '#a98250'], far:['#c98a55', '#b07142', '#955b33'], cloud:'255,200,150', dust:'220,185,130' },
-  volcan:   { sky:['#1a0d0b', '#5a2418', '#e0662a'], sun:{ x:.5, y:.9, r:.06, c:'#ffb36b', g:'255,100,40' }, fog:'#33160d', ground:['#1d1512', '#241a16'], road:['#2a201c', '#30241f'], kerb:['#a8481d', '#5b2a14'], far:['#3a1d14', '#2a130e', '#1a0b08'], cloud:'90,40,30', dust:'120,70,50' },
+  volcan:   { sky:['#1a0d0b', '#5a2418', '#e0662a'], sun:{ x:.5, y:.9, r:.06, c:'#ffb36b', g:'255,100,40' }, fog:'#6a3e2e', ground:['#3a2c26', '#42322b'], road:['#4a3d37', '#52443d'], kerb:['#c9702f', '#7a4020'], far:['#3a1d14', '#2a130e', '#1a0b08'], cloud:'90,40,30', dust:'120,70,50' },
   jungle:   { sky:['#46604a', '#8aa07a', '#d6d9a8'], sun:{ x:.5, y:.25, r:.05, c:'#fff6c8', g:'255,240,170' }, fog:'#6b7a5c', ground:['#1e2a1b', '#192416'], road:['#5b5a50', '#4f4e45'], kerb:['#8da07a', '#556745'], far:['#3d5c3c', '#2c4a2e', '#1f3a24'], cloud:'220,230,200', dust:'150,140,110' },
   ruines:   { sky:['#3a424e', '#6a727c', '#9aa0a6'], sun:{ x:.6, y:.55, r:.045, c:'#e6e2d6', g:'200,200,190' }, fog:'#8d9296', ground:['#4a4a46', '#42423e'], road:['#55565a', '#4d4e52'], kerb:['#8a8a84', '#5e5e5a'], far:['#4c525c', '#383d46', '#272b33'], cloud:'150,155,160', dust:'140,138,130' }
 };
@@ -2609,7 +2609,7 @@ P.layerCtx = function(){
   if(L.width !== w || L.height !== h){ L.width = w; L.height = h; }
   var c = L.getContext('2d'); c.setTransform(this.DPR, 0, 0, this.DPR, 0, 0); return c;
 };
-var GRADE = { ville:'rgba(255,140,70,.22)', foret:'rgba(255,250,190,.12)', montagne:'rgba(120,150,230,.16)', glace:'rgba(150,190,255,.14)', desert:'rgba(255,170,80,.2)', volcan:'rgba(255,90,30,.2)', jungle:'rgba(190,255,160,.1)', ruines:'rgba(170,180,190,.14)' };
+var GRADE = { ville:'rgba(255,140,70,.22)', foret:'rgba(255,250,190,.12)', montagne:'rgba(120,150,230,.16)', glace:'rgba(150,190,255,.14)', desert:'rgba(255,170,80,.2)', volcan:'rgba(255,120,60,.07)', jungle:'rgba(190,255,160,.1)', ruines:'rgba(170,180,190,.14)' };
 var SUN = { ville:[-.9, .22], foret:[.55, .12], montagne:[-.5, .15], glace:[-.5, .15], desert:[.9, .2], volcan:[0, .12], jungle:[.4, .12], ruines:[-.3, .15] };
 var _dsp = P.decorSprite;
 P.decorSprite = function(th, h, x, y, u, now, side){
@@ -2760,7 +2760,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=9'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=10'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); setTimeout(function(){ try{ if(R3ON && Z3D.makeRoad) Z3D.makeRoad().init(); }catch(e){} }, 900); loadRunners(function(){ mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
@@ -2829,7 +2829,7 @@ function r3lab(stg){ return [0, 1, 2].map(function(l){ return stg.opts[stg.map[l
 function r3state(f, ENG, C){
   var tl = ENG.timeline, forks = [], items = [], lane = Math.max(0, Math.min(2, Math.round(f.vx))), curves = !!(window.ZRoad && ZRoad.enabled && ZRoad.enabled());
   tl.forEach(function(en, i){ if(en.fork && C.stages[i]) forks.push({ tb:Math.round(en.base), dir:curves ? r3dirOf(C.stages[i], en.opt) : 0, labels:r3lab(C.stages[i]) }); });
-  var from = f.now - 500, to = f.now + 3600;
+  var from = f.now - 9000, to = f.now + 3800;
   function add(evs, base){ for(var i = 0; i < evs.length; i++){ var x = evs[i], t = base + x[0]; if(t > from && t < to) items.push({ k:x[1], t:Math.round(t), occ:x[2], ctr:x[3] }); } }
   tl.slice(-2).forEach(function(seg){ add(seg.evs, seg.base); });
   var ns = null, nb = 0;
