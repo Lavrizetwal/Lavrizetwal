@@ -1632,7 +1632,7 @@ body.cs-play #zmin-fab,body.cs-play .zt-wal,body.cs-play #promo-bar{display:none
     <div class="cs-hero-in wrap">
       <div class="cs-sign"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 9h-5v11H9V11H4z"/></svg>Jeu Zetwal · 18 ans et plus</div>
       <h1><span>La course</span><span>vers la mort</span></h1>
-      <p class="lead">Courez jusqu’à votre destination sans perdre toute votre énergie. Esquivez, sautez, glissez-vous dessous : chaque obstacle a sa réponse, et la carte vous montre la bonne route à chaque carrefour.</p>
+      <p class="lead">Courez jusqu’à votre destination sans commettre une seule erreur : un obstacle touché et c’est perdu. Esquivez, sautez, glissez-vous dessous : chaque obstacle a sa réponse, et la carte vous montre la bonne route à chaque carrefour.</p>
       <div class="cs-tools">
         <span class="cs-chip" id="cs-wal" hidden>Solde <b data-bal>0</b><span id="cs-wal-ic"></span></span>
         <button class="cs-tool" type="button" id="gm-snd" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span>Son activé</span></button>
@@ -1666,9 +1666,9 @@ body.cs-play #zmin-fab,body.cs-play .zt-wal,body.cs-play #promo-bar{display:none
     <button class="cs-ib" type="button" id="cs-quit" aria-label="Abandonner la course">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
     </button>
-    <div class="cs-en">
-      <div class="cs-en-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg><span>Énergie</span><b id="cs-env">5,0</b></div>
-      <div class="cs-bar" id="cs-bar" role="progressbar" aria-label="Énergie" aria-valuemin="0" aria-valuemax="5" aria-valuenow="5"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
+    <div class="cs-en" id="cs-one">
+      <div class="cs-en-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a9 9 0 0 0-9 9c0 3 1.5 5.6 4 7.2V21h10v-2.8c2.5-1.600 4-4.200 4-7.200a9 9 0 0 0-9-9zM9 13a1.500 1.500 0 1 1 0-3 1.500 1.500 0 0 1 0 3zm6 0a1.500 1.500 0 1 1 0-3 1.500 1.500 0 0 1 0 3z"/></svg><span>Une seule erreur : perdu</span></div>
+      <div hidden><b id="cs-env">1</b><div id="cs-bar" role="progressbar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="1"></div></div>
     </div>
     <div class="cs-trk">
       <div class="cs-trk-h"><span id="cs-dst">—</span><b id="cs-tm">0:00</b></div>
@@ -2988,7 +2988,7 @@ function renderSum(force){
     '<div class="cs-pass-lv" style="--lc:' + LVC[SEL.lv - 1] + '"><i></i>Niveau ' + SEL.lv + ' · ' + LVN[SEL.lv - 1] + ' · route ×' + String(+v.dist_mult).replace('.', ',') + '</div>' +
     '<table><tbody><tr><td>Mise, prélevée au départ</td><td>' + r.entry + ' jetons</td></tr>' +
     '<tr><td>Arrivée : mise rendue + ' + (10 * SEL.lv) + '</td><td>+' + win + ' jetons</td></tr>' +
-    '<tr><td>Énergie épuisée avant l’arrivée</td><td>0 jeton, mise perdue</td></tr>' +
+    '<tr><td>Un obstacle touché avant l’arrivée</td><td>0 jeton, mise perdue</td></tr>' +
     '<tr><td>Durée sans détour</td><td>≈ ' + mmssl(r.base_s * 1000 * v.dist_mult) + '</td></tr></tbody></table></div>' +
     '<div class="cs-pass-stub"><div class="cs-gain"><small>Gain à l’arrivée</small><b id="cs-gn" data-v="' + win + '">' + win + '</b><span>jetons</span></div>' +
     '<button class="gm-btn" type="button" id="cs-go"' + (lack ? ' disabled' : '') + '>' + (lack ? 'Solde insuffisant' : 'Prendre la route') + '</button><button class="gm-btn q" type="button" id="cs-help2">Règles et dangers</button></div>';
@@ -3067,10 +3067,10 @@ function showEndInf(r){
 function help(){
   var rows = INFO && INFO.obs ? INFO.obs.map(function(o){ return '<tr><td>' + esc(o.label) + '</td><td>' + CTR[o.ctr] + '</td><td>−' + lv1(o.dmg) + '</td></tr>'; }).join('') : '';
   openModal('<div class="cs-help"><h2>Règles et dangers</h2>' +
-    '<p>Vous courez vers la destination choisie. Votre énergie compte <b>5 niveaux</b>, du rouge au vert. La course elle-même en use un peu ; chaque obstacle mal géré en retire davantage. À zéro, la course est perdue.</p>' +
+    '<p>Vous courez vers la destination choisie. <b>Une seule erreur et la course est perdue</b> : il n’y a plus d’énergie. Touchez un obstacle, tombez dans un trou ou laissez-vous attraper, et c’est terminé.</p>' +
     '<p><b>Commandes.</b> Ordinateur : flèches gauche et droite pour changer de couloir, flèche haut ou espace pour sauter, flèche bas pour se glisser sous les obstacles. Téléphone : glissez le doigt dans la direction voulue ou utilisez les boutons.</p>' +
     '<p><b>Carrefours.</b> La route se sépare en trois. La carte indique quelle voie mène à la destination et laquelle est un détour (plus long et plus dangereux). Le couloir où vous êtes au carrefour décide de la route prise. Les deux bonnes voies n’ont pas les mêmes obstacles : choisissez celle que vous maîtrisez le mieux.</p>' +
-    '<p><b>Trou :</b> tomber dans un trou fait toujours perdre un niveau entier. <b>Eau et mangue :</b> elles redonnent un peu d’énergie.</p>' +
+    '<p><b>Trou :</b> tomber dans un trou met fin à la course. Il n’y a plus d’eau ni de mangue à ramasser.</p>' +
     '<p><b>Gains.</b> Arrivée à destination : mise + 10 × le niveau. Sinon, la mise est perdue. Plafond de gain : ' + (GM.st && GM.st.cap_day ? GM.st.cap_day : 300) + ' jetons par jour.</p>' +
     '<table class="cs-dg"><thead><tr><th>Danger</th><th>Bonne réponse</th><th>Niveaux perdus</th></tr></thead><tbody>' + rows + '</tbody></table>' +
     '<div class="row"><button class="gm-btn" type="button" data-close>Compris</button></div></div>');
@@ -3098,7 +3098,7 @@ function gateConsent(go){
   openModal('<h2>Avant de jouer</h2><p>Lisez bien : vous pouvez <b>perdre</b> des jetons.</p><ul class="cs-rules">' +
     '<li>Mise : <b class="b">−' + r.entry + ' jetons</b> pour la route ' + esc(r.name) + ', prélevés dès le départ.</li>' +
     '<li>Arrivée à destination : <b class="g">+' + win + ' jetons</b> (mise rendue + ' + (10 * SEL.lv) + ').</li>' +
-    '<li>Énergie épuisée avant l’arrivée, ou abandon : la mise est <b class="b">perdue</b>.</li>' +
+    '<li>Obstacle touché avant l’arrivée, ou abandon : la mise est <b class="b">perdue</b>.</li>' +
     '<li>La mise et le gain dépendent de la destination et du niveau choisis ; ils sont affichés avant chaque départ.</li></ul>' +
     '<p class="cs-gen">Les jetons sont des points de jeu : ils s’utilisent uniquement dans l’univers Zetwal (jeux et boutique du hub) et ne sont pas convertibles en argent. Réservé aux personnes de 18 ans ou plus. Plafond de gain : ' + (GM.st && GM.st.cap_day ? GM.st.cap_day : 300) + ' jetons par jour.</p>' +
     '<label class="gm-chk"><input type="checkbox" id="cs-c"><span>J’ai lu et compris les gains et les pertes possibles, et je consens à jouer.</span></label>' +
@@ -3242,9 +3242,6 @@ function act(code, ts){
 }
 var lastTm = -1;
 function hud(now){
-  var e = Math.max(0, ENG.e), segs = $$('#cs-bar i b');
-  for(var i = 0; i < 5; i++) segs[i].style.width = clampv((e - i * 1000) / 1000, 0, 1) * 100 + '%';
-  $('#cs-env').textContent = lv1(e); $('#cs-bar').setAttribute('aria-valuenow', (e / 1000).toFixed(1)); $('#cs-bar').classList.toggle('low', e < 1000);
   var p = clampv(now / C.tgt, 0, 1) * 100; $('#cs-pg').style.width = p + '%'; $('#cs-rn').style.left = p + '%';
   var sc = Math.floor(now / 1000); if(sc !== lastTm){ lastTm = sc; $('#cs-tm').textContent = mmssl(sc * 1000); }
 }
@@ -3336,7 +3333,7 @@ $('#cs-quit').addEventListener('click', function(){
 
 /* ═══ Fin de course ═══ */
 function finishRun(){
-  var cd = $('#cs-cd'); cd.className = 'cs-cd sm'; cd.textContent = ENG.won ? 'Arrivée ! Validation…' : 'Énergie épuisée… Validation…';
+  var cd = $('#cs-cd'); cd.className = 'cs-cd sm'; cd.textContent = ENG.won ? 'Arrivée ! Validation…' : 'Perdu… Validation…';
   sendResult(1);
 }
 function sendResult(n){
@@ -3364,11 +3361,11 @@ function showEnd(r){
   } else if(ab){ h = '<div class="cs-endsign neu"><small>Route quittée</small>Course abandonnée</div><h2>Vous avez abandonné</h2><p>La mise est perdue. La route sera toujours là.</p>'; ZS.play('lose'); }
   else if(to){ h = '<div class="cs-endsign neu"><small>Trop lent</small>Temps écoulé</div><h2>Le temps est écoulé</h2><p>La course n’a pas été terminée à temps : la mise est perdue.</p>'; ZS.play('lose'); }
   else if(r.status === 'error'){ h = '<div class="cs-endsign neu"><small>Course terminée</small>Résultat en attente</div><h2>Résultat non confirmé</h2><p>Votre résultat n’a pas pu être enregistré. Vérifiez votre solde dans quelques instants.</p>'; }
-  else { h = '<div class="cs-endsign bad"><small>Route interrompue</small>Énergie épuisée</div><h2>Pas cette fois</h2><p>Vous n’avez pas atteint ' + esc(rt.name) + '. La mise de ' + fmt(r.entry) + ' jetons est perdue.</p><div class="big neg">' + sgn(r.net) + ' jetons</div>'; ZS.play('lose'); FX.rain(); }
+  else { h = '<div class="cs-endsign bad"><small>Route interrompue</small>Une erreur, perdu</div><h2>Pas cette fois</h2><p>Vous n’avez pas atteint ' + esc(rt.name) + '. La mise de ' + fmt(r.entry) + ' jetons est perdue.</p><div class="big neg">' + sgn(r.net) + ' jetons</div>'; ZS.play('lose'); FX.rain(); }
   if(r.nobs != null && r.status !== 'forfeit' && r.status !== 'error'){
     var worst = {}; (r.hits || []).forEach(function(x){ worst[x[1]] = (worst[x[1]] || 0) + x[2]; });
     var ks = Object.keys(worst).sort(function(a, b){ return worst[b] - worst[a]; }).slice(0, 3);
-    h += '<table><tbody><tr><td>Obstacles rencontrés</td><td>' + fmt(r.nobs) + '</td></tr><tr><td>Obstacles mal gérés</td><td>' + fmt(r.nhit) + '</td></tr><tr><td>Énergie à l’arrivée</td><td>' + lv1(r.energy || 0) + ' / 5</td></tr>' +
+    h += '<table><tbody><tr><td>Obstacles rencontrés</td><td>' + fmt(r.nobs) + '</td></tr><tr><td>Obstacles mal gérés</td><td>' + fmt(r.nhit) + '</td></tr>' +
       ks.map(function(k){ return '<tr><td>Plus coûteux : ' + esc(OBS[k] ? OBS[k][0] : k) + '</td><td>−' + lv1(worst[k]) + '</td></tr>'; }).join('') + '</tbody></table>';
   }
   h += '<p class="muted">Solde : ' + fmt(GM.st ? GM.st.balance : 0) + ' jetons</p><div class="btns"><button class="gm-btn" type="button" id="cs-again">Rejouer</button><button class="gm-btn ln" type="button" id="cs-change">Changer de route</button><a class="gm-btn ln" href="games.html">Classement</a></div>';
