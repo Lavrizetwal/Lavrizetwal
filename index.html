@@ -432,7 +432,7 @@
       '<button type="button" class="zm-btn o" id="zm-cancel">Pita</button><div class="zm-err" id="zm-me" role="alert"></div></div>';
     document.body.appendChild(m);
     var cons = $('#zm-cons'), act = $('#zm-act');
-    if(!ok){ setErr('#zm-me', 'Aparèy oswa navigatè sa a pa sipòte anprent/vizaj. Eseye ak yon telefòn ki gen yon kwochè ekran oswa bayometri.'); cons.disabled = true; }
+    if(!ok){ setErr('#zm-me', 'Aparèy oswa navigatè sa a pa sipòte anprent/vizaj. Eseye ak yon telefòn ki gen yon kwochè ekran oswa biyometri.'); cons.disabled = true; }
     cons.addEventListener('change', function(){ act.disabled = !cons.checked || !ok; });
     $('#zm-cancel').addEventListener('click', function(){ removeEl('zm-md'); });
     act.addEventListener('click', async function(){
@@ -4135,7 +4135,7 @@ function zrBuild(rec){
           '<button class="zp-btn go" type="button" id="zs-scan" style="margin-bottom:16px">Voye pa skane kòd QR yon moun</button>'
         + '<div class="zp-fld"><label for="zs-mail">Oswa imel OSWA nimewo telefòn moun w ap voye a</label>'
           + '<input type="text" id="zs-mail" autocomplete="off" autocapitalize="none" placeholder="egzanp@imel.com oswa +509 3712 3456"></div>'
-        + '<div class="zp-fld"><label for="zs-amt">Konbe pwen</label><input type="number" id="zs-amt" min="1" step="0.1" placeholder="10"></div>'
+        + '<div class="zp-fld"><label for="zs-amt">Konbyen pwen</label><input type="number" id="zs-amt" min="1" step="0.1" placeholder="10"></div>'
         + '<div class="zp-fld"><label for="zs-note">Yon ti mo (fakiltatif)</label><input type="text" id="zs-note" placeholder="Pou bòdwo lekòl la…"></div>'
         + '<button class="zp-btn go" id="zs-go">Voye pwen yo</button>'
         + '<p class="zp-hint">Pwen yo soti sou kont ou imedyatman epi yo antre sou kont benefisyè a. Tranzaksyon yo anrejistre epi ekip Zetwal la ka verifye yo.</p>'
@@ -4148,7 +4148,7 @@ function zrBuild(rec){
         var amt = parseFloat($('#zs-amt').value) || 0;
         var note = ($('#zs-note').value||'').trim();
         if(!mail){ toast('Ekri imel oswa nimewo telefòn moun nan'); return; }
-        if(amt <= 0){ toast('Konbe pwen ou vle voye ?'); return; }
+        if(amt <= 0){ toast('Konbyen pwen ou vle voye ?'); return; }
         if(mail === (currentUser.email||'').toLowerCase()){ toast('Ou pa ka voye pwen pou tèt ou'); return; }
         var btn = this; btn.disabled = true; btn.textContent = 'K ap voye…';
         try{
@@ -4219,13 +4219,13 @@ function zrBuild(rec){
     function renderAsk(){
       var box = $('#zp-in'); if(!box) return;
       box.innerHTML =
-          '<div class="zp-fld"><label for="za-amt">Konbe pwen ou ta renmen</label><input type="number" id="za-amt" min="1" step="0.1" placeholder="20"></div>'
+          '<div class="zp-fld"><label for="za-amt">Konbyen pwen ou ta renmen</label><input type="number" id="za-amt" min="1" step="0.1" placeholder="20"></div>'
         + '<div class="zp-fld"><label for="za-why">Poukisa</label><textarea id="za-why" placeholder="Eksplike rezon demann lan…"></textarea></div>'
         + '<button class="zp-btn go" id="za-go">Voye demann lan</button>'
         + '<p class="zp-hint">Ekip Zetwal la ap egzaminen demann lan epi l ap reponn ou.</p>';
       $('#za-go').addEventListener('click', async function(){
         var amt = parseFloat($('#za-amt').value)||0, why = ($('#za-why').value||'').trim();
-        if(amt <= 0){ toast('Konbe pwen ou ta renmen?'); return; }
+        if(amt <= 0){ toast('Konbyen pwen ou ta renmen?'); return; }
         var btn = this; btn.disabled = true;
         try{
           await sb.from('point_asks').insert({
@@ -4543,7 +4543,7 @@ function zrBuild(rec){
       var bal = await currentPoints();
       var m = sheet(sheetHead('Voye pwen') + whoHtml(info)
         + '<div class="zq-bal">Solid ou : <b>' + bal.toFixed(1) + '</b> pwen</div>'
-        + '<div class="zp-fld"><label for="zq-amt">Konbe pwen</label>'
+        + '<div class="zp-fld"><label for="zq-amt">Konbyen pwen</label>'
         + '<input type="number" id="zq-amt" min="1" step="0.1" inputmode="decimal" placeholder="10"></div>'
         + '<div class="zq-chips">' + [10, 50, 100, 500].map(function(v){ return '<button type="button" data-v="' + v + '">' + v + '</button>'; }).join('') + '</div>'
         + '<div class="zp-fld"><label for="zq-note">Yon ti mo (fakiltatif)</label><input type="text" id="zq-note" placeholder="Pou…"></div>'
@@ -4556,7 +4556,7 @@ function zrBuild(rec){
       amtEl.focus();
       m.querySelector('#zq-go').addEventListener('click', async function(){
         var btn = this, amt = round2(amtEl.value), note = (m.querySelector('#zq-note').value || '').trim();
-        if(!(amt > 0)){ toast('Konbe pwen ou vle voye ?'); return; }
+        if(!(amt > 0)){ toast('Konbyen pwen ou vle voye ?'); return; }
         if(amt > bal + 0.0001){ toast('Ou pa gen ase pwen'); return; }
         btn.disabled = true; btn.textContent = 'K ap voye…';
         var res = await doQrSend(tok, amt, note);
@@ -4609,7 +4609,7 @@ function zrBuild(rec){
     async function sellSheet(tok, info){
       var rate = await pointRate();
       var m = sheet(sheetHead('Vann pwen') + whoHtml(info)
-        + '<div class="zp-fld"><label for="zq-amt">Konbe pwen kliyan an achte</label>'
+        + '<div class="zp-fld"><label for="zq-amt">Konbyen pwen kliyan an achte</label>'
         + '<input type="number" id="zq-amt" min="1" step="0.1" inputmode="decimal" placeholder="100"></div>'
         + '<div class="zq-chips">' + [50, 100, 500, 1000].map(function(v){ return '<button type="button" data-v="' + v + '">' + v + '</button>'; }).join('') + '</div>'
         + '<div class="zp-fld"><label for="zq-htg">Lajan kach ou resevwa (HTG) — 1 pwen = ' + rate + ' HTG</label>'
@@ -4635,7 +4635,7 @@ function zrBuild(rec){
       amtEl.focus();
       m.querySelector('#zq-go').addEventListener('click', async function(){
         var btn = this, amt = round2(amtEl.value), htg = round2(htgEl.value), note = (m.querySelector('#zq-note').value || '').trim();
-        if(!(amt > 0)){ toast('Konbe pwen kliyan an achte ?'); return; }
+        if(!(amt > 0)){ toast('Konbyen pwen kliyan an achte ?'); return; }
         btn.disabled = true; btn.textContent = 'K ap anrejistre…';
         var res = await doStoreSale(tok, amt, htg, note);
         if(res.ok){

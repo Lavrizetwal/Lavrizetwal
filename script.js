@@ -202,7 +202,7 @@ document.getElementById('btn-calc').addEventListener('click', function() {
     const sechageOpt = document.getElementById('sechage-opt');
     const pliyajRadios = document.getElementsByName('pliyaj');
     
-    if (kg <= 0) { alert("Tanpri mete konbe kilo rad ou genyen"); return; }
+    if (kg <= 0) { alert("Tanpri mete konbyen kilo rad ou genyen"); return; }
 
     let basePrice = 0;
     let forfaitName = "";
@@ -288,7 +288,7 @@ window.onload = function() {
             const sheet = document.getElementById('result-sheet');
 
             if (!kg || kg <= 0) {
-                alert("Tanpri mete konbe kilo rad ou genyen.");
+                alert("Tanpri mete konbyen kilo rad ou genyen.");
                 return;
             }
 
