@@ -30,6 +30,10 @@ jobs:
             case "$f" in index.html|package.json|package-lock.json) continue;; esac
             cp -f "$f" dist/
           done
+          for d in models bestiaire textures hub; do
+            test -d "$d" && cp -r "$d" dist/
+          done
+          test -f dist/models/fille1.glb && test -f dist/bestiaire/tigre.glb && test -d dist/textures
           test -f dist/lavri.html && test -f dist/games.html && test -f dist/sw.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
