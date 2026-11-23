@@ -1396,6 +1396,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
 .sh-it .art{height:130px;border-radius:8px;display:grid;place-items:center;background:var(--bg-2);color:var(--gold-ink);overflow:hidden}
 .sh-it .art svg{width:70px;height:70px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 .sh-it .art img{width:100%;height:100%;object-fit:contain}
+.sh-it .art .stn{width:76px;height:76px;border-radius:50%;box-shadow:0 6px 12px rgba(0,0,0,.4)}
+.stn.k-argent{background:radial-gradient(circle at 33% 28%,#fff,#dfe3ea 28%,#a4abb7 62%,#5f6671)}
+.stn.k-saphir{background:radial-gradient(circle at 33% 28%,#a9d0ff,#2f74e6 36%,#0d3190 76%,#041341);box-shadow:0 6px 12px rgba(0,0,0,.45),inset 0 0 0 1px rgba(160,200,255,.45)}
+.stn.k-diamant{background:conic-gradient(from 20deg,rgba(255,255,255,.7),rgba(255,255,255,0) 18%,rgba(255,255,255,.55) 38%,rgba(255,255,255,0) 58%,rgba(255,255,255,.65) 78%,rgba(255,255,255,0)),radial-gradient(circle at 30% 26%,#fff,#dcf8ff 26%,#8fdcf2 58%,#3da9cf);box-shadow:0 6px 12px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.7)}
+.sh-it .art svg.pf{fill:currentColor;stroke:none}
 .sh-it h3{font-family:var(--serif);font-size:1.25rem;font-weight:600;line-height:1.2}
 .sh-it p{font-size:.84rem;color:var(--ink-2);line-height:1.5;flex:1}
 .sh-it .pr{display:flex;align-items:center;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
@@ -1981,7 +1986,7 @@ function blocker(){
   return null;
 }
 function noteHtml(b,cls){ return '<div class="gm-note'+(cls?' '+cls:'')+'"><b>'+esc(b.t)+'</b>'+esc(b.m)+(b.b?'<br><button class="gm-btn sm" type="button" id="gm-nb">'+esc(b.b)+'</button>':'')+'</div>'; }
-var ERRS={ deja:'Vous possédez déjà cet article.', rupture:'Cet article est épuisé.', introuvable:'Article introuvable.', non_possede:'Vous ne possédez pas cet article.', consentement:'Confirmez d’abord votre consentement pour jouer.', ferme:'Les jeux sont fermés pour le moment.', age:'Confirmez votre âge pour jouer.', autre_partie:'Vous avez déjà une partie en cours.', niveau:'Niveau inconnu.', choix:'Choix invalide.',
+var ERRS={ max:'Vous avez déjà le maximum de cet article.', non_equipable:'Cet article ne s’équipe pas : il s’active tout seul.', deja:'Vous possédez déjà cet article.', rupture:'Cet article est épuisé.', introuvable:'Article introuvable.', non_possede:'Vous ne possédez pas cet article.', consentement:'Confirmez d’abord votre consentement pour jouer.', ferme:'Les jeux sont fermés pour le moment.', age:'Confirmez votre âge pour jouer.', autre_partie:'Vous avez déjà une partie en cours.', niveau:'Niveau inconnu.', choix:'Choix invalide.',
   plafond:'Plafond quotidien atteint : vous avez gagné le maximum autorisé aujourd’hui. Revenez demain.', mythique_jour:'Le niveau Mythique est limité à une partie par jour.',
   banque:'Aucune question disponible pour ce choix pour le moment. Choisissez-en un autre.', terminee:'Cette partie est terminée.', ordre:'Réponse déjà prise en compte.', session:'Partie introuvable.' };
 function errMsg(r){
@@ -2155,20 +2160,26 @@ var SHOP=[];
 var ART={maillot:'<path d="M8.5 3 3 6l2 4.2 2.2-1V21h9.6V9.2l2.2 1L21 6l-5.5-3a3.6 3.6 0 0 1-7 0z"/>',
   chapeau:'<path d="M4 15a8 8 0 0 1 16 0z"/><path d="M3 15h18v2.2H3zM12 7V5"/>',
   bottes:'<path d="M8 3h6v9l4 2.2V19H6V8z"/><path d="M6 15h8"/>',
+  'perk-star':'<path d="M12 2.5l2.6 6.1 6.4.6-4.9 4.2 1.5 6.3L12 16.4 6.4 19.7l1.5-6.3L3 9.2l6.4-.6z"/>',
+  'perk-heart':'<path d="M12 20.5S3.5 15 3.5 8.9A4.6 4.6 0 0 1 12 6.6a4.6 4.6 0 0 1 8.5 2.3C20.5 15 12 20.5 12 20.5z"/>',
+  'perk-shield':'<path d="M12 3l7.5 3v5.6c0 4.4-3.1 7.9-7.5 9.4-4.4-1.5-7.5-5-7.5-9.4V6z"/><path d="M12 8v8" stroke-dasharray="2 2"/>',
   autre:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>'};
 function shopArt(it){
   var a=it.art||'';
   if(/^(https?:|data:image\/)/.test(a)) return '<img src="'+esc(a)+'" alt="" loading="lazy">';
+  if(/^stone-/.test(a)) return '<span class="stn k-'+esc(a.slice(6))+'" aria-hidden="true"></span>';
   return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(ART[a]||ART[it.cat]||ART.autre)+'</svg>';
 }
 function renderShop(){
   var g=$('#hb-shop-grid'); if(!g) return;
   if(!SHOP.length){ g.innerHTML='<div class="sh-em" style="grid-column:1/-1">La boutique ouvrira bientôt. Les maillots, chapeaux et bottes Zetwal apparaîtront ici.</div>'; return; }
   g.innerHTML=SHOP.map(function(it){
-    var btn=it.owned?'<button class="gm-btn ln" type="button" data-eq="'+it.id+'">'+(it.equipped?'Retirer':'Équiper')+'</button>'
-      :(it.stock!==null&&it.stock<1?'<button class="gm-btn ln" type="button" disabled>Épuisé</button>':'<button class="gm-btn" type="button" data-buy="'+it.id+'">Acheter</button>');
+    var full=it.consumable&&it.qty>=it.max_qty, perk=it.cat==='avantage',
+        btn=(it.owned&&!it.consumable)?(perk?'<button class="gm-btn ln" type="button" disabled>Déjà acheté</button>':'<button class="gm-btn ln" type="button" data-eq="'+it.id+'">'+(it.equipped?'Retirer':'Équiper')+'</button>')
+      :full?'<button class="gm-btn ln" type="button" disabled>Maximum atteint</button>'
+      :(it.stock!==null&&it.stock<1?'<button class="gm-btn ln" type="button" disabled>Épuisé</button>':'<button class="gm-btn" type="button" data-buy="'+it.id+'">'+(it.consumable&&it.owned?'En acheter un autre':'Acheter')+'</button>');
     return '<article class="sh-it'+(it.owned?' own':'')+'"><div class="art">'+shopArt(it)+'</div><h3>'+esc(it.name)+'</h3><p>'+esc(it.descr||'')+'</p>'+
-      '<div class="pr"><b>'+fmt(it.price)+' jeton'+(it.price>1?'s':'')+'</b>'+(it.owned?'<small>'+(it.equipped?'Équipé':'Possédé')+'</small>':(it.stock!==null?'<small>'+it.stock+' restant'+(it.stock>1?'s':'')+'</small>':''))+'</div>'+btn+'</article>';
+      '<div class="pr"><b>'+fmt(it.price)+' jeton'+(it.price>1?'s':'')+'</b>'+(it.owned?'<small>'+(it.consumable?'Vous en avez '+it.qty+' / '+it.max_qty:(it.equipped?'Équipé':'Possédé'))+'</small>':(it.stock!==null?'<small>'+it.stock+' restant'+(it.stock>1?'s':'')+'</small>':''))+'</div>'+btn+'</article>';
   }).join('');
 }
 function loadShop(){
@@ -2186,7 +2197,7 @@ document.addEventListener('click',function(e){
       var k=this; k.disabled=true;
       rpc('zj_shop_buy',{p_item:it.id}).then(function(r){
         if(r&&r.ok){ closeModal(); setBal(r.balance); if(GM.st) GM.st.balance=r.balance; toast('Achat effectué : '+it.name); loadShop(); }
-        else { k.disabled=false; $('#sh-e').textContent=errMsg(r); }
+        else { k.disabled=false; $('#sh-e').textContent=(r&&r.error==='solde')?'Solde insuffisant : il vous faut '+fmt(r.need)+' jetons.':errMsg(r); }
       },function(er){ k.disabled=false; $('#sh-e').textContent=errMsg(er); });
     });
   } else if(q){

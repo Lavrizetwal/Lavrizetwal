@@ -1446,14 +1446,22 @@ body.gm{background:var(--bg)}
 .gk-c.c0{--hl:50%}.gk-c.c14{--hr:50%}.gk-c.r0{--vt:50%}.gk-c.r14{--vb:50%}
 .gk-c.star .st{position:absolute;left:50%;top:50%;width:22%;height:22%;transform:translate(-50%,-50%);border-radius:50%;background:rgba(60,32,8,.85);z-index:1}
 .gk-c .s{position:absolute;left:8%;top:8%;right:8%;bottom:8%;border-radius:50%;z-index:2;box-shadow:0 2px 3px rgba(0,0,0,.45)}
-.gk-c .s.b{background:radial-gradient(circle at 35% 30%,#6b6f7a,#15161a 62%,#000)}
-.gk-c .s.w{background:radial-gradient(circle at 35% 30%,#fff,#e8eaf0 55%,#b9bfcc)}
+.gk-c .s.k-black{background:radial-gradient(circle at 35% 30%,#6b6f7a,#15161a 62%,#000)}
+.gk-c .s.k-white{background:radial-gradient(circle at 35% 30%,#fff,#e8eaf0 55%,#b9bfcc)}
+.gk-c .s.k-argent{background:radial-gradient(circle at 33% 28%,#fff,#dfe3ea 28%,#a4abb7 62%,#5f6671)}
+.gk-c .s.k-saphir{background:radial-gradient(circle at 33% 28%,#a9d0ff,#2f74e6 36%,#0d3190 76%,#041341);box-shadow:0 2px 3px rgba(0,0,0,.5),inset 0 0 0 1px rgba(160,200,255,.45)}
+.gk-c .s.k-diamant{background:conic-gradient(from 20deg,rgba(255,255,255,.7),rgba(255,255,255,0) 18%,rgba(255,255,255,.55) 38%,rgba(255,255,255,0) 58%,rgba(255,255,255,.65) 78%,rgba(255,255,255,0)),radial-gradient(circle at 30% 26%,#fff,#dcf8ff 26%,#8fdcf2 58%,#3da9cf);box-shadow:0 2px 3px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.7)}
 .gk-c .h{position:absolute;left:18%;top:18%;right:18%;bottom:18%;border-radius:50%;z-index:2;opacity:0;pointer-events:none}
 @media (hover:hover){.gk-c.can:hover .h{opacity:.5;background:radial-gradient(circle at 35% 30%,var(--gh1),var(--gh2))}}
 .gk-board{--gh1:#6b6f7a;--gh2:#000}
-.gk-board.me2{--gh1:#fff;--gh2:#b9bfcc}
+.gk-board.lk-white{--gh1:#fff;--gh2:#b9bfcc}
+.gk-board.lk-argent{--gh1:#fff;--gh2:#8e95a1}
+.gk-board.lk-saphir{--gh1:#6aa6ff;--gh2:#0a2a7a}
+.gk-board.lk-diamant{--gh1:#fff;--gh2:#6cc9e6}
 .gk-c.last .s::after{content:"";position:absolute;left:50%;top:50%;width:34%;height:34%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#fff3b0,#D4AF37 60%,#a8841c);box-shadow:0 0 8px 2px rgba(240,217,138,.85)}
 .gk-c.win .s{box-shadow:0 0 0 3px #D4AF37,0 0 14px 4px rgba(240,217,138,.9)}
+.gk-c.gold .s{background:radial-gradient(circle at 33% 28%,#fffbd0,#ffd84a 38%,#d9a410 72%,#8a6205)!important;box-shadow:0 0 0 3px #fff3b0,0 0 20px 7px rgba(255,200,40,.95)!important}
+.gk-c.gold .s::after{display:none}
 .gk-c:focus-visible{outline:3px solid #1e6fff;outline-offset:-3px;z-index:3}
 .gk-board.wait{cursor:progress}
 .gk-board.off .gk-c{cursor:default}
@@ -1611,7 +1619,7 @@ body.gm{background:var(--bg)}
         </div>
         <aside class="gk-side">
           <div class="sd-card" id="gk-info"></div>
-          <div class="sd-card"><h3>Comment jouer</h3><p class="muted" style="font-size:.9rem;line-height:1.65">Touchez une intersection pour poser une pierre. Le premier à aligner cinq pierres, en ligne, colonne ou diagonale, gagne. La pierre jouée en dernier est marquée d’un point doré. Clavier : flèches pour se déplacer, Entrée pour jouer.</p></div>
+          <div class="sd-card"><h3>Comment jouer</h3><p class="muted" style="font-size:.9rem;line-height:1.65">Touchez une intersection pour poser une pierre. Le premier à aligner cinq pierres, en ligne, colonne ou diagonale, gagne. La pierre jouée en dernier est marquée d’un point doré ; à la fin, la cinquième pierre de la ligne gagnante brille en or. Des pierres en argent, saphir ou diamant sont disponibles dans la boutique des jeux (en ligne, deux joueurs n’ont jamais la même pierre). Clavier : flèches pour se déplacer, Entrée pour jouer.</p></div>
         </aside>
       </div>
     </div>
@@ -1984,21 +1992,25 @@ function five(b){
   }
   return null;
 }
+var LKN={black:'noire',white:'blanche',argent:'en argent',saphir:'en saphir',diamant:'en diamant'}, LKS=['black','white','argent','saphir','diamant'];
+function lookOf(v){ var k=(v==='1'?G.you===1:G.you===2)?G.look:G.olook; return k||(v==='1'?'black':'white'); }
+function myLook(){ return G.look||(G.you===2?'white':'black'); }
 function paint(){
-  if(!G) return; var b=G.board, w=G.over?five(b):null, i, v, el, key, can=canPlay();
-  $('#gk-board').classList.toggle('me2',G.you===2);
+  if(!G) return; var b=G.board, w=G.over?five(b):null, gi=-1, i, v, el, key, can=canPlay(), bd=$('#gk-board');
+  if(w) gi=w.indexOf(G.last)>=0?G.last:w[4];
+  LKS.forEach(function(k){ bd.classList.toggle('lk-'+k,myLook()===k); });
   $('#gk-board').classList.toggle('off',!can);
   $('#gk-board').classList.toggle('wait',busy);
-  for(i=0;i<N*N;i++){ v=b.charAt(i); el=cells[i]; key=v+(i===G.last?'L':'')+(w&&w.indexOf(i)>=0?'W':'')+(can?'c':'');
+  for(i=0;i<N*N;i++){ v=b.charAt(i); el=cells[i]; key=v+(v==='0'?'':lookOf(v))+(i===G.last?'L':'')+(w&&w.indexOf(i)>=0?'W':'')+(i===gi?'G':'')+(can?'c':'');
     if(shown[i]===key) continue; shown[i]=key;
-    var s=el.querySelector('.s'); if(v==='0'){ if(s) s.remove(); } else { if(!s){ s=document.createElement('i'); el.appendChild(s); } s.className='s '+(v==='1'?'b':'w'); }
-    el.classList.toggle('last',i===G.last); el.classList.toggle('win',!!(w&&w.indexOf(i)>=0)); el.classList.toggle('can',can&&v==='0');
-    el.setAttribute('aria-label','Ligne '+((i/N|0)+1)+', colonne '+(i%N+1)+', '+(v==='0'?'vide':v==='1'?'pierre noire':'pierre blanche')+(i===G.last?', dernier coup':''));
+    var s=el.querySelector('.s'); if(v==='0'){ if(s) s.remove(); } else { if(!s){ s=document.createElement('i'); el.appendChild(s); } s.className='s k-'+lookOf(v); }
+    el.classList.toggle('last',i===G.last); el.classList.toggle('win',!!(w&&w.indexOf(i)>=0)); el.classList.toggle('gold',i===gi); el.classList.toggle('can',can&&v==='0');
+    el.setAttribute('aria-label','Ligne '+((i/N|0)+1)+', colonne '+(i%N+1)+', '+(v==='0'?'vide':(i===gi?'cinquième pierre, en or':'pierre '+LKN[lookOf(v)]))+(i===G.last&&i!==gi?', dernier coup':''));
   }
 }
 function canPlay(){ return !!G&&!G.over&&!busy&&(G.mode==='ia'||G.myTurn); }
 function turnText(){
-  var t=$('#gk-turn'), me=G.you===1?'noires':'blanches';
+  var t=$('#gk-turn'), me=({black:'noires',white:'blanches',argent:'en argent',saphir:'en saphir',diamant:'en diamant'})[myLook()];
   if(G.over){ t.innerHTML='Partie terminée'; return; }
   if(G.mode==='ia'){ t.innerHTML=(busy?'L’ordinateur réfléchit…':'À vous de jouer')+'<small>Vous jouez les pierres '+me+(G.you===1?' et vous commencez':' ; l’ordinateur commence')+'</small>'; }
   else t.innerHTML=(G.myTurn?'À vous de jouer':'Au tour de '+esc(G.opp||'l’adversaire'))+'<small>Vous jouez les pierres '+me+' · adversaire : '+esc(G.opp||'…')+'</small>';
@@ -2025,7 +2037,7 @@ function stopAll(){ clearInterval(clkT); clearInterval(pollT); }
 function openGame(){ show('#gk-menu',false); show('#gk-game',true); showNote(null); buildBoard(); window.scrollTo({top:$('#gk-game').offsetTop-70,behavior:REDUCE?'auto':'smooth'}); }
 function enterIA(r,resumed){
   var lv=lvInfo(r.level)||{name:r.name,entry:r.entry,win:r.win}, mv=r.moves||[];
-  G={mode:'ia',sid:r.sid,level:r.level,name:r.name||lv.name,you:r.you,board:String(r.board),last:mv.length?mv[mv.length-1]:-1,entry:r.entry,win:r.win,over:false,stars:r.stars!=null?r.stars:2,end:Date.now()+(r.ms_left!=null?r.ms_left:10000)};
+  G={mode:'ia',sid:r.sid,level:r.level,name:r.name||lv.name,you:r.you,board:String(r.board),last:mv.length?mv[mv.length-1]:-1,entry:r.entry,win:r.win,over:false,look:r.look,olook:r.opp_look,stars:r.stars!=null?r.stars:2,end:Date.now()+(r.ms_left!=null?r.ms_left:10000)};
   if(r.balance!=null) setBal(r.balance);
   stopAll(); busy=false; openGame(); paint(); turnText(); infoIA(); startClock();
   if(!resumed) ZS.play('start'); else toast('Partie reprise.');
@@ -2291,7 +2303,7 @@ function pvpCall(kind,stake,mid,conf,mv){
 /* ── Partie en ligne ── */
 function enterPvp(p){
   clearInterval(lobT); stopAll();
-  G={mode:'pvp',mid:p.mid,over:false,board:String(p.board),last:-1,stake:p.stake,you:p.you,myTurn:!!p.my_turn,opp:p.mine?p.guest:p.host,end:0,fee:p.fee||0,moveS:p.move_s||90};
+  G={mode:'pvp',mid:p.mid,over:false,look:p.look,olook:p.opp_look,board:String(p.board),last:-1,stake:p.stake,you:p.you,myTurn:!!p.my_turn,opp:p.mine?p.guest:p.host,end:0,fee:p.fee||0,moveS:p.move_s||90};
   var mv=p.moves||[]; G.last=mv.length?mv[mv.length-1]:-1; G.end=p.ms_left!=null?Date.now()+p.ms_left:0;
   busy=false; openGame(); paint(); turnText(); infoPvp(); startClock(); ZS.play('start');
   pollT=setInterval(pollPvp,1500);
@@ -2312,6 +2324,7 @@ function applyPvp(p){
   var prev=G.board, mv=p.moves||[];
   G.board=String(p.board); G.myTurn=!!p.my_turn; G.last=mv.length?mv[mv.length-1]:G.last; G.end=p.ms_left!=null&&p.status==='playing'?Date.now()+p.ms_left:0;
   if(p.opp==null) G.opp=p.mine?p.guest:p.host;
+  if(p.look){ G.look=p.look; G.olook=p.opp_look; }
   if(p.balance!=null) setBal(p.balance);
   if(prev!==G.board&&!(p.my_turn===false&&G.justMoved)) ZS.play('place',(G.last||0)%8+3);
   G.justMoved=false; paint(); turnText(); clock();
