@@ -2562,8 +2562,8 @@ function makeTex(th){
 }
 
 /* ── Textures photographiques (fournies par Mike) : superposées à la chaussée, rechargées à la demande ── */
-var PHOTO = {}, PHU = { ville:'textures/route-ville.jpg?v=1', foret:'textures/route-foret.jpg?v=1', montagne:'textures/route-montagne.jpg?v=1' }, PHT = { ville:2, foret:2, montagne:2 }, FULL = { glace:1, desert:1, volcan:1, jungle:1, ruines:1 }, LANE = { glace:'rgba(235,245,255,.55)', desert:'rgba(250,235,200,.5)', volcan:'rgba(255,170,90,.26)', jungle:'rgba(225,235,200,.3)', ruines:'rgba(235,225,170,.5)' };
-for(var _t in FULL) PHU[_t] = 'textures/road-' + _t + '.jpg?v=1';
+var PHOTO = {}, PHU = { ville:'textures/route-ville.jpg?v=2', foret:'textures/route-foret.jpg?v=2', montagne:'textures/route-montagne.jpg?v=2' }, PHT = { ville:2, foret:2, montagne:2 }, FULL = { glace:1, desert:1, volcan:1, jungle:1, ruines:1 }, LANE = { glace:'rgba(235,245,255,.55)', desert:'rgba(250,235,200,.5)', volcan:'rgba(255,170,90,.26)', jungle:'rgba(225,235,200,.3)', ruines:'rgba(235,225,170,.5)' };
+for(var _t in FULL) PHU[_t] = 'textures/road-' + _t + '.jpg?v=2';
 function lowEnd(){ if(window.__Z3D_FORCE) return false; try{ if(/[?&]q3d=off/.test(location.search)) return true; var m = navigator.deviceMemory, c = navigator.hardwareConcurrency; if((m && m <= 1) || (c && c <= 2)) return true; if(navigator.connection && navigator.connection.saveData) return true; }catch(e){} return false; }
 function photoRoad(g, th){
   if(FULL[th]){ g.drawImage(PHOTO[th], 0, 0, 1024, 1024); g.save(); g.fillStyle = LANE[th]; for(var d = 0; d < 4; d++){ g.fillRect(427 - 4, d * 256 + 40, 8, 130); g.fillRect(597 - 4, d * 256 + 40, 8, 130); } g.restore(); return; }
@@ -2696,7 +2696,7 @@ P.event = function(x, d, now, guided){
 /* Cinq décors : ciel photographique et décor de bord de route propres à chaque route. */
 (function(){
 var P = ZScene.prototype, TAU = 6.2832;
-var SK = { glace:{ u:'textures/sky-glace.jpg?v=1', hz:.90 }, desert:{ u:'textures/sky-desert.jpg?v=1', hz:.93 }, volcan:{ u:'textures/sky-volcan.jpg?v=1', hz:.92 }, jungle:{ u:'textures/sky-jungle.jpg?v=1', hz:.94 }, ruines:{ u:'textures/sky-ruines.jpg?v=1', hz:.92 } }, SKI = {};
+var SK = { glace:{ u:'textures/sky-glace.jpg?v=2', hz:.90 }, desert:{ u:'textures/sky-desert.jpg?v=2', hz:.93 }, volcan:{ u:'textures/sky-volcan.jpg?v=2', hz:.92 }, jungle:{ u:'textures/sky-jungle.jpg?v=2', hz:.94 }, ruines:{ u:'textures/sky-ruines.jpg?v=2', hz:.92 } }, SKI = {};
 function lowEnd(){ if(window.__Z3D_FORCE) return false; try{ if(/[?&]q3d=off/.test(location.search)) return true; var m = navigator.deviceMemory, c = navigator.hardwareConcurrency; if((m && m <= 1) || (c && c <= 2)) return true; if(navigator.connection && navigator.connection.saveData) return true; }catch(e){} return false; }
 ZScene.loadSkies = function(){ if(ZScene._sk || lowEnd()) return; ZScene._sk = 1; Object.keys(SK).forEach(function(t){ var im = new Image(); im.onload = function(){ SKI[t] = im; }; im.src = SK[t].u; }); };
 setTimeout(function(){ ZScene.loadSkies(); }, 1000);
@@ -2774,7 +2774,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=11'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=12'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); setTimeout(function(){ try{ if(R3ON && Z3D.makeRoad) Z3D.makeRoad().init(); }catch(e){} }, 900); loadRunners(function(){ mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
