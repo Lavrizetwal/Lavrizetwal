@@ -27,7 +27,8 @@ const PROP = {
 /* PNJ vivants : ils courent vers le coureur (à ~45 % de leur vitesse avant le contact), puis le poursuivent par derrière
    à cette fraction de VEL ; le coureur les distance peu à peu. Les obstacles fixes (trou, tronc…) restent en place. */
 const CHASE = { tigre: .97, loup: .97, grand_loup: .95, ours: .86, crocodile: .72, bandit_homme: .94, bandit_femme: .94, bandit_debout: .94, zombie: .82, colosse: .76, dimon: .9, manon_fire: .9, roi_scorpion: .86, scorpion: .72, chien: .96, taureau: .92, cochon: .78, araignee_noire: .9, araignee_monstre: .86, serpent: .66, serpent_sol: .66, abeilles: .95 };
-const WIDEK = { trou: 1, fil_elec: 1, branche: 1, tronc: 1, bandit_saut: 1 };
+const BR = { pont_casse: 1, pont_gele: 1, pont_metal: 1 };
+const WIDEK = { pont_casse: 1, pont_gele: 1, pont_metal: 1, trou: 1, fil_elec: 1, branche: 1, tronc: 1, bandit_saut: 1 };
 
 export function installRoad(X){
   const { R, CRE, loadCre, creAnim, ctlFor, runnerUpdate, rigFromMesh, SPEC_FILLE1 } = X;
@@ -161,10 +162,87 @@ export function installRoad(X){
     else g.add(bx(std(0x7a2a2a), 1.1, 1.1, 1.1, 0, .55, 0));
     r.g = g; return r;
   }
+
+  /* ── pont modulaire qui s'effondre (ralenti visuel : horloges de jeu inchangées) ──
+     rel = distance du coureur au centre du pont (m, >0 une fois passé) ; tout est fonction de rel → déterministe. */
+  const sm = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const bump = x => sm(-8, -3, x) * (1 - sm(3, 11, x));
+  const ETAB = (() => { const a = [0]; for(let j = 1; j <= 320; j++){ const x = -40 + j * .25; a.push(a[j - 1] + (1 - .7 * bump(x)) * .25 / VEL); } return a; })();
+  const EV = x => { const f = (Math.max(-40, Math.min(79.9, x)) + 40) * 4, j = Math.floor(f); return ETAB[j] + (ETAB[j + 1] - ETAB[j]) * (f - j) + (x < -40 ? (x + 40) / VEL : 0); };
+  const BLB = 22, GH = 3.6;
+  let dustTex = null;
+  function dustT(){ if(dustTex) return dustTex; const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 2, 32, 32, 30); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); dustTex = new T.CanvasTexture(c); return dustTex; }
+  function bridgePal(kind, th){
+    if(kind === 'pont_gele') return { deck: 0xa6dcf0, rail: 0xe3f6fd, beam: 0x7fb8d6, alpha: .8, pit: 0x06141c, dust: 0xe8f6ff, mat: 'ice' };
+    if(kind === 'pont_metal') return { deck: 0x6e737c, rail: 0xa3a9b2, beam: 0x474b53, pit: 0x08090b, dust: 0x9a9890, mat: 'metal' };
+    if(th === 'jungle') return { deck: 0x7a6a30, rail: 0x3d7a2a, beam: 0x4f3a1e, pit: 0x050a05, dust: 0x8a8a5a, mat: 'wood' };
+    if(th === 'ruines') return { deck: 0x938d7e, rail: 0x7a766a, beam: 0x6a665c, pit: 0x08080a, dust: 0xb0aa98, mat: 'stone' };
+    if(th === 'volcan') return { deck: 0x3b2e2a, rail: 0x5a3a2a, beam: 0x2a201d, pit: 0x120403, dust: 0x6a4a3a, mat: 'rock', glow: 0xff5a1a };
+    return { deck: 0x8d5b31, rail: 0xb48c58, beam: 0x5a3b22, pit: 0x070605, dust: 0xc8b890, mat: 'wood' };
+  }
+  function buildBridge(kind, w){
+    const pal = bridgePal(kind, S.th), grp = new T.Group(), W = Math.min(w, ROADW) || ROADW - 1, pcs = [];
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const mk = (geo, color, o) => new T.Mesh(geo, new T.MeshStandardMaterial(Object.assign({ color, roughness: pal.mat === 'metal' ? .45 : .9, metalness: pal.mat === 'metal' ? .7 : 0, transparent: !!pal.alpha, opacity: pal.alpha || 1 }, o || {})));
+    const pc = document.createElement('canvas'); pc.width = 64; pc.height = 128; { const g = pc.getContext('2d'), c0 = new T.Color(pal.pit); g.fillStyle = '#' + c0.getHexString(); g.fillRect(0, 0, 64, 128); [[0, 0, 0, 40], [0, 128, 0, 88]].forEach(a => { const gr = g.createLinearGradient(0, a[1], 0, a[3]); gr.addColorStop(0, 'rgba(120,112,100,.75)'); gr.addColorStop(1, 'rgba(120,112,100,0)'); g.fillStyle = gr; g.fillRect(0, Math.min(a[1], a[3]), 64, 40); }); [[0, 8], [56, 8]].forEach(a => { const gr = g.createLinearGradient(a[0] ? 64 : 0, 0, a[0] ? 56 : 8, 0); gr.addColorStop(0, 'rgba(120,112,100,.6)'); gr.addColorStop(1, 'rgba(120,112,100,0)'); g.fillStyle = gr; g.fillRect(a[0], 0, a[1], 128); }); }
+    const pt = new T.CanvasTexture(pc); pt.colorSpace = T.SRGBColorSpace;
+    const pit = new T.Mesh(new T.BoxGeometry(ROADW + .6, .02, BLB + .6), new T.MeshBasicMaterial({ map: pt, depthWrite: false })); pit.position.y = .035; pit.renderOrder = 1; grp.add(pit);
+    const rimM = new T.MeshStandardMaterial({ color: pal.mat === 'ice' ? 0xcfe6f0 : pal.mat === 'rock' ? 0x2a2220 : 0x6a655b, roughness: 1 });
+    [[-1, 0], [1, 0]].forEach(([sd]) => { const r = new T.Mesh(new T.BoxGeometry(.5, .3, BLB + 1.2), rimM); r.position.set(sd * (ROADW / 2 + .3), .15, 0); grp.add(r); });
+    [-1, 1].forEach(sd => { const r = new T.Mesh(new T.BoxGeometry(ROADW + 1.4, .26, .5), rimM); r.position.set(0, .13, sd * (BLB / 2 + .3)); grp.add(r); });
+    if(pal.glow){ const gl = new T.Mesh(new T.BoxGeometry(ROADW * .5, .02, BLB * .8), new T.MeshBasicMaterial({ color: pal.glow, transparent: true, opacity: .55, depthWrite: false })); gl.position.y = .04; gl.renderOrder = 1; grp.add(gl); }
+    const dust = pal.dust;
+    const piece = (mesh, u, x, y, trig, o) => { o = o || {}; mesh.position.set(x, y, -u); mesh.renderOrder = 4; grp.add(mesh); const p = { m: mesh, u, x, y, trig, sp: [(rnd() - .5) * 5, (rnd() - .5) * 2.4, (rnd() - .5) * 6], dx: (rnd() - .5) * 1.8, dz: (rnd() - .5) * .5, rz0: o.rz0 || 0, rx0: o.rx0 || 0, fall: 0, ang: o.ang || 0, tens: o.tens == null ? 1 : o.tens, base: mesh.material.color.getHex() }; pcs.push(p); return p; };
+    const n = Math.round(BLB / .55);
+    for(let i = 0; i < n; i++){
+      const u = -BLB / 2 + (i + .5) * (BLB / n), au = Math.abs(u); if(au < GH) continue;
+      const edge = au < GH + 1.2, geo = new T.BoxGeometry(W * (.97 + rnd() * .03), .12, .44);
+      const pl = mk(geo, pal.deck); pl.material.color.offsetHSL(0, 0, (rnd() - .5) * .06);
+      const trig = u < 0 ? u + 1.4 + rnd() * 2.6 : u + 5 + rnd() * 4;
+      piece(pl, u, 0, .1, trig, { rx0: edge ? (u < 0 ? .5 : -.5) * (.4 + rnd() * .5) * -1 : 0, rz0: edge ? (rnd() - .5) * .3 : 0, tens: edge ? 2 : 1 });
+    }
+    [-1, 1].forEach(sd => {
+      [[-BLB / 2, -GH - .3], [GH + .3, BLB / 2]].forEach(([a, b], k) => {
+        const L = b - a, bm = mk(new T.BoxGeometry(.28, .3, L), pal.beam); piece(bm, (a + b) / 2, sd * (W / 2 - .1), -.05, k ? (a + b) / 2 + 6 : (a + b) / 2 + 3.2, { tens: .4 });
+        const rp = mk(new T.BoxGeometry(.07, .07, L), pal.rail); piece(rp, (a + b) / 2, sd * (W / 2 - .1), 1.15, k ? (a + b) / 2 + 6 : (a + b) / 2 + 3.2, { tens: .4, rz0: 0 });
+      });
+      for(let i = 0; i < 9; i++){ const u = -BLB / 2 + 1 + i * (BLB - 2) / 8, au = Math.abs(u); if(au < GH + .3) continue; const ps = mk(new T.BoxGeometry(.14, 1.15, .14), pal.beam); piece(ps, u, sd * (W / 2 - .1), .6, u < 0 ? u + 2.4 : u + 6.5, { tens: .6 }); }
+    });
+    const sprites = pcs.map(() => { const sp = new T.Sprite(new T.SpriteMaterial({ map: dustT(), color: dust, transparent: true, opacity: 0, depthWrite: false })); sp.visible = false; sp.renderOrder = 5; grp.add(sp); return sp; });
+    return { grp, pcs, sprites, snd: {}, W, pal };
+  }
+  const DARKC = new T.Color(0x24180d);
+  function bridgeUpd(it, cur){
+    const B = it.br, rel = cur.sr - it.sx, E0 = EV(rel), tn = sm(-24, -6, rel) * (1 - sm(4, 10, rel)), t = cur.now / 1000;
+    const bp = bump(rel); if(bp > S.slo){ S.slo = bp; S.sloRel = rel; }
+    /* sons : une seule fois par passage, jamais au-delà de la fenêtre utile */
+    const sn = B.snd, ZS = window.ZS, pl = n => { try{ ZS && ZS.play(n); }catch(e){} };
+    if(rel < -30){ B.snd = {}; }
+    else {
+      if(rel > -26 && !sn.a){ sn.a = 1; pl('bcreak'); } if(rel > -13 && !sn.b){ sn.b = 1; pl('bcreak'); } if(rel > -3.6 && !sn.c){ sn.c = 1; pl('brumble'); } if(rel > 7 && !sn.d){ sn.d = 1; pl('bland'); }
+    }
+    let nf = 0;
+    B.pcs.forEach((p, i) => {
+      const tau = Math.max(0, E0 - EV(p.trig)), m = p.m, sp = B.sprites[i];
+      if(tau <= 0){
+        const j = tn * p.tens, ph = i * 1.7;
+        m.position.set(p.x, p.y + Math.sin(t * 38 + ph) * .012 * j, -p.u); m.rotation.set(p.rx0 + Math.sin(t * 27 + ph) * .025 * j, 0, p.rz0 + Math.cos(t * 31 + ph) * .03 * j); m.visible = true;
+        if(p.fall){ p.fall = 0; m.material.depthTest = true; }
+        if(tn > .35 && p.tens > 1) m.material.color.setHex(p.base).lerp(DARKC, Math.min(.6, tn * .6)); sp.visible = false; return;
+      }
+      if(!p.fall){ p.fall = 1; m.material.depthTest = false; if(nf === 0 && cur.now - (B.lastCrack || 0) > 230){ pl('bcrack'); B.lastCrack = cur.now; } }
+      nf++;
+      const g = 11, y = p.y - .5 * g * tau * tau + Math.min(.6, tau * 2.4) * (p.tens > .5 ? 1 : .2);
+      m.position.set(p.x + p.dx * tau, y, -p.u - p.dz * tau * -1); m.rotation.set(p.rx0 + p.sp[0] * tau, p.sp[1] * tau, p.rz0 + p.sp[2] * tau); m.visible = y > -16 && (-m.position.z) > rel - 2.4 - 3 * S.slo;
+      const dl = Math.min(1, tau / .25) * Math.max(0, 1 - tau / 1.3);
+      sp.visible = dl > .02; if(sp.visible){ sp.position.set(p.x + p.dx * tau * .4, .25 + tau * 1.7, -p.u); const sz = .4 + tau * 1.8; sp.scale.set(sz, sz, 1); sp.material.opacity = .34 * dl; }
+    });
+  }
   function inst(kind, w){
-    const pk = kind + '|' + w, pool = S.pool[pk] || (S.pool[pk] = []); let it = pool.pop(); if(it) return it;
-    const cf = CRE[kind], grp = new T.Group();
-    if(cf){
+    const pk = kind + '|' + w + (BR[kind] ? '|' + S.th : ''), pool = S.pool[pk] || (S.pool[pk] = []); let it = pool.pop(); if(it) return it;
+    const cf = BR[kind] ? null : CRE[kind], grp = new T.Group();
+    if(BR[kind]){ const br = buildBridge(kind, w); grp.add(br.grp); it = { grp, m: null, cf: null, kind, pk, br, r: { flat: true, upd: null } }; it.r.upd = () => bridgeUpd(it, S.cur); }
+    else if(cf){
       const base = R.models[kind]; if(!base){ loadCre(kind); return null; }
       let m;
       if(cf.hu){ const h = rigFromMesh(R.creMesh[kind], SPEC_FILLE1); m = { root: h.root, h }; grp.add(h.root); grp.scale.setScalar(cf.Fu / SPEC_FILLE1.H); }
@@ -184,7 +262,7 @@ export function installRoad(X){
         const ls = wide ? [[(r.a + r.b) / 2, (r.b - r.a + 1) * LW * .94]] : Array.from({ length: r.b - r.a + 1 }, (_, i) => [r.a + i, LW * .9]);
         ls.forEach(([ln, w]) => {
           const key = kind + '@' + e.t + '#' + ln; seen.add(key); let it = S.objs.get(key);
-          if(!it){ it = inst(kind, wide ? Math.round(w * 10) / 10 : 0); if(!it) return; S.objs.set(key, it); S.objG.add(it.grp); S.objG.add(it.sh); it.seed = ((e.t / 97) | 0) + ln * 3; }
+          if(!it){ it = inst(kind, wide ? Math.round(w * 10) / 10 : 0); if(!it) return; S.objs.set(key, it); S.objG.add(it.grp); S.objG.add(it.sh); it.seed = ((e.t / 97) | 0) + ln * 3; if(it.br) it.br.snd = {}; }
           let sx = VEL * e.t / 1000, lat = (ln - 1) * LW, back = false;
           const cf = CHASE[kind];
           if(cf){
@@ -192,7 +270,7 @@ export function installRoad(X){
             if(dtm < 0) sx -= dtm * vc * .45;
             else { back = true; sx += vc * dtm - 2.2 * (1 - Math.exp(-dtm / .4)) - ln * .6; lat += (((Sx.vx - 1) * LW + (ln - 1) * .9) - lat) * (1 - Math.exp(-dtm / 1.6)); if(sx < Sx.sr - 5.4) return; }
           }
-          const o = at(sx, lat);
+          it.sx = sx; const o = at(sx, lat);
           it.grp.position.set(o.x, 0, o.z); it.grp.rotation.y = back ? o.h : o.h + Math.PI; it.sh.position.set(o.x, .04, o.z);
           if(it.cf){ creAnim(it.m, it.cf, now, it.seed); it.sh.scale.setScalar((it.cf.Fu || 1.6) * .55); it.sh.visible = true; if(it.cf.lift) it.grp.position.y = it.cf.lift * 1.05; }
           else if(it.r){ if(it.r.upd) it.r.upd(now + it.seed * 300); if(it.r.pick){ it.grp.rotation.y = now / 380; it.grp.position.y = .12 * Math.sin(now / 260); } it.sh.visible = !it.r.flat; it.sh.scale.setScalar(wide ? w * .5 : .8); }
@@ -239,18 +317,21 @@ export function installRoad(X){
     }
     S.forks.forEach(f => { f.Jc = S.fkJ[f.tb]; });
     if(S.win < -1e8 || sr < S.win + CH * .6 || sr > S.win + CH * 2.4) rebuild(Sx.th, sr);
-    Sx.sr = sr; placeGantries(); placeObjs(Sx);
+    Sx.sr = sr; S.cur = { sr, now: Sx.now }; S.slo = 0; placeGantries(); placeObjs(Sx);
+    const slo = S.slo, rt = performance.now(), rdt = S.rt ? Math.min(100, rt - S.rt) : 16; S.rt = rt;
+    if(S.animT == null || Math.abs(S.animT - Sx.now) > 4000 + 1200 * 0) S.animT = Sx.now; else S.animT += rdt * (1 - .7 * slo);
     /* coureur */
     const c = ctlFor('road', Sx.who); if(c.o.root.parent !== S.sc) S.sc.add(c.o.root); c.o.root.visible = !window.ZSHIELD;
     const lat = (Sx.vx - 1) * LW;
-    runnerUpdate(c, Sx.now, lat, { speed: Sx.speed, jump: Sx.jump >= 0, jv: Sx.jump, crouch: Sx.crouch, hit: Sx.hit }, 1.2);
-    const ro = at(sr, lat); rp.x = ro.x; rp.z = ro.z; const rh = ro.h, jy = Sx.jump >= 0 ? Math.sin(Math.PI * Math.max(0, Math.min(1, Sx.jump))) * 1.15 : 0;
+    runnerUpdate(c, S.animT, lat, { speed: Sx.speed, jump: Sx.jump >= 0, jv: Sx.jump, crouch: Sx.crouch, hit: Sx.hit }, 1.2);
+    const ro = at(sr, lat); rp.x = ro.x; rp.z = ro.z; const rh = ro.h, jy = Sx.jump >= 0 ? Math.sin(Math.PI * Math.max(0, Math.min(1, Sx.jump))) * (1.15 + 1.5 * slo) : 0;
     c.o.root.position.set(rp.x, jy, rp.z); c.o.root.rotation.y = Math.PI - rh;
     S.runnerPos = { x: rp.x, y: jy + 1, z: rp.z };
     /* caméra : derrière le coureur sur le tracé, regarde 9 m devant ; pendant les coudes elle tourne avec la route */
-    const cb = at(sr - 5.4, lat * .6); cp.x = cb.x; cp.z = cb.z; const ct = at(sr + 9, lat * .25); tp.x = ct.x; tp.z = ct.z;
+    const cb = at(sr - 5.4 - 3 * slo, lat * .6 + 1.5 * slo); cp.x = cb.x; cp.z = cb.z; const ct = at(sr + 9 + 4 * slo, lat * .25); tp.x = ct.x; tp.z = ct.z;
     const sk = Sx.shake > 0 ? Sx.shake * .12 : 0, bob = Sx.speed ? Math.sin(Sx.now / 46) * .02 : 0;
-    S.cam.position.set(cp.x + (Math.random() - .5) * sk, 3.1 + bob + (Math.random() - .5) * sk, cp.z + (Math.random() - .5) * sk); S.cam.lookAt(tp.x, 1.15, tp.z);
+    S.cam.position.set(cp.x + (Math.random() - .5) * sk, 3.1 + 1.1 * slo + bob + (Math.random() - .5) * sk, cp.z + (Math.random() - .5) * sk); S.cam.lookAt(tp.x, 1.15 + .5 * slo, tp.z);
+    { const fv = (w / h < .9 ? 74 : 60) + 7 * slo; if(Math.abs(S.cam.fov - fv) > .05){ S.cam.fov = fv; S.cam.updateProjectionMatrix(); } }
     if(Sx.top){ S.cam.position.set(rp.x, 70, rp.z + 24); S.cam.lookAt(rp.x, 0, rp.z - 16); }
     S.cam.updateMatrixWorld(true);
     S.sky.position.x = S.cam.position.x; S.sky.position.z = S.cam.position.z; S.gnd.position.x = S.cam.position.x; S.gnd.position.z = S.cam.position.z;
