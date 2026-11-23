@@ -2774,7 +2774,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=12'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=14'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); setTimeout(function(){ try{ if(R3ON && Z3D.makeRoad) Z3D.makeRoad().init(); }catch(e){} }, 900); loadRunners(function(){ mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
@@ -2943,7 +2943,8 @@ SP.serpent_arbre = function(X, a){
 };
 /* créatures-obstacles : rendu 3D (bestiaire) ; sans 3D, silhouette 2D selon le geste attendu */
 var CRC = { tigre:['L','#c9772b'], crocodile:['J','#8a8a5a'], araignee_noire:['J','#1c1c1f'], serpent:['J','#a88c5a'], araignee_monstre:['C','#2a2118'], loup:['L','#7a7a80'], grand_loup:['L','#d8d8d4'], ours:['L','#5a3b24'],
-  bandit_homme:['L','#6b5238'], bandit_femme:['L','#8a7a5a'], colosse:['L','#4a4038'], zombie:['L','#9aa49a'], dimon:['C','#3a1f2a'], manon_fire:['L','#2a1a16'], roi_scorpion:['L','#8a6a2a'], ver_geant:['J','#a89868'] };
+  bandit_homme:['L','#6b5238'], bandit_femme:['L','#8a7a5a'], colosse:['L','#4a4038'], zombie:['L','#9aa49a'], dimon:['C','#3a1f2a'], manon_fire:['L','#2a1a16'], roi_scorpion:['L','#8a6a2a'], ver_geant:['J','#a89868'],
+  tronc_deracine:['J','#5a4228'], pont_casse:['J','#4b5a3a'], pont_gele:['J','#7a8fa0'], pont_metal:['J','#6a5a50'], rocher:['L','#a8845a'], rocher_lave:['L','#2a1a1a'], eboulis:['J','#4a4a4c'], scie:['L','#8a8a8e'], barricade:['L','#7a5a3a'], piege_pointes:['J','#8a7a5a'], camion:['L','#8a7a5a'] };
 function creFallback(X, k, a){
   var d = CRC[k], u = a.u, cx = a.cx, y = a.y, cl = d[0], col = d[1], hang = cl === 'C';
   X.save(); X.fillStyle = 'rgba(0,0,0,.28)'; X.beginPath(); X.ellipse(cx, y, u * .55, u * .09, 0, 0, 6.2832); X.fill();
