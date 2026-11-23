@@ -4,7 +4,7 @@
    move koneksyon. Li PA JANM kenbe done : pri, kòmand, pwen ak
    machin yo toujou soti dirèk nan sèvè a.
    ════════════════════════════════════════════════════════════════ */
-const VERSION = 'zetwal-v26';
+const VERSION = 'zetwal-v27';
 
 /* Paj ak fichye ki chaje depi telefòn nan */
 const SHELL = [
@@ -26,7 +26,7 @@ const SHELL = [
 ];
 
 /* Jwèt yo : yo antre nan kach la sèlman lè jwè a louvri yo yon fwa */
-const GAMES = ['sudoku.html','duel.html','course.html'];
+const GAMES = ['sudoku.html','duel.html','course.html','gomoku.html'];
 
 self.addEventListener('install', function(e){
   e.waitUntil(

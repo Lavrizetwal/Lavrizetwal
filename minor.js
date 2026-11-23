@@ -16,7 +16,7 @@
   birthMinor = ls('g', 'zmin:b') === '1';
   function active(){ return !!devState() || birthMinor; }
   function pageKey(){ return (location.pathname.split('/').pop() || '').replace(/\.html$/i, '').toLowerCase() || 'index'; }
-  var GAME_PAGES = { games:1, sudoku:1, duel:1, course:1 };
+  var GAME_PAGES = { games:1, sudoku:1, duel:1, course:1, gomoku:1 };
 
   /* ── Âge à partir de la date de naissance (AAAA-MM-JJ). Invalide / absente / future => null (= majeur) ── */
   function age(bd){
@@ -77,7 +77,7 @@
       var u = String((input && input.url) || input || ''), m = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
       if(m === 'GET' || m === 'HEAD' || m === 'OPTIONS') return null;
       if(/\/rest\/v1\/(move_orders|rides)(\?|$)/.test(u) && m === 'POST') return 'Kòmand sa a';
-      if(/\/rest\/v1\/rpc\/z[jc]_/.test(u)) return 'Jwèt la';
+      if(/\/rest\/v1\/rpc\/z[jcg]_/.test(u)) return 'Jwèt la';
       if(/\/functions\/v1\/zpoints/.test(u)){
         var body = init && init.body; if(typeof body === 'string'){ var o = JSON.parse(body); if(o && SPEND[o.op]) return o.op === 'charge' ? 'Peman sa a' : 'Don pwen sa a'; }
       }
@@ -139,7 +139,7 @@
   }
 
   /* ── Application de l'état à la page ── */
-  var CSS = 'html.zminor a[href^="games"],html.zminor a[href^="sudoku"],html.zminor a[href^="duel"]{display:none!important}'
+  var CSS = 'html.zminor a[href^="games"],html.zminor a[href^="sudoku"],html.zminor a[href^="duel"],html.zminor a[href^="gomoku"]{display:none!important}'
     + '#zmin-fab{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:860;min-width:44px;height:44px;border-radius:99px;border:1px solid rgba(212,175,55,.7);background:rgba(13,12,9,.82);color:#f2dc8e;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 12px;cursor:pointer;font:700 .72rem var(--sans,system-ui);backdrop-filter:blur(4px);touch-action:manipulation}'
     + '#zmin-fab.on{background:#D4AF37;color:#17130a;padding:0 14px}#zmin-fab:focus-visible{outline:2px solid #fff;outline-offset:2px}#zmin-fab svg{width:20px;height:20px;flex:none}'
     + '@media (max-width:520px){#zmin-fab:not(.on){opacity:.75}}';
