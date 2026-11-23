@@ -2511,7 +2511,7 @@ header.hero,.sec,.contact{background:transparent}
             Mande kous la
           </button>
           <p class="hintline" id="ride-note">Pri a se yon estimasyon. Chofè a konfime l anvan li pati. Ou swiv kous la dirèkteman isit la.</p>
-          <button type="button" id="ride-wa" class="walink">Voye tou sou WhatsApp, si w vle yon moun konfime avè w</button>
+          <button type="button" id="ride-wa" class="walink">Voye tout enfo yo sou WhatsApp, si w vle yon moun konfime avè w</button>
         </div>
       </div>
 
@@ -4452,7 +4452,7 @@ function buildRideCard(){
   } else if(rideMode === 'object'){
     c.innerHTML =
       '<div class="warn">Chofè a pran objè a nan pwen <b>A</b> epi li remèt li nan pwen <b>B</b>. '
-      + 'Moun ki resevwa a ap bezwen yon <b>kòd remèt</b> n ap ba ou.</div>'
+      + 'Moun ki resevwa a ap bezwen yon <b>kòd resepsyon</b> n ap ba ou.</div>'
       + '<div class="fld"><label>Gwosè objè a</label><div class="cars" id="sizes"></div></div>'
       + '<div class="fld"><label for="o-what">Kisa li ye</label>'
       + '<input type="text" id="o-what" placeholder="Egzanp : yon òdinatè pòtatif nan yon sak"></div>'
@@ -4474,7 +4474,7 @@ function buildRideCard(){
   } else {
     c.innerHTML =
       '<div class="warn">Sèvis sa a fèt sèlman ak <b>chofè ki abilite</b>. '
-      + 'Yon kòd remèt bay moun ki depoze a : san kòd sa, timoun nan pa remèt.</div>'
+      + 'Yon kòd resepsyon bay moun ki depoze a : san kòd sa, timoun nan pa remèt.</div>'
       + '<div class="two">'
       + '<div class="fld"><label for="c-name">Non timoun nan</label><input type="text" id="c-name" placeholder="Non ak siyati"></div>'
       + '<div class="fld"><label for="c-age">Laj</label><input type="number" id="c-age" placeholder="Egzanp : 9" min="1" max="17"></div>'
@@ -4708,7 +4708,7 @@ $('#ride-go').addEventListener('click', async function(){
     + (extra.child_name ? 'Timoun : ' + extra.child_name + '\n' : '')
     + (extra.recipient_name ? 'Resevwa : ' + extra.recipient_name + ' ' + (extra.recipient_phone||'') + '\n' : '')
     + (note ? 'Nòt : ' + note + '\n' : '')
-    + (drop ? 'Kòd remèt : ' + drop + '\n' : '')
+    + (drop ? 'Kòd resepsyon : ' + drop + '\n' : '')
     + (usePts ? '\nPEYE AK PWEN : ' + ptsNeeded.toFixed(1) + ' pwen ✓\n' : '')
     + '\nESTIMASYON : ' + fmt(window._fare) + ' HTG\n\nMèsi !';
 
@@ -5165,7 +5165,7 @@ $('#cart-go').addEventListener('click', async function(){
     + '\nMòd : ' + (orderMode==='pickup' ? 'Vin chèche l' : 'Livrezon') + '\n'
     + (usePts ? 'PEYE AK PWEN : ' + ptsNeeded.toFixed(1) + ' pwen ✓' : '') + '\n\nMèsi !';
   window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(m), '_blank');
-  toast(saved ? (usePts ? 'Kòmand peye ak pwen — anrejistre' : 'Kòmand ou a anrejistre') : 'Kòmand la ale sou WhatsApp');
+  toast(saved ? (usePts ? 'Kòmand ou peye ak pwen — nou anrejistre li.' : 'Kòmand ou a anrejistre') : 'Kòmand la ale sou WhatsApp');
   cart = []; cartVenue = null; orderMode = 'delivery'; paintCart();
   $('#cart').classList.remove('open'); $('#veil').classList.remove('open');
   if(saved && window._me) loadMine();
@@ -5290,7 +5290,7 @@ function renderMine(){
          + (o.driver_phone ? ' · ' + esc(o.driver_phone) : '') + '</div>' : '');
     var code = o.drop_code && o.status !== 'done' && o.status !== 'cancelled'
       ? '<div class="rc-code"><b>' + esc(o.drop_code) + '</b>'
-        + '<small>Kòd remèt — bay li sèlman lè ou resevwa</small></div>' : '';
+        + '<small>Kòd resepsyon — bay li sèlman lè ou resevwa pwodui oswa manje ou a.</small></div>' : '';
     return '<div class="rc ' + esc(o.status) + '" data-open="' + esc(o.id+':'+o._t) + '">'
       + '<div class="rc-h"><div class="rc-n">' + esc(title) + '</div>'
       + '<span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
@@ -5380,7 +5380,7 @@ function trackTpl(o){
   var pen = o.wait_penalty > 0
     ? '<p class="hintline" style="color:var(--warn)">Tan tann lan te depase 3 min — ' + Number(o.wait_penalty).toFixed(1) + ' pwen penalite aplike.</p>' : '';
   var code = o.drop_code && o.status !== 'done' && o.status !== 'cancelled'
-    ? '<div class="rc-code"><b>' + esc(o.drop_code) + '</b><small>Kòd remèt — bay li sèlman lè ou resevwa</small></div>' : '';
+    ? '<div class="rc-code"><b>' + esc(o.drop_code) + '</b><small>Kòd resepsyon — bay li sèlman lè ou resevwa pwodui oswa manje ou a.</small></div>' : '';
   return '<button class="trk-back" id="trk-back" type="button">← Tounen nan lis la</button>'
     + '<div class="trk-h"><div class="trk-t">' + esc(title) + '</div><span class="rc-b" style="' + S.s + '">' + S.t + '</span></div>'
     + driver + (pos1||'') + '<div class="trk-steps">' + rows + '</div>' + wait + pen + code;
@@ -6786,7 +6786,7 @@ var KB = [
   { k:['sevis','sèvis','ki sa nou fe','kisa','plateform','move'],
     a:function(){ return "Zetwal Kòmand gen <b>twa sèvis</b> nan yon sèl kote :\n\n"
       + "• <b>Taksi</b> — yon moun, yon objè, oswa yon timoun ki bezwen akonpayman.\n"
-      + "• <b>Manje</b> — restoran patnè nou yo, plat pa plat.\n"
+      + "• <b>Manje</b> — restoran patnè nou yo, pla pa pla.\n"
       + "• <b>Pake</b> — magazen patnè nou yo, ak livrezon.\n\n"
       + "Klike sou youn nan twa kat yo anwo a."; } },
 
@@ -6798,10 +6798,10 @@ var KB = [
       + "Mete pwen A ak pwen B epi pri a parèt tousuit, anvan ou voye anyen."; } },
 
   { k:['objè','obje','voye','pake pou moun','livre yon bagay','kolis'],
-    a:function(){ return "Wi. Chwazi <b>Yon objè</b> nan Taksi a.\n\nOu mete kote pou pran l, kote pou livre l, sa li ye, gwosè l, epi moun k ap resevwa a.\n\nNou ba ou yon <b>kòd remèt</b> : chofè a p ap kite objè a san moun nan pa bay kòd la."; } },
+    a:function(){ return "Wi. Chwazi <b>Yon objè</b> nan Taksi a.\n\nOu mete kote pou pran l, kote pou livre l, sa li ye, gwosè l, epi moun k ap resevwa a.\n\nNou ba ou yon <b>kòd resepsyon</b> : chofè a p ap kite objè a san moun nan pa bay kòd la."; } },
 
   { k:['timoun','pitit','lekol','lekòl','akonpayman'],
-    a:function(){ return "Sèvis timoun nan fèt <b>sèlman ak chofè ki abilite</b>.\n\nOu bay non timoun nan, laj li, moun ki depoze a ak moun ki resevwa a. Yon <b>kòd remèt</b> bay moun ki depoze a — san kòd sa, timoun nan pa remèt.\n\nPou nenpòt kesyon sou sa, rele nou dirèk."; } },
+    a:function(){ return "Sèvis timoun nan fèt <b>sèlman ak chofè ki abilite</b>.\n\nOu bay non timoun nan, laj li, moun ki depoze a ak moun ki resevwa a. Yon <b>kòd resepsyon</b> bay moun ki depoze a — san kòd sa, timoun nan pa remèt.\n\nPou nenpòt kesyon sou sa, rele nou dirèk."; } },
 
   { k:['restoran','manje','plat','meni','ki restoran'],
     a:function(){
