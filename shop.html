@@ -1872,7 +1872,7 @@ header.hero{background:transparent!important}
       <label for="ck-addr">Kote pou nou livre</label>
       <input type="text" id="ck-addr" placeholder="Adrès ou — kay, repè">
     </div>
-    <p class="hintline" id="ck-pickup-note" style="display:none;margin-bottom:14px">Ou va vin chèche kòmand ou lakay nou — nou avize w lè li pare.</p>
+    <p class="hintline" id="ck-pickup-note" style="display:none;margin-bottom:14px">Ou ka vin chèche kòmand ou nan lokal nou an — nou ap avize w lè li pare.</p>
     <div class="fld" style="margin-bottom:14px"><label for="ck-name">Non ou</label><input type="text" id="ck-name" placeholder="Non ak siyati"></div>
     <div class="fld" style="margin-bottom:14px"><label for="ck-tel">Telefòn</label><input type="text" id="ck-tel" placeholder="+509 …"></div>
     <div id="cart-sum"></div>
@@ -2475,7 +2475,7 @@ function paint(){
 function card(p){
   var s = stateOf(p), inC = CART.has(p.id), it = CART.get(p.id);
   var badge = s==='ok'    ? '<span class="pc-st st-ok">Disponib</span>'
-            : s==='out'   ? '<span class="pc-st st-out">Ann atant</span>'
+            : s==='out'   ? '<span class="pc-st st-out">Annatant</span>'
             : s==='coming'? '<span class="pc-st st-soon">Byento</span>'
             :               '<span class="pc-st st-sold">Vandi</span>';
   var d = s==='coming' ? daysLeft(p) : null;
@@ -2626,7 +2626,7 @@ function openDetail(id){
     : ICON_BOX.replace('class="none"','class="none" style="width:74px;height:74px"');
 
   var badge = s==='ok'? '<span class="pc-st st-ok" style="position:static">Disponib</span>'
-            : s==='out'? '<span class="pc-st st-out" style="position:static">Ann atant</span>'
+            : s==='out'? '<span class="pc-st st-out" style="position:static">Annatant</span>'
             : s==='coming'? '<span class="pc-st st-soon" style="position:static">Byento</span>'
             : '<span class="pc-st st-sold" style="position:static">Vandi</span>';
 
@@ -2691,7 +2691,7 @@ function openDetail(id){
   var shm = $('#d-share-msg');
   if(shm) shm.addEventListener('click', function(){
     if(!window._me){ toast('Konekte anvan pou w pataje'); return; }
-    if(!window.ZetwalProfile || !window.ZetwalProfile.shareLink){ toast('Mesaj poko disponib — eseye ankò nan yon ti moman'); return; }
+    if(!window.ZetwalProfile || !window.ZetwalProfile.shareLink){ toast('Mesaj la poko disponib — eseye ankò nan yon ti moman'); return; }
     window.ZetwalProfile.shareLink(url, p.name);
   });
 
@@ -2853,7 +2853,7 @@ var usePoints = false, cartPay = 'points';
 /* ── Fason pou peye : « pwen » oswa « kach » ──────────────────
    Menm lojik pou panye a ak pou achte dirèk yon pwodwi.
    · pwen : debite sou kont lan touswit, kòmand lan make « peye ».
-   · kach : kòmand lan make « peman ap tann » jiskaske yon admin
+   · kach : kòmand lan make « peman annatant » jiskaske yon admin
      oswa yon anplwaye resevwa lajan an epi peze « Peman aksepte ». */
 function payChoice(cur, total){
   var need = PTS_RATE_SHOP ? total / PTS_RATE_SHOP : 0;
@@ -2881,9 +2881,9 @@ function payPaint(px, cur, total, mode, goBtn){
   if(c.method === 'points'){
     note.innerHTML = 'Pwen yo soti sou kont ou touswit epi kòmand ou a peye. Ou ka achte pwen nan magazen an : montre kòd QR ou bay yon anplwaye.';
   } else if(mode === 'pickup'){
-    note.innerHTML = 'Si w nan magazen an, peye kach : kòmand ou make « peman ap tann » jiskaske yon anplwaye resevwa lajan an epi konfime l. Pote <b>'+fmt(total)+' HTG</b>.';
+    note.innerHTML = 'Si w nan magazen an, peye kach : kòmand ou make « peman annatant » jiskaske yon anplwaye resevwa lajan an epi konfime l. Pote <b>'+fmt(total)+' HTG</b>.';
   } else {
-    note.innerHTML = 'Ou ka peye kach nan magazen an, oswa lè kòmand lan rive. Peman an make « ap tann » jiskaske yon anplwaye konfime l.';
+    note.innerHTML = 'Ou ka peye kach nan magazen an, oswa lè kòmand lan rive. Peman an make « annatant » jiskaske yon anplwaye konfime l.';
   }
   if(goBtn && !goBtn.disabled) goBtn.textContent = c.method === 'points' ? 'Peye '+c.need.toFixed(1)+' pwen' : 'Konfime — peye kach';
   return c.method;
@@ -2954,8 +2954,8 @@ function payDone(o){
   } else {
     h += '<div class="pd-big">'+fmt(o.total)+' HTG</div>'
       + (o.mode === 'pickup'
-        ? '<p class="hintline">Prezante w nan kès magazen an epi peye <b>'+fmt(o.total)+' HTG</b> kach bay yon anplwaye. Kòmand ou a make « peman ap tann » jiskaske li konfime lajan an.</p>'
-        : '<p class="hintline">Peye <b>'+fmt(o.total)+' HTG</b> kach nan magazen an, oswa lè kòmand lan rive. Kòmand ou a make « peman ap tann » jiskaske yon anplwaye konfime l.</p>');
+        ? '<p class="hintline">Prezante w nan kès magazen an epi peye <b>'+fmt(o.total)+' HTG</b> kach bay yon anplwaye. Kòmand ou a make « peman annatant » jiskaske li konfime lajan an.</p>'
+        : '<p class="hintline">Peye <b>'+fmt(o.total)+' HTG</b> kach nan magazen an, oswa lè kòmand lan rive. Kòmand ou a make « peman annatant » jiskaske yon anplwaye konfime l.</p>');
   }
   h += '<button class="btn btn-g" id="pd-ok" type="button" style="width:100%;margin-top:18px">Wè kòmand mwen yo</button></div>';
   $('#o-body').innerHTML = h;
@@ -3107,7 +3107,7 @@ function openOrder(id){
         +'<button type="button" class="kind" data-om="pickup"><b style="display:block;font-size:.82rem;margin-bottom:2px">Vin chèche l</b>'
         +'<span style="font-size:.63rem;color:var(--ink-4)">Peye sèlman pwodwi a</span></button></div>'
       +'<div class="fld" id="o-addr-wrap"><label for="o-addr">Kote pou nou livre</label><input type="text" id="o-addr" placeholder="Adrès ou — kay, repè"></div>'
-      +'<p class="hintline" id="o-pickup-note" style="display:none;margin-bottom:14px">Ou va vin chèche kòmand ou lakay nou — nou avize w lè li pare.</p>'
+      +'<p class="hintline" id="o-pickup-note" style="display:none;margin-bottom:14px">Ou ka vin chèche kòmand ou nan lokal nou an — nou ap avize w lè li pare.</p>'
       +'<div class="fld"><label for="o-name">Non ou</label><input type="text" id="o-name" value="'
         +esc(window._me.displayName||'')+'" placeholder="Non ak siyati"></div>'
       +'<div class="fld"><label for="o-tel">Telefòn</label><input type="text" id="o-tel" placeholder="+509 …"></div>'
@@ -3728,7 +3728,7 @@ var KB = [
         + "\n\nKlike sou youn nan bouton yo anba bar rechèch la."; } },
 
   { k:['panye','achte','ajoute','komande','kòmande','kijan','peye'],
-    a:function(){ return "Klike sou <b>Ajoute</b> sou yon pwodwi, chwazi kantite a, epi louvri panye a anwo adwat.\n\nBouton vèt la voye tout lis la sou WhatsApp nou ak total la deja kalkile. Nou reponn ou epi nou fikse livrezon an."; } },
+    a:function(){ return "Klike sou <b>Ajoute</b> sou yon pwodwi, chwazi kantite a, epi louvri panye a anwo adwat.\n\nBouton vè a voye tout lis la sou WhatsApp nou ak total la deja kalkile. Nou reponn ou epi nou fikse livrezon an."; } },
 
   { k:['pri','pwen','dola','peso','usd','htg','goud','tarif','chanje'],
     a:function(){
@@ -3745,7 +3745,7 @@ var KB = [
       return s; } },
 
   { k:['byento','vini','ann atant','rupture','pa gen','stok fini','avize'],
-    a:function(){ return "Yon pwodwi ki make <b>Byento</b> oswa <b>Ann atant</b> poko nan stòk, men ou ka <b>kòmande</b> l kanmenm.\n\nNou mete w sou lis la, epi w ap wè eta kòmand ou a nan « Kòmand mwen yo » — ap tann, aksepte oswa refize."; } },
+    a:function(){ return "Yon pwodwi ki make <b>Byento</b> oswa <b>Annatant</b> poko nan stòk, men ou ka <b>kòmande</b> l kanmenm.\n\nNou mete w sou lis la, epi w ap wè eta kòmand ou a nan « Kòmand mwen yo » — annatant, aksepte oswa refize."; } },
 
   { k:['livrezon','livre','delivery','voye','kote'],
     a:function(){ return "Chak fich pwodwi di si nou ka livre l oswa si se sou plas sèlman. Detay livrezon an fikse sou WhatsApp, dapre kote w ye.\n\nGen pwodwi ki soti an Ayiti, gen lòt ki soti nan Repiblik Dominikèn — fich la di w sa tou."; } },
