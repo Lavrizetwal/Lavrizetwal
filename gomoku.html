@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ht">
+<html lang="fr">
 <head>
 <script src="minor.js"></script>
 <meta charset="UTF-8">
@@ -1469,6 +1469,9 @@ body.gm{background:var(--bg)}
 .gk-row b{color:#fff}
 .gk-row .gm-btn{padding:8px 16px;font-size:.85rem}
 .gk-empty{color:#cfd5ea;font-size:.92rem;padding:10px 0;line-height:1.55}
+.gk-st{color:#F0D98A;letter-spacing:2px;font-size:1.2rem}
+.gk-delay{margin:6px 0 10px}.gk-delay label{display:block;font-weight:600;font-size:.9rem;margin-bottom:6px;color:#e9ecf7}
+.gk-dl{display:flex;gap:8px;margin-bottom:6px}.gk-dl input,.gk-dl select{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(240,217,138,.35);border-radius:8px;padding:9px 12px;font:600 1rem 'Inter',sans-serif;min-width:0}.gk-dl input{width:7.5em}.gk-dl select option{color:#111}
 .gk-warn{margin:12px 0;padding:14px 16px;border-radius:8px;border:1px solid rgba(255,138,128,.7);background:rgba(255,138,128,.1);line-height:1.6}
 .gk-warn b{color:#c0392b}
 .gm-modal .gk-warn{color:var(--ink)}
@@ -1487,23 +1490,23 @@ body.gm{background:var(--bg)}
     </a>
 
     <ul class="menu">
-      <li><a href="index.html">Akèy</a></li>
+      <li><a href="index.html">Accueil</a></li>
       <li><a href="lavri.html">Lavri</a></li>
-      <li><a href="taxi.html">Kòmand</a></li>
-      <li><a href="shop.html">Shop</a></li>
-      <li><a href="games.html" class="on" aria-current="page">Jwèt</a></li>
-      <li><a href="travay.html">Travay</a></li>
+      <li><a href="taxi.html">Commandes</a></li>
+      <li><a href="shop.html">Boutique</a></li>
+      <li><a href="games.html" class="on" aria-current="page">Jeux</a></li>
+      <li><a href="travay.html">Travail</a></li>
     </ul>
 
     <div class="nav-act">
       <button class="pill" id="login-btn" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
-        <span>Konekte</span>
+        <span>Se connecter</span>
       </button>
 
       <button class="pill" id="who-btn" type="button" style="display:none;padding-left:6px" aria-expanded="false">
-        <span class="av" id="who-av">Z</span><span id="who-nm">Kont</span>
-        <span class="pts" id="who-pt">0.0<s>pwen</s></span>
+        <span class="av" id="who-av">Z</span><span id="who-nm">Compte</span>
+        <span class="pts" id="who-pt">0.0<s>points</s></span>
       </button>
 
       <div class="acct" id="acct">
@@ -1511,45 +1514,45 @@ body.gm{background:var(--bg)}
           <div class="av" id="a-av">Z</div>
           <div><div class="acct-nm" id="a-nm">—</div><div class="acct-ml" id="a-ml">—</div></div>
         </div>
-        <div class="row"><span class="k">Statit</span><span class="v" id="a-st">Itilizatè</span></div>
-        <div class="row"><span class="k">Pwen ou genyen</span><span class="v gold" id="a-pt">0.0</span></div>
-        <a href="admin.html" class="pill full" id="a-admin" style="display:none">Espas jesyon</a>
-        <button class="pill" id="a-out" type="button">Dekonekte</button>
+        <div class="row"><span class="k">Statut</span><span class="v" id="a-st">Utilisateur</span></div>
+        <div class="row"><span class="k">Vos points</span><span class="v gold" id="a-pt">0.0</span></div>
+        <a href="admin.html" class="pill full" id="a-admin" style="display:none">Espace de gestion</a>
+        <button class="pill" id="a-out" type="button">Se déconnecter</button>
       </div>
     </div>
 
-    <button id="theme-btn" type="button" aria-label="Chanje tèm (klè / fènwa)" title="Tèm klè / fènwa">
+    <button id="theme-btn" type="button" aria-label="Changer de thème (clair / sombre)" title="Thème clair / sombre">
       <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
       <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
     </button>
-    <button class="pill" id="who-mini" type="button" aria-label="Kont mwen">
-      <span class="av" id="who-mini-av">Z</span><span class="pts" id="who-mini-pt">0.0<s>pwen</s></span>
+    <button class="pill" id="who-mini" type="button" aria-label="Mon compte">
+      <span class="av" id="who-mini-av">Z</span><span class="pts" id="who-mini-pt">0.0<s>points</s></span>
     </button>
-    <button class="burger" id="burger" type="button" aria-label="Meni" aria-expanded="false">
+    <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false">
       <span></span><span></span>
     </button>
   </div>
 </nav>
 
 <div id="drawer">
-  <a href="index.html">Akèy</a>
+  <a href="index.html">Accueil</a>
   <a href="lavri.html">Lavri</a>
-  <a href="taxi.html">Kòmand</a>
-  <a href="shop.html">Shop</a>
-  <a href="games.html">Jwèt</a>
-  <a href="travay.html">Travay</a>
+  <a href="taxi.html">Commandes</a>
+  <a href="shop.html">Boutique</a>
+  <a href="games.html">Jeux</a>
+  <a href="travay.html">Travail</a>
 
   <div id="dr-auth">
     <div class="who" id="dr-who" style="display:none">
       <span class="av" id="dr-av">Z</span>
       <div>
         <div class="nm" id="dr-nm">—</div>
-        <div class="sub"><span id="dr-st">Itilizatè</span> · <span id="dr-pt">0.0</span> pwen</div>
+        <div class="sub"><span id="dr-st">Utilisateur</span> · <span id="dr-pt">0.0</span> points</div>
       </div>
     </div>
-    <button class="pill full" id="dr-login" type="button">Konekte</button>
-    <a href="admin.html" class="pill full" id="dr-admin" style="display:none">Espas jesyon</a>
-    <button class="pill" id="dr-out" type="button" style="display:none">Dekonekte</button>
+    <button class="pill full" id="dr-login" type="button">Se connecter</button>
+    <a href="admin.html" class="pill full" id="dr-admin" style="display:none">Espace de gestion</a>
+    <button class="pill" id="dr-out" type="button" style="display:none">Se déconnecter</button>
   </div>
 </div>
 
@@ -1559,7 +1562,7 @@ body.gm{background:var(--bg)}
     <div class="wrap">
       <div class="eyebrow">Jeux Zetwal</div>
       <h1>Gomoku</h1>
-      <p class="lead">Lè dernier point doré. Alignez cinq pierres avant l’adversaire : contre l’ordinateur, sur sept niveaux, ou en ligne contre un autre joueur.</p>
+      <p class="lead">Le dernier point doré. Alignez cinq pierres avant l’adversaire : contre l’ordinateur, sur sept niveaux, ou en ligne contre un autre joueur.</p>
       <div class="gm-bar">
         <span class="gm-chip" id="gk-wal" hidden>Solde <b data-bal>0</b><span id="gk-wal-ic"></span></span>
         <button class="gm-tool" type="button" id="gm-snd" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span>Son activé</span></button>
@@ -1618,9 +1621,9 @@ body.gm{background:var(--bg)}
 <footer class="foot">
   <div class="wrap">
       <div class="fb">ZETWAL <em>ORGANISATION</em></div>
-      <small>© 2026 Zetwal Organisation — Tout dwa rezève</small>
-      <nav class="zt-lg" aria-label="Dokiman legal"><a href="legal.html#cgu">Kondisyon itilizasyon</a><a href="legal.html#confidentialite">Konfidansyalite</a></nav>
-      <button id="top" type="button"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg> Tounen anwo</button>
+      <small>© 2026 Zetwal Organisation — Tous droits réservés</small>
+      <nav class="zt-lg" aria-label="Documents légaux"><a href="legal.html#cgu">Conditions d’utilisation</a><a href="legal.html#confidentialite">Confidentialité</a></nav>
+      <button id="top" type="button"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg> Retour en haut</button>
   </div>
 </footer>
 
@@ -1880,7 +1883,7 @@ function errMsg(r){
 var acct=$('#acct'), unsubPts=null;
 function initial(s){ return (s||'Z').trim().charAt(0).toUpperCase()||'Z'; }
 function setPts(n){ var t=n.toFixed(1); ['#a-pt','#dr-pt'].forEach(function(s){ var e=$(s); if(e) e.textContent=t; });
-  var w=$('#who-pt'); if(w) w.innerHTML=t+'<s>pwen</s>'; var m=$('#who-mini-pt'); if(m) m.innerHTML=t+'<s>pwen</s>'; }
+  var w=$('#who-pt'); if(w) w.innerHTML=t+'<s>points</s>'; var m=$('#who-mini-pt'); if(m) m.innerHTML=t+'<s>points</s>'; }
 $('#login-btn').addEventListener('click',goLogin);
 $('#dr-login').addEventListener('click',goLogin);
 $('#who-btn').addEventListener('click',function(e){ e.stopPropagation(); var o=acct.classList.toggle('open'); this.setAttribute('aria-expanded',o); });
@@ -1944,20 +1947,21 @@ addEventListener('zmfa:changed',function(e){ try{
 <script>
 (function(){
 'use strict';
-var N=15, STAKES=[0,20,40,100,200,400,1000,2000], MOVE_MS=20*60*1000;
+var N=15, STAKES=[0,20,40,100,200,400,1000,2000], pvpDelay=90, drawn='';
 var INFO=null, G=null, busy=false, tab='ia', pollT=0, lobT=0, clkT=0, pvpStake=0, shown=[], cells=[];
 Object.assign(ERRS,{
   bloque:'Votre accès au Gomoku est bloqué : deux jours de suite perdus aux niveaux Mythique et GOAT. Contactez l’administration.',
   limite_jour:'Ce niveau est limité à une partie par jour. Revenez demain.',
   confirmation:'Confirmation requise avant de jouer.', pvp_en_cours:'Vous avez déjà une partie en ligne en cours.',
   case:'Cette case n’est pas jouable.', indisponible:'Cette partie n’est plus disponible.', soi_meme:'Vous ne pouvez pas rejoindre votre propre partie.',
-  mise:'Mise non autorisée.', introuvable:'Partie introuvable.', pas_ton_tour:'Ce n’est pas votre tour.'
+  mise:'Mise non autorisée.', delai:'Délai non autorisé : de 5 secondes à 30 minutes.', introuvable:'Partie introuvable.', pas_ton_tour:'Ce n’est pas votre tour.'
 });
 var GAMEPAGE={sudoku:'sudoku.html',duel:'duel.html',course:'course.html'}, GAMENAME={sudoku:'Sudoku',duel:'Duel Mental',course:'Course vers la mort'};
 $('#gk-wal-ic').innerHTML=JT;
 
 /* ── Formats ── */
 function dec(x,d){ var k=Math.pow(10,d); return (Math.round(x*k)/k).toLocaleString('fr-FR'); }
+function dly(t){ t=Math.round(t); return t<60?t+' s':(t%60===0?(t/60)+' min':Math.floor(t/60)+' min '+(t%60)+' s'); }
 function half(x){ return Math.abs(x-Math.round(x))<1e-9?fmt(x):dec(x,1); }
 function pct(p){ return (p>=1?dec(p,0):dec(p,p<0.01?3:1))+' %'; }
 function showNote(b){ var n=$('#gk-note'); if(!b){ n.innerHTML=''; return; } n.innerHTML=noteHtml(b,b.k==='err'?'bad':''); var bt=$('#gm-nb'); if(bt&&b.f) bt.addEventListener('click',b.f); }
@@ -1999,10 +2003,20 @@ function turnText(){
   if(G.mode==='ia'){ t.innerHTML=(busy?'L’ordinateur réfléchit…':'À vous de jouer')+'<small>Vous jouez les pierres '+me+(G.you===1?' et vous commencez':' ; l’ordinateur commence')+'</small>'; }
   else t.innerHTML=(G.myTurn?'À vous de jouer':'Au tour de '+esc(G.opp||'l’adversaire'))+'<small>Vous jouez les pierres '+me+' · adversaire : '+esc(G.opp||'…')+'</small>';
 }
+function starsHtml(){ var h='', i; for(i=0;i<2;i++) h+=(i<G.stars?'★':'☆'); return '<span class="gk-st" aria-label="'+G.stars+' étoile'+(G.stars>1?'s':'')+' de marge">'+h+'</span> '; }
 function clock(){
-  var e=$('#gk-clock'); if(!G||G.over||!G.end){ e.textContent=''; return; }
-  var left=G.end-Date.now(); e.textContent=(G.mode==='pvp'?(G.myTurn?'Votre temps ':'Son temps '):'')+mmss(left); e.classList.toggle('urg',left<=15000||(G.mode==='ia'&&left<=60000));
-  if(left<=0&&G.mode==='ia'&&!G._exp){ G._exp=true; expired(); }
+  var e=$('#gk-clock'); if(!G||G.over){ e.textContent=''; return; }
+  if(G.mode==='ia'){
+    if(!G.end){ e.innerHTML=starsHtml()+'…'; return; }
+    var left=G.end-Date.now();
+    if(left<=0){
+      if(G.stars>0){ G.stars--; G.end+=10000; left=G.end-Date.now(); toast(G.stars>0?'Temps écoulé : une étoile perdue, il vous en reste '+G.stars+'.':'Temps écoulé : dernière étoile perdue. Au prochain dépassement, la partie est perdue.'); ZS.play('wrong'); ZS.vib(120); }
+      else if(!G._exp){ G._exp=true; setTimeout(expired,700); }
+    }
+    e.innerHTML=starsHtml()+mmss(Math.max(0,left)); e.classList.toggle('urg',left<=3000); return;
+  }
+  if(!G.end){ e.textContent=''; return; }
+  var l2=G.end-Date.now(); e.textContent=(G.myTurn?'Votre temps ':'Son temps ')+mmss(l2); e.classList.toggle('urg',l2<=Math.min(15000,(G.moveS||90)*250));
 }
 function startClock(){ clearInterval(clkT); clock(); clkT=setInterval(clock,500); }
 function stopAll(){ clearInterval(clkT); clearInterval(pollT); }
@@ -2011,8 +2025,7 @@ function stopAll(){ clearInterval(clkT); clearInterval(pollT); }
 function openGame(){ show('#gk-menu',false); show('#gk-game',true); showNote(null); buildBoard(); window.scrollTo({top:$('#gk-game').offsetTop-70,behavior:REDUCE?'auto':'smooth'}); }
 function enterIA(r,resumed){
   var lv=lvInfo(r.level)||{name:r.name,entry:r.entry,win:r.win}, mv=r.moves||[];
-  G={mode:'ia',sid:r.sid,level:r.level,name:r.name||lv.name,you:r.you,board:String(r.board),last:mv.length?mv[mv.length-1]:-1,entry:r.entry,win:r.win,over:false,end:r.deadline?Date.parse(r.deadline):Date.now()+MOVE_MS};
-  if(!(G.end>0)) G.end=Date.now()+MOVE_MS;
+  G={mode:'ia',sid:r.sid,level:r.level,name:r.name||lv.name,you:r.you,board:String(r.board),last:mv.length?mv[mv.length-1]:-1,entry:r.entry,win:r.win,over:false,stars:r.stars!=null?r.stars:2,end:Date.now()+(r.ms_left!=null?r.ms_left:10000)};
   if(r.balance!=null) setBal(r.balance);
   stopAll(); busy=false; openGame(); paint(); turnText(); infoIA(); startClock();
   if(!resumed) ZS.play('start'); else toast('Partie reprise.');
@@ -2023,7 +2036,8 @@ function infoIA(){
    '<div class="sd-stat"><span>Vous recevez si vous gagnez</span><b class="g">+'+half(G.win)+'</b></div>'+
    '<div class="sd-stat"><span>Net si vous gagnez</span><b class="good">'+(G.win-G.entry>=0?'+':'−')+half(Math.abs(G.win-G.entry))+'</b></div>'+
    '<div class="sd-stat"><span>Partie nulle</span><b>mise rendue</b></div>'+
-   '<div class="sd-stat"><span>Délai par coup</span><b>20 min</b></div>';
+   '<div class="sd-stat"><span>Délai par coup</span><b>10 s</b></div>'+
+   '<div class="sd-stat"><span>Marge</span><b>2 étoiles</b></div>';
 }
 
 /* ── Coup contre l’ordinateur ── */
@@ -2031,25 +2045,31 @@ function play(i){
   if(!G||G.over||busy) return;
   if(G.mode==='pvp') return playPvp(i);
   if(G.board.charAt(i)!=='0') return;
-  var b0=G.board, l0=G.last; busy=true; ZS.play('place',i%8);
+  var b0=G.board, l0=G.last, e0=G.end; busy=true; G.end=0; ZS.play('place',i%8);
   G.board=b0.slice(0,i)+G.you+b0.slice(i+1); G.last=i; paint(); turnText();
   rpc('zg_move',{p_sid:G.sid,p_cell:i}).then(function(r){
     busy=false;
-    if(!r||r.ok===false){ G.board=b0; G.last=l0; paint(); turnText(); toast(errMsg(r)); if(r&&(r.error==='terminee'||r.error==='session')) endFromStatus(); return; }
+    if(!r||r.ok===false){ G.board=b0; G.last=l0; G.end=e0; paint(); turnText(); toast(errMsg(r)); if(r&&(r.error==='terminee'||r.error==='session')) endFromStatus(); else resync(); return; }
     if(r.board) G.board=String(r.board);
     G.last=r.last_ai!=null?r.last_ai:(r.last!=null?r.last:G.last);
     if(r.over){ finishIA(r); return; }
-    G.end=Date.now()+MOVE_MS; ZS.play('place',(G.last||0)%8+3); paint(); turnText();
-  },function(e){ busy=false; G.board=b0; G.last=l0; paint(); turnText(); toast(errMsg(e)); resync(); });
+    if(r.stars!=null) G.stars=r.stars; G.end=Date.now()+(r.ms_left!=null?r.ms_left:10000); ZS.play('place',(G.last||0)%8+3); paint(); turnText();
+  },function(e){ busy=false; G.board=b0; G.last=l0; G.end=e0; paint(); turnText(); toast(errMsg(e)); resync(); });
 }
 function resync(){
   rpc('zg_resume').then(function(r){
     if(!G) return;
     if(r&&r.none) return endFromStatus();
-    if(r&&r.ok){ G.board=String(r.board); var mv=r.moves||[]; G.last=mv.length?mv[mv.length-1]:-1; if(r.deadline) G.end=Date.parse(r.deadline)||G.end; paint(); turnText(); }
+    if(r&&r.ok){ G.board=String(r.board); var mv=r.moves||[]; G.last=mv.length?mv[mv.length-1]:-1; if(r.stars!=null) G.stars=r.stars; if(r.ms_left!=null) G.end=Date.now()+r.ms_left; paint(); turnText(); }
   },function(){});
 }
-function expired(){ rpc('zg_resume').catch(function(){}).then(function(){ endFromStatus(); }); }
+function expired(){
+  rpc('zg_resume').then(function(r){
+    if(!G||G.over) return;
+    if(r&&r.ok&&!r.none){ G.stars=r.stars!=null?r.stars:G.stars; G.end=Date.now()+(r.ms_left||0)+300; G._exp=false; }
+    else endFromStatus();
+  },function(){ if(G) G._exp=false; });
+}
 function endFromStatus(){
   if(!G||G.over) return;
   rpc('zj_my_stats',{p_game:'gomoku'}).then(function(s){
@@ -2065,7 +2085,7 @@ function finishIA(r){
   var st=r.status, won=st==='won', net=r.net||0, ic, title, sub, cls=(won||st==='draw')?'':'l';
   if(won){ ic='<path d="M12 2.5l2.6 6.1 6.4.6-4.9 4.2 1.5 6.3L12 16.4 6.4 19.7l1.5-6.3L3 9.2l6.4-.6z"/>'; title=G.level>=5?'Légende !':'Victoire'; sub='Cinq pierres alignées. Vous recevez '+half(r.gain!=null?r.gain:G.win)+' jeton'+((r.gain!=null?r.gain:G.win)>1?'s':'')+'.'; }
   else if(st==='draw'){ ic='<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'; title='Partie nulle'; sub='Le plateau est plein. Votre mise est rendue.'; }
-  else if(st==='timeout'){ ic='<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'; title='Temps écoulé'; sub='Plus de 20 minutes sans jouer : la partie est perdue.'; }
+  else if(st==='timeout'){ ic='<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>'; title='Temps écoulé'; sub='Vos deux étoiles de marge sont épuisées et le délai de 10 secondes a encore été dépassé : la partie est perdue.'; }
   else if(st==='forfeit'){ ic='<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'; title='Partie abandonnée'; sub='Vous avez quitté la partie : la mise est perdue.'; }
   else { ic='<circle cx="12" cy="12" r="9"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7"/>'; title='Partie perdue'; sub='L’ordinateur a aligné cinq pierres.'; }
   var extra='';
@@ -2121,7 +2141,8 @@ function consentModal(game,rules,okLabel,go){
 function iaRules(){
   var h='<p>Lisez bien : vous pouvez <b>perdre</b> des jetons.</p><ul class="cs-rules">'+
    '<li>Chaque partie contre l’ordinateur a une <b>mise</b> (de 1 à 1 000 jetons selon le niveau), prélevée dès le départ.</li>'+
-   '<li><b>Victoire</b> : vous recevez le montant du niveau, mise comprise. <b>Défaite, abandon, plus de 20 minutes sans jouer</b> : la mise est perdue. <b>Nulle</b> : mise rendue.</li>'+
+   '<li><b>Victoire</b> : vous recevez le montant du niveau, mise comprise. <b>Défaite, abandon ou temps écoulé</b> : la mise est perdue. <b>Nulle</b> : mise rendue.</li>'+
+   '<li>Vous avez <b>10 secondes par coup</b> et <b>2 étoiles de marge</b> : chaque dépassement de 10 secondes retire une étoile et relance 10 secondes. Sans étoile, un nouveau dépassement fait <b>perdre la partie</b>. Le chrono continue même si vous quittez la page.</li>'+
    '<li>Les pourcentages de victoire affichés sont des <b>objectifs de conception estimés</b>, pas des garanties.</li>'+
    '<li>Les trois derniers niveaux (<b>Grand Master, Mythique, GOAT</b>) sont <b>déconseillés</b> sauf si vous êtes un très grand joueur de Gomoku. Une confirmation vous sera demandée avant chaque partie.</li>'+
    '<li>Mythique et GOAT : <b>une partie par jour</b>. Si vous <b>perdez deux jours de suite</b> à ces deux niveaux, l’accès au Gomoku est <b>bloqué</b>.</li></ul>';
@@ -2133,7 +2154,7 @@ function pvpRules(){
    '<li><b>Partie avec mise</b> : chaque joueur mise le même nombre de jetons (de 20 à 2 000), prélevés dès la création ou l’entrée dans la partie.</li>'+
    '<li><b>Frais : 5 % de la mise de chaque joueur</b> sont retenus par Zetwal sur les parties avec mise, soit 10 % d’une mise en tout. Exemple : mise de 100 jetons chacun → le gagnant reçoit <b>190</b> (net +90), le perdant perd <b>100</b>.</li>'+
    '<li>Partie nulle ou annulée avant le début : les mises sont rendues, sans frais.</li>'+
-   '<li>Vous avez <b>90 secondes par coup</b>. Temps dépassé ou abandon = défaite.</li>'+
+   '<li><b>Délai par coup</b> : le créateur de la partie le choisit (de 5 secondes à 30 minutes) et il est affiché avant de rejoindre. Temps dépassé ou abandon = défaite, sans étoile de marge.</li>'+
    '<li>Zetwal ne contrôle pas le niveau de votre adversaire. Ne misez que des jetons que vous acceptez de perdre.</li></ul>';
 }
 
@@ -2203,58 +2224,64 @@ function loadLobby(quiet){
   rpc('zg_pvp_list').then(function(r){
     if(G) return; LOB=r; if(r&&r.balance!=null) setBal(r.balance);
     if(r&&r.mine&&r.mine.status==='playing'){ enterPvp(r.mine); return; }
-    renderLobby();
+    renderLobby(quiet);
   },function(e){ if(!quiet) toast(errMsg(e)); });
 }
-function stakeNote(s){ var fee=Math.round(s*0.05); return s?'Mise '+fmt(s)+' chacun · le gagnant reçoit '+fmt(2*s-2*fee)+' (frais 5 % de chaque mise : '+fmt(2*fee)+')':'Partie gratuite'; }
-function renderLobby(){
+function stakeNote(s,mv){ var fee=Math.round(s*0.05); return (s?'Mise '+fmt(s)+' chacun · le gagnant reçoit '+fmt(2*s-2*fee)+' (frais 5 % de chaque mise : '+fmt(2*fee)+')':'Partie gratuite')+' · '+dly(mv||pvpDelay)+' par coup'; }
+function renderLobby(quiet){
   if(!LOB) return; var bal=LOB.balance, mine=LOB.mine, h='';
   if(mine&&mine.status==='open'){
-    $('#gk-create').innerHTML='<h3>Votre partie</h3><div class="gk-wait"><span class="gk-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>En attente d’un adversaire…<br><small>'+stakeNote(mine.stake)+'</small></span></div>'+
+    $('#gk-create').innerHTML='<h3>Votre partie</h3><div class="gk-wait"><span class="gk-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>En attente d’un adversaire…<br><small>'+stakeNote(mine.stake,mine.move_s)+'</small></span></div>'+
       '<p class="muted" style="font-size:.85rem;margin-top:10px">Gardez cette page ouverte. Sans adversaire au bout de 10 minutes, la partie est annulée et la mise est rendue.</p><div class="row" style="margin-top:12px"><button class="gm-btn q" type="button" id="pv-cancel">Annuler la partie</button></div>';
     $('#pv-cancel').addEventListener('click',function(){ this.disabled=true; rpc('zg_pvp_cancel',{p_mid:mine.mid}).then(function(r){ if(r&&r.balance!=null) setBal(r.balance); toast('Partie annulée.'); loadLobby(); },function(e){ toast(errMsg(e)); loadLobby(); }); });
-    $('#gk-open').innerHTML='<h3>Parties ouvertes</h3><p class="gk-empty">Vous avez déjà une partie en attente.</p>'; return;
+    $('#gk-open').innerHTML='<h3>Parties ouvertes</h3><p class="gk-empty">Vous avez déjà une partie en attente.</p>'; drawn='wait'; return;
   }
   if(pvpStake>0&&bal<pvpStake) pvpStake=0;
+  if(!(quiet&&drawn==='form')){ drawn='form';
+  var mn=pvpDelay>=60&&pvpDelay%60===0;
   h='<h3>Créer une partie</h3><p class="muted" style="font-size:.88rem">Choisissez la mise de chaque joueur.</p><div class="gk-stakes" role="group" aria-label="Mise">';
   STAKES.forEach(function(s){ h+='<button class="gk-stake" type="button" data-s="'+s+'" aria-pressed="'+(s===pvpStake)+'"'+(s>bal?' disabled':'')+'>'+(s?fmt(s):'Gratuit')+'</button>'; });
-  h+='</div><p class="muted" style="font-size:.85rem;line-height:1.5" id="pv-note">'+stakeNote(pvpStake)+'</p><div class="row" style="margin-top:12px"><button class="gm-btn" type="button" id="pv-create">Créer la partie</button></div>';
-  $('#gk-create').innerHTML=h;
+  h+='</div><div class="gk-delay"><label for="pv-t">Temps accordé à chaque coup</label><div class="gk-dl"><input id="pv-t" type="number" min="1" step="1" inputmode="numeric" value="'+(mn?pvpDelay/60:pvpDelay)+'"><select id="pv-u" aria-label="Unité"><option value="1"'+(mn?'':' selected')+'>secondes</option><option value="60"'+(mn?' selected':'')+'>minutes</option></select></div><p class="muted" style="font-size:.8rem">De 5 secondes à 30 minutes. Votre adversaire voit ce délai avant de rejoindre. Pas d’étoile de marge en ligne.</p></div><p class="muted" style="font-size:.85rem;line-height:1.5" id="pv-note">'+stakeNote(pvpStake)+'</p><div class="row" style="margin-top:12px"><button class="gm-btn" type="button" id="pv-create">Créer la partie</button></div>';
+  $('#gk-create').innerHTML=h; }
   h='<h3>Parties ouvertes</h3>'; var list=LOB.open||[];
   if(!list.length) h+='<p class="gk-empty">Aucune partie ouverte pour le moment. Créez la vôtre : un autre joueur peut la rejoindre.</p>';
-  list.forEach(function(m){ h+='<div class="gk-row"><span><b>'+esc(m.host)+'</b><br><small>'+(m.stake?'Mise '+fmt(m.stake)+' chacun':'Gratuite')+'</small></span><button class="gm-btn" type="button" data-j="'+m.mid+'" data-s="'+m.stake+'"'+(m.stake>bal?' disabled':'')+'>Rejoindre</button></div>'; });
+  list.forEach(function(m){ h+='<div class="gk-row"><span><b>'+esc(m.host)+'</b><br><small>'+(m.stake?'Mise '+fmt(m.stake)+' chacun':'Gratuite')+' · '+dly(m.move_s||90)+' par coup</small></span><button class="gm-btn" type="button" data-j="'+m.mid+'" data-s="'+m.stake+'" data-m="'+(m.move_s||90)+'"'+(m.stake>bal?' disabled':'')+'>Rejoindre</button></div>'; });
   $('#gk-open').innerHTML=h;
 }
 $('#gk-create').addEventListener('click',function(e){
   var s=e.target.closest('.gk-stake'); if(s&&!s.disabled){ pvpStake=+s.dataset.s; $$('.gk-stake',$('#gk-create')).forEach(function(x){ x.setAttribute('aria-pressed',+x.dataset.s===pvpStake); }); $('#pv-note').textContent=stakeNote(pvpStake); return; }
-  if(e.target.closest('#pv-create')) pvpGo('create',pvpStake,null);
+  if(e.target.closest('#pv-create')){ var d=readDelay(); if(d==null){ toast('Délai non valide : choisissez de 5 secondes à 30 minutes.'); return; } pvpGo('create',pvpStake,null,d); }
 });
-$('#gk-open').addEventListener('click',function(e){ var b=e.target.closest('[data-j]'); if(!b||b.disabled) return; pvpGo('join',+b.dataset.s,b.dataset.j); });
-function pvpGo(kind,stake,mid){
-  if(!INFO.consent_pvp) return consentModal('gomoku_pvp',pvpRules(),'Je consens et je continue',function(){ pvpGo(kind,stake,mid); });
-  if(stake>0) return stakeModal(kind,stake,mid);
-  pvpCall(kind,stake,mid,false);
+function readDelay(){ var t=parseFloat(($('#pv-t')||{}).value), u=+($('#pv-u')||{}).value||1, d=Math.round(t*u); if(!(d>=5&&d<=1800)) return null; pvpDelay=d; return d; }
+$('#gk-create').addEventListener('input',function(){ var d=readDelay(); var n=$('#pv-note'); if(n&&d!=null) n.textContent=stakeNote(pvpStake); });
+$('#gk-create').addEventListener('change',function(e){ if(e.target.id==='pv-u'){ var d=readDelay(); var n=$('#pv-note'); if(n&&d!=null) n.textContent=stakeNote(pvpStake); } });
+$('#gk-open').addEventListener('click',function(e){ var b=e.target.closest('[data-j]'); if(!b||b.disabled) return; pvpGo('join',+b.dataset.s,b.dataset.j,+b.dataset.m); });
+function pvpGo(kind,stake,mid,mv){
+  if(!INFO.consent_pvp) return consentModal('gomoku_pvp',pvpRules(),'Je consens et je continue',function(){ pvpGo(kind,stake,mid,mv); });
+  if(stake>0) return stakeModal(kind,stake,mid,mv);
+  pvpCall(kind,stake,mid,false,mv);
 }
-function stakeModal(kind,stake,mid){
+function stakeModal(kind,stake,mid,mv){
   var fee=Math.round(stake*0.05), win=2*stake-2*fee;
   openModal('<h2>'+(kind==='create'?'Créer':'Rejoindre')+' une partie avec mise</h2>'+
     '<div class="gk-warn"><b>Vous pouvez perdre '+fmt(stake)+' jetons.</b> La mise est prélevée tout de suite.</div>'+
     '<ul class="cs-rules"><li>Mise de chaque joueur : <b>'+fmt(stake)+' jetons</b>.</li>'+
+    '<li>Délai accordé à chaque coup : <b>'+dly(mv)+'</b>. Temps dépassé = défaite.</li>'+
     '<li><b>Frais : 5 % de la mise de chaque joueur</b>, soit '+fmt(fee)+' jeton'+(fee>1?'s':'')+' retenu'+(fee>1?'s':'')+' sur la vôtre et autant sur celle de l’adversaire (total '+fmt(2*fee)+').</li>'+
     '<li>Si vous gagnez : vous recevez <b>'+fmt(win)+'</b> (net <b>+'+fmt(win-stake)+'</b>). Si vous perdez : <b class="b">−'+fmt(stake)+'</b>.</li>'+
     '<li>Nulle ou annulation avant le début : mise rendue, sans frais.</li></ul>'+
     '<label class="gm-chk"><input type="checkbox" id="sk-c"><span>Je comprends que je risque de perdre '+fmt(stake)+' jetons et que 5 % de ma mise (et de celle de l’adversaire) sont retenus en frais.</span></label>'+
     '<p class="gm-err" id="sk-e" role="alert"></p><div class="row"><button class="gm-btn" type="button" id="sk-ok" disabled>Je confirme la mise de '+fmt(stake)+'</button><button class="gm-btn q" type="button" data-close>Annuler</button></div>','gm-consent');
   $('#sk-c').addEventListener('change',function(){ $('#sk-ok').disabled=!this.checked; });
-  $('#sk-ok').addEventListener('click',function(){ closeModal(); pvpCall(kind,stake,mid,true); });
+  $('#sk-ok').addEventListener('click',function(){ closeModal(); pvpCall(kind,stake,mid,true,mv); });
 }
-function pvpCall(kind,stake,mid,conf){
+function pvpCall(kind,stake,mid,conf,mv){
   if(busy) return; busy=true;
-  var p=kind==='create'?rpc('zg_pvp_create',{p_stake:stake,p_confirm:conf}):rpc('zg_pvp_join',{p_mid:mid,p_confirm:conf});
+  var p=kind==='create'?rpc('zg_pvp_create',{p_stake:stake,p_confirm:conf,p_move_s:mv}):rpc('zg_pvp_join',{p_mid:mid,p_confirm:conf});
   p.then(function(r){
     busy=false;
-    if(r&&r.error==='consentement'){ INFO.consent_pvp=false; return pvpGo(kind,stake,mid); }
-    if(r&&r.error==='confirmation') return stakeModal(kind,stake,mid);
+    if(r&&r.error==='consentement'){ INFO.consent_pvp=false; return pvpGo(kind,stake,mid,mv); }
+    if(r&&r.error==='confirmation') return stakeModal(kind,stake,mid,mv);
     if(!r||!r.ok){ toast(errMsg(r)); if(r&&r.balance!=null) setBal(r.balance); loadLobby(); return; }
     if(r.balance!=null) setBal(r.balance);
     if(r.status==='playing') enterPvp(r); else loadLobby();
@@ -2264,7 +2291,7 @@ function pvpCall(kind,stake,mid,conf){
 /* ── Partie en ligne ── */
 function enterPvp(p){
   clearInterval(lobT); stopAll();
-  G={mode:'pvp',mid:p.mid,over:false,board:String(p.board),last:-1,stake:p.stake,you:p.you,myTurn:!!p.my_turn,opp:p.mine?p.guest:p.host,end:0,fee:p.fee||0};
+  G={mode:'pvp',mid:p.mid,over:false,board:String(p.board),last:-1,stake:p.stake,you:p.you,myTurn:!!p.my_turn,opp:p.mine?p.guest:p.host,end:0,fee:p.fee||0,moveS:p.move_s||90};
   var mv=p.moves||[]; G.last=mv.length?mv[mv.length-1]:-1; G.end=p.ms_left!=null?Date.now()+p.ms_left:0;
   busy=false; openGame(); paint(); turnText(); infoPvp(); startClock(); ZS.play('start');
   pollT=setInterval(pollPvp,1500);
@@ -2274,7 +2301,7 @@ function infoPvp(){
   $('#gk-info').innerHTML='<h3>Partie en ligne</h3><div class="sd-stat"><span>Adversaire</span><b>'+esc(G.opp||'—')+'</b></div>'+
    '<div class="sd-stat"><span>Votre mise (prélevée)</span><b class="'+(s?'bad':'')+'">'+(s?'−'+fmt(s):'Gratuite')+'</b></div>'+
    (s?'<div class="sd-stat"><span>Frais (5 % de chaque mise)</span><b>'+fmt(2*fee)+'</b></div><div class="sd-stat"><span>Vous recevez si vous gagnez</span><b class="g">+'+fmt(win)+'</b></div><div class="sd-stat"><span>Net si vous gagnez</span><b class="good">+'+fmt(win-s)+'</b></div>':'')+
-   '<div class="sd-stat"><span>Délai par coup</span><b>90 s</b></div>';
+   '<div class="sd-stat"><span>Délai par coup</span><b>'+dly(G.moveS||90)+'</b></div>';
 }
 function pollPvp(){
   if(!G||G.over||G.mode!=='pvp'||busy) return;
@@ -2325,9 +2352,9 @@ var pvpAgain=false;
 /* ── Règles ── */
 $('#gk-help').addEventListener('click',function(){
   openModal('<h2>Règles du Gomoku</h2><p>Le plateau compte 15 × 15 intersections. Les noirs commencent. Le premier qui aligne <b>cinq pierres</b> ou plus, en ligne, colonne ou diagonale, gagne. La pierre jouée en dernier porte un point doré.</p>'+
-   '<h3>Contre l’ordinateur</h3><p>Sept niveaux : Amateur, Moyen, Difficile, Légende, Grand Master, Mythique, GOAT. Chaque partie a une mise, prélevée au départ. Victoire : vous recevez le montant du niveau, mise comprise. Défaite, abandon ou plus de 20 minutes sans jouer : mise perdue. Partie nulle : mise rendue. Au niveau Amateur, un demi-jeton éventuel est reporté sur votre prochaine victoire.</p>'+
-   '<h3>Niveaux déconseillés</h3><p>Grand Master, Mythique et GOAT sont déconseillés, sauf si vous êtes un très grand joueur de Gomoku. Une confirmation est demandée avant chaque partie. Mythique et GOAT : une partie par jour ; perdre deux jours de suite à ces deux niveaux bloque l’accès au jeu.</p>'+
-   '<h3>En ligne</h3><p>Parties gratuites ou avec mise égale (20 à 2 000 jetons). Sur les parties avec mise, Zetwal retient 5 % de la mise de chaque joueur. 90 secondes par coup ; temps dépassé ou abandon = défaite. Nulle ou annulation : mises rendues.</p>'+
+   '<h3>Contre l’ordinateur</h3><p>Sept niveaux : Amateur, Moyen, Difficile, Légende, Grand Master, Mythique, GOAT. Chaque partie a une mise, prélevée au départ. Victoire : vous recevez le montant du niveau, mise comprise. Défaite, abandon ou temps écoulé : mise perdue. Partie nulle : mise rendue. Au niveau Amateur, un demi-jeton éventuel est reporté sur votre prochaine victoire.</p>'+
+   '<h3>Temps de réflexion</h3><p>Contre l’ordinateur : 10 secondes par coup, avec 2 étoiles de marge. Chaque dépassement retire une étoile et relance 10 secondes ; sans étoile, un nouveau dépassement fait perdre la partie. En ligne : le créateur de la partie choisit le délai par coup, de 5 secondes à 30 minutes.</p><h3>Niveaux déconseillés</h3><p>Grand Master, Mythique et GOAT sont déconseillés, sauf si vous êtes un très grand joueur de Gomoku. Une confirmation est demandée avant chaque partie. Mythique et GOAT : une partie par jour ; perdre deux jours de suite à ces deux niveaux bloque l’accès au jeu.</p>'+
+   '<h3>En ligne</h3><p>Parties gratuites ou avec mise égale (20 à 2 000 jetons). Sur les parties avec mise, Zetwal retient 5 % de la mise de chaque joueur. Délai par coup choisi par le créateur de la partie ; temps dépassé ou abandon = défaite. Nulle ou annulation : mises rendues.</p>'+
    '<p class="muted" style="font-size:.85rem">Les pourcentages de victoire sont des objectifs de conception estimés, pas des garanties.</p><div class="row"><button class="gm-btn" type="button" data-close>Compris</button></div>');
 });
 
