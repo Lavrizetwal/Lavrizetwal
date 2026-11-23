@@ -94,19 +94,25 @@ const CRE = {
   loup:{ f:'loup', Fu:1.95, an:'walk' }, grand_loup:{ f:'grand-loup', Fu:2.1, an:'walk' }, ours:{ f:'ours', Fu:2.2, an:'stomp' },
   bandit_homme:{ f:'bandit-homme', Fu:1.85, hu:1 }, bandit_femme:{ f:'bandit-femme', Fu:1.75, hu:1 }, colosse:{ f:'colosse', Fu:2.5, hu:1, wide:1.3 },
   zombie:{ f:'zombie', Fu:1.85, hu:1, an:'zomb' }, dimon:{ f:'dimon', Fu:2.0, an:'fly', lift:1.0 }, manon_fire:{ f:'manon-fire', Fu:2.7, an:'stomp' },
-  roi_scorpion:{ f:'roi-scorpion', Fu:2.7, an:'scuttle' }, ver_geant:{ f:'ver-geant', Fu:2.6, an:'worm' }
+  roi_scorpion:{ f:'roi-scorpion', Fu:2.7, an:'scuttle' }, ver_geant:{ f:'ver-geant', Fu:2.6, an:'worm' },
+  /* pièges fixes (modèles de Mike) : ry = orientation, sink = enfoncement dans le sol (unité du modèle), pas d'animation */
+  tronc_deracine:{ lit:.4, f:'tronc-deracine', Fu:2.7, an:'none', ry:Math.PI / 2 }, pont_casse:{ f:'pont-casse', Fu:6, an:'none', ry:Math.PI / 2, sink:.17 },
+  pont_gele:{ f:'pont-gele', Fu:6, an:'none', ry:Math.PI / 2, sink:.15 }, pont_metal:{ f:'pont-metal', Fu:6, an:'none', ry:Math.PI / 2, sink:.125 },
+  rocher:{ lit:.4, f:'rocher', Fu:2.5, an:'none', ry:Math.PI / 2 }, rocher_lave:{ lit:.55, f:'rocher-lave', Fu:2.6, an:'none', ry:.4 }, eboulis:{ lit:.55, f:'eboulis', Fu:2.6, an:'none', ry:0 },
+  scie:{ lit:.35, f:'scie', Fu:2.3, an:'none', ry:0 }, barricade:{ lit:.5, f:'barricade', Fu:2.4, an:'none', ry:0 }, piege_pointes:{ f:'piege-pointes', Fu:2.6, an:'none', ry:Math.PI / 2 },
+  camion:{ f:'camion', Fu:4.4, an:'none', ry:0 }
 };
 for(const k in CRE){ CFG[k] = CFG[k] || (CRE[k].hu ? { Fm: 2.4, Fu: CRE[k].Fu, pitch: .2 } : { Fm: 1.25, Fu: CRE[k].Fu, pitch: .22 }); }
 R.creS = {}; R.creMesh = {};
 function loadCre(k, cb){
   const cf = CRE[k]; if(!cf) return; if(R.creS[k]){ if(cb) (R.creS[k] === 2 ? cb(true) : (R.creW = R.creW || []).push(cb)); return; } R.creS[k] = 1;
   const done = ok => { R.creS[k] = ok ? 2 : 3; if(cb) cb(ok); };
-  try{ new GLTFLoader().load('bestiaire/' + cf.f + '.glb?v=1', g => {
+  try{ new GLTFLoader().load('bestiaire/' + cf.f + '.glb?v=2', g => {
     try{
       let m;
       if(cf.hu){ let mesh; g.scene.traverse(n => { if(n.isMesh && !mesh) mesh = n; }); R.creMesh[k] = mesh; const h = rigFromMesh(mesh, SPEC_FILLE1); m = { root: h.root, h }; }
       else {
-        const obj = g.scene, bb = new T.Box3().setFromObject(obj), sz = bb.getSize(new T.Vector3()), c = bb.getCenter(new T.Vector3()), sc = 1 / Math.max(sz.x, sz.y, sz.z);
+        const obj = g.scene; if(cf.lit) obj.traverse(n => { if(n.isMesh && n.material && n.material.map){ n.material.emissive = new T.Color(0xffffff); n.material.emissiveMap = n.material.map; n.material.emissiveIntensity = cf.lit; } }); const bb = new T.Box3().setFromObject(obj), sz = bb.getSize(new T.Vector3()), c = bb.getCenter(new T.Vector3()), sc = 1 / Math.max(sz.x, sz.y, sz.z);
         obj.scale.setScalar(sc); obj.position.set(-c.x * sc, -bb.min.y * sc, -c.z * sc);
         const pv = new T.Group(); pv.add(obj); const root = new T.Group(); root.add(pv); m = { root, pv };
       }
@@ -121,7 +127,7 @@ function creAnim(m, cf, now, seed){
     applyPose(m.h, poseStand(cf.an === 'zomb' ? t * .55 : t)); r.rotation.set(0, .15, cf.an === 'zomb' ? .08 * Math.sin(now / 420) : 0);
     r.position.y = 0; if(cf.wide) r.scale.set(cf.wide, 1.04, cf.wide); return;
   }
-  const pv = m.pv; pv.rotation.set(0, 0, 0); r.position.set(0, 0, 0); r.rotation.set(0, .3, 0); r.scale.setScalar(1);
+  const pv = m.pv; pv.rotation.set(0, 0, 0); r.position.set(0, -(cf.sink || 0), 0); r.rotation.set(0, cf.ry != null ? cf.ry : .3, 0); r.scale.setScalar(1);
   const a = cf.an;
   if(a === 'walk'){ const ph = t / 190; r.position.y = Math.abs(Math.sin(ph)) * .035; pv.rotation.z = Math.sin(ph) * .05; pv.rotation.x = Math.sin(ph * 2) * .035; }
   else if(a === 'stomp'){ const ph = t / 330; r.position.y = Math.abs(Math.sin(ph)) * .03; pv.rotation.z = Math.sin(ph) * .07; r.scale.setScalar(1 + .012 * Math.sin(ph * 2)); }
@@ -133,7 +139,7 @@ function creAnim(m, cf, now, seed){
   else if(a === 'hang'){ pv.rotation.z = Math.sin(t / 520) * .1; r.position.y = .03 * Math.sin(t / 380); }
 }
 
-const WHO = { fille1: { url: 'models/fille1.glb?v=1', state: 0, cbs: [], gltf: null, spec: SPEC_FILLE1 } };
+const WHO = { fille1: { url: 'models/fille1.glb?v=2', state: 0, cbs: [], gltf: null, spec: SPEC_FILLE1 } };
 function loadWho(name, cb){
   const w = WHO[name]; if(!w){ cb && cb(false); return; }
   if(w.state === 2){ cb && cb(true); return; } if(w.state === 3){ cb && cb(false); return; }

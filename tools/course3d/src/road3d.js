@@ -53,7 +53,7 @@ export function installRoad(X){
   }
   function tex(name){
     if(S.texC[name]) return S.texC[name];
-    const t = new T.TextureLoader().load('textures/' + name + '.jpg?v=1'); t.colorSpace = T.SRGBColorSpace; t.anisotropy = 4; t.wrapS = T.RepeatWrapping; t.wrapT = T.RepeatWrapping; return (S.texC[name] = t);
+    const t = new T.TextureLoader().load('textures/' + name + '.jpg?v=2'); t.colorSpace = T.SRGBColorSpace; t.anisotropy = 4; t.wrapS = T.RepeatWrapping; t.wrapT = T.RepeatWrapping; return (S.texC[name] = t);
   }
 
   /* ── tracé : droites + quarts de cercle (cap h : avant = (sin h, −cos h), droite = (cos h, sin h)) ── */
@@ -241,7 +241,7 @@ export function installRoad(X){
     if(S.win < -1e8 || sr < S.win + CH * .6 || sr > S.win + CH * 2.4) rebuild(Sx.th, sr);
     Sx.sr = sr; placeGantries(); placeObjs(Sx);
     /* coureur */
-    const c = ctlFor('road', Sx.who); if(c.o.root.parent !== S.sc) S.sc.add(c.o.root); c.o.root.visible = true;
+    const c = ctlFor('road', Sx.who); if(c.o.root.parent !== S.sc) S.sc.add(c.o.root); c.o.root.visible = !window.ZSHIELD;
     const lat = (Sx.vx - 1) * LW;
     runnerUpdate(c, Sx.now, lat, { speed: Sx.speed, jump: Sx.jump >= 0, jv: Sx.jump, crouch: Sx.crouch, hit: Sx.hit }, 1.2);
     const ro = at(sr, lat); rp.x = ro.x; rp.z = ro.z; const rh = ro.h, jy = Sx.jump >= 0 ? Math.sin(Math.PI * Math.max(0, Math.min(1, Sx.jump))) * 1.15 : 0;
