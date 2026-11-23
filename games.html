@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <script>try{var __t=localStorage.getItem("zt-theme");if(__t==="light"||__t==="dark")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
 <title>Jwèt — ZETWAL ORGANISATION</title>
-<meta name="description" content="Jwèt Zetwal : Sudoku ak Duel Mental, klasman ak statistik.">
+<meta name="description" content="Jwèt Zetwal : Sudoku, Duel Mental, La course vers la mort ak Gomoku, klasman ak statistik.">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -1678,6 +1678,15 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
           <ul><li>5 destinasyon, 5 nivo (wout la vin pi long)</li><li>Antre : 25 a 50 jeton</li><li>Gany : antre a + 10 × nivo</li><li>Yon sèl erè = pèdi</li></ul>
           <div class="acts"><a class="gm-btn" href="course.html">Jwe</a><button class="gm-btn ln" type="button" data-stats="course">Statistik mwen</button></div>
         </article>
+        <article class="hb-g" id="hb-go">
+          <div class="pv" aria-hidden="true">
+            <svg viewBox="0 0 240 190" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="pvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6c383"/><stop offset="1" stop-color="#c99a4b"/></linearGradient></defs><rect width="240" height="190" fill="#0d1a42"/><rect x="40" y="0" width="160" height="190" fill="url(#pvg)"/><g stroke="rgba(60,32,8,.7)" stroke-width="1"><path d="M52 12V178M68 12V178M84 12V178M100 12V178M116 12V178M132 12V178M148 12V178M164 12V178M180 12V178M52 12H180M52 28H180M52 44H180M52 60H180M52 76H180M52 92H180M52 108H180M52 124H180M52 140H180M52 156H180M52 172H180"/></g><g><circle cx="100" cy="92" r="6.5" fill="#15161a"/><circle cx="116" cy="92" r="6.5" fill="#15161a"/><circle cx="132" cy="92" r="6.5" fill="#15161a"/><circle cx="148" cy="92" r="6.5" fill="#15161a"/><circle cx="116" cy="108" r="6.5" fill="#f4f5f9"/><circle cx="132" cy="108" r="6.5" fill="#f4f5f9"/><circle cx="100" cy="76" r="6.5" fill="#f4f5f9"/><circle cx="148" cy="76" r="6.5" fill="#f4f5f9"/><circle cx="84" cy="92" r="6.5" fill="#15161a"/></g><circle cx="84" cy="92" r="2.8" fill="#F0D98A"/></svg>
+          </div>
+          <h2>Gomoku</h2><div class="tag">Lè dènye pwen an dore</div>
+          <p>Aliyen senk wòch anvan advèsè a. Jwe kont òdinatè a sou 7 nivo, oswa an liy kont yon lòt jwè, gratis oswa ak yon miz. Twa dènye nivo yo (Grand Master, Mythique, GOAT) pa rekòmande si ou pa yon trè gran jwè Gomoku.</p>
+          <ul><li>7 nivo, Amateur rive GOAT</li><li>Miz : 1 a 1 000 jeton</li><li>An liy : 5 % frè sou chak miz</li></ul>
+          <div class="acts"><a class="gm-btn" href="gomoku.html">Jwe</a><button class="gm-btn ln" type="button" data-stats="gomoku">Statistik mwen</button></div>
+        </article>
       </div>
     </div>
   </section>
@@ -1704,6 +1713,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
           <div class="hb-t" id="hb-t-sudoku"></div>
           <div class="hb-t" id="hb-t-duel"></div>
           <div class="hb-t" id="hb-t-course"></div>
+          <div class="hb-t" id="hb-t-gomoku"></div>
         </div>
       </div>
       <div class="hb-rules">
@@ -1714,6 +1724,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-6;pointer-events:none;ba
           <li>Antre a pèdi toujou. Gany a vini anplis si ou genyen. Ou ka pèdi jeton ou yo : gany ak pèt yo afiche aklè anvan ou jwe.</li>
           <li>Anvan chak jwèt, ou dwe bay konsantman ou nan yon ekran ki rezime gany ak pèt posib yo.</li>
           <li>Gen yon limit gany chak jou, e Mythique a limite a yon pati pa jou.</li>
+          <li>Gomoku : twa dènye nivo yo (Grand Master, Mythique, GOAT) pa rekòmande si ou pa yon trè gran jwè. Mythique ak GOAT limite a yon pati pa jou, e si ou pèdi de jou youn dèyè lòt nan de nivo sa yo, aksè ou nan Gomoku bloke. Nan pati an liy ak miz, Zetwal pran 5 % sou miz chak jwè.</li>
           <li>Yon pati ki fini twò vit pase limit nòmal la mete an verifikasyon anvan gany a peye.</li>
           <li>Si koneksyon an koupe, ou ka rekòmanse pati a, men tan an kontinye kouri.</li>
         </ul>
@@ -2049,7 +2060,7 @@ addEventListener('zmfa:changed',function(e){ try{
 <script>
 (function(){
 'use strict';
-var LVN=['','Facile','Moyen','Difficile','Légendaire','Mythique'];
+var LVN=['','Facile','Moyen','Difficile','Légendaire','Mythique'], GLV=['','Amateur','Moyen','Difficile','Légende','Grand Master','Mythique','GOAT'];
 var CATN=['','Calcul mental','Haïti','Mémoire','Culture générale','Philosophie'];
 var period='all';
 $('#hb-wal-ic').innerHTML=JT;
@@ -2059,9 +2070,10 @@ function showNote(b){ var n=$('#hb-note'); if(!b){ n.innerHTML=''; return; } n.i
 function lvLabel(g,x){
   if(g==='sudoku') return LVN[x.level]||'—';
   if(g==='course') return (DN[x.mode]||'Course')+' · Nivo '+(x.level||1);
+  if(g==='gomoku') return (x.mode==='pvp'||!x.level)?'An liy':(GLV[x.level]||'Nivo '+x.level);
   var a=x.level?('Nivo '+x.level):'Nivo 1→10', b=x.cat?CATN[x.cat]:'Tout kategori'; return a+' · '+b;
 }
-var GN={sudoku:'Sudoku',duel:'Duel Mental',course:'La course vers la mort'}, DN={zetwal:'Zetwal',cejjd:'CEJJD',soldiers:'The Soldiers Studio',dadoute:'Dadoute',phada:'Phada Business'};
+var GN={sudoku:'Sudoku',duel:'Duel Mental',course:'La course vers la mort',gomoku:'Gomoku'}, DN={zetwal:'Zetwal',cejjd:'CEJJD',soldiers:'The Soldiers Studio',dadoute:'Dadoute',phada:'Phada Business'};
 function renderTop(g,rows){
   var t=GN[g]||g, h='<h3>'+t+'</h3>';
   if(!rows||!rows.length){ $('#hb-t-'+g).innerHTML=h+'<div class="em">Poko gen pati nan klasman an. Premye a ka se ou.</div>'; return; }
@@ -2070,7 +2082,7 @@ function renderTop(g,rows){
   $('#hb-t-'+g).innerHTML=h+'</ol>';
 }
 function loadTop(){
-  ['sudoku','duel','course'].forEach(function(g){
+  ['sudoku','duel','course','gomoku'].forEach(function(g){
     rpc('zj_top',{p_game:g,p_period:period}).then(function(r){ renderTop(g,r); },function(){ $('#hb-t-'+g).innerHTML='<h3>'+(GN[g]||g)+'</h3><div class="em">Klasman an pa disponib pou kounye a.</div>'; });
   });
 }
@@ -2085,10 +2097,10 @@ function statsHtml(g,s){
      '<div><b>'+fmt(s.forfeits)+'</b><span>Abandon</span></div><div><b>'+fmt(s.review)+'</b><span>An verifikasyon</span></div><div><b>'+fmt(s.best_score)+'</b><span>Pi bon sko</span></div>'+
      '<div><b>'+fmt(s.gain)+'</b><span>Jeton gany</span></div><div><b>'+fmt(s.lost)+'</b><span>Jeton pèdi</span></div><div><b>'+sgn(s.net)+'</b><span>Bilan net</span></div></div>';
   h+='<table class="gm-tbl"><tbody><tr><td>Seri viktwa aktyèl</td><td class="r">'+fmt(s.streak)+'</td></tr><tr><td>Tan total jwe</td><td class="r">'+dur(s.ms_total)+'</td></tr>'+
-     (g==='duel'?'<tr><td>Bon repons</td><td class="r">'+fmt(s.correct)+'</td></tr><tr><td>Move repons</td><td class="r">'+fmt(s.wrong)+'</td></tr>':'<tr><td>Erè total</td><td class="r">'+fmt(s.errors)+'</td></tr>')+'</tbody></table>';
+     (g==='duel'?'<tr><td>Bon repons</td><td class="r">'+fmt(s.correct)+'</td></tr><tr><td>Move repons</td><td class="r">'+fmt(s.wrong)+'</td></tr>':g==='gomoku'?'':'<tr><td>Erè total</td><td class="r">'+fmt(s.errors)+'</td></tr>')+'</tbody></table>';
   if(s.by_level&&s.by_level.length){
     h+='<h3>Pa nivo</h3><table class="gm-tbl"><thead><tr><th>Nivo</th><th class="r">Pati</th><th class="r">Viktwa</th><th class="r">Pi bon sko</th><th class="r">Net</th></tr></thead><tbody>';
-    s.by_level.forEach(function(x){ h+='<tr><td>'+(g==='sudoku'?LVN[x.level]:'Nivo '+x.level)+'</td><td class="r">'+x.played+'</td><td class="r">'+x.wins+'</td><td class="r">'+fmt(x.best_score)+'</td><td class="r '+(x.net>0?'pos':x.net<0?'neg':'')+'">'+sgn(x.net)+'</td></tr>'; });
+    s.by_level.forEach(function(x){ h+='<tr><td>'+(g==='sudoku'?LVN[x.level]:g==='gomoku'?(GLV[x.level]||'An liy'):'Nivo '+x.level)+'</td><td class="r">'+x.played+'</td><td class="r">'+x.wins+'</td><td class="r">'+fmt(x.best_score)+'</td><td class="r '+(x.net>0?'pos':x.net<0?'neg':'')+'">'+sgn(x.net)+'</td></tr>'; });
     h+='</tbody></table>';
   }
   if(g==='duel'&&s.by_cat&&s.by_cat.length){
@@ -2126,10 +2138,10 @@ $('#hb-pseudo').addEventListener('click',function(){
 function hubNote(){
   var s=GM.st, b=blocker();
   if(b&&b.k==='login') b={k:b.k,t:'Konekte pou jwe',m:'Konekte ak kont Zetwal ou pou jwe, wè statistik ou yo epi antre nan klasman an.',b:'Konekte',f:goLogin};
-  else if(b&&b.k==='closed') b={k:b.k,t:'Jwèt yo ap louvri talè',m:'Sudoku, Duel Mental ak La course vers la mort pral louvri talè sou Zetwal. Ou ka deja wè klasman an anba a.'};
+  else if(b&&b.k==='closed') b={k:b.k,t:'Jwèt yo ap louvri talè',m:'Sudoku, Duel Mental, La course vers la mort ak Gomoku pral louvri talè sou Zetwal. Ou ka deja wè klasman an anba a.'};
   else if(b&&b.k==='age') b={k:b.k,t:s&&s.age_known?'Aksè rezève pou adilt':'Yon dènye verifikasyon',m:s&&s.age_known?'Jwèt Zetwal yo rezève pou moun ki gen 18 an oswa plis.':'Konfime laj ou : jwèt yo rezève pou moun ki gen 18 an oswa plis.',b:s&&s.age_known?null:'Konfime laj mwen',f:b.f};
   else if(b&&b.k==='verify') b={k:b.k,t:'Verifye adrès imèl ou',m:'Verifye adrès imèl ou pou ka jwe, apre sa rechaje paj la.'};
-  else if(!b&&s&&s.resume){ b={k:'resume',t:'Ou gen yon pati ki ap kouri',m:'Tan an kontinye kouri. Retounen nan pati a pou fini l.',b:'Reprann pati a',f:function(){ location.href=(s.resume.game==='duel'?'duel.html':s.resume.game==='course'?'course.html':'sudoku.html'); }}; }
+  else if(!b&&s&&s.resume){ b={k:'resume',t:'Ou gen yon pati ki ap kouri',m:'Tan an kontinye kouri. Retounen nan pati a pou fini l.',b:'Reprann pati a',f:function(){ location.href=(s.resume.game==='duel'?'duel.html':s.resume.game==='course'?'course.html':s.resume.game==='gomoku'?'gomoku.html':'sudoku.html'); }}; }
   showNote(b);
 }
 function boot(){
