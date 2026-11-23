@@ -2826,26 +2826,39 @@ var A3 = false, R3 = null, R3F = 0, NOPS = ['sky', 'ground', 'decor', 'gantry', 
 window.ZRoad3D = { on:function(){ return R3ON; }, set:function(v){ R3ON = !!v; try{ localStorage.setItem('zc-road3d', R3ON ? '1' : '0'); }catch(e){} }, active:function(){ return A3; } };
 function r3dirOf(stg, opt){ for(var ln = 0; ln < 3; ln++){ if(stg.opts[stg.map[ln]] === opt) return ln - 1; } return 0; }
 function r3lab(stg){ return [0, 1, 2].map(function(l){ return stg.opts[stg.map[l]].label; }); }
+/* Accélération aux 3/4 du parcours : le serveur marque le tronçon (opt.lf) ; à partir de cet instant le temps « de route » défile plus vite (rush.b) */
+function r3rs(ENG, C, lane){
+  if(ENG._rs != null) return ENG._rs;
+  var tl = ENG.timeline;
+  for(var i = 0; i < tl.length; i++){ var en = tl[i]; if(en.opt && en.opt.lf != null){ ENG._rs = Math.round(en.base + en.opt.lf); return ENG._rs; } }
+  var ns = null, nb = 0;
+  if(!ENG.loaded && ENG.si < C.stages.length){ ns = C.stages[ENG.si]; nb = ENG.tcur; }
+  else if(ENG.loaded && ENG.si + 1 < C.stages.length){ ns = C.stages[ENG.si + 1]; nb = ENG.base + ENG.stdur; }
+  if(ns && ns.k === 'fork'){ var po = ns.opts[ns.map[Math.max(0, Math.min(2, lane))]]; if(po && po.lf != null) return Math.round(nb + ns.appr + po.lf); }
+  return null;
+}
+function r3warp(t, rs, b){ return (rs == null || !b || t <= rs) ? t : t + b * (t - rs); }
 function r3state(f, ENG, C){
   var tl = ENG.timeline, forks = [], items = [], lane = Math.max(0, Math.min(2, Math.round(f.vx))), curves = !!(window.ZRoad && ZRoad.enabled && ZRoad.enabled());
-  tl.forEach(function(en, i){ if(en.fork && C.stages[i]) forks.push({ tb:Math.round(en.base), dir:curves ? r3dirOf(C.stages[i], en.opt) : 0, labels:r3lab(C.stages[i]) }); });
+  var RS = r3rs(ENG, C, lane), RB = (C.rush && +C.rush.b) || 0;
+  tl.forEach(function(en, i){ if(en.fork && C.stages[i]) forks.push({ tb:Math.round(r3warp(en.base, RS, RB)), dir:curves ? r3dirOf(C.stages[i], en.opt) : 0, labels:r3lab(C.stages[i]) }); });
   var from = f.now - 9000, to = f.now + 3800;
-  function add(evs, base){ for(var i = 0; i < evs.length; i++){ var x = evs[i], t = base + x[0]; if(t > from && t < to) items.push({ k:x[1], t:Math.round(t), occ:x[2], ctr:x[3] }); } }
+  function add(evs, base){ for(var i = 0; i < evs.length; i++){ var x = evs[i], t = base + x[0]; if(t > from && t < to) items.push({ k:x[1], t:Math.round(r3warp(t, RS, RB)), t0:Math.round(t), occ:x[2], ctr:x[3] }); } }
   tl.slice(-2).forEach(function(seg){ add(seg.evs, seg.base); });
   var ns = null, nb = 0;
   if(!ENG.loaded && ENG.si < C.stages.length){ ns = C.stages[ENG.si]; nb = ENG.tcur; }
   else if(ENG.loaded && ENG.si + 1 < C.stages.length){ ns = C.stages[ENG.si + 1]; nb = ENG.base + ENG.stdur; }
   if(ns){
-    if(ns.k === 'fork'){ var tb = Math.round(nb + ns.appr); forks.push({ tb:tb, dir:curves ? lane - 1 : 0, labels:r3lab(ns) }); var po = ns.opts[ns.map[lane]]; if(po) add(po.ev, nb + ns.appr); }
+    if(ns.k === 'fork'){ var tb = Math.round(r3warp(nb + ns.appr, RS, RB)); forks.push({ tb:tb, dir:curves ? lane - 1 : 0, labels:r3lab(ns) }); var po = ns.opts[ns.map[lane]]; if(po) add(po.ev, nb + ns.appr); }
     else add(ns.ev, nb);
   }
-  return { forks:forks, items:items };
+  return { forks:forks, items:items, rs:RS, rb:RB };
 }
 function r3hints(me, f, st, W, H, C){
   if(!f.guided) return;
   var X = me.X;
   st.items.forEach(function(e){
-    var d = (e.t - f.now) / C.lead; if(e.ctr === 'P' || d < .06 || d > .75 || !HINT3[e.ctr]) return;
+    var d = ((e.t0 != null ? e.t0 : e.t) - f.now) / C.lead; if(e.ctr === 'P' || d < .06 || d > .75 || !HINT3[e.ctr]) return;
     var s = R3.VEL * e.t / 1000, lanes = []; for(var l = 0; l < 3; l++) if(e.occ & (1 << l)) lanes.push(l);
     var lm = (lanes[0] + lanes[lanes.length - 1]) / 2, p0 = R3.lanePoint(s, lm, 0, W, H), p1 = R3.lanePoint(s, lm, 1, W, H); if(p0.z > 1 || p0.z < 0) return;
     var u = Math.abs(p0.y - p1.y); if(u < 6) return;
@@ -2867,6 +2880,7 @@ var _frame3 = P.frame;
 P.frame = function(f){
   var me = this, ok = false, st = null;
   var G = me.isGame && window.ZGAME ? ZGAME() : null, ENG = G && G.E, C = G && G.C;
+  try{ if(G && ENG && C && f.now != null && C.rush){ var rs0 = r3rs(ENG, C, Math.round(f.vx)); if(rs0 != null && f.now >= rs0 && !ENG._rsShown){ ENG._rsShown = 1; if(window.ZRushNote) window.ZRushNote(); } } }catch(e){}
   if(R3ON && G && ENG && C && f.now != null){
     var Z = z();
     try{
@@ -2874,7 +2888,7 @@ P.frame = function(f){
         R3 = R3 || Z.makeRoad();
         if(R3.supported()){
           st = r3state(f, ENG, C);
-          ok = R3.frame({ W:me.W, H:me.H, dpr:me.DPR || 1, th:f.th, now:f.now, forks:st.forks, items:st.items, who:window.ZRUN !== 'man' && Z.whoReady(window.ZRUN) ? window.ZRUN : undefined,
+          ok = R3.frame({ W:me.W, H:me.H, dpr:me.DPR || 1, th:f.th, now:Math.round(r3warp(f.now, st.rs, st.rb)), forks:st.forks, items:st.items, who:window.ZRUN !== 'man' && Z.whoReady(window.ZRUN) ? window.ZRUN : undefined,
             vx:f.vx, speed:f.speed, jump:f.jump, crouch:f.crouchOn, hit:f.hitT > 0, shake:f.shake });
         }
       }
@@ -2989,6 +3003,7 @@ function renderSum(force){
     '<table><tbody><tr><td>Mise, prélevée au départ</td><td>' + r.entry + ' jetons</td></tr>' +
     '<tr><td>Arrivée : mise rendue + ' + (10 * SEL.lv) + '</td><td>+' + win + ' jetons</td></tr>' +
     '<tr><td>Un obstacle touché avant l’arrivée</td><td>0 jeton, mise perdue</td></tr>' +
+    '<tr><td>Aux 3/4 du parcours</td><td>le coureur accélère, plus d’obstacles</td></tr>' +
     '<tr><td>Durée sans détour</td><td>≈ ' + mmssl(r.base_s * 1000 * v.dist_mult) + '</td></tr></tbody></table></div>' +
     '<div class="cs-pass-stub"><div class="cs-gain"><small>Gain à l’arrivée</small><b id="cs-gn" data-v="' + win + '">' + win + '</b><span>jetons</span></div>' +
     '<button class="gm-btn" type="button" id="cs-go"' + (lack ? ' disabled' : '') + '>' + (lack ? 'Solde insuffisant' : 'Prendre la route') + '</button><button class="gm-btn q" type="button" id="cs-help2">Règles et dangers</button></div>';
@@ -3065,14 +3080,15 @@ function showEndInf(r){
 
 /* ═══ Règles ═══ */
 function help(){
-  var rows = INFO && INFO.obs ? INFO.obs.map(function(o){ return '<tr><td>' + esc(o.label) + '</td><td>' + CTR[o.ctr] + '</td><td>−' + lv1(o.dmg) + '</td></tr>'; }).join('') : '';
+  var rows = INFO && INFO.obs ? INFO.obs.map(function(o){ return o.ctr === 'P' ? '' : '<tr><td>' + esc(o.label) + '</td><td>' + CTR[o.ctr] + '</td></tr>'; }).join('') : '';
   openModal('<div class="cs-help"><h2>Règles et dangers</h2>' +
-    '<p>Vous courez vers la destination choisie. <b>Une seule erreur et la course est perdue</b> : il n’y a plus d’énergie. Touchez un obstacle, tombez dans un trou ou laissez-vous attraper, et c’est terminé.</p>' +
+    '<p>Vous courez vers la destination choisie. <b>Une seule erreur et la course est perdue</b> : touchez un obstacle, tombez dans un trou ou laissez-vous attraper, et c’est terminé.</p>' +
+    '<p><b>Accélération.</b> Aux trois quarts du parcours, le coureur accélère et les obstacles se rapprochent : la fin de la course est la partie la plus dure. Plus le niveau est haut, plus la route est longue avant d’y arriver.</p>' +
     '<p><b>Commandes.</b> Ordinateur : flèches gauche et droite pour changer de couloir, flèche haut ou espace pour sauter, flèche bas pour se glisser sous les obstacles. Téléphone : glissez le doigt dans la direction voulue ou utilisez les boutons.</p>' +
     '<p><b>Carrefours.</b> La route se sépare en trois. La carte indique quelle voie mène à la destination et laquelle est un détour (plus long et plus dangereux). Le couloir où vous êtes au carrefour décide de la route prise. Les deux bonnes voies n’ont pas les mêmes obstacles : choisissez celle que vous maîtrisez le mieux.</p>' +
     '<p><b>Trou :</b> tomber dans un trou met fin à la course. Il n’y a plus d’eau ni de mangue à ramasser.</p>' +
     '<p><b>Gains.</b> Arrivée à destination : mise + 10 × le niveau. Sinon, la mise est perdue. Plafond de gain : ' + (GM.st && GM.st.cap_day ? GM.st.cap_day : 300) + ' jetons par jour.</p>' +
-    '<table class="cs-dg"><thead><tr><th>Danger</th><th>Bonne réponse</th><th>Niveaux perdus</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<table class="cs-dg"><thead><tr><th>Danger</th><th>Bonne réponse</th></tr></thead><tbody>' + rows + '</tbody></table>' +
     '<div class="row"><button class="gm-btn" type="button" data-close>Compris</button></div></div>');
 }
 $('#cs-help').addEventListener('click', help);
@@ -3209,6 +3225,7 @@ function mixv(a, b, t){ return a + (b - a) * t; }
 
 /* ── Boucle de jeu ── */
 var FORKS = [];
+window.ZRushNote = function(){ try{ var f = $('#cs-ft'); f.style.color = '#ffd36b'; f.textContent = 'Accélération ! Le coureur file, les obstacles se rapprochent'; f.style.opacity = 1; clearTimeout(f._h); f._h = setTimeout(function(){ f.style.opacity = 0; }, 3200); if(navigator.vibrate) navigator.vibrate([40, 60, 40]); ZS.play('sel'); }catch(e){} };
 function fx(text, col){ var f = $('#cs-ft'); f.style.color = col; f.textContent = text; f.style.opacity = 1; clearTimeout(f._h); f._h = setTimeout(function(){ f.style.opacity = 0; }, 1300); }
 function onEng(type, data){
   var px = SC.laneX(V.vx, 1), py = SC.PY - SC.U * 1.0;
@@ -3220,8 +3237,7 @@ function onEng(type, data){
     var o = OBS[data.x[1]] || [data.x[1]]; V.flash = performance.now(); V.shake = performance.now() + 360;
     ZS.play('wrong'); ZS.vib(data.x[4] >= 900 ? [60, 40, 90] : 55);
     SC.emit('hit', px, py, 18, { a:-1.57, spread:3.2, v:170, g:300, life:650, r:SC.U * .05, c:'255,95,85' });
-    SC.text('−' + lv1(data.x[4]), px, py - SC.U * .75, '#ff8a80', Math.round(SC.U * .5));
-    fx(o[0] + ' !', '#ff8a80');
+    fx(o[0] + ' ! Perdu', '#ff8a80');
   } else if(type === 'pick'){
     ZS.play('coin'); SC.emit('spark', px, py, 14, { a:-1.57, spread:3.2, v:120, g:-20, life:700, r:SC.U * .045, c:'255,226,120' });
     SC.text('+' + lv1(data.x[4]), px, py - SC.U * .75, '#9df0b0', Math.round(SC.U * .5)); fx((OBS[data.x[1]] ? OBS[data.x[1]][0] : 'Bonus'), '#8be39c');
@@ -3363,10 +3379,9 @@ function showEnd(r){
   else if(r.status === 'error'){ h = '<div class="cs-endsign neu"><small>Course terminée</small>Résultat en attente</div><h2>Résultat non confirmé</h2><p>Votre résultat n’a pas pu être enregistré. Vérifiez votre solde dans quelques instants.</p>'; }
   else { h = '<div class="cs-endsign bad"><small>Route interrompue</small>Une erreur, perdu</div><h2>Pas cette fois</h2><p>Vous n’avez pas atteint ' + esc(rt.name) + '. La mise de ' + fmt(r.entry) + ' jetons est perdue.</p><div class="big neg">' + sgn(r.net) + ' jetons</div>'; ZS.play('lose'); FX.rain(); }
   if(r.nobs != null && r.status !== 'forfeit' && r.status !== 'error'){
-    var worst = {}; (r.hits || []).forEach(function(x){ worst[x[1]] = (worst[x[1]] || 0) + x[2]; });
-    var ks = Object.keys(worst).sort(function(a, b){ return worst[b] - worst[a]; }).slice(0, 3);
+    var ks = (r.hits || []).slice(0, 1).map(function(x){ return x[1]; });
     h += '<table><tbody><tr><td>Obstacles rencontrés</td><td>' + fmt(r.nobs) + '</td></tr><tr><td>Obstacles mal gérés</td><td>' + fmt(r.nhit) + '</td></tr>' +
-      ks.map(function(k){ return '<tr><td>Plus coûteux : ' + esc(OBS[k] ? OBS[k][0] : k) + '</td><td>−' + lv1(worst[k]) + '</td></tr>'; }).join('') + '</tbody></table>';
+      ks.map(function(k){ return '<tr><td>Obstacle fatal</td><td>' + esc(OBS[k] ? OBS[k][0] : k) + '</td></tr>'; }).join('') + '</tbody></table>';
   }
   h += '<p class="muted">Solde : ' + fmt(GM.st ? GM.st.balance : 0) + ' jetons</p><div class="btns"><button class="gm-btn" type="button" id="cs-again">Rejouer</button><button class="gm-btn ln" type="button" id="cs-change">Changer de route</button><a class="gm-btn ln" href="games.html">Classement</a></div>';
   $('#cs-endbox').innerHTML = h; $('#cs-end').hidden = false; try{ $('#cs-end').scrollIntoView({ block:'start' }); }catch(e){ window.scrollTo({ top:0 }); }
