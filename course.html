@@ -1376,6 +1376,14 @@ body.gm{background:var(--bg)}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
+
+.cs-daily{margin:14px 0 18px;padding:14px 16px;border-radius:16px;border:1px solid rgba(240,217,138,.35);background:linear-gradient(135deg,rgba(212,175,55,.16),rgba(8,16,42,.6));color:#f4f1e8}
+.cs-daily h3{margin:0 0 4px;font:700 1.1rem Inter,system-ui,sans-serif;color:#F0D98A}
+.cs-daily p{margin:2px 0 10px;font-size:.92rem;line-height:1.45;color:#dfe4f3}
+.cs-daily .dr{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.cs-daily .ok{color:#8be39c;font-weight:700}
+.cs-daily details{margin-top:10px;font-size:.88rem}.cs-daily summary{cursor:pointer;color:#F0D98A;min-height:32px}
+.cs-daily ol{margin:6px 0 0;padding-left:22px}
 </style>
 <style id="zj-consent-css">
 .gm-chk{display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:.9rem;line-height:1.5;margin:14px 0 4px;padding:12px;border:1px solid var(--line-2,rgba(128,128,128,.4));border-radius:12px;cursor:pointer}
@@ -1657,6 +1665,7 @@ body.cs-play #zmin-fab,body.cs-play .zt-wal,body.cs-play #promo-bar{display:none
     <div class="wrap">
       <h2>Choisissez votre route</h2>
       <p class="sub">Toutes les destinations sont ouvertes à tous les niveaux. Plus le niveau monte, plus la route s’allonge et plus elle est dure.</p>
+      <div class="cs-daily" id="cs-daily" hidden></div>
       <div class="cs-grp"><h3>Destination</h3><div class="cs-routes" id="cs-routes" role="radiogroup" aria-label="Destination"></div></div>
       <div class="cs-grp"><h3>Niveau</h3><div class="cs-lvs" id="cs-lvs" role="radiogroup" aria-label="Niveau"></div></div>
       <div class="cs-pass" id="cs-sum" aria-live="polite"></div>
@@ -2099,7 +2108,7 @@ Eng.prototype.step = function(now, log, cb){
       if(ctr === 'P'){
         if((occ & lb) !== 0){ this.e = Math.min(this.emax, this.e + val); this.picks++; if(cb) cb('pick', { x: x, t: t }); }
       } else {
-        this.nobs++;
+        this.nobs++; try{ if(window.ZSeen) window.ZSeen(x[1]); }catch(e){}
         var hit = (occ & lb) !== 0 && !(t < this.shend) && (ctr === 'L' || (ctr === 'J' && !(t < this.jend)) || (ctr === 'C' && !(t < this.cend)));
         if(hit){
           this.e -= val; this.nhit++; this.hits.push([t, x[1], val]); this.streak = 0;
@@ -2998,6 +3007,22 @@ function tween(el, to, ms){
   (function st(t){ var p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(from + (to - from) * e); if(p < 1) requestAnimationFrame(st); })(t0);
 }
 var DT = { zetwal:'jungle', cejjd:'glace', soldiers:'ruines', dadoute:'volcan', phada:'desert' };
+
+function renderDaily(){
+  var box = $('#cs-daily'); if(!box || !INFO) return;
+  rpc('zc_daily').then(function(d){
+    if(!d || !d.dest){ box.hidden = true; return; }
+    var rt = INFO.routes.filter(function(r){ return r.dest === d.dest; })[0], nm = rt ? rt.name : d.dest, lvn = LVN[d.level - 1] || ('Niveau ' + d.level);
+    var goal = d.hits_max === 0 ? 'aucune erreur' : 'au plus ' + d.hits_max + ' erreur' + (d.hits_max > 1 ? 's' : '');
+    var h = '<h3>Défi du jour</h3><p>' + esc(nm) + ' · niveau ' + d.level + ' (' + esc(lvn) + ') · arrive à destination avec <b>' + goal + '</b>.</p><div class="dr">';
+    if(d.done) h += '<span class="ok">Défi réussi (' + d.my_hits + ' erreur' + (d.my_hits > 1 ? 's' : '') + ') ✓</span>';
+    else h += '<button class="gm-btn" type="button" id="cs-dly">Relever le défi</button>';
+    h += '<span>Série : ' + (d.streak || 0) + ' jour' + ((d.streak || 0) > 1 ? 's' : '') + '</span></div>';
+    if(d.top && d.top.length) h += '<details><summary>Classement du jour</summary><ol>' + d.top.map(function(t){ return '<li>' + esc(t.pseudo || 'Joueur') + ' · ' + t.hits + ' erreur' + (t.hits > 1 ? 's' : '') + ' · ' + Math.round((t.dur_ms || 0) / 1000) + ' s</li>'; }).join('') + '</ol></details>';
+    box.innerHTML = h; box.hidden = false;
+    var b = $('#cs-dly'); if(b) b.onclick = function(){ SEL.dest = d.dest; SEL.lv = d.level; saveSel(); renderPick(); renderSum(); ZS.play('sel'); var g = $('#cs-go'); if(g) try{ g.scrollIntoView({ behavior:'smooth', block:'center' }); }catch(e){} };
+  }, function(){ box.hidden = true; });
+}
 function renderPick(){
   var h = '';
   INFO.routes.slice().sort(function(a, b){ return b.entry - a.entry; }).forEach(function(r){
@@ -3123,7 +3148,7 @@ $('#cs-best').addEventListener('click', function(){
   var go = function(){ if(window.ZBest) ZBest.open(); };
   if(window.ZBest){ go(); return; }
   var b = $('#cs-best'); b.disabled = true;
-  var s = document.createElement('script'); s.src = 'bestiary.js?v=2';
+  var s = document.createElement('script'); s.src = 'bestiary.js?v=3';
   s.onload = function(){ b.disabled = false; go(); };
   s.onerror = function(){ b.disabled = false; try{ openModal('<h2>Personnages</h2><p>Impossible de charger les fiches pour le moment. Vérifiez la connexion et réessayez.</p><div class="row"><button class="gm-btn" type="button" data-close>Fermer</button></div>'); }catch(e){} };
   document.head.appendChild(s);
@@ -3250,6 +3275,7 @@ function mixv(a, b, t){ return a + (b - a) * t; }
 /* ── Boucle de jeu ── */
 var FORKS = [];
 window.ZRushNote = function(){ try{ var f = $('#cs-ft'); f.style.color = '#ffd36b'; f.textContent = 'Accélération ! Le coureur file, les obstacles se rapprochent'; f.style.opacity = 1; clearTimeout(f._h); f._h = setTimeout(function(){ f.style.opacity = 0; }, 3200); if(navigator.vibrate) navigator.vibrate([40, 60, 40]); ZS.play('sel'); }catch(e){} };
+window.ZSeen = function(kind){ try{ var id = String(kind).replace(/_/g, '-'), m = JSON.parse(localStorage.getItem('zc-seen') || '{}') || {}; if(!m[id]){ m[id] = Date.now(); localStorage.setItem('zc-seen', JSON.stringify(m)); } }catch(e){} };
 function fx(text, col){ var f = $('#cs-ft'); f.style.color = col; f.textContent = text; f.style.opacity = 1; clearTimeout(f._h); f._h = setTimeout(function(){ f.style.opacity = 0; }, 1300); }
 function onEng(type, data){
   var px = SC.laneX(V.vx, 1), py = SC.PY - SC.U * 1.0;
@@ -3437,6 +3463,7 @@ function showEnd(r){
   }
   h += '<p class="muted">Solde : ' + fmt(GM.st ? GM.st.balance : 0) + ' jetons</p><div class="btns"><button class="gm-btn" type="button" id="cs-again">Rejouer</button><button class="gm-btn ln" type="button" id="cs-change">Changer de route</button><a class="gm-btn ln" href="games.html">Classement</a></div>';
   $('#cs-endbox').innerHTML = h; $('#cs-end').hidden = false; try{ $('#cs-end').scrollIntoView({ block:'start' }); }catch(e){ window.scrollTo({ top:0 }); }
+  if(r && r.won){ try{ rpc('zc_daily').then(function(d){ if(d && d.done && d.rid_today !== false && String(d.dest) === String(r.dest) && +d.level === +r.level){ var bx = $('#cs-endbox'), n = document.createElement('p'); n.className = 'muted'; n.style.color = '#8be39c'; n.textContent = 'Défi du jour réussi ! Série : ' + (d.streak || 0) + ' jour' + ((d.streak || 0) > 1 ? 's' : '') + '.'; if(bx) bx.insertBefore(n, bx.firstChild.nextSibling); } }); }catch(e){} }
   if(big != null) tween($('#cs-bigv'), big, 900);
   $('#cs-again').onclick = function(){ again(true); }; $('#cs-change').onclick = function(){ again(false); };
   startHero();
@@ -3487,7 +3514,7 @@ function boot(){
       $('#cs-pick').hidden = true; return;
     }
     if(GM.st.resume){ showNote({ k:'err', t:'Partie en cours', m:'Un autre jeu est ouvert. Terminez-le avant de courir.', b:'Aller aux jeux', f:function(){ location.href = 'games.html'; } }); $('#cs-pick').hidden = true; return; }
-    $('#cs-pick').hidden = false; renderPick();
+    $('#cs-pick').hidden = false; renderPick(); renderDaily();
   }, function(){ showNote({ k:'err', t:'Jeu indisponible', m:'Impossible de joindre le serveur. Réessayez dans un instant.' }); });
 }
 onUser.push(function(){ refreshStatus().then(boot, function(){ boot(); }); });

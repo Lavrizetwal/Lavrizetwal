@@ -159,6 +159,105 @@ var DATA = [
 "s": "jeu"
 },
 {
+"id": "tronc-deracine",
+"n": "Tronc déraciné",
+"k": "piege",
+"e": "Jungle, ruines",
+"d": "Gros tronc arraché, racines en l'air, couché en travers de la route.",
+"r": "À sauter : il barre toute la largeur.",
+"s": "jeu"
+},
+{
+"id": "pont-casse",
+"n": "Pont cassé",
+"k": "piege",
+"e": "Jungle",
+"d": "Vieux pont de bois aux planches pourries, troué en son milieu.",
+"r": "S'effondre derrière toi : saute au-dessus du trou. Si tu tombes, tu perds de l'énergie.",
+"s": "jeu"
+},
+{
+"id": "pont-gele",
+"n": "Pont gelé",
+"k": "piege",
+"e": "Glace",
+"d": "Passerelle de glace craquelée suspendue au-dessus d'une crevasse.",
+"r": "Se fissure à ton passage : un grand saut est nécessaire.",
+"s": "jeu"
+},
+{
+"id": "pont-metal",
+"n": "Pont métallique brisé",
+"k": "piege",
+"e": "Ruines, volcan",
+"d": "Pont industriel en acier tordu, tablier arraché au centre.",
+"r": "Les poutres cèdent : saute avant la rupture.",
+"s": "jeu"
+},
+{
+"id": "rocher",
+"n": "Gros rocher",
+"k": "piege",
+"e": "Désert, ruines",
+"d": "Bloc de pierre massif tombé au milieu du passage.",
+"r": "Il occupe une voie : change de couloir.",
+"s": "jeu"
+},
+{
+"id": "rocher-lave",
+"n": "Rocher de lave",
+"k": "piege",
+"e": "Volcan",
+"d": "Rocher noir fendu de veines incandescentes.",
+"r": "Brûlant : contourne-le en changeant de voie.",
+"s": "jeu"
+},
+{
+"id": "eboulis",
+"n": "Éboulis",
+"k": "piege",
+"e": "Volcan, ruines, glace",
+"d": "Tas de pierres et de débris qui s'est effondré sur la route.",
+"r": "À franchir d'un saut.",
+"s": "jeu"
+},
+{
+"id": "scie",
+"n": "Scie géante",
+"k": "piege",
+"e": "Ruines, volcan, désert",
+"d": "Lame circulaire industrielle dressée sur la route.",
+"r": "Occupe une voie : évite-la latéralement.",
+"s": "jeu"
+},
+{
+"id": "barricade",
+"n": "Barricade de pieux",
+"k": "piege",
+"e": "Jungle, désert, ruines",
+"d": "Rangée de pieux pointus liés entre eux.",
+"r": "Bloque une voie : change de couloir.",
+"s": "jeu"
+},
+{
+"id": "piege-pointes",
+"n": "Piège à pointes",
+"k": "piege",
+"e": "Ruines, désert, jungle",
+"d": "Plaque piégée hérissée de pointes de métal.",
+"r": "À sauter avant qu'elle ne t'atteigne.",
+"s": "jeu"
+},
+{
+"id": "camion",
+"n": "Camion abandonné",
+"k": "piege",
+"e": "Désert, ruines, volcan",
+"d": "Carcasse de camion rouillée, roues à plat.",
+"r": "Occupe une voie : passe sur le côté.",
+"s": "jeu"
+},
+{
 "id": "cerbere",
 "n": "Cerbère ancestral",
 "k": "boss",
@@ -204,12 +303,16 @@ var DATA = [
 "s": "bientot"
 }
 ];
-var KINDS = [['all','Tous'],['coureuse','Coureuse'],['humain','Humains'],['animal','Animaux'],['creature','Créatures'],['boss','Boss']];
-var KLAB = { coureuse:'Coureuse', humain:'Humain', animal:'Animal', creature:'Créature', boss:'Boss' };
+var KINDS = [['all','Tous'],['coureuse','Coureuse'],['humain','Humains'],['animal','Animaux'],['creature','Créatures'],['piege','Pièges'],['boss','Boss']];
+var KLAB = { coureuse:'Coureuse', humain:'Humain', animal:'Animal', creature:'Créature', piege:'Piège', boss:'Boss' };
 var BASE = 'bestiaire/';
 var Z3V = 'course3d.js?v=6';
 var root = null, st = { filter:'all', cur:-1, view:null, opener:null }, cssDone = false;
 
+function seenMap(){ try{ return JSON.parse(localStorage.getItem('zc-seen') || '{}') || {}; }catch(e){ return {}; } }
+var ALL = /[?&]best=all/.test(location.search);
+function isSeen(d, m){ return ALL || d.id === 'coureuse' || d.s !== 'jeu' ? true : !!(m || seenMap())[d.id]; }
+function counts(){ var m = seenMap(), n = 0, t = 0; DATA.forEach(function(d){ if(d.s === 'jeu' && d.id !== 'coureuse'){ t++; if(ALL || m[d.id]) n++; } }); return [n, t]; }
 function el(t, c, h){ var e = document.createElement(t); if(c) e.className = c; if(h != null) e.innerHTML = h; return e; }
 function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); }
 
@@ -243,6 +346,7 @@ var CSS = '.zb{position:fixed;inset:0;z-index:99990;display:flex;flex-direction:
  + '.zb-t p{margin:12px 0 0;line-height:1.65;color:#dfe4f3;max-width:60ch}.zb-t .lb{display:block;margin-top:18px;font:700 .8rem Inter,system-ui,sans-serif;letter-spacing:.06em;color:#F0D98A}'
  + '.zb-nav{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}.zb-nav button{padding:0 14px}.zb-nav [data-back]{flex:1 1 100%}.zb-nav [data-prev],.zb-nav [data-next]{flex:1 1 0}@media (min-width:761px){.zb-nav [data-back]{flex:0 0 auto}.zb-nav [data-prev],.zb-nav [data-next]{flex:0 0 auto}}'
  + '@media (max-width:760px){.zb-d{grid-template-columns:1fr}.zb-v{max-height:50vh}.zb-g{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}'
+ + '.zb-lk img{filter:brightness(0) contrast(.7);opacity:.55}.zb-lk b{color:#8c95b3}'
  + '@media (prefers-reduced-motion:reduce){.zb-c{transition:none}}';
 
 function build(){
@@ -273,11 +377,11 @@ function vis(){ return DATA.map(function(d, i){ return i; }).filter(function(i){
 
 function showList(keepFocus){
   stop3d(); st.cur = -1;
-  var box = root.querySelector('#zb-in'), ids = vis();
+  var box = root.querySelector('#zb-in'), ids = vis(), sm = seenMap(), cn = counts(); var sub = root.querySelector('.zb-top small'); if(sub) sub.textContent = 'Découverts : ' + cn[0] + ' / ' + cn[1] + (cn[0] === cn[1] ? ' · Collection complète !' : ' · Croise-les sur la route pour dévoiler leur fiche');
   var h = '<div class="zb-f" role="group" aria-label="Filtrer">' + KINDS.map(function(k){ return '<button type="button" data-f="' + k[0] + '" aria-pressed="' + (st.filter === k[0]) + '">' + k[1] + '</button>'; }).join('') + '</div><ul class="zb-g">';
   ids.forEach(function(i){
     var d = DATA[i];
-    h += '<li><button type="button" class="zb-c" data-i="' + i + '"><img src="' + BASE + d.id + '.jpg" alt="" loading="lazy" decoding="async" width="560" height="330"><div><b>' + esc(d.n) + '</b><span><i class="zb-tag' + (d.k === 'boss' ? ' b' : '') + '">' + KLAB[d.k] + '</i>' + esc(d.e) + '</span></div></button></li>';
+    h += '<li><button type="button" class="zb-c' + (isSeen(d, sm) ? '' : ' zb-lk') + '" data-i="' + i + '"><img src="' + BASE + d.id + '.jpg" alt="" loading="lazy" decoding="async" width="560" height="330"><div><b>' + (isSeen(d, sm) ? esc(d.n) : '???') + '</b><span><i class="zb-tag' + (d.k === 'boss' ? ' b' : '') + '">' + KLAB[d.k] + '</i>' + esc(d.e) + '</span></div></button></li>';
   });
   box.innerHTML = h + '</ul>';
   root.querySelector('.zb-body').scrollTop = 0;
@@ -291,14 +395,14 @@ function step(dx){
 
 function showOne(i){
   stop3d(); st.cur = i;
-  var d = DATA[i], ids = vis(), box = root.querySelector('#zb-in');
+  var d = DATA[i], ids = vis(), box = root.querySelector('#zb-in'), lk = !isSeen(d);
   box.innerHTML = '<div class="zb-d"><div class="zb-v" id="zb-v"><img src="' + BASE + d.id + '.jpg" alt="' + esc(d.n) + ' en 3D"><div class="zb-msg" id="zb-msg" hidden></div></div>'
     + '<div class="zb-t"><span><i class="zb-tag' + (d.k === 'boss' ? ' b' : '') + '">' + KLAB[d.k] + '</i><i class="zb-tag">' + (d.s === 'jeu' ? 'Dans le jeu' : 'Bientôt sur la route') + '</i></span>'
-    + '<h3>' + esc(d.n) + '</h3><span class="lb">Où le croiser</span><p>' + esc(d.e) + '</p><span class="lb">Description</span><p>' + esc(d.d) + '</p><span class="lb">Rôle dans le jeu</span><p>' + esc(d.r) + '</p>'
+    + '<h3>' + (lk ? '???' : esc(d.n)) + '</h3><span class="lb">Où le croiser</span><p>' + esc(d.e) + '</p>' + (lk ? '<p>Rencontre-le sur la route pour dévoiler sa fiche complète.</p>' : '<span class="lb">Description</span><p>' + esc(d.d) + '</p><span class="lb">Rôle dans le jeu</span><p>' + esc(d.r) + '</p>')
     + '<div class="zb-nav"><button type="button" data-back>Tous les personnages</button><button type="button" data-prev' + (ids.length < 2 ? ' disabled' : '') + ' aria-label="Précédent">Précédent</button><button type="button" data-next' + (ids.length < 2 ? ' disabled' : '') + ' aria-label="Suivant">Suivant</button></div></div></div>';
   root.querySelector('.zb-body').scrollTop = 0;
   var bk = box.querySelector('[data-back]'); try{ bk.focus({ preventScroll:true }); }catch(e){}
-  start3d(d);
+  if(lk){ var im0 = box.querySelector('.zb-v img'); if(im0) im0.style.filter = 'brightness(0) contrast(.7)'; } else start3d(d);
 }
 
 /* ── Visionneuse 3D (facultative) ── */
