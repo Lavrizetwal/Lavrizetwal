@@ -3014,7 +3014,7 @@ function renderDaily(){
     if(!d || !d.dest){ box.hidden = true; return; }
     var rt = INFO.routes.filter(function(r){ return r.dest === d.dest; })[0], nm = rt ? rt.name : d.dest, lvn = LVN[d.level - 1] || ('Niveau ' + d.level);
     var goal = d.hits_max === 0 ? 'aucune erreur' : 'au plus ' + d.hits_max + ' erreur' + (d.hits_max > 1 ? 's' : '');
-    var h = '<h3>Défi du jour</h3><p>' + esc(nm) + ' · niveau ' + d.level + ' (' + esc(lvn) + ') · arrive à destination avec <b>' + goal + '</b>.</p><div class="dr">';
+    var h = '<h3>Défi du jour</h3><p>' + esc(nm) + ' · niveau ' + d.level + ' (' + esc(lvn) + ') · arrive à destination avec <b>' + goal + '</b>. Récompense : +' + (d.bonus || 2) + ' jetons par jour.</p><div class="dr">';
     if(d.done) h += '<span class="ok">Défi réussi (' + d.my_hits + ' erreur' + (d.my_hits > 1 ? 's' : '') + ') ✓</span>';
     else h += '<button class="gm-btn" type="button" id="cs-dly">Relever le défi</button>';
     h += '<span>Série : ' + (d.streak || 0) + ' jour' + ((d.streak || 0) > 1 ? 's' : '') + '</span></div>';
@@ -3458,12 +3458,12 @@ function showEnd(r){
   else { h = '<div class="cs-endsign bad"><small>Route interrompue</small>Une erreur, perdu</div><h2>Pas cette fois</h2><p>Vous n’avez pas atteint ' + esc(rt.name) + '. La mise de ' + fmt(r.entry) + ' jetons est perdue.</p><div class="big neg">' + sgn(r.net) + ' jetons</div>'; ZS.play('lose'); FX.rain(); }
   if(r.nobs != null && r.status !== 'forfeit' && r.status !== 'error'){
     var ks = (r.hits || []).slice(0, 1).map(function(x){ return x[1]; });
-    h += '<table><tbody><tr><td>Obstacles rencontrés</td><td>' + fmt(r.nobs) + '</td></tr><tr><td>Obstacles mal gérés</td><td>' + fmt(r.nhit) + '</td></tr>' +
+    h += '<table><tbody><tr><td>Obstacles rencontrés</td><td>' + fmt(r.nobs) + '</td></tr><tr><td>Obstacles mal gérés</td><td>' + fmt(r.nhit) + '</td></tr>' + (r.bonus_serie > 0 ? '<tr><td>Bonus série de réussites (max 5)</td><td>+' + fmt(r.bonus_serie) + '</td></tr>' : '') +
       ks.map(function(k){ return '<tr><td>Obstacle fatal</td><td>' + esc(OBS[k] ? OBS[k][0] : k) + '</td></tr>'; }).join('') + '</tbody></table>';
   }
   h += '<p class="muted">Solde : ' + fmt(GM.st ? GM.st.balance : 0) + ' jetons</p><div class="btns"><button class="gm-btn" type="button" id="cs-again">Rejouer</button><button class="gm-btn ln" type="button" id="cs-change">Changer de route</button><a class="gm-btn ln" href="games.html">Classement</a></div>';
   $('#cs-endbox').innerHTML = h; $('#cs-end').hidden = false; try{ $('#cs-end').scrollIntoView({ block:'start' }); }catch(e){ window.scrollTo({ top:0 }); }
-  if(r && r.won){ try{ rpc('zc_daily').then(function(d){ if(d && d.done && d.rid_today !== false && String(d.dest) === String(r.dest) && +d.level === +r.level){ var bx = $('#cs-endbox'), n = document.createElement('p'); n.className = 'muted'; n.style.color = '#8be39c'; n.textContent = 'Défi du jour réussi ! Série : ' + (d.streak || 0) + ' jour' + ((d.streak || 0) > 1 ? 's' : '') + '.'; if(bx) bx.insertBefore(n, bx.firstChild.nextSibling); } }); }catch(e){} }
+  if(r && r.won){ try{ rpc('zc_daily').then(function(d){ if(d && d.done && d.fresh && String(d.dest) === String(r.dest) && +d.level === +r.level){ var bx = $('#cs-endbox'), n = document.createElement('p'); n.className = 'muted'; n.style.color = '#8be39c'; n.textContent = 'Défi du jour réussi ! +' + (d.bonus || 2) + ' jetons · Série : ' + (d.streak || 0) + ' jour' + ((d.streak || 0) > 1 ? 's' : '') + '.'; if(bx) bx.insertBefore(n, bx.firstChild.nextSibling); } }); }catch(e){} }
   if(big != null) tween($('#cs-bigv'), big, 900);
   $('#cs-again').onclick = function(){ again(true); }; $('#cs-change').onclick = function(){ again(false); };
   startHero();
