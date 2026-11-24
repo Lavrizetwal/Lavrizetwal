@@ -215,6 +215,8 @@ export function installRoad(X){
   function bridgeUpd(it, cur){
     const B = it.br, rel = cur.sr - it.sx, E0 = EV(rel), tn = sm(-24, -6, rel) * (1 - sm(4, 10, rel)), t = cur.now / 1000;
     const bp = bump(rel); if(bp > S.slo){ S.slo = bp; S.sloRel = rel; }
+    if(rel < -GH - 8) B.jl = 0; else if(cur.jump >= 0 && rel < GH) B.jl = 1;
+    if(rel > -GH - .4 && rel < GH + .4 && B.jl && !cur.hit) S.gp = (rel + GH + .4) / (2 * GH + .8);
     /* sons : une seule fois par passage, jamais au-delà de la fenêtre utile */
     const sn = B.snd, ZS = window.ZS, pl = n => { try{ ZS && ZS.play(n); }catch(e){} };
     if(rel < -30){ B.snd = {}; }
@@ -317,14 +319,14 @@ export function installRoad(X){
     }
     S.forks.forEach(f => { f.Jc = S.fkJ[f.tb]; });
     if(S.win < -1e8 || sr < S.win + CH * .6 || sr > S.win + CH * 2.4) rebuild(Sx.th, sr);
-    Sx.sr = sr; S.cur = { sr, now: Sx.now }; S.slo = 0; placeGantries(); placeObjs(Sx);
+    Sx.sr = sr; S.cur = { sr, now: Sx.now, jump: Sx.jump, hit: Sx.hit }; S.slo = 0; S.gp = -1; placeGantries(); placeObjs(Sx);
     const slo = S.slo, rt = performance.now(), rdt = S.rt ? Math.min(100, rt - S.rt) : 16; S.rt = rt;
     if(S.animT == null || Math.abs(S.animT - Sx.now) > 4000 + 1200 * 0) S.animT = Sx.now; else S.animT += rdt * (1 - .7 * slo);
     /* coureur */
     const c = ctlFor('road', Sx.who); if(c.o.root.parent !== S.sc) S.sc.add(c.o.root); c.o.root.visible = !window.ZSHIELD;
     const lat = (Sx.vx - 1) * LW;
-    runnerUpdate(c, S.animT, lat, { speed: Sx.speed, jump: Sx.jump >= 0, jv: Sx.jump, crouch: Sx.crouch, hit: Sx.hit }, 1.2);
-    const ro = at(sr, lat); rp.x = ro.x; rp.z = ro.z; const rh = ro.h, jy = Sx.jump >= 0 ? Math.sin(Math.PI * Math.max(0, Math.min(1, Sx.jump))) * (1.15 + 1.5 * slo) : 0;
+    runnerUpdate(c, S.animT, lat, { speed: Sx.speed, jump: Sx.jump >= 0 || S.gp >= 0, jv: S.gp >= 0 ? S.gp : Sx.jump, crouch: Sx.crouch, hit: Sx.hit }, 1.2);
+    const ro = at(sr, lat); rp.x = ro.x; rp.z = ro.z; const rh = ro.h, jy = Math.max(Sx.jump >= 0 ? Math.sin(Math.PI * Math.max(0, Math.min(1, Sx.jump))) * (1.15 + 1.5 * slo) : 0, S.gp >= 0 ? Math.sin(Math.PI * S.gp) * (1.15 + 1.5 * slo) : 0);
     c.o.root.position.set(rp.x, jy, rp.z); c.o.root.rotation.y = Math.PI - rh;
     S.runnerPos = { x: rp.x, y: jy + 1, z: rp.z };
     /* caméra : derrière le coureur sur le tracé, regarde 9 m devant ; pendant les coudes elle tourne avec la route */
