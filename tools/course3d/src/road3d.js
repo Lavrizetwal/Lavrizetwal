@@ -18,6 +18,7 @@ const ENV = {
   foret: { fog: 0x9cc8a0, gnd: 0x2d5c2c, sun: 0xfff2cf, si: 2.8, sky: 0xc4e8ff, hg: 0x2d5c2c, hi: 1.1, prop: 'tree', pc: [0x2a6a30, 0x3f8a3a, 0x1f5524] },
   montagne: { fog: 0xb4c4dc, gnd: 0x5a5a60, sun: 0xf3f6ff, si: 2.7, sky: 0xa5bde6, hg: 0x5a5a60, hi: 1.0, prop: 'rock', pc: [0x6a6a72, 0x585860, 0x8a8a92] }
 };
+const ROADLIFT = { jungle: .55, ruines: .7, volcan: .75, ville: .5, foret: .3, montagne: .3, desert: .1, glace: 0 };
 const ROADTEX = { jungle: 'road-jungle', glace: 'road-glace', ruines: 'road-ruines', volcan: 'road-volcan', desert: 'road-desert', ville: 'route-ville', foret: 'route-foret', montagne: 'route-montagne' };
 const SKYTEX = { jungle: 1, glace: 1, ruines: 1, volcan: 1, desert: 1 };
 const hash = n => { n = (n ^ 61) ^ (n >>> 16); n = n + (n << 3); n = n ^ (n >>> 4); n = Math.imul(n, 0x27d4eb2d); n = n ^ (n >>> 15); return (n >>> 0) / 4294967296; };
@@ -103,6 +104,7 @@ export function installRoad(X){
     const env = ENV[th] || ENV.jungle, a0 = Math.floor(sr / CH) * CH - CH, a1 = a0 + CH * 4;
     S.win = a0; clearGroup(S.roadG); clearGroup(S.propG); S.gantry.forEach(g => S.gantG.remove(g)); S.gantry.clear();
     const mat = new T.MeshStandardMaterial({ map: tex(ROADTEX[th] || 'road-jungle'), roughness: .95, metalness: 0 });
+    { const rb = ROADLIFT[th] || 0; if(rb){ mat.emissive = new T.Color(0xffffff); mat.emissiveMap = mat.map; mat.emissiveIntensity = rb; mat.color.setScalar(1 + rb * .5); } }
     S.roadG.add(ribbon(Math.max(-30, a0), a1, 2, mat, .02));
     S.forks.forEach(f => { const J = f.Jc; if(!J) return; const sJ = VEL * f.tb / 1000; if(sJ < a0 - 20 || sJ > a1 + 20) return; [J.h, J.h - Math.PI / 2, J.h + Math.PI / 2].forEach(hh => S.roadG.add(armMesh(J.x, J.z, hh, mat))); });
     /* décor : une paire d'éléments par cellule de 9 m, graine = numéro de cellule (même décor à chaque passage) */
