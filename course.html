@@ -1783,6 +1783,7 @@ var ZS = (function(){
     bcreak:p(function(t){ tone(70+Math.random()*30,t,.7,'sawtooth',.07,{to:46,lp:260,rev:.25,a:.08}); noise(t,.5,.1,500+Math.random()*500,9,'bandpass'); noise(t+.22,.3,.07,900,12,'bandpass'); }),
     bcrack:p(function(t){ noise(t,.09,.2,2200,3,'bandpass'); noise(t+.03,.22,.1,700,2,'bandpass'); tone(200,t,.12,'square',.05,{to:80,lp:900,rev:.1}); }),
     brumble:p(function(t){ noise(t,1.8,.26,160,.8,'lowpass'); tone(58,t,1.7,'sine',.28,{to:30,rev:.3,a:.04}); noise(t+.1,.5,.14,1200,2,'bandpass'); tone(110,t+.05,.9,'sawtooth',.06,{to:55,lp:400,rev:.4}); }),
+    bfall:p(function(t){ tone(520,t,.9,'sine',.12,{to:70,rev:.4}); noise(t,.9,.12,900,1,'lowpass'); noise(t+.95,.35,.2,200,.8,'lowpass'); tone(70,t+.95,.35,'sine',.22,{to:35,rev:.2}); }),
     bland:p(function(t){ noise(t,.28,.18,260,.8,'lowpass'); tone(90,t,.25,'sine',.2,{to:50,rev:.1}); }),
     tap:p(function(t){ tone(900,t,.05,'sine',.12,{to:620,rev:.1}); }),
     sel:p(function(t){ tone(1400,t,.035,'triangle',.07,{rev:.05}); }),
@@ -2778,7 +2779,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=16'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=17'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); setTimeout(function(){ try{ if(R3ON && Z3D.makeRoad) Z3D.makeRoad().init(); }catch(e){} }, 900); loadRunners(function(){ mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
@@ -3334,7 +3335,9 @@ function loop(ts){
 
 /* ═══ Entrée en jeu ═══ */
 function enter(r){
-  SID = r.sid; C = r.course; try{ var _ks = {}; C.stages.forEach(function(s){ (s.k === 'fork' ? s.opts.reduce(function(a, o){ return a.concat(o.ev); }, []) : s.ev || []).forEach(function(e){ _ks[e[1]] = 1; }); }); if(window.Z3D && Z3D.preload) Z3D.preload(Object.keys(_ks)); }catch(e){}  if(C.lead) C.lead = Math.round(C.lead * (window.ZPRESS || 1)); OBS = r.obs || {}; LOG = []; ENG = new Eng(C); ENG.vjend = -1; ENG.vcend = -1; FORKS = forkIdxs();
+  SID = r.sid; C = r.course;
+  try{ var _h = 0, _s = String(SID || ''); for(var _i = 0; _i < _s.length; _i++) _h = (_h * 31 + _s.charCodeAt(_i)) >>> 0; var _q = (_h % 100), _ice = (SEL && SEL.dest === 'cejjd');
+    window.ZWEATHER = (/[?&]wx=(clair|pluie|neige|nuit|brume)/.exec(location.search) || [])[1] || (_q < 50 ? 'clair' : _q < 70 ? (_ice ? 'neige' : 'pluie') : _q < 85 ? 'nuit' : 'brume'); }catch(e){ window.ZWEATHER = 'clair'; } try{ var _ks = {}; C.stages.forEach(function(s){ (s.k === 'fork' ? s.opts.reduce(function(a, o){ return a.concat(o.ev); }, []) : s.ev || []).forEach(function(e){ _ks[e[1]] = 1; }); }); if(window.Z3D && Z3D.preload) Z3D.preload(Object.keys(_ks)); }catch(e){}  if(C.lead) C.lead = Math.round(C.lead * (window.ZPRESS || 1)); OBS = r.obs || {}; LOG = []; ENG = new Eng(C); ENG.vjend = -1; ENG.vcend = -1; FORKS = forkIdxs();
   V = { theme:DT[SEL.dest] || 'ville', prev:null, tchg:-9999, lane:1, vx:1, flash:0, shake:0, forkRec:null, lastDec:-9999, decOpt:null };
   SC.lead = C.lead; SC.parts = []; SC.lastT = 0; lastTm = -1; stopHero();
   setBal(r.balance); lastRes = null; showNote(null);

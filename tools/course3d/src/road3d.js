@@ -128,6 +128,7 @@ export function installRoad(X){
     if(withTrunk){ tr.count = k; tr.instanceMatrix.needsUpdate = true; S.propG.add(tr); }
   }
 
+  let Sx0 = { th: 'jungle' };
   function setTheme(th){
     if(S.th === th) return; S.th = th; const e = ENV[th] || ENV.jungle;
     S.sc.fog.color.setHex(e.fog); S.sc.background = new T.Color(e.fog); S.gnd.material.color.setHex(e.gnd);
@@ -135,6 +136,36 @@ export function installRoad(X){
     if(SKYTEX[th]){ const sk = tex('sky-' + th); sk.wrapS = T.MirroredRepeatWrapping; sk.repeat.set(2, 1); S.sky.material.map = sk; S.sky.material.color.setHex(0xffffff); }
     else { S.sky.material.map = null; S.sky.material.color.setHex(e.sky); }
     S.sky.material.needsUpdate = true; S.win = -1e9;
+    wxApply(th, e);
+  }
+  /* ── météo : clair | pluie | neige | nuit | brume (tirée par course, cosmétique, ne change pas le serveur) ── */
+  function wxApply(th, e){
+    const wx = window.ZWEATHER || 'clair', fg = S.sc.fog, dim = (c, k) => new T.Color(c).multiplyScalar(k);
+    fg.near = 26; fg.far = 76; S.wx = wx;
+    if(!S.lamp){ S.lamp = new T.PointLight(0xfff0d0, 0, 16, 1.6); S.sc.add(S.lamp); }
+    S.lamp.intensity = 0;
+    if(wx === 'brume'){ fg.near = 16; fg.far = 56; fg.color.lerp(new T.Color(0xcfd6dc), .6); S.sc.background = fg.color.clone(); S.sun.intensity = e.si * .55; S.hemi.intensity = e.hi * 1.1; }
+    else if(wx === 'pluie'){ fg.near = 20; fg.far = 64; fg.color.lerp(new T.Color(0x6a7684), .6); S.sc.background = fg.color.clone(); S.sun.intensity = e.si * .35; S.hemi.intensity = e.hi * .85; S.gnd.material.color.multiplyScalar(.7); S.sky.material.color.setHex(0x8a949e); }
+    else if(wx === 'neige'){ fg.near = 18; fg.far = 60; fg.color.lerp(new T.Color(0xdde6ee), .6); S.sc.background = fg.color.clone(); S.sun.intensity = e.si * .6; }
+    else if(wx === 'nuit'){ fg.near = 20; fg.far = 66; fg.color.copy(dim(0x1a2540, 1)); S.sc.background = fg.color.clone(); S.sun.color.setHex(0x8aa4ff); S.sun.intensity = .55; S.hemi.color.setHex(0x30406a); S.hemi.groundColor.setHex(0x0c1020); S.hemi.intensity = .55; S.gnd.material.color.multiplyScalar(.35); S.sky.material.color.setHex(0x2a3452); S.lamp.intensity = 9; }
+    S.sky.material.needsUpdate = true;
+    if(S.wxp){ S.sc.remove(S.wxp); S.wxp.geometry.dispose(); S.wxp = null; }
+    if(wx === 'pluie' || wx === 'neige'){
+      const n = wx === 'pluie' ? 380 : 260, rain = wx === 'pluie', g = new T.BufferGeometry(), pos = new Float32Array(n * (rain ? 6 : 3));
+      for(let i = 0; i < n; i++){ const x = (Math.random() - .5) * 26, y = Math.random() * 14, z = (Math.random() - .5) * 30; if(rain){ pos.set([x, y, z, x - .05, y + .55, z], i * 6); } else pos.set([x, y, z], i * 3); }
+      g.setAttribute('position', new T.BufferAttribute(pos, 3));
+      S.wxp = rain ? new T.LineSegments(g, new T.LineBasicMaterial({ color: 0xbcd0e0, transparent: true, opacity: .45, fog: false })) : new T.Points(g, new T.PointsMaterial({ color: 0xffffff, size: .16, transparent: true, opacity: .85, fog: false }));
+      S.wxp.frustumCulled = false; S.wxp.renderOrder = 7; S.sc.add(S.wxp); S.wxrain = rain;
+    }
+  }
+  function wxTick(dt){
+    if((window.ZWEATHER || 'clair') !== S.wx){ S.th = null; setTheme(Sx0.th); }
+    if(S.lamp){ S.lamp.position.set(rp.x, 3.2, rp.z); const f = new T.Vector3(); S.cam.getWorldDirection(f); S.lamp.position.addScaledVector(f, 5.5); }
+    if(!S.wxp) return; const a = S.wxp.geometry.attributes.position, d = a.array, rain = S.wxrain, st = rain ? 6 : 3, v = (rain ? 22 : 2.4) * dt / 1000, cx = S.cam.position.x, cz = S.cam.position.z;
+    const f = new T.Vector3(); S.cam.getWorldDirection(f);
+    S.wxp.position.set(cx + f.x * 10, 0, cz + f.z * 10);
+    for(let i = 0; i < d.length; i += st){ d[i + 1] -= v; if(rain) d[i + 4] -= v; if(d[i + 1] < 0){ const k = 14 + Math.random() * 2 - d[i + 1]; d[i + 1] += 14; if(rain) d[i + 4] += 14; } if(!rain) d[i] += Math.sin(d[i + 1] * 1.3 + i) * .004; }
+    a.needsUpdate = true;
   }
 
   /* ── objets ── */
@@ -215,6 +246,9 @@ export function installRoad(X){
   function bridgeUpd(it, cur){
     const B = it.br, rel = cur.sr - it.sx, E0 = EV(rel), tn = sm(-24, -6, rel) * (1 - sm(4, 10, rel)), t = cur.now / 1000;
     const bp = bump(rel); if(bp > S.slo){ S.slo = bp; S.sloRel = rel; }
+    if(rel < -GH - 8){ B.jl = 0; B.fell = 0; B.ft = 0; }
+    if(!B.fell && cur.hit && rel > -GH - 1.2 && rel < GH + .4){ B.fell = 1; B.ft = 0; try{ window.ZS && window.ZS.play('bfall'); }catch(e){} }
+    if(B.fell && rel < 11.2){ B.ft += cur.rdt * (1 - .5 * bp) / 1000; S.fl = { ft: B.ft, rel }; }
     if(rel < -GH - 8) B.jl = 0; else if(cur.jump >= 0 && rel < GH) B.jl = 1;
     if(rel > -GH - .4 && rel < GH + .4 && B.jl && !cur.hit) S.gp = (rel + GH + .4) / (2 * GH + .8);
     /* sons : une seule fois par passage, jamais au-delà de la fenêtre utile */
@@ -310,7 +344,7 @@ export function installRoad(X){
     const t0 = performance.now();
     const dpr = Math.min(Sx.dpr || 1, R.tier === 'high' ? 1.25 : 1), w = Math.max(64, Math.round(Sx.W * dpr)), h = Math.max(64, Math.round(Sx.H * dpr));
     if(w !== S.W || h !== S.H){ S.W = w; S.H = h; S.rd.setPixelRatio(1); S.rd.setSize(w, h, false); S.cam.aspect = w / h; S.cam.fov = w / h < .9 ? 74 : 60; S.cam.updateProjectionMatrix(); }
-    setTheme(Sx.th);
+    Sx0 = Sx; setTheme(Sx.th);
     S.forks = Sx.forks.slice().sort((a, b) => a.tb - b.tb);
     const sig = S.forks.map(f => f.tb + ':' + f.dir + ':' + (f.labels ? f.labels.join('/') : '')).join(';'), sr = VEL * Sx.now / 1000;
     if(sig !== S.sig || !S.path){
@@ -319,20 +353,24 @@ export function installRoad(X){
     }
     S.forks.forEach(f => { f.Jc = S.fkJ[f.tb]; });
     if(S.win < -1e8 || sr < S.win + CH * .6 || sr > S.win + CH * 2.4) rebuild(Sx.th, sr);
-    Sx.sr = sr; S.cur = { sr, now: Sx.now, jump: Sx.jump, hit: Sx.hit }; S.slo = 0; S.gp = -1; placeGantries(); placeObjs(Sx);
-    const slo = S.slo, rt = performance.now(), rdt = S.rt ? Math.min(100, rt - S.rt) : 16; S.rt = rt;
+    Sx.sr = sr; const rt = performance.now(), rdt = S.rt ? Math.min(100, rt - S.rt) : 16; S.rt = rt;
+    S.cur = { sr, now: Sx.now, jump: Sx.jump, hit: Sx.hit, rdt }; S.slo = 0; S.gp = -1; S.fl = null; placeGantries(); placeObjs(Sx);
+    const slo = S.slo; wxTick(rdt);
     if(S.animT == null || Math.abs(S.animT - Sx.now) > 4000 + 1200 * 0) S.animT = Sx.now; else S.animT += rdt * (1 - .7 * slo);
     /* coureur */
     const c = ctlFor('road', Sx.who); if(c.o.root.parent !== S.sc) S.sc.add(c.o.root); c.o.root.visible = !window.ZSHIELD;
     const lat = (Sx.vx - 1) * LW;
     runnerUpdate(c, S.animT, lat, { speed: Sx.speed, jump: Sx.jump >= 0 || S.gp >= 0, jv: S.gp >= 0 ? S.gp : Sx.jump, crouch: Sx.crouch, hit: Sx.hit }, 1.2);
     const ro = at(sr, lat); rp.x = ro.x; rp.z = ro.z; const rh = ro.h, jy = Math.max(Sx.jump >= 0 ? Math.sin(Math.PI * Math.max(0, Math.min(1, Sx.jump))) * (1.15 + 1.5 * slo) : 0, S.gp >= 0 ? Math.sin(Math.PI * S.gp) * (1.15 + 1.5 * slo) : 0);
-    c.o.root.position.set(rp.x, jy, rp.z); c.o.root.rotation.y = Math.PI - rh;
-    S.runnerPos = { x: rp.x, y: jy + 1, z: rp.z };
+    let fy = jy;
+    if(S.fl){ const tau = S.fl.ft, rr = S.fl.rel; fy = -13 * tau * tau; if(rr > 8.5) fy = -2.2 * (1 - (v => v * v * (3 - 2 * v))(Math.max(0, Math.min(1, (rr - 8.5) / 2.7)))); c.o.root.visible = !window.ZSHIELD && (fy > -3 || rr > 8.5); }
+    if((S.fl ? 1 : 0) !== (S.fdt || 0)){ S.fdt = S.fl ? 1 : 0; c.o.root.traverse(n => { if(n.material){ (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => { m.depthTest = !S.fdt; }); n.renderOrder = S.fdt ? 6 : 0; } }); }
+    c.o.root.position.set(rp.x, fy, rp.z); c.o.root.rotation.y = Math.PI - rh; if(S.fl) c.o.root.rotation.x = Math.min(1.1, S.fl.ft * 1.6); else c.o.root.rotation.x = 0;
+    S.runnerPos = { x: rp.x, y: fy + 1, z: rp.z };
     /* caméra : derrière le coureur sur le tracé, regarde 9 m devant ; pendant les coudes elle tourne avec la route */
     const cb = at(sr - 5.4 - 3 * slo, lat * .6 + 1.5 * slo); cp.x = cb.x; cp.z = cb.z; const ct = at(sr + 9 + 4 * slo, lat * .25); tp.x = ct.x; tp.z = ct.z;
     const sk = Sx.shake > 0 ? Sx.shake * .12 : 0, bob = Sx.speed ? Math.sin(Sx.now / 46) * .02 : 0;
-    S.cam.position.set(cp.x + (Math.random() - .5) * sk, 3.1 + 1.1 * slo + bob + (Math.random() - .5) * sk, cp.z + (Math.random() - .5) * sk); S.cam.lookAt(tp.x, 1.15 + .5 * slo, tp.z);
+    S.cam.position.set(cp.x + (Math.random() - .5) * sk, 3.1 + 1.1 * slo + bob + (Math.random() - .5) * sk, cp.z + (Math.random() - .5) * sk); S.cam.lookAt(tp.x, 1.15 + .5 * slo + Math.min(0, fy * .5), tp.z);
     { const fv = (w / h < .9 ? 74 : 60) + 7 * slo; if(Math.abs(S.cam.fov - fv) > .05){ S.cam.fov = fv; S.cam.updateProjectionMatrix(); } }
     if(Sx.top){ S.cam.position.set(rp.x, 70, rp.z + 24); S.cam.lookAt(rp.x, 0, rp.z - 16); }
     S.cam.updateMatrixWorld(true);
