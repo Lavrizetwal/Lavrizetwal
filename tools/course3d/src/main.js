@@ -100,7 +100,10 @@ const CRE = {
   pont_gele:{ f:'pont-gele', Fu:6, an:'none', ry:Math.PI / 2, sink:.15 }, pont_metal:{ f:'pont-metal', Fu:6, an:'none', ry:Math.PI / 2, sink:.125 },
   rocher:{ lit:.4, f:'rocher', Fu:2.5, an:'none', ry:Math.PI / 2 }, rocher_lave:{ lit:.55, f:'rocher-lave', Fu:2.6, an:'none', ry:.4 }, eboulis:{ lit:.55, f:'eboulis', Fu:2.6, an:'none', ry:0 },
   scie:{ lit:.35, f:'scie', Fu:2.3, an:'none', ry:0 }, barricade:{ lit:.5, f:'barricade', Fu:2.4, an:'none', ry:0 }, piege_pointes:{ f:'piege-pointes', Fu:2.6, an:'none', ry:Math.PI / 2 },
-  camion:{ f:'camion', Fu:4.4, an:'none', ry:0 }
+  camion:{ f:'camion', Fu:4.4, an:'none', ry:0 },
+  /* boss de fin de route (un par destination) : placés par road3d devant le coureur */
+  boss_yeti:{ f:'yeti', lit:.55, Fu:7.5, an:'stomp', ry:0 }, boss_croco_geant:{ f:'croco-geant', lit:.55, Fu:12, an:'crawl', ry:0 }, boss_cerbere:{ f:'cerbere', lit:.55, Fu:9.5, an:'walk', ry:0 },
+  boss_dragon:{ f:'dragon', lit:.55, Fu:11, an:'fly', ry:0, lift:2 }, boss_roi_sables:{ f:'roi-sables', lit:.55, Fu:8, an:'stomp', ry:0 }
 };
 for(const k in CRE){ CFG[k] = CFG[k] || (CRE[k].hu ? { Fm: 2.4, Fu: CRE[k].Fu, pitch: .2 } : { Fm: 1.25, Fu: CRE[k].Fu, pitch: .22 }); }
 R.creS = {}; R.creMesh = {};
