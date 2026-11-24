@@ -263,8 +263,8 @@ var DATA = [
 "k": "boss",
 "e": "Ville abandonnée",
 "d": "Bête gris-noir au corps de félin et à la longue queue, avec deux têtes bien visibles.",
-"r": "Boss de la ville abandonnée : un gardien à deux têtes qui poursuit le coureur.",
-"s": "bientot"
+"r": "Boss des ruines : il garde l'arrivée et lance onde, balayage et projectiles.",
+"s": "jeu"
 },
 {
 "id": "dragon",
@@ -273,7 +273,7 @@ var DATA = [
 "e": "Zone volcanique",
 "d": "Dragon brun foncé aux ailes déployées, cornes sur la tête et longue queue épineuse.",
 "r": "Boss de la zone volcanique : il survole la route et crache le feu.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "roi-sables",
@@ -282,7 +282,7 @@ var DATA = [
 "e": "Canyon désertique",
 "d": "Créature debout couleur sable : tête de crocodile, torse musclé, griffes et longue queue épineuse.",
 "r": "Boss du canyon : il jaillit des dunes pour couper la route.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "yeti",
@@ -291,7 +291,7 @@ var DATA = [
 "e": "Région glaciale",
 "d": "Gorille géant au pelage gris-blanc et au dos bleu sombre, bras énormes, crocs jaunes.",
 "r": "Boss de la région glaciale : un géant des neiges aux bras immenses.",
-"s": "bientot"
+"s": "jeu"
 },
 {
 "id": "croco-geant",
@@ -300,7 +300,7 @@ var DATA = [
 "e": "Jungle ancienne",
 "d": "Crocodile géant sombre, dos hérissé de pointes, gueule pleine de dents, pattes puissantes.",
 "r": "Boss de la jungle : une créature des eaux sombres qui sort des marais.",
-"s": "bientot"
+"s": "jeu"
 }
 ];
 var KINDS = [['all','Tous'],['coureuse','Coureuse'],['humain','Humains'],['animal','Animaux'],['creature','Créatures'],['piege','Pièges'],['boss','Boss']];

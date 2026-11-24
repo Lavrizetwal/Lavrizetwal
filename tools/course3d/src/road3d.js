@@ -28,8 +28,10 @@ const PROP = {
 /* PNJ vivants : ils courent vers le coureur (à ~45 % de leur vitesse avant le contact), puis le poursuivent par derrière
    à cette fraction de VEL ; le coureur les distance peu à peu. Les obstacles fixes (trou, tronc…) restent en place. */
 const CHASE = { tigre: .97, loup: .97, grand_loup: .95, ours: .86, crocodile: .72, bandit_homme: .94, bandit_femme: .94, bandit_debout: .94, zombie: .82, colosse: .76, dimon: .9, manon_fire: .9, roi_scorpion: .86, scorpion: .72, chien: .96, taureau: .92, cochon: .78, araignee_noire: .9, araignee_monstre: .86, serpent: .66, serpent_sol: .66, abeilles: .95 };
+const BOSSCOL = { glace: 0x2fa8ff, jungle: 0x6aff7a, ruines: 0xb07aff, volcan: 0xff6a1a, desert: 0xffc45a };
+const BOSSK = { boss_yeti: 1, boss_croco_geant: 1, boss_cerbere: 1, boss_dragon: 1, boss_roi_sables: 1 };
 const BR = { pont_casse: 1, pont_gele: 1, pont_metal: 1 };
-const WIDEK = { pont_casse: 1, pont_gele: 1, pont_metal: 1, trou: 1, fil_elec: 1, branche: 1, tronc: 1, bandit_saut: 1 };
+const WIDEK = { pont_casse: 1, pont_gele: 1, pont_metal: 1, trou: 1, fil_elec: 1, branche: 1, tronc: 1, bandit_saut: 1, boss_onde: 1, boss_coup: 1 };
 
 export function installRoad(X){
   const { R, CRE, loadCre, creAnim, ctlFor, runnerUpdate, rigFromMesh, SPEC_FILLE1 } = X;
@@ -181,6 +183,12 @@ export function installRoad(X){
     else if(kind === 'voiture'){ g.add(bx(std(0xb23a48), 2, .8, 3.6, 0, .75, 0)); g.add(bx(std(0x8f2c39), 1.7, .7, 1.8, 0, 1.4, -.1)); [-1, 1].forEach(sx => [-1.2, 1.2].forEach(zz => { const wl = new T.Mesh(new T.CylinderGeometry(.38, .38, .3, 12), std(0x111111)); wl.rotation.z = Math.PI / 2; wl.position.set(sx * 1, .38, zz); g.add(wl); })); }
     else if(kind === 'branche'){ const pm = std(0x5a3b22), lm = std(0x2e8b3a); [-1, 1].forEach(s => g.add(bx(pm, .25, 1.8, .25, s * w / 2, .9, 0))); for(let i = 0; i < 6; i++){ const l = new T.Mesh(new T.IcosahedronGeometry(.75, 0), lm); l.position.set(-w / 2 + (i + .5) * w / 6, 1.45, 0); l.scale.set(1.2, .7, .9); g.add(l); } }
     else if(kind === 'tronc'){ const c = new T.Mesh(new T.CylinderGeometry(.42, .42, w, 14), std(0x6d4c2a)); c.rotation.z = Math.PI / 2; c.position.y = .42; g.add(c); }
+    else if(kind === 'boss_onde' || kind === 'boss_coup' || kind === 'boss_charge'){
+      const bc = BOSSCOL[S.th] || 0xff8a3a, em = o => std(bc, Object.assign({ emissive: bc, emissiveIntensity: 1.1, transparent: true, opacity: .88 }, o || {}));
+      if(kind === 'boss_onde'){ const wv = new T.Mesh(new T.BoxGeometry(w, .75, .4), em()); wv.position.y = .38; g.add(wv); const gl = new T.Mesh(new T.PlaneGeometry(w * 1.05, 2.6), new T.MeshBasicMaterial({ color: bc, transparent: true, opacity: .35, depthWrite: false })); gl.rotation.x = -Math.PI / 2; gl.position.y = .05; g.add(gl); r.upd = t => { wv.scale.y = 1 + .22 * Math.sin(t / 90); gl.material.opacity = .28 + .14 * Math.sin(t / 110); }; }
+      else if(kind === 'boss_coup'){ const bar = new T.Mesh(new T.BoxGeometry(w, .5, .5), em()); bar.position.y = 1.55; g.add(bar); for(let i = 0; i < 5; i++){ const cl = new T.Mesh(new T.ConeGeometry(.2, .7, 6), em()); cl.rotation.z = Math.PI; cl.position.set(-w / 2 + (i + .5) * w / 5, 1.1, 0); g.add(cl); } [-1, 1].forEach(sd => g.add(bx(em(), .22, 1.8, .22, sd * w / 2, .9, 0))); r.upd = t => { bar.position.y = 1.55 + .05 * Math.sin(t / 120); }; }
+      else { const sp = new T.Mesh(new T.IcosahedronGeometry(.85, 1), em()); sp.position.y = .95; g.add(sp); for(let i = 0; i < 8; i++){ const a = i / 8 * Math.PI * 2, c = new T.Mesh(new T.ConeGeometry(.17, .55, 5), em()); c.position.set(Math.cos(a) * .85, .95 + Math.sin(a) * .85, 0); c.rotation.z = a - Math.PI / 2; g.add(c); } r.upd = t => { g.rotation.z = t / 260; }; }
+    }
     else if(kind === 'eboulement'){ [0, 1, 2].forEach(i => { const rk = new T.Mesh(new T.DodecahedronGeometry(.6 + (i === 1 ? .35 : 0), 0), std([0x7b7a72, 0x8f8d82, 0x65645e][i], { flatShading: true })); rk.position.set((i - 1) * .75, .5, i === 1 ? .2 : 0); g.add(rk); }); }
     else if(kind === 'abeilles'){ const b = buildBees(); g.add(b.root); r.upd = t => updBees(b, t); }
     else if(kind === 'bandit_debout' || kind === 'bandit_saut'){ const h = buildHuman('bandit'); g.add(h.root); const lp = kind === 'bandit_saut'; r.upd = t => { applyPose(h, lp ? poseLeap(t) : poseStand(t)); h.root.position.y = lp ? .62 + .05 * Math.sin(t / 160) : 0; }; }
@@ -295,6 +303,7 @@ export function installRoad(X){
     Sx.items.forEach(e => {
       if(!CHASE[e.k] ? e.t < now - 500 : e.t < now - 9000) return;
       const kind = e.k, occ = e.occ, wide = !!WIDEK[kind], runs = []; let cur = null;
+      const BA = kind === 'boss_onde' || kind === 'boss_coup' || kind === 'boss_charge', bd = VEL * e.t / 1000 - Sx.sr; if(BA && bd > 27) return;
       for(let l = 0; l < 3; l++){ if(occ & (1 << l)){ if(cur && cur.b === l - 1) cur.b = l; else { cur = { a: l, b: l }; runs.push(cur); } } }
       runs.forEach(r => {
         const ls = wide ? [[(r.a + r.b) / 2, (r.b - r.a + 1) * LW * .94]] : Array.from({ length: r.b - r.a + 1 }, (_, i) => [r.a + i, LW * .9]);
@@ -308,14 +317,34 @@ export function installRoad(X){
             if(dtm < 0) sx -= dtm * vc * .45;
             else { back = true; sx += vc * dtm - 2.2 * (1 - Math.exp(-dtm / .4)) - ln * .6; lat += (((Sx.vx - 1) * LW + (ln - 1) * .9) - lat) * (1 - Math.exp(-dtm / 1.6)); if(sx < Sx.sr - 5.4) return; }
           }
-          it.sx = sx; const o = at(sx, lat);
+          it.sx = sx; const o = at(sx, lat); it.grp.scale.y = BA ? Math.max(.03, Math.min(1, (27 - bd) / 6)) : 1;
           it.grp.position.set(o.x, 0, o.z); it.grp.rotation.y = back ? o.h : o.h + Math.PI; it.sh.position.set(o.x, .04, o.z);
           if(it.cf){ creAnim(it.m, it.cf, now, it.seed); it.sh.scale.setScalar((it.cf.Fu || 1.6) * .55); it.sh.visible = true; if(it.cf.lift) it.grp.position.y = it.cf.lift * 1.05; }
           else if(it.r){ if(it.r.upd) it.r.upd(now + it.seed * 300); if(it.r.pick){ it.grp.rotation.y = now / 380; it.grp.position.y = .12 * Math.sin(now / 260); } it.sh.visible = !it.r.flat; it.sh.scale.setScalar(wide ? w * .5 : .8); }
         });
       });
     });
-    S.objs.forEach((it, key) => { if(!seen.has(key)){ S.objs.delete(key); S.objG.remove(it.grp); S.objG.remove(it.sh); it.grp.position.y = 0; (S.pool[it.pk] || (S.pool[it.pk] = [])).push(it); } });
+    /* boss de fin de route : surgit au loin, reste ~30 m devant le coureur, se cabre avant chaque attaque, puis s'enfuit */
+    const bs = Sx.boss;
+    if(bs){
+      const bk = 'boss_' + String(bs.id).replace(/-/g, '_'), key = 'BOSS@' + bk, ease = v => v * v * (3 - 2 * Math.max(0, Math.min(1, v)));
+      let D = -1;
+      if(now >= bs.t0 - 2400 && now < bs.t0) D = 30 + 45 * (1 - ease((now - (bs.t0 - 2400)) / 2400));
+      else if(now >= bs.t0 && now <= bs.t1) D = 30;
+      else if(now > bs.t1 && now < bs.t1 + 2200) D = 30 + 90 * ease((now - bs.t1) / 2200);
+      if(D > 0){
+        seen.add(key); let it = S.objs.get(key);
+        if(!it){ it = inst(bk, 0); if(it){ S.objs.set(key, it); S.objG.add(it.grp); S.objG.add(it.sh); it.seed = 5; } }
+        if(it){
+          let wd = 0; for(const a of bs.ats){ const dt = a - now; if(dt > -250 && dt < 900) wd = Math.max(wd, dt > 0 ? 1 - dt / 900 : 1 + dt / 250); }
+          const o = at(Sx.sr + D + (wd > 0 && wd < 1 ? -.6 * wd : 0), 0);
+          it.grp.position.set(o.x, 0, o.z); it.grp.rotation.y = o.h + Math.PI; it.sh.position.set(o.x, .04, o.z);
+          creAnim(it.m, it.cf, now, it.seed); it.grp.scale.setScalar(it.cf.Fu * (1 + .09 * wd)); it.m.pv.rotation.x += -.22 * wd;
+          it.sh.visible = true; it.sh.scale.setScalar(it.cf.Fu * .5); if(it.cf.lift) it.grp.position.y = it.cf.lift * (1 + .15 * Math.sin(now / 300));
+        }
+      }
+    }
+    S.objs.forEach((it, key) => { if(!seen.has(key)){ S.objs.delete(key); S.objG.remove(it.grp); S.objG.remove(it.sh); it.grp.position.y = 0; it.grp.scale.y = 1; (S.pool[it.pk] || (S.pool[it.pk] = [])).push(it); } });
   }
 
   /* ── portique de carrefour : trois panneaux au-dessus des voies ── */
