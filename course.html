@@ -2102,9 +2102,12 @@ Eng.prototype.step = function(now, log, cb){
         this.nobs++;
         var hit = (occ & lb) !== 0 && !(t < this.shend) && (ctr === 'L' || (ctr === 'J' && !(t < this.jend)) || (ctr === 'C' && !(t < this.cend)));
         if(hit){
-          this.e -= val; this.nhit++; this.hits.push([t, x[1], val]);
+          this.e -= val; this.nhit++; this.hits.push([t, x[1], val]); this.streak = 0;
           if(cb) cb('hit', { x: x, t: t });
           if(this.e <= 0){ if(this.hl > 0){ this.hl--; this.hu++; this.e = this.emax; if(cb) cb('revive', { t: t }); } else { this.dead = true; this.endms = t; if(cb) cb('dead', { t: t }); return; } }
+        } else {
+          this.streak = (this.streak || 0) + 1; var _in = (occ & lb) !== 0 && (ctr === 'J' || ctr === 'C');
+          if(cb && (_in || [3, 5, 8, 12, 16, 20, 25, 30].indexOf(this.streak) >= 0)) cb('ok', { x: x, t: t, streak: this.streak, skill: _in });
         }
       }
       this.ei++;
@@ -3259,6 +3262,10 @@ function onEng(type, data){
     ZS.play('wrong'); ZS.vib(data.x[4] >= 900 ? [60, 40, 90] : 55);
     SC.emit('hit', px, py, 18, { a:-1.57, spread:3.2, v:170, g:300, life:650, r:SC.U * .05, c:'255,95,85' });
     fx(o[0] + ' ! Perdu', '#ff8a80');
+  } else if(type === 'ok'){
+    var ko = data.x[1], tx = data.skill ? (/^pont/.test(ko) ? 'Grand saut réussi !' : data.x[3] === 'C' ? 'Glissade parfaite !' : 'Saut parfait !') : 'Bien joué !';
+    if(data.streak >= 3) tx += ' · Série ×' + data.streak;
+    fx(tx, '#ffe27a'); ZS.play('coin'); SC.emit('spark', px, py, 10, { a:-1.57, spread:3.2, v:120, g:-20, life:600, r:SC.U * .04, c:'255,226,120' });
   } else if(type === 'revive'){
     ZS.play('start'); ZS.vib([40,50,40]); SC.emit('spark', px, py, 22, { a:-1.57, spread:3.2, v:150, g:-20, life:800, r:SC.U * .05, c:'255,140,170' });
     fx('Cœur utilisé ! Énergie rechargée', '#ff9bb0'); perks();
