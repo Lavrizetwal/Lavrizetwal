@@ -43,7 +43,7 @@ export function rigFromMesh(mesh, spec){
     for(const s of seg){
       if(s.kind === 'leg' && p.y < crotch && Math.sign(p.x) !== s.side) continue;
       if(s.kind === 'leg' && p.y >= crotch + .05 && Math.abs(p.x) > .2) continue;
-      if(s.kind === 'arm'){ if(Math.sign(p.x) !== s.side) continue; if(Math.abs(p.x) < S.sh[0] * H - .02 && p.y < shY + .1) continue; if(p.y < shY - .3) continue; }
+      if(s.kind === 'arm'){ if(Math.sign(p.x) !== s.side) continue; if(Math.abs(p.x) < S.sh[0] * H - .02 && p.y < shY + .1) continue; if(p.y < Math.min(shY - .3, Math.min(S.hand[1], S.wr[1]) * H - .1)) continue; }
       d.subVectors(s.c, s.a); const l2 = d.lengthSq(); let t = l2 ? q.subVectors(p, s.a).dot(d) / l2 : 0; t = Math.max(0, Math.min(1, t)); q.copy(s.a).addScaledVector(d, t);
       let dist = Math.max(0, p.distanceTo(q) - s.r * .6); if(s.kind === 'core') dist *= .85;
       if(!(s.b in best) || dist < best[s.b]) best[s.b] = dist;

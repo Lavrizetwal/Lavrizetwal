@@ -11,6 +11,32 @@
    "name": "La coureuse",
    "desc": "Chemisier rouge, jupe noire, bottes",
    "url": "models/fille1.glb?v=2"
+  },
+  {
+   "id": "mike",
+   "name": "L'aventurier",
+   "desc": "Chapeau, chemise kaki, ceinture de cuir",
+   "url": "models/mike.glb?v=1",
+   "spec": {
+    "H": 1.78,
+    "hip": 0.49,
+    "crotch": 0.44,
+    "chest": 0.62,
+    "sh": [
+     0.12,
+     0.8
+    ],
+    "wr": [
+     0.29,
+     0.49
+    ],
+    "hand": [
+     0.31,
+     0.44
+    ],
+    "neck": 0.83,
+    "head": 0.87
+   }
   }
  ]
 }

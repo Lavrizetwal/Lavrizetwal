@@ -2791,7 +2791,7 @@ function load(){
     var nav = navigator, mem = nav.deviceMemory || 4, cores = nav.hardwareConcurrency || 4;
     if(!window.__Z3D_FORCE && (mem <= 1 || cores <= 2 || (nav.connection && nav.connection.saveData) || /[?&]q3d=off/.test(location.search))) return;
   }catch(e){}
-  var s = document.createElement('script'); s.src = 'course3d.js?v=19'; s.async = true;
+  var s = document.createElement('script'); s.src = 'course3d.js?v=20'; s.async = true;
   s.onload = function(){ try{ if(window.Z3D){ Z3D.warm(); setTimeout(function(){ try{ if(R3ON && Z3D.makeRoad) Z3D.makeRoad().init(); }catch(e){} }, 900); loadRunners(function(){ mountPicker(); }); } }catch(e){} };
   document.head.appendChild(s);
 }
