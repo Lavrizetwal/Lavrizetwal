@@ -1374,6 +1374,78 @@ body.gm{background:var(--bg)}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
+
+/* ── Salons et défis du jour ── */
+.sl-tabs{position:sticky;top:0;z-index:20;background:var(--band);border-bottom:1px solid rgba(212,175,55,.3)}
+.sl-tabs .wrap{display:flex;gap:8px;padding-top:10px;padding-bottom:10px;overflow-x:auto}
+.sl-tab{flex:1 1 0;min-width:110px;min-height:46px;border-radius:99px;border:1px solid rgba(212,175,55,.35);background:transparent;color:var(--on-band);font-weight:700;font-size:.95rem;cursor:pointer;touch-action:manipulation;position:relative}
+.sl-tab[aria-pressed=true]{background:var(--gold);color:var(--on-gold);border-color:var(--gold-lt)}
+.sl-tab .dot{position:absolute;top:6px;right:12px;width:9px;height:9px;border-radius:50%;background:#FF6B5E}
+.sl-tab:focus-visible{outline:2px solid var(--gold-lt);outline-offset:2px}
+.sl-box{margin-top:22px;padding:20px 22px;border:1px solid rgba(212,175,55,.35);border-radius:8px;background:rgba(255,255,255,.05)}
+.sl-box h3{font-family:var(--serif);font-size:1.35rem;font-weight:600;margin:0 0 12px;color:var(--on-band)}
+.sl-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+.sl-grid.c{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.sl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sl-in{min-height:50px;padding:0 16px;border-radius:6px;border:1px solid rgba(212,175,55,.4);background:rgba(255,255,255,.08);color:var(--on-band);font:600 1.1rem var(--sans);width:150px;font-variant-numeric:tabular-nums}
+.sl-in.code{width:170px;text-transform:uppercase;letter-spacing:.2em;text-align:center}
+.sl-in:focus-visible{outline:2px solid var(--gold-lt);outline-offset:2px}
+.sl-sub{color:var(--on-band-2);font-size:.9rem;margin:6px 0 10px;line-height:1.55}
+.sl-fsum{display:flex;flex-wrap:wrap;gap:18px 34px;align-items:center;margin-top:18px}
+.sl-fsum small{display:block;color:var(--on-band-2);font-size:.78rem}
+.sl-fsum b{font-family:var(--serif);font-size:1.6rem;font-weight:600;color:var(--gold-lt);font-variant-numeric:tabular-nums}
+.sl-fsum .go{margin-left:auto}
+.sl-item{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:14px 16px;border:1px solid rgba(255,255,255,.14);border-radius:6px;background:rgba(255,255,255,.04);margin-top:10px}
+.sl-item .m{flex:1 1 220px;min-width:0}
+.sl-item b{font-family:var(--serif);font-size:1.3rem;color:var(--gold-lt)}
+.sl-item span.s{display:block;color:var(--on-band-2);font-size:.85rem;margin-top:2px}
+.sl-empty{margin-top:10px;color:var(--on-band-2);line-height:1.6}
+.sl-code{font:700 clamp(2rem,8vw,3.2rem) var(--serif);letter-spacing:.25em;color:var(--gold-lt);text-align:center;margin:6px 0}
+.sl-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:14px}
+.sl-slot{padding:14px 16px;border:1px dashed rgba(212,175,55,.4);border-radius:6px;color:var(--on-band-2);min-height:62px;display:flex;align-items:center;gap:10px}
+.sl-slot.on{border-style:solid;color:var(--on-band);background:rgba(255,255,255,.07)}
+.sl-slot b{font-weight:700}
+.sl-pl{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.sl-p{position:relative;flex:1 1 130px;min-width:0;padding:8px 12px;border:1px solid rgba(255,255,255,.18);border-radius:6px;background:rgba(255,255,255,.05);font-size:.88rem}
+.sl-p.me{border-color:var(--gold)}
+.sl-p.out{opacity:.45}
+.sl-p .n{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sl-p .sc{font:600 1.15rem var(--serif);color:var(--gold-lt);font-variant-numeric:tabular-nums}
+.sl-p .ok{position:absolute;top:8px;right:10px;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+.sl-p.ans .ok{background:#34D399}
+.sl-p .rx{position:absolute;right:8px;bottom:4px;font-size:1.5rem;animation:slrx 2.2s ease-out forwards}
+@keyframes slrx{0%{transform:translateY(8px) scale(.5);opacity:0}15%{transform:none;opacity:1}85%{opacity:1}100%{transform:translateY(-14px);opacity:0}}
+.sl-pre{font:700 clamp(4rem,22vw,9rem) var(--serif);text-align:center;color:var(--gold-lt);padding:30px 0;line-height:1}
+.sl-opt-ok{border-color:#34D399!important;background:rgba(52,211,153,.22)!important;opacity:1!important}
+.sl-opt-ko{border-color:#FF8A80!important;background:rgba(255,138,128,.18)!important;opacity:1!important}
+.sl-picks{margin-top:14px;display:grid;gap:6px}
+.sl-picks div{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;border-radius:6px;background:rgba(255,255,255,.05);font-size:.92rem}
+.sl-picks .g{color:#34D399;font-weight:700}.sl-picks .b{color:#FF8A80;font-weight:700}
+.sl-rx{display:flex;gap:6px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.sl-rx button{min-width:46px;min-height:46px;border-radius:50%;border:1px solid rgba(212,175,55,.35);background:rgba(255,255,255,.06);font-size:1.3rem;cursor:pointer;touch-action:manipulation}
+.sl-pod{display:grid;gap:10px;margin-top:18px}
+.sl-pod .r{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid rgba(255,255,255,.16);border-radius:6px;background:rgba(255,255,255,.05)}
+.sl-pod .r.w{border-color:var(--gold);background:rgba(212,175,55,.16)}
+.sl-pod .r .k{font:700 1.7rem var(--serif);width:40px;text-align:center;color:var(--gold-lt)}
+.sl-pod .r .m{flex:1;min-width:0}
+.sl-pod .r .m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sl-pod .r .m small{color:var(--on-band-2)}
+.sl-pod .r .g{font:700 1.2rem var(--serif);font-variant-numeric:tabular-nums}
+.sl-pod .g.pos{color:#34D399}.sl-pod .g.neg{color:#FF8A80}
+.df-top{display:flex;flex-wrap:wrap;gap:14px 34px;align-items:center;padding:18px 22px;border:1px solid rgba(212,175,55,.35);border-radius:8px;background:rgba(255,255,255,.05)}
+.df-top small{display:block;color:var(--on-band-2);font-size:.78rem}
+.df-top b{font:600 1.7rem var(--serif);color:var(--gold-lt)}
+.df-it{margin-top:12px;padding:16px 18px;border:1px solid rgba(255,255,255,.16);border-radius:6px;background:rgba(255,255,255,.05);display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.df-it.ok{border-color:#34D399}
+.df-it .m{flex:1 1 260px;min-width:0}
+.df-it p{margin:0 0 8px;line-height:1.45}
+.df-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden}
+.df-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-lt));border-radius:4px;transition:width .4s}
+.df-it small{color:var(--on-band-2)}
+.df-rw{font:700 1.3rem var(--serif);color:var(--gold-lt);white-space:nowrap}
+.sl-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.sl-chips .gm-pick{min-height:42px;padding:0 14px;font-size:.92rem}
+@media (max-width:560px){.dl-opts{grid-template-columns:1fr}.sl-fsum .go{margin-left:0;width:100%}.sl-fsum .go .gm-btn{width:100%}}
 </style>
 <style id="zj-consent-css">
 .gm-chk{display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:.9rem;line-height:1.5;margin:14px 0 4px;padding:12px;border:1px solid var(--line-2,rgba(128,128,128,.4));border-radius:12px;cursor:pointer}
@@ -1514,6 +1586,38 @@ body.gm{background:var(--bg)}
       <div id="dl-note" aria-live="polite"></div>
     </div>
   </header>
+
+  <nav class="sl-tabs" id="sl-tabs" aria-label="Modes de jeu" hidden>
+    <div class="wrap">
+      <button class="sl-tab" type="button" data-t="solo" aria-pressed="true">Solo</button>
+      <button class="sl-tab" type="button" data-t="salon" aria-pressed="false">Salons</button>
+      <button class="sl-tab" type="button" data-t="daily" aria-pressed="false">Défis du jour<span class="dot" id="df-dot" hidden></span></button>
+    </div>
+  </nav>
+
+  <section class="gm-stage gm-sec" id="sl-lobby" hidden>
+    <div class="wrap">
+      <h2>Salons : jouez contre d’autres joueurs</h2>
+      <p class="sub">De 2 à 4 joueurs, mêmes questions pour tous, en direct. Chacun mise, le meilleur score remporte la cagnotte (Zetwal garde <span id="sl-pct">5</span> %).</p>
+      <div id="sl-resume"></div>
+      <div class="sl-box" id="sl-form"></div>
+      <div class="sl-box"><h3>Rejoindre avec un code</h3><div class="sl-row"><input class="sl-in code" id="sl-jc" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="CODE" aria-label="Code du salon"><button class="gm-btn" type="button" id="sl-jgo">Rejoindre</button></div><p class="gm-err" id="sl-je" role="alert"></p></div>
+      <div class="sl-box"><h3>Salons ouverts</h3><div id="sl-list"><p class="sl-empty">Chargement…</p></div></div>
+      <div class="sl-box" id="sl-my" hidden></div>
+    </div>
+  </section>
+
+  <section class="gm-stage gm-sec" id="sl-room" hidden>
+    <div class="wrap"><div class="dl-play" id="sl-rb"></div></div>
+  </section>
+
+  <section class="gm-stage gm-sec" id="df-sec" hidden>
+    <div class="wrap">
+      <h2>Défis du jour</h2>
+      <p class="sub">Trois défis par jour. Réussissez-les pour gagner des jetons, et gardez votre série de jours pour un bonus qui grandit.</p>
+      <div id="df-b"><p class="sl-empty">Chargement…</p></div>
+    </div>
+  </section>
 
   <section class="gm-stage gm-sec" id="dl-pick" hidden>
     <div class="wrap">
@@ -1804,7 +1908,7 @@ function blocker(){
 function noteHtml(b,cls){ return '<div class="gm-note'+(cls?' '+cls:'')+'"><b>'+esc(b.t)+'</b>'+esc(b.m)+(b.b?'<br><button class="gm-btn sm" type="button" id="gm-nb">'+esc(b.b)+'</button>':'')+'</div>'; }
 var ERRS={ consentement:'Confirmez d’abord votre consentement pour jouer.', ferme:'Les jeux sont fermés pour le moment.', age:'Confirmez votre âge pour jouer.', autre_partie:'Vous avez déjà une partie en cours.', niveau:'Niveau inconnu.', choix:'Choix invalide.',
   plafond:'Plafond quotidien atteint : vous avez gagné le maximum autorisé aujourd’hui. Revenez demain.', mythique_jour:'Le niveau Mythique est limité à une partie par jour.',
-  banque:'Aucune question disponible pour ce choix pour le moment. Choisissez-en un autre.', terminee:'Cette partie est terminée.', ordre:'Réponse déjà prise en compte.', session:'Partie introuvable.' };
+  banque:'Aucune question disponible pour ce choix pour le moment. Choisissez-en un autre.', salon_ferme:'Les salons sont fermés pour le moment.', deja_salon:'Vous êtes déjà dans un salon.', joueurs:'Nombre de joueurs invalide.', plein:'Ce salon est complet.', introuvable:'Salon introuvable ou déjà commencé. Vérifiez le code.', seul:'Il faut au moins 2 joueurs.', hote:'Seul l’organisateur peut faire cela.', aucun:'Salon introuvable.', terminee:'Cette partie est terminée.', ordre:'Réponse déjà prise en compte.', session:'Partie introuvable.' };
 function errMsg(r){
   if(!r) return 'Une erreur est survenue.';
   if(r.error==='solde') return 'Solde insuffisant : il faut '+fmt(r.need)+' jeton'+(r.need>1?'s':'')+' (mise + réserve pour les erreurs). Vous en avez '+fmt(r.balance)+'.';
@@ -1950,7 +2054,7 @@ function doStart(){
   rpc('zj_duel_start',{p_level:S.lv,p_cat:S.ct}).then(function(r){
     busy=false;
     if(r&&r.error==='consentement'){ if(GM.st&&GM.st.consents) delete GM.st.consents.duel; return start(); }
-    if(!r||!r.ok){ toast(errMsg(r)); if(r&&r.error==='autre_partie') showNote({k:'err',t:'Partie en cours',m:'Une partie de Sudoku est déjà ouverte.',b:'Reprendre le Sudoku',f:function(){ location.href='sudoku.html'; }}); return; }
+    if(!r||!r.ok){ toast(errMsg(r)); if(r&&r.error==='autre_partie') showNote(r.game==='salon'?{k:'err',t:'Salon en cours',m:'Vous êtes dans un salon. Terminez-le ou quittez-le avant de lancer un duel solo.',b:'Aller aux salons',f:function(){ showTab('salon'); }}:{k:'err',t:'Partie en cours',m:'Une partie de Sudoku est déjà ouverte.',b:'Reprendre le Sudoku',f:function(){ location.href='sudoku.html'; }}); return; }
     ZS.play('start'); enter(r,!!r.resumed);
   },function(e){ busy=false; if(e&&e.error==='login') return loginModal(); toast(errMsg(e)); });
 }
@@ -1959,7 +2063,7 @@ function doStart(){
 function enter(r,resumed){
   lastSid=r.sid;
   D={ sid:r.sid, total:r.total, mode:r.mode, lvl:r.level, cat:r.cat, i:0, lock:false, tdl:0, show:null, q:null };
-  setBal(r.balance); $('#dl-pick').hidden=true; $('#dl-end').hidden=true; $('#dl-game').hidden=false; showNote(null);
+  setBal(r.balance); hideAll(); $('#dl-end').hidden=true; $('#dl-game').hidden=false; showNote(null);
   var p=''; for(var i=0;i<r.total;i++) p+='<span class="dl-pip"></span>'; $('#dl-pips').innerHTML=p;
   if(resumed) toast('Partie reprise. Le temps de la question en cours a continué.');
   window.scrollTo({top:$('#dl-game').offsetTop-70,behavior:REDUCE?'auto':'smooth'});
@@ -2021,7 +2125,7 @@ function send(choice){
 function resume(){
   rpc('zj_duel_resume').then(function(r){
     if(r&&r.ok){ if(!D) enter(r,true); else showQ(r.q,r.left_ms); }
-    else { D=null; $('#dl-game').hidden=true; refreshStatus().then(function(){ showNote({k:'err',t:'Partie terminée',m:'Votre partie a expiré : les questions restantes sont comptées comme perdues. Le détail est dans vos statistiques.'}); $('#dl-pick').hidden=false; renderPick(); }); }
+    else { D=null; $('#dl-game').hidden=true; refreshStatus().then(function(){ showNote({k:'err',t:'Partie terminée',m:'Votre partie a expiré : les questions restantes sont comptées comme perdues. Le détail est dans vos statistiques.'}); showTab('solo'); }); }
   },function(e){ toast(errMsg(e)); });
 }
 
@@ -2067,26 +2171,323 @@ function tally(r){
   $('#dl-change').addEventListener('click',function(){ back(false); });
 }
 function back(again){
-  refreshStatus().then(function(){ $('#dl-end').hidden=true; $('#dl-pick').hidden=false; renderPick(); window.scrollTo({top:0}); if(again&&GM.st&&GM.st.balance>=calc().need) start(); });
+  refreshStatus().then(function(){ $('#dl-end').hidden=true; showTab('solo'); window.scrollTo({top:0}); if(again&&GM.st&&GM.st.balance>=calc().need) start(); });
 }
 
 $('#dl-help').addEventListener('click',function(){
   openModal('<h2>Règles du Duel Mental</h2><p>Dix questions à choix multiple, dix secondes pour chacune. Les réponses justes et fausses ne sont révélées qu’à la fin.</p>'+
    '<h3>Points</h3><p>Une bonne réponse rapporte le niveau de la question en jetons (+1 au niveau 1 jusqu’à +10 au niveau 10) ; une mauvaise le retire. Dix sur dix donne en plus un bonus égal au niveau moyen. La mise est de 10 jetons, perdue dans tous les cas.</p>'+
-   '<h3>Les cinq catégories</h3><p>Calcul mental, Haïti (histoire et géographie), Mémoire, Connaissances générales et Philosophie.</p>'+
+   '<h3>Salons (2 à 4 joueurs)</h3><p>Créez ou rejoignez un salon avec une mise de 25 à 2 000 jetons. Tout le monde répond aux mêmes questions en direct ; le meilleur score (puis le plus rapide) remporte la cagnotte moins 5 % pour Zetwal. Quitter une partie commencée fait perdre la mise.</p><h3>Défis du jour</h3><p>Trois défis par jour et une série de jours consécutifs, avec de petites récompenses en jetons.</p><h3>Les cinq catégories</h3><p>Calcul mental, Haïti (histoire et géographie), Mémoire, Connaissances générales et Philosophie.</p>'+
    '<h3>Coupure ou abandon</h3><p>Vous pouvez reprendre une partie après une coupure, mais le chrono de la question en cours continue. Une question laissée sans réponse est perdue.</p>'+
    '<h3>Un doute sur une question ?</h3><p>À la fin de la partie, signalez-la : après plusieurs signalements, elle est retirée.</p><div class="row"><button class="gm-btn" type="button" data-close>Compris</button></div>');
+});
+
+/* ══ Onglets, salons et défis du jour ══ */
+var TAB='solo';
+function hideAll(){ ['#sl-tabs','#dl-pick','#sl-lobby','#sl-room','#df-sec'].forEach(function(s){ $(s).hidden=true; }); clearInterval(SL.lt); }
+function showTab(t){
+  if(t) TAB=t; stopRoom(); $('#sl-room').hidden=true; $('#sl-tabs').hidden=false;
+  $$('#sl-tabs [data-t]').forEach(function(b){ b.setAttribute('aria-pressed',b.dataset.t===TAB); });
+  $('#dl-pick').hidden=TAB!=='solo'; $('#sl-lobby').hidden=TAB!=='salon'; $('#df-sec').hidden=TAB!=='daily';
+  clearInterval(SL.lt);
+  if(TAB==='solo') renderPick(); else if(TAB==='salon') loadLobby(); else loadDaily();
+}
+$('#sl-tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-t]'); if(!b) return; ZS.play('tap'); showTab(b.dataset.t); });
+
+var SL={id:null,poll:0,st:null,key:'',t0:0,left:0,raf:0,lt:0,busy:false,pend:false,
+  f:{stake:100,max:2,cats:[1,2,3,4,5],lvls:[1,2,3,4,5,6,7,8,9,10],priv:false}, cfg:{min:25,max:2000,pct:5}};
+var LV_ALL=[1,2,3,4,5,6,7,8,9,10];
+function listTxt(a,all,w){ if(!a||a.length===all) return 'tous'; return a.join(', '); }
+function catTxt(a){ if(!a||a.length===5) return 'toutes les catégories'; return a.map(function(k){ return CATS[k]?CATS[k].n:k; }).join(', '); }
+function lvTxt(a){ if(!a||a.length===10) return 'niveaux 1 à 10'; return (a.length>1?'niveaux ':'niveau ')+a.join(', '); }
+
+/* Formulaire de création */
+function renderForm(){
+  var f=SL.f, c=SL.cfg, h='<h3>Créer un salon</h3>';
+  h+='<div class="dl-grp"><h3 style="font-size:1rem">Mise par joueur (jetons)</h3><div class="sl-row"><input class="sl-in" id="sl-stake" type="number" inputmode="numeric" min="'+c.min+'" max="'+c.max+'" step="5" value="'+f.stake+'" aria-label="Mise en jetons"></div><div class="sl-chips">';
+  [25,50,100,250,500,1000,2000].forEach(function(v){ if(v>=c.min&&v<=c.max) h+='<button class="gm-pick" type="button" data-st="'+v+'" aria-pressed="'+(f.stake===v)+'">'+fmt(v)+'</button>'; });
+  h+='</div></div><div class="dl-grp" style="margin-top:18px"><h3 style="font-size:1rem">Nombre de joueurs maximum</h3><div class="sl-chips">';
+  [2,3,4].forEach(function(v){ h+='<button class="gm-pick" type="button" data-mx="'+v+'" aria-pressed="'+(f.max===v)+'">'+v+' joueurs</button>'; });
+  h+='</div></div><div class="dl-grp" style="margin-top:18px"><h3 style="font-size:1rem">Catégories (une ou plusieurs)</h3><div class="sl-grid c">';
+  for(var k=1;k<=5;k++) h+='<button class="gm-pick" type="button" data-sc="'+k+'" aria-pressed="'+(f.cats.indexOf(k)>=0)+'" style="display:flex;align-items:center;gap:10px;padding:0 14px;justify-content:flex-start"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none">'+CATS[k].i+'</svg>'+CATS[k].n+'</button>';
+  h+='</div></div><div class="dl-grp" style="margin-top:18px"><h3 style="font-size:1rem">Niveaux (un ou plusieurs)</h3><div class="sl-grid">';
+  h+='<button class="gm-pick" type="button" data-sl="0" aria-pressed="'+(f.lvls.length===10)+'" style="grid-column:1/-1">Tous les niveaux</button>';
+  for(var i=1;i<=10;i++) h+='<button class="gm-pick" type="button" data-sl="'+i+'" aria-pressed="'+(f.lvls.indexOf(i)>=0)+'" aria-label="Niveau '+i+'">'+i+'</button>';
+  h+='</div></div><label class="gm-chk" style="margin-top:18px"><input type="checkbox" id="sl-priv"'+(f.priv?' checked':'')+'><span>Salon privé : visible seulement par ceux qui ont le code.</span></label><div class="sl-fsum" id="sl-fs"></div><p class="gm-err" id="sl-fe" role="alert"></p>';
+  $('#sl-form').innerHTML=h; updForm();
+}
+function updForm(){
+  var f=SL.f, c=SL.cfg, bal=GM.st?GM.st.balance:0, ok=f.stake>=c.min&&f.stake<=c.max&&f.cats.length>0&&f.lvls.length>0, lack=bal<f.stake;
+  var pot=f.stake*f.max, fee=Math.floor(pot*c.pct/100), win=pot-fee;
+  var lab=!ok?(f.cats.length&&f.lvls.length?'Mise de '+c.min+' à '+fmt(c.max):'Choisissez au moins une catégorie et un niveau'):lack?'Solde insuffisant':'Créer le salon';
+  $('#sl-fs').innerHTML='<div><small>Cagnotte à '+f.max+' joueurs</small><b>'+fmt(pot)+'</b></div><div><small>Le vainqueur reçoit</small><b>+'+fmt(win)+'</b></div><div><small>Commission Zetwal ('+c.pct+' %)</small><b>'+fmt(fee)+'</b></div><div class="go"><button class="gm-btn" type="button" id="sl-create"'+(ok&&!lack?'':' disabled')+'>'+lab+'</button></div>';
+}
+$('#sl-form').addEventListener('click',function(e){
+  var f=SL.f, b;
+  if((b=e.target.closest('[data-st]'))){ f.stake=+b.dataset.st; ZS.play('tap'); renderForm(); return; }
+  if((b=e.target.closest('[data-mx]'))){ f.max=+b.dataset.mx; ZS.play('tap'); renderForm(); return; }
+  if((b=e.target.closest('[data-sc]'))){ var k=+b.dataset.sc, i=f.cats.indexOf(k); if(i>=0) f.cats.splice(i,1); else f.cats.push(k); f.cats.sort(); ZS.play('tap'); renderForm(); return; }
+  if((b=e.target.closest('[data-sl]'))){ var v=+b.dataset.sl; if(!v) f.lvls=f.lvls.length===10?[1]:LV_ALL.slice(); else { var j=f.lvls.indexOf(v); if(j>=0) f.lvls.splice(j,1); else f.lvls.push(v); f.lvls.sort(function(a,b){ return a-b; }); } ZS.play('tap'); renderForm(); return; }
+  if(e.target.closest('#sl-create')) gateConsent('salon',slRules(),doCreate);
+});
+$('#sl-form').addEventListener('input',function(e){
+  if(e.target.id==='sl-stake'){ SL.f.stake=Math.round(+e.target.value)||0; updForm(); $$('#sl-form [data-st]').forEach(function(x){ x.setAttribute('aria-pressed',+x.dataset.st===SL.f.stake); }); }
+  if(e.target.id==='sl-priv') SL.f.priv=e.target.checked;
+});
+function slRules(){
+  var c=SL.cfg;
+  return '<p>Un salon se joue <b>avec de vraies mises</b> contre d’autres joueurs.</p><ul class="cs-rules"><li>La mise (de '+c.min+' à '+fmt(c.max)+' jetons) est <b class="b">prélevée dès que vous entrez</b> dans le salon.</li>'+
+   '<li>Le meilleur score remporte la cagnotte, moins <b>'+c.pct+' %</b> pour Zetwal. En cas d’égalité parfaite, les gagnants se partagent le gain.</li>'+
+   '<li>Si vous ne gagnez pas, <b class="b">vous perdez votre mise</b>.</li>'+
+   '<li>Si vous quittez un salon déjà commencé, ou laissez 3 questions sans réponse de suite, <b class="b">votre mise est perdue</b>.</li>'+
+   '<li>Un salon annulé avant le début (ou jamais commencé) vous rembourse entièrement.</li></ul>';
+}
+function slErr(r){
+  if(r&&r.error==='mise') return 'La mise doit être comprise entre '+fmt(r.min||SL.cfg.min)+' et '+fmt(r.max||SL.cfg.max)+' jetons.';
+  if(r&&r.error==='plafond_mise') return 'Plafond de mises atteint pour aujourd’hui ('+fmt(r.cap)+' jetons). Revenez demain.';
+  if(r&&r.error==='solde') return 'Solde insuffisant : il faut '+fmt(r.need)+' jetons. Vous en avez '+fmt(r.balance)+'.';
+  return errMsg(r);
+}
+function gateErr(r,retry){ if(r&&r.error==='consentement'){ if(GM.st&&GM.st.consents) delete GM.st.consents.salon; retry(); return true; } return false; }
+function doCreate(){
+  if(SL.busy) return; SL.busy=true; ZS.wake(); var f=SL.f;
+  rpc('zj_salon_create',{p_stake:f.stake,p_max:f.max,p_cats:f.cats,p_lvls:f.lvls,p_priv:!!f.priv}).then(function(r){
+    SL.busy=false;
+    if(gateErr(r,function(){ gateConsent('salon',slRules(),doCreate); })) return;
+    if(!r||!r.ok){ $('#sl-fe').textContent=slErr(r); return; }
+    ZS.play('start'); enterRoom(r);
+  },function(e){ SL.busy=false; if(e&&e.error==='login') return loginModal(); $('#sl-fe').textContent=errMsg(e); });
+}
+function doJoin(code){
+  code=String(code||'').trim().toUpperCase(); if(!code){ $('#sl-je').textContent='Entrez le code du salon.'; return; }
+  if(SL.busy) return; SL.busy=true; ZS.wake();
+  rpc('zj_salon_join',{p_code:code}).then(function(r){
+    SL.busy=false;
+    if(gateErr(r,function(){ gateConsent('salon',slRules(),function(){ doJoin(code); }); })) return;
+    if(!r||!r.ok){ var m=slErr(r); $('#sl-je').textContent=m; toast(m); return; }
+    ZS.play('start'); enterRoom(r);
+  },function(e){ SL.busy=false; if(e&&e.error==='login') return loginModal(); toast(errMsg(e)); });
+}
+function askJoin(code){
+  code=String(code||'').toUpperCase(); gateConsent('salon',slRules(),function(){ doJoin(code); });
+}
+$('#sl-jgo').addEventListener('click',function(){ $('#sl-je').textContent=''; askJoin($('#sl-jc').value); });
+$('#sl-jc').addEventListener('keydown',function(e){ if(e.key==='Enter'){ $('#sl-je').textContent=''; askJoin(this.value); } });
+
+/* Salle d’accueil : liste, statistiques, reprise */
+function ago(s){ return s<60?'à l’instant':'depuis '+Math.floor(s/60)+' min'; }
+function loadLobby(){
+  rpc('zj_salon_list').then(function(r){
+    if(!r||!r.ok) return; SL.cfg={min:r.min,max:r.max,pct:r.pct}; $('#sl-pct').textContent=r.pct;
+    if(!$('#sl-form').firstChild||!$('#sl-form').querySelector('#sl-stake')){ if(SL.f.stake<r.min) SL.f.stake=r.min; if(SL.f.stake>r.max) SL.f.stake=r.max; renderForm(); } else updForm();
+    var h=''; if(!r.open) h='<p class="sl-empty">Les salons sont fermés pour le moment.</p>';
+    else if(!r.rooms.length) h='<p class="sl-empty">Aucun salon ouvert pour le moment. Créez le vôtre ci-dessus, puis invitez un ami avec le code ou le lien WhatsApp.</p>';
+    else r.rooms.forEach(function(x){ h+='<div class="sl-item"><div class="m"><b>'+fmt(x.stake)+' jetons</b><span class="s">'+esc(x.host||'Joueur')+' · '+x.n+'/'+x.max+' joueurs · '+esc(catTxt(x.cats))+' · '+lvTxt(x.lvls)+' · '+ago(x.age)+'</span></div><button class="gm-btn sm" type="button" data-jn="'+esc(x.code)+'">Rejoindre</button></div>'; });
+    $('#sl-list').innerHTML=h;
+  },function(){ $('#sl-list').innerHTML='<p class="sl-empty">Impossible de charger les salons. Vérifiez votre connexion.</p>'; });
+  rpc('zj_salon_my').then(function(r){
+    var b=$('#sl-my'); if(!r||!r.ok||!r.played){ b.hidden=true; return; } b.hidden=false;
+    var h='<h3>Vos salons</h3><div class="sl-fsum"><div><small>Parties jouées</small><b>'+r.played+'</b></div><div><small>Victoires</small><b>'+r.wins+'</b></div><div><small>Bilan net</small><b>'+sgn(r.net)+'</b></div></div>';
+    (r.last||[]).slice(0,5).forEach(function(x){ var net=(x.paid||0)-x.stake; h+='<div class="sl-item"><div class="m"><span class="s">'+dshort(x.at)+' · '+x.n+' joueurs · mise '+fmt(x.stake)+'</span></div><b>'+sgn(net)+'</b></div>'; });
+    b.innerHTML=h;
+  },function(){});
+  var rs=GM.st&&GM.st.salon; $('#sl-resume').innerHTML=rs&&(rs.status==='wait'||rs.status==='live')?'<div class="gm-note"><b>Salon en cours</b>Vous êtes dans le salon '+esc(rs.code)+'.<br><button class="gm-btn sm" type="button" id="sl-back">Reprendre le salon</button></div>':'';
+  clearInterval(SL.lt); SL.lt=setInterval(function(){ if(TAB==='salon'&&!$('#sl-lobby').hidden&&!document.hidden) loadLobby(); },6000);
+}
+$('#sl-lobby').addEventListener('click',function(e){
+  var b=e.target.closest('[data-jn]'); if(b){ askJoin(b.dataset.jn); return; }
+  if(e.target.closest('#sl-back')) resumeRoom();
+});
+function resumeRoom(){
+  rpc('zj_salon_state').then(function(r){ if(r&&r.ok) enterRoom(r); else { if(GM.st) GM.st.salon=null; toast('Ce salon est terminé.'); showTab('salon'); } },function(e){ toast(errMsg(e)); });
+}
+
+/* Salle de jeu en direct */
+function enterRoom(r){
+  stopRoom(); hideAll(); SL.id=r.room.id; SL.key=''; $('#sl-room').hidden=false; showNote(null);
+  if(GM.st) GM.st.salon={id:r.room.id,code:r.room.code,status:r.room.status};
+  window.scrollTo({top:$('#sl-room').offsetTop-70,behavior:REDUCE?'auto':'smooth'});
+  paintRoom(r); schedPoll();
+}
+function stopRoom(){ clearTimeout(SL.poll); SL.poll=0; cancelAnimationFrame(SL.raf); SL.id=null; SL.key=''; SL.st=null; }
+function schedPoll(){
+  clearTimeout(SL.poll); if(!SL.id) return;
+  var s=SL.st, d=(s&&s.room.status==='wait')?1800:(s&&s.room.status!=='live')?4000:1000; if(document.hidden) d=2500;
+  SL.poll=setTimeout(pollRoom,d);
+}
+function pollRoom(){
+  if(!SL.id) return; var id=SL.id;
+  rpc('zj_salon_state',{p_room:id}).then(function(r){
+    if(SL.id!==id) return;
+    if(!r||!r.ok){ stopRoom(); if(GM.st) GM.st.salon=null; toast('Salon introuvable.'); showTab('salon'); return; }
+    paintRoom(r); schedPoll();
+  },function(e){ if(SL.id!==id) return; if(e&&e.error==='login'){ stopRoom(); return loginModal(); } schedPoll(); });
+}
+document.addEventListener('visibilitychange',function(){ if(!document.hidden&&SL.id){ clearTimeout(SL.poll); pollRoom(); } });
+function paintRoom(r){
+  var prev=SL.st; SL.st=r; if(r.balance!=null) setBal(r.balance);
+  SL.t0=performance.now(); SL.left=r.left_ms||0;
+  if(r.phase==='q'&&!r.mine&&SL.myAns&&SL.myAns.id===r.room.id&&SL.myAns.i===r.idx) r.mine={c:SL.myAns.c};
+  var st=r.room.status, key=keyOf(r);
+  if(st==='live'||st==='wait'){ if(GM.st) GM.st.salon={id:r.room.id,code:r.room.code,status:st}; }
+  else if(GM.st) GM.st.salon=null;
+  if(key!==SL.key){ var old=SL.key; SL.key=key; buildRoom(r,old,prev); } else softRoom(r);
+}
+function keyOf(r){ var st=r.room.status; return st+'|'+(st==='live'?r.phase+'|'+r.idx:'')+'|'+(r.mine?'m':'')+'|'+(st==='wait'?r.players.length:''); }
+function plBar(r){
+  var h='<div class="sl-pl">'; r.players.forEach(function(p){
+    h+='<div class="sl-p'+(p.me?' me':'')+(p.left?' out':'')+(p.answered?' ans':'')+'"><span class="ok" aria-hidden="true"></span><span class="n">'+esc(p.pseudo)+(p.me?' (vous)':'')+(p.host?' ★':'')+'</span><span class="sc">'+(p.score==null?'·':fmt(p.score))+'</span>'+(p.left?'<small> parti</small>':'')+(p.react?'<span class="rx">'+esc(p.react)+'</span>':'')+'</div>';
+  }); return h+'</div>';
+}
+function rxBar(){ return '<div class="sl-rx" id="sl-rx" aria-label="Réactions">'+['👏','🔥','😂','😮','💪','😅'].map(function(e){ return '<button type="button" data-rx="'+e+'" aria-label="Réaction '+e+'">'+e+'</button>'; }).join('')+'</div>'; }
+function softRoom(r){
+  var pl=$('#sl-pl'); if(pl) pl.innerHTML=plBar(r);
+  var sl=$('#sl-slots'); if(sl&&r.room.status==='wait') sl.innerHTML=slotsHtml(r);
+}
+function slotsHtml(r){
+  var h=''; for(var i=0;i<r.room.max;i++){ var p=r.players[i]; h+=p?'<div class="sl-slot on"><b>'+esc(p.pseudo)+(p.me?' (vous)':'')+'</b>'+(p.host?'<small>organisateur</small>':'')+'</div>':'<div class="sl-slot">En attente d’un joueur…</div>'; } return h;
+}
+function buildRoom(r,old,prev){
+  var b=$('#sl-rb'), rm=r.room, st=rm.status;
+  cancelAnimationFrame(SL.raf);
+  if(st==='wait'){
+    var link=location.origin+location.pathname+'?salon='+rm.code, msg='Je t’invite sur un salon Duel Mental Zetwal (mise '+rm.stake+' jetons). Code : '+rm.code+' '+link;
+    b.innerHTML='<h2 style="font-family:var(--serif);font-size:2rem;font-weight:600">Salle d’attente</h2><p class="sl-sub">Mise '+fmt(rm.stake)+' jetons · '+esc(catTxt(rm.cats))+' · '+lvTxt(rm.lvls)+(rm.priv?' · privé':'')+'<br>Le salon démarre tout seul dès qu’il est plein'+(rm.host?', ou quand vous le lancez à deux joueurs ou plus':'')+'. Il est annulé (mises remboursées) après 20 minutes d’attente.</p>'+
+     '<div class="sl-code" aria-label="Code du salon">'+esc(rm.code)+'</div><div class="sl-row" style="justify-content:center"><a class="gm-btn sm" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(msg)+'">Inviter par WhatsApp</a><button class="gm-btn sm ln" type="button" id="sl-cp">Copier le lien</button></div>'+
+     '<div class="sl-slots" id="sl-slots">'+slotsHtml(r)+'</div><div class="sl-fsum" style="margin-top:18px"><div><small>Cagnotte actuelle</small><b>'+fmt(rm.stake*r.players.length)+'</b></div></div>'+
+     '<div class="sl-row" style="margin-top:18px">'+(rm.host?'<button class="gm-btn" type="button" id="sl-start"'+(r.players.length<2?' disabled':'')+'>Lancer la partie</button>':'')+'<button class="gm-btn q" type="button" id="sl-leave">'+(rm.host?'Annuler le salon':'Quitter (mise remboursée)')+'</button></div><p class="gm-err" id="sl-re" role="alert"></p>';
+    return;
+  }
+  if(st==='cancel'){
+    ZS.play('lose'); b.innerHTML='<h2 style="font-family:var(--serif);font-size:2rem;font-weight:600">Salon annulé</h2><p class="sl-sub">Votre mise de '+fmt(rm.stake)+' jetons a été remboursée.</p><div class="sl-row"><button class="gm-btn" type="button" id="sl-out">Retour aux salons</button></div>'; return;
+  }
+  if(st==='done'){ buildDone(r); return; }
+  /* live */
+  if(r.phase==='pre'){
+    ZS.play('start'); b.innerHTML='<div id="sl-pl">'+plBar(r)+'</div><p class="sl-sub" style="text-align:center">La partie va commencer. Mise '+fmt(rm.stake)+' jetons · cagnotte '+fmt(rm.pot||rm.stake*r.players.length)+'.</p><div class="sl-pre" id="sl-cd" role="timer">5</div><div class="sl-row" style="justify-content:center"><button class="gm-btn q sm" type="button" id="sl-leave">Quitter (mise perdue)</button></div>';
+    (function tk(){ var n=Math.max(0,Math.ceil((SL.left-(performance.now()-SL.t0))/1000)), e=$('#sl-cd'); if(e&&e.textContent!==String(n)){ e.textContent=n; if(n>0&&n<=3) ZS.play('tick',true); } if(SL.st&&SL.st.phase==='pre'&&SL.id) SL.raf=requestAnimationFrame(tk); })();
+    return;
+  }
+  if(r.phase==='q') { buildQ(r); return; }
+  buildRev(r);
+}
+function buildQ(r){
+  var q=r.q, b=$('#sl-rb'), L=['A','B','C','D'], mine=r.mine, myc=mine?mine.c:null;
+  var opts=''; L.forEach(function(l,k){ if(q.opts[k]!=null) opts+='<button class="gm-opt'+(mine&&myc===k?' pick':'')+'" type="button" data-k="'+k+'" disabled><kbd>'+l+'</kbd><span>'+esc(q.opts[k])+'</span></button>'; });
+  b.innerHTML='<div id="sl-pl">'+plBar(r)+'</div><div class="dl-meta"><span><b>Question '+(q.i+1)+' / '+q.total+'</b></span><span>Niveau '+q.lvl+' · '+esc(CATS[q.cat]?CATS[q.cat].n:'')+'</span></div>'+
+   '<div class="dl-timer" id="sl-tb" role="timer" aria-label="Temps restant"><i id="sl-ti"></i></div><div class="dl-q'+(q.show?' mem':'')+'" id="sl-q"><p id="sl-qt"></p></div><div class="dl-opts" id="sl-opts">'+opts+'</div><div class="dl-wait" id="sl-wt"></div>'+rxBar()+
+   '<div class="sl-row" style="margin-top:16px;justify-content:center"><button class="gm-btn q sm" type="button" id="sl-leave">Quitter (mise perdue)</button></div>';
+  var lastS=-1, shown=false, idx=q.i;
+  (function frame(){
+    if(!SL.st||SL.st.phase!=='q'||SL.st.idx!==idx||!SL.id) return;
+    var left=SL.left-(performance.now()-SL.t0), inShow=!!q.show&&left>10000;
+    var qt=$('#sl-qt'), tb=$('#sl-tb'), ti=$('#sl-ti'); if(!qt) return;
+    if(inShow){ if(qt.dataset.m!=='s'){ qt.dataset.m='s'; qt.innerHTML=esc(q.show)+'<span class="hint">Mémorisez bien…</span>'; ZS.play('whoosh'); } ti.style.transform='scaleX('+Math.max(0,Math.min(1,(left-10000)/Math.max(1,q.show_ms)))+')'; tb.style.opacity='.55'; }
+    else {
+      if(qt.dataset.m!=='q'){ qt.dataset.m='q'; qt.textContent=q.q; tb.style.opacity='1'; if(!q.show) ZS.play('whoosh'); var mineNow=SL.st.mine; $$('#sl-opts .gm-opt').forEach(function(o){ o.disabled=!!mineNow; }); }
+      var f=Math.max(0,Math.min(1,left/10000)); ti.style.transform='scaleX('+f+')'; if(left<=3000) tb.classList.add('urg');
+      var s=Math.ceil(left/1000); if(s!==lastS){ lastS=s; if(s<=3&&s>0&&!SL.st.mine) ZS.play('tick',true); }
+      var w=$('#sl-wt'); if(w) w.textContent=SL.st.mine?'Réponse enregistrée. En attente des autres joueurs…':'';
+    }
+    SL.raf=requestAnimationFrame(frame);
+  })();
+}
+function buildRev(r){
+  var v=r.rev, b=$('#sl-rb'), L=['A','B','C','D'], myc=null, mypts=0;
+  r.rev.picks.forEach(function(p,i){ var pl=r.players[i]; if(pl&&pl.me){ myc=p.c; mypts=p.pts; } });
+  var opts=''; L.forEach(function(l,k){ if(v.opts[k]!=null) opts+='<button class="gm-opt '+(k===v.ans?'sl-opt-ok':(k===myc?'sl-opt-ko':''))+(k===myc?' pick':'')+'" type="button" disabled><kbd>'+l+'</kbd><span>'+esc(v.opts[k])+'</span></button>'; });
+  var pk='<div class="sl-picks">'+v.picks.map(function(p){ var ok=p.c===v.ans; return '<div><span>'+esc(p.pseudo)+' : '+(p.c>=0&&v.opts[p.c]!=null?esc(v.opts[p.c]):'pas de réponse')+'</span><span class="'+(ok?'g':'b')+'">'+(ok?'+'+p.pts:'0')+'</span></div>'; }).join('')+'</div>';
+  b.innerHTML='<div id="sl-pl">'+plBar(r)+'</div><div class="dl-meta"><span><b>Question '+(r.idx+1)+' / '+r.total+'</b></span><span>Bonne réponse affichée</span></div><div class="dl-q'+(v.show?' mem':'')+'"><p>'+esc(v.q)+'</p></div><div class="dl-opts">'+opts+'</div>'+pk+rxBar()+
+   '<div class="sl-row" style="margin-top:16px;justify-content:center"><button class="gm-btn q sm" type="button" id="sl-leave">Quitter (mise perdue)</button></div>';
+  if(myc===v.ans){ ZS.play('right'); ZS.vib(15); } else ZS.play('ko');
+}
+function buildDone(r){
+  var rm=r.room, res=r.result||{}, b=$('#sl-rb'), me=null, h='';
+  var ps=r.players.slice().sort(function(a,b){ return (a.rank||99)-(b.rank||99); });
+  ps.forEach(function(p){ if(p.me) me=p; });
+  var won=me&&me.paid>0, net=me?(me.paid||0)-rm.stake:0;
+  h+='<h2 style="font-family:var(--serif);font-size:2.2rem;font-weight:600">'+(won?(res.split?'Égalité : vous partagez le gain !':'Vous avez gagné !'):'Partie terminée')+'</h2>';
+  h+='<p class="sl-sub">Cagnotte '+fmt(res.pot||rm.pot)+' jetons · commission Zetwal '+fmt(res.fee||rm.fee)+' ('+rm.pct+' %).'+(res.winners&&res.winners.length?' Vainqueur'+(res.winners.length>1?'s':'')+' : '+esc(res.winners.join(', '))+'.':'')+'</p>';
+  h+='<div class="sl-pod">'; ps.forEach(function(p,i){ var g=(p.paid||0)-rm.stake; h+='<div class="r'+(p.paid>0?' w':'')+'"><span class="k">'+(i+1)+'</span><div class="m"><b>'+esc(p.pseudo)+(p.me?' (vous)':'')+'</b><small>'+fmt(p.score||0)+' points'+(p.ms!=null?' · '+dur(p.ms):'')+(p.left?' · a quitté':'')+'</small></div><span class="g '+(g>0?'pos':'neg')+'">'+sgn(g)+'</span></div>'; }); h+='</div>';
+  h+='<div class="gm-card'+(won?'':' l')+'" style="margin-top:20px"><div class="gm-net '+(net>0?'p':net<0?'n':'z')+'">'+sgn(net)+'<small>jeton'+(Math.abs(net)>1?'s':'')+'</small></div><div class="gm-tab"><div class="sd-stat"><span>Solde</span><b>'+fmt(r.balance)+' jetons</b></div></div></div>';
+  if(res.review&&res.review.length){
+    h+='<h3 style="font-family:var(--serif);font-size:1.5rem;margin:26px 0 6px">Les questions</h3><div class="dl-rev" id="sl-rev">';
+    res.review.forEach(function(x,n){ var mi=-1; r.players.forEach(function(pp,j){ if(pp.me&&x.picks[j]) mi=x.picks[j].c; }); var ok=mi===x.ans;
+      h+='<article class="dl-ri show '+(ok?'ok':'ko')+'"><div class="t"><span>Question '+(n+1)+' · Niveau '+x.lvl+' · '+esc(CATS[x.cat]?CATS[x.cat].n:'')+'</span><b>'+(ok?'✓':'✗')+'</b></div><div class="q">'+esc(x.q)+(x.show?'<div class="muted" style="font-size:.9rem;font-family:var(--sans);font-weight:500;margin-top:4px">Liste montrée : '+esc(x.show)+'</div>':'')+'</div><div class="a">'+(ok?'<span class="r">Bonne réponse :</span> '+esc(x.opts[x.ans]):'<span class="w">Votre réponse :</span> '+(mi>=0&&x.opts[mi]!=null?esc(x.opts[mi]):'aucune')+'<br><span class="r">Bonne réponse :</span> '+esc(x.opts[x.ans]))+'</div></article>'; });
+    h+='</div>';
+  }
+  h+=rxBar()+'<div class="sl-row" style="margin-top:22px"><button class="gm-btn" type="button" id="sl-out">Retour aux salons</button><a class="gm-btn ln" href="games.html">Classement</a></div>';
+  b.innerHTML=h;
+  if(won){ ZS.play('win'); FX.confetti(net>=rm.stake*2); } else ZS.play('lose');
+  refreshStatus().catch(function(){});
+}
+$('#sl-room').addEventListener('click',function(e){
+  var t=e.target, id=SL.id, r=SL.st, b;
+  if((b=t.closest('[data-rx]'))){ if(id) rpc('zj_salon_react',{p_room:id,p_emoji:b.dataset.rx}).catch(function(){}); ZS.play('tap'); return; }
+  if(t.closest('#sl-out')){ var g=SL.st; stopRoom(); refreshStatus().then(function(){ showTab('salon'); },function(){ showTab('salon'); }); return; }
+  if(t.closest('#sl-cp')){ var lk=location.origin+location.pathname+'?salon='+r.room.code; try{ navigator.clipboard.writeText(lk).then(function(){ toast('Lien copié.'); },function(){ toast(lk); }); }catch(x){ toast(lk); } return; }
+  if(t.closest('#sl-start')){ b=t.closest('#sl-start'); b.disabled=true; rpc('zj_salon_start',{p_room:id}).then(function(x){ if(x&&x.ok){ paintRoom(x); clearTimeout(SL.poll); schedPoll(); } else { b.disabled=false; $('#sl-re').textContent=({seul:'Il faut au moins 2 joueurs.',banque:'Pas assez de questions pour ce choix : salon annulé et remboursé.'})[x&&x.error]||errMsg(x); } },function(x){ b.disabled=false; $('#sl-re').textContent=errMsg(x); }); return; }
+  if(t.closest('#sl-leave')){
+    var live=r&&r.room.status==='live', host=r&&r.room.host;
+    openModal('<h2>'+(live?'Quitter la partie ?':host?'Annuler le salon ?':'Quitter le salon ?')+'</h2><p>'+(live?'La partie est en cours : <b>votre mise de '+fmt(r.room.stake)+' jetons sera perdue</b>.':'Votre mise sera remboursée'+(host?' et le salon fermé pour tous les joueurs':'')+'.')+'</p><div class="row"><button class="gm-btn" type="button" id="sl-lv-ok">'+(live?'Quitter et perdre la mise':'Confirmer')+'</button><button class="gm-btn q" type="button" data-close>Rester</button></div>');
+    $('#sl-lv-ok').addEventListener('click',function(){ this.disabled=true; rpc('zj_salon_leave',{p_room:id}).then(function(x){ closeModal(); if(x&&x.balance!=null) setBal(x.balance); stopRoom(); refreshStatus().then(function(){ showTab('salon'); },function(){ showTab('salon'); }); },function(x){ closeModal(); toast(errMsg(x)); }); });
+    return;
+  }
+});
+$('#sl-room').addEventListener('click',function(e){
+  var b=e.target.closest('#sl-opts .gm-opt'); if(!b||b.disabled||!SL.st||SL.st.phase!=='q'||SL.st.mine) return; slAnswer(+b.dataset.k);
+});
+function slAnswer(k){
+  var r=SL.st, id=SL.id, i=r.idx; if(!r||r.mine) return;
+  r.mine={c:k}; SL.myAns={id:id,i:i,c:k}; SL.key=keyOf(r); $$('#sl-opts .gm-opt').forEach(function(o){ o.disabled=true; if(+o.dataset.k===k) o.classList.add('pick'); }); ZS.play('lock'); ZS.vib(15);
+  var w=$('#sl-wt'); if(w) w.textContent='Réponse enregistrée. En attente des autres joueurs…';
+  rpc('zj_salon_answer',{p_room:id,p_i:i,p_choice:k}).then(function(x){ if(SL.id!==id) return; if(x&&x.ok===false){ toast(({trop_tot:'Trop tôt : attendez la fin de l’affichage.'})[x.error]||errMsg(x)); } if(x&&x.ok!==false) paintRoom(x); },function(e){ if(e&&e.error==='login') return loginModal(); toast(errMsg(e)); });
+}
+document.addEventListener('keydown',function(e){
+  if(!SL.id||!SL.st||SL.st.phase!=='q'||SL.st.mine||$('#gm-mask').classList.contains('open')) return;
+  var m={a:0,b:1,c:2,d:3,'1':0,'2':1,'3':2,'4':3}, k=m[String(e.key).toLowerCase()]; if(k==null) return;
+  var o=$$('#sl-opts .gm-opt')[k]; if(o&&!o.disabled) slAnswer(k);
+});
+
+/* Défis du jour */
+function loadDaily(){
+  rpc('zj_daily_get').then(function(r){ paintDaily(r); },function(e){ $('#df-b').innerHTML='<p class="sl-empty">'+esc(errMsg(e))+'</p>'; });
+}
+function paintDaily(r){
+  if(!r||!r.ok){ $('#df-b').innerHTML='<p class="sl-empty">Défis indisponibles pour le moment.</p>'; return; }
+  var left=0; r.items.forEach(function(x){ if(x.done&&!x.claimed) left++; }); $('#df-dot').hidden=!left;
+  var h='<div class="df-top"><div><small>Série en cours</small><b>'+r.streak+' jour'+(r.streak>1?'s':'')+'</b></div><div><small>Meilleure série</small><b>'+r.best+'</b></div><div><small>'+(r.claimed_today?'Bonus de demain':'Bonus de série aujourd’hui')+'</small><b>+'+r.next_bonus+'</b></div><div><small>Nouveaux défis dans</small><b>'+Math.floor(r.reset_s/3600)+' h '+('0'+Math.floor(r.reset_s%3600/60)).slice(-2)+'</b></div></div>';
+  r.items.forEach(function(x){
+    var pc=Math.round(100*x.have/x.need);
+    h+='<div class="df-it'+(x.claimed?' ok':'')+'"><div class="m"><p>'+esc(x.text)+'</p><div class="df-bar"><i style="width:'+pc+'%"></i></div><small>'+x.have+' / '+x.need+'</small></div><span class="df-rw">+'+x.reward+'</span>'+
+     (x.claimed?'<span class="muted">Récupéré ✓</span>':'<button class="gm-btn sm" type="button" data-cl="'+x.slot+'"'+(x.done?'':' disabled')+'>'+(x.done?'Récupérer':'En cours')+'</button>')+'</div>';
+  });
+  h+='<p class="sl-sub" style="margin-top:16px">Jouez au moins un défi chaque jour pour garder votre série : le bonus monte jusqu’à +14 jetons. Les défis se valident avec vos duels en solo et vos salons du jour. Les gains des défis sont de petites récompenses plafonnées.</p>';
+  $('#df-b').innerHTML=h;
+}
+$('#df-sec').addEventListener('click',function(e){
+  var b=e.target.closest('[data-cl]'); if(!b||b.disabled) return; b.disabled=true;
+  rpc('zj_daily_claim',{p_slot:+b.dataset.cl}).then(function(r){
+    if(r&&r.ok){ ZS.play('win'); FX.confetti(false); toast('+'+r.reward+' jetons'+(r.bonus?' et +'+r.bonus+' de série':'')+'.'); if(r.balance!=null) setBal(r.balance); loadDaily(); }
+    else { b.disabled=false; toast(({pas_fini:'Ce défi n’est pas encore terminé.',deja:'Déjà récupéré.'})[r&&r.error]||errMsg(r)); loadDaily(); }
+  },function(e){ b.disabled=false; toast(errMsg(e)); });
 });
 
 /* ── Démarrage ── */
 function boot(){
   bindSound();
   $('#dl-wal').hidden=!GM.user;
-  if(!GM.user||!GM.st){ showNote(blocker()); $('#dl-pick').hidden=true; return; }
-  setBal(GM.st.balance); var b=blocker(); showNote(b); if(b){ $('#dl-pick').hidden=true; return; }
-  if(GM.st.resume&&GM.st.resume.game==='sudoku'){ showNote({k:'err',t:'Partie en cours',m:'Une partie de Sudoku est ouverte. Terminez-la avant de lancer un Duel.',b:'Reprendre le Sudoku',f:function(){ location.href='sudoku.html'; }}); $('#dl-pick').hidden=true; return; }
-  if(GM.st.resume&&GM.st.resume.game==='duel'){ rpc('zj_duel_resume').then(function(r){ if(r&&r.ok) enter(r,true); else { $('#dl-pick').hidden=false; renderPick(); } },function(){ $('#dl-pick').hidden=false; renderPick(); }); return; }
-  $('#dl-pick').hidden=false; renderPick();
+  if(!GM.user||!GM.st){ showNote(blocker()); hideAll(); return; }
+  setBal(GM.st.balance); var b=blocker(); showNote(b); if(b){ hideAll(); return; }
+  if(GM.st.resume&&GM.st.resume.game==='sudoku'){ showNote({k:'err',t:'Partie en cours',m:'Une partie de Sudoku est ouverte. Terminez-la avant de lancer un Duel.',b:'Reprendre le Sudoku',f:function(){ location.href='sudoku.html'; }}); hideAll(); return; }
+  if(GM.st.resume&&GM.st.resume.game==='duel'){ rpc('zj_duel_resume').then(function(r){ if(r&&r.ok) enter(r,true); else showTab('solo'); },function(){ showTab('solo'); }); return; }
+  rpc('zj_daily_get').then(function(r){ if(r&&r.ok&&r.items.some(function(x){ return x.done&&!x.claimed; })) $('#df-dot').hidden=false; },function(){});
+  var sa=GM.st.salon;
+  if(sa&&(sa.status==='wait'||sa.status==='live')){ rpc('zj_salon_state').then(function(r){ if(r&&r.ok){ enterRoom(r); toast('Salon repris.'); } else showTab('solo'); },function(){ showTab('solo'); }); return; }
+  var qs=null; try{ qs=new URLSearchParams(location.search); }catch(e){}
+  var code=qs&&qs.get('salon');
+  if(code){ showTab('salon'); $('#sl-jc').value=code.toUpperCase().slice(0,8); try{ history.replaceState(null,'',location.pathname); }catch(e){} askJoin(code); return; }
+  var tb=qs&&qs.get('tab'); showTab(tb==='salon'||tb==='daily'?tb:'solo');
 }
 onUser.push(function(){ refreshStatus().then(boot,function(){ boot(); }); });
 window.__dl={D:function(){return D;}};

@@ -2306,6 +2306,11 @@ tbody tr:last-child td{border-bottom:none}
         <button class="btn btn-gold btn-block" id="jt-t-add" style="margin-top:var(--s4)" onclick="jtTesterAdd()"><span data-icon="plus" data-size="sm"></span> Donner l'accès</button>
         <div id="jt-testers" style="margin-top:var(--s5)"></div>
       </div>
+      <div class="card" id="jt-salon-card">
+        <div class="card-head"><h3><span data-icon="settings"></span> Salons Duel Mental et défis du jour</h3>
+          <button class="btn btn-ghost btn-sm" onclick="jtSalon()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
+        <div id="jt-salon"></div>
+      </div>
       <div class="card">
         <div class="card-head"><h3><span data-icon="history"></span> Derniers mouvements d'administration</h3>
           <button class="btn btn-ghost btn-sm" onclick="jtRecent()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
@@ -4513,7 +4518,27 @@ function jtErr(e){
   if(/interdit/i.test(m)) return "Réservé à l'administrateur principal (session admin requise)";
   return rlsHint(e);
 }
-window.initJetons=()=>{ jtRecent(); jtTesters(); };
+
+window.jtSalon=async()=>{
+  const el=document.getElementById('jt-salon'); if(!el) return;
+  try{
+    const {data:d,error}=await db.rpc('zj_admin_salon_stats'); if(error) throw error;
+    const st=d.settings, on=k=>st[k]==='1';
+    const sw=(k,l)=>'<label style="display:flex;gap:10px;align-items:center;margin:6px 0"><input type="checkbox" '+(on(k)?'checked':'')+' onchange="jtSalonSet(\''+k+'\',this.checked?\'1\':\'0\')"> '+l+'</label>';
+    const num=(k,l)=>'<div class="field" style="min-width:150px"><label>'+l+'</label><input type="number" class="input" value="'+escH(st[k])+'" onchange="jtSalonSet(\''+k+'\',this.value)"></div>';
+    el.innerHTML=sw('zj_salon_open','Salons ouverts aux joueurs')+sw('zj_daily_open','Défis du jour ouverts')
+      +'<div style="display:flex;gap:var(--s4);flex-wrap:wrap;margin-top:var(--s4)">'+num('zj_salon_fee','Commission Zetwal (%)')+num('zj_salon_min','Mise minimale')+num('zj_salon_max','Mise maximale')+num('zj_salon_cap_day','Plafond de mises par joueur et par jour')+'</div>'
+      +'<p style="margin-top:var(--s4)"><b>Aujourd\'hui</b> : '+d.today.rooms+' salon(s), cagnottes '+jtN(d.today.pot)+', commission '+jtN(d.today.fee)+' · défis payés '+jtN(d.daily_paid)+'<br><b>Total</b> : '+d.totals.rooms+' salon(s), cagnottes '+jtN(d.totals.pot)+', commission Zetwal '+jtN(d.totals.fee)+' · salons en cours : '+d.live+'</p>'
+      +(d.recent.length?'<table class="table stack"><thead><tr><th>Date</th><th>Joueurs</th><th>Mise</th><th>Cagnotte</th><th>Commission</th><th>Gagnant</th></tr></thead><tbody>'+d.recent.map(r=>'<tr><td data-l="Date">'+jtD(r.at)+'</td><td data-l="Joueurs">'+r.n+'</td><td data-l="Mise">'+jtN(r.stake)+'</td><td data-l="Cagnotte">'+jtN(r.pot)+'</td><td data-l="Commission">'+jtN(r.fee)+'</td><td data-l="Gagnant">'+escH((r.winners||[]).join(', ')||'—')+'</td></tr>').join('')+'</tbody></table>':'<p style="color:var(--muted)">Aucun salon terminé pour le moment.</p>');
+  }catch(e){ el.innerHTML=emptyState('alert','Salons indisponibles',jtErr(e)); }
+};
+window.jtSalonSet=async(k,v)=>{
+  try{ const {data,error}=await db.rpc('zj_admin_salon_set',{p_key:k,p_value:String(v)}); if(error) throw error;
+    if(!data||!data.ok){ toast('Valeur refusée','error'); } else toast('Réglage enregistré','success'); }
+  catch(e){ toast('Enregistrement impossible : '+jtErr(e),'error'); }
+  jtSalon();
+};
+window.initJetons=()=>{ jtRecent(); jtTesters(); jtSalon(); };
 window.jtQuick=v=>{ const i=document.getElementById('jt-amt'); if(i){ i.value=v; jtReset(); } };
 function jtReset(){ JT.pending=null; const c=document.getElementById('jt-confirm'); if(c) c.innerHTML=''; const g=document.getElementById('jt-go'); if(g){ g.hidden=false; g.disabled=false; } }
 window.jtFind=async()=>{
