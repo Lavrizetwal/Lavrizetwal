@@ -18,6 +18,7 @@ const ENV = {
   foret: { fog: 0x9cc8a0, gnd: 0x2d5c2c, sun: 0xfff2cf, si: 2.8, sky: 0xc4e8ff, hg: 0x2d5c2c, hi: 1.1, prop: 'tree', pc: [0x2a6a30, 0x3f8a3a, 0x1f5524] },
   montagne: { fog: 0xb4c4dc, gnd: 0x5a5a60, sun: 0xf3f6ff, si: 2.7, sky: 0xa5bde6, hg: 0x5a5a60, hi: 1.0, prop: 'rock', pc: [0x6a6a72, 0x585860, 0x8a8a92] }
 };
+const TREEMAP = { jungle: { ids: ['arbre1'], dens: 1 }, foret: { ids: ['arbre1'], dens: 1 }, glace: { ids: ['arbre3', 'arbre4'], dens: 1 }, montagne: { ids: ['arbre3', 'arbre4'], dens: .3, keep: 1 }, desert: { ids: ['arbre2'], dens: .18, keep: 1 }, volcan: { ids: ['arbre2'], dens: .18, keep: 1 } };
 const ROADLIFT = { jungle: .55, ruines: .7, volcan: .75, ville: .5, foret: .3, montagne: .3, desert: .1, glace: 0 };
 const ROADTEX = { jungle: 'road-jungle', glace: 'road-glace', ruines: 'road-ruines', volcan: 'road-volcan', desert: 'road-desert', ville: 'route-ville', foret: 'route-foret', montagne: 'route-montagne' };
 const SKYTEX = { jungle: 1, glace: 1, ruines: 1, volcan: 1, desert: 1 };
@@ -34,7 +35,7 @@ const BR = { pont_casse: 1, pont_gele: 1, pont_metal: 1 };
 const WIDEK = { pont_casse: 1, pont_gele: 1, pont_metal: 1, trou: 1, fil_elec: 1, branche: 1, tronc: 1, bandit_saut: 1, boss_onde: 1, boss_coup: 1 };
 
 export function installRoad(X){
-  const { R, CRE, loadCre, creAnim, ctlFor, runnerUpdate, rigFromMesh, SPEC_FILLE1 } = X;
+  const { R, CRE, loadCre, creAnim, ctlFor, runnerUpdate, rigFromMesh, SPEC_FILLE1, treeGet, treeLoad } = X;
   const S = { ok: false, rd: null, sc: null, cam: null, W: 0, H: 0, th: '', objs: new Map(), pool: {}, texC: {}, gantry: new Map(), slow: 0, ema: 0, sig: '', path: null, win: -1e9, forks: [], fkJ: {} };
 
   function init(){
@@ -114,6 +115,8 @@ export function installRoad(X){
     const withTrunk = env.prop === 'tree' || env.prop === 'pine', im = new T.InstancedMesh(geo, pm, cnt);
     const tr = new T.InstancedMesh(new T.CylinderGeometry(.25, .3, 1.8, 6), new T.MeshStandardMaterial({ color: 0x5a3b24, roughness: 1 }), withTrunk ? cnt : 1);
     const m4 = new T.Matrix4(), col = new T.Color(), q = new T.Quaternion(), e = new T.Euler(), v = new T.Vector3(), sv = new T.Vector3(); let k = 0;
+    const tm = R.tier === 'high' ? TREEMAP[th] : null, tts = tm ? tm.ids.map(treeGet) : null, useG = !!(tts && tts.every(Boolean)), TL = tm ? tm.ids.map(() => []) : [];
+    if(tm && !useG && treeLoad) treeLoad(tm.ids, () => { S.win = -1e9; });
     for(let c = Math.floor(a0 / 9); c < Math.ceil(a1 / 9) && k < cnt - 1; c++){
       for(let sd = -1; sd <= 1; sd += 2){
         const r1 = hash(c * 7 + (sd + 3) * 131), r2 = hash(c * 13 + (sd + 5) * 71), r3 = hash(c * 29 + (sd + 7) * 17);
@@ -121,6 +124,11 @@ export function installRoad(X){
         const p = at(c * 9 + r2 * 9, sd * (ROADW / 2 + 3 + r3 * 20));
         let bad = false; S.forks.forEach(f => { const J = f.Jc; if(!J) return; const dx = p.x - J.x, dz = p.z - J.z; if(Math.hypot(dx, dz) < ARM + 6){ const lx = Math.abs(dx * Math.cos(J.h) + dz * Math.sin(J.h)), lz = Math.abs(dx * Math.sin(J.h) - dz * Math.cos(J.h)); if(lx < ROADW / 2 + 3 || lz < ROADW / 2 + 3) bad = true; } });
         if(bad) continue;
+        if(useG){
+          const ti = Math.floor(hash(c * 41 + sd * 3) * tm.ids.length) % tm.ids.length, tt = tts[ti], isW = tt.w >= tt.h * .8, sz = (isW ? 5.2 : 6.4) * (.75 + r1 * .85), hw = tt.w * sz / 2;
+          if(!tm.keep || hash(c * 53 + (sd + 4) * 11) < tm.dens){ const pg = at(c * 9 + r2 * 9, sd * (ROADW / 2 + 2.5 + hw + r3 * 18)); TL[ti].push([pg.x, pg.z, sz, r2 * 6.28]); }
+          if(!tm.keep) continue;
+        }
         const sc = .8 + r1 * 1.1, hgt = env.prop === 'rock' ? .4 * sc : env.prop === 'pillar' ? 2 * sc : 1.8 + 3 * sc;
         e.set(0, r2 * 6.28, 0); q.setFromEuler(e); v.set(p.x, hgt, p.z); sv.set(sc, sc * (env.prop === 'pillar' ? 1 + r3 : 1), sc); m4.compose(v, q, sv); im.setMatrixAt(k, m4);
         col.setHex(env.pc[Math.floor(r3 * env.pc.length) % env.pc.length]); im.setColorAt(k, col);
@@ -130,6 +138,8 @@ export function installRoad(X){
     }
     im.count = k; im.instanceMatrix.needsUpdate = true; if(im.instanceColor) im.instanceColor.needsUpdate = true; S.propG.add(im);
     if(withTrunk){ tr.count = k; tr.instanceMatrix.needsUpdate = true; S.propG.add(tr); }
+    if(useG) TL.forEach((arr, ti) => { if(!arr.length) return; const tt = tts[ti], gm = new T.InstancedMesh(tt.geo, tt.mat, arr.length); gm.userData.keep = true;
+      arr.forEach((a, i) => { e.set(0, a[3], 0); q.setFromEuler(e); v.set(a[0], 0, a[1]); sv.set(a[2], a[2], a[2]); m4.compose(v, q, sv); gm.setMatrixAt(i, m4); }); gm.instanceMatrix.needsUpdate = true; gm.frustumCulled = false; S.propG.add(gm); });
   }
 
   let Sx0 = { th: 'jungle' };

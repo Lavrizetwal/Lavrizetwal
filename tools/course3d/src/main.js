@@ -252,4 +252,20 @@ function frameEnd(){
 }
 function warm(){ if(R.off) return; if(!R.ready && !init()) return; const ks = Object.keys(CFG).filter(k => k !== 'runner'); let i = 0; (function step(){ if(i === 0) ctlFor('main'); else if(i <= ks.length) getModel(ks[i - 1]); else return; i++; setTimeout(step, 30); })(); }
 
-window.Z3D = { road: null, makeRoad(){ return this.road || (this.road = installRoad({ R, CRE, loadCre, creAnim, ctlFor, runnerUpdate, rigFromMesh, SPEC_FILLE1, init })); }, preload, creKinds: Object.keys(CRE), registerWho, loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };
+/* arbres GLB du bord de route (models/trees/arbreN.glb, ~3 500 à 6 000 triangles) : géométrie normalisée, pied à y = 0, centrée */
+const TR = {};
+function treeGet(id){ const t = TR[id]; return t && t.state === 2 ? t : null; }
+function treeLoad(ids, cb){
+  ids.forEach(id => {
+    if(TR[id]) return; const t = TR[id] = { state: 1 };
+    try{ new GLTFLoader().load('models/trees/' + id + '.glb?v=1', g => {
+      try{ let mesh; g.scene.updateMatrixWorld(true); g.scene.traverse(n => { if(n.isMesh && !mesh) mesh = n; });
+        const geo = mesh.geometry.clone(); geo.applyMatrix4(mesh.matrixWorld); geo.computeBoundingBox(); const bb = geo.boundingBox;
+        geo.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
+        const mat = mesh.material.clone(); mat.roughness = 1; mat.metalness = 0;
+        t.geo = geo; t.mat = mat; t.w = Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z); t.h = bb.max.y - bb.min.y; t.state = 2; cb && cb();
+      }catch(e){ t.state = 3; }
+    }, undefined, () => { t.state = 3; }); }catch(e){ t.state = 3; }
+  });
+}
+window.Z3D = { road: null, makeRoad(){ return this.road || (this.road = installRoad({ R, CRE, loadCre, creAnim, ctlFor, runnerUpdate, rigFromMesh, SPEC_FILLE1, init, treeGet, treeLoad })); }, preload, creKinds: Object.keys(CRE), registerWho, loadWho, whoReady, R, init, draw, setTheme, frameStart, frameEnd, warm, CFG, THREE: T, getModel, ctlFor, fit, GLTFLoader };
