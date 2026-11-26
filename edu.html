@@ -16,7 +16,7 @@ button,input,select{font:inherit}
 header{background:linear-gradient(180deg,var(--navy),var(--navy2));color:#fff;border-bottom:4px solid var(--gold);position:sticky;top:0;z-index:20}
 .hd{display:flex;align-items:center;gap:14px;padding:10px max(16px,env(safe-area-inset-left,0px));flex-wrap:wrap;max-width:1300px;margin:0 auto}
 .brand{font:700 26px/1 var(--serif);text-decoration:none;color:#fff;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
-.brand i{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--navy2);font-style:normal;font-size:20px}
+.lgo{border-radius:50%;background:#fff;object-fit:contain}#hm{text-decoration:none;white-space:nowrap;margin-left:auto}#lg{margin-left:0}.brand i{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--navy2);font-style:normal;font-size:20px}
 .brand small{display:block;font:500 11px var(--sans);opacity:.8;letter-spacing:.4px}
 #sf{flex:1;min-width:220px;display:flex;gap:6px}
 #qs{flex:1;min-width:0;padding:9px 12px;border:2px solid var(--gold);border-radius:6px;background:#fff;color:var(--ink)}
@@ -172,12 +172,12 @@ body{background:radial-gradient(circle at 20% 0,#EEF2FB,#D5DDF0 70%)}
 </head>
 <body>
 <a class="skip" id="sk" href="#main">Skip</a>
-<header><div class="hd"><a class="brand" href="#/"><i>★</i><span>Zetwal Edu<small>zetwal.org</small></span></a>
+<header><div class="hd"><a class="brand" href="#/"><img src="logo-192.png" alt="" width="34" height="34" class="lgo"><span>Zetwal Edu<small>zetwal.org</small></span></a>
 <form id="sf" role="search"><input id="qs" type="search" aria-label="search" autocomplete="off"><button id="qb" class="btn" type="submit">Search</button></form>
-<div id="lg" role="group" aria-label="Language"></div><span id="mini"></span></div></header>
+<a id="hm" class="btn" href="/">Zetwal</a><div id="lg" role="group" aria-label="Language"></div><span id="mini"></span></div></header>
 <div class="wrap"><nav id="side" aria-label="Menu"></nav><main id="main" tabindex="-1"></main></div>
 <nav id="bar" aria-label="Menu"></nav>
-<footer><b id="fo"></b><span id="ad"></span></footer>
+<footer><a id="hf" href="/" style="color:inherit;margin-right:12px"></a><b id="fo"></b><span id="ad"></span></footer>
 <script>
 /* ===== Zetwal Edu : textes de l'interface (ht, fr, en, ru) ===== */
 var UI={
@@ -191,7 +191,7 @@ media:"Medya",words:"Mo kle",related:"Atik ki gen rapò",nores:"Pa gen rezilta."
 sRead:"atik li",sQuiz:"bon repons",sStreak:"jou youn apre lòt",reset:"Efase pwogrè m",resetq:"Efase tout pwogrè sou aparèy sa a ?",
 acct:"Ou pa oblije fè kont. Pita, yon kont opsyonèl ap sove pwogrè w sou tout aparèy ou.",
 guest:"Pwogrè w sove sou aparèy sa a sèlman.",galt:"Galri imaj",galtx:"Tout ilistrasyon atik yo. Imaj yo pral ranplase pa foto yo ajoute nan administrasyon an.",
-glt:"Diksyonè",gltx:"Tout mo kle nan atik yo, pa lòd alfabetik.",filter:"Filtre mo yo",foot:"Zetwal Edu · yon pwojè Zetwal Organisation",
+glt:"Diksyonè",gltx:"Tout mo kle nan atik yo, pa lòd alfabetik.",filter:"Filtre mo yo",zhome:"Akèy Zetwal",foot:"Zetwal Edu · yon pwojè Zetwal Organisation",
 addr:"Wout Nasyonal #1, nan antre ri Jean Pierre a, zòn Pont-Gaudin, Gonayiv, Ayiti W.I",lang:"Lang",skip:"Ale nan kontni an",
 done:"Li",pts:"pwen",inprog:"Nan preparasyon",avail:"atik disponib",of:"sou",
 bits:"Bit yo",dec:"Desimal",hex:"Egzadesimal",listen:"Koute",
@@ -206,7 +206,7 @@ media:"Médias",words:"Mots clés",related:"À lire aussi",nores:"Aucun résulta
 sRead:"articles lus",sQuiz:"bonnes réponses",sStreak:"jours de suite",reset:"Effacer ma progression",resetq:"Effacer toute la progression sur cet appareil ?",
 acct:"Aucun compte obligatoire. Plus tard, un compte facultatif sauvegardera votre progression sur tous vos appareils.",
 guest:"Votre progression est enregistrée sur cet appareil uniquement.",galt:"Galerie d'images",galtx:"Toutes les illustrations des articles. Elles seront remplacées par les photos ajoutées depuis l'administration.",
-glt:"Dictionnaire",gltx:"Tous les mots clés des articles, par ordre alphabétique.",filter:"Filtrer les mots",foot:"Zetwal Edu · un projet de Zetwal Organisation",
+glt:"Dictionnaire",gltx:"Tous les mots clés des articles, par ordre alphabétique.",filter:"Filtrer les mots",zhome:"Accueil Zetwal",foot:"Zetwal Edu · un projet de Zetwal Organisation",
 addr:"Route Nationale n° 1, entrée de la ruelle Jean Pierre, zone de Pont-Gaudin, Gonaïves, Haïti W.I",lang:"Langue",skip:"Aller au contenu",
 done:"Lu",pts:"points",inprog:"En préparation",avail:"articles disponibles",of:"sur",
 bits:"Bits",dec:"Décimal",hex:"Hexadécimal",listen:"Écouter",
@@ -221,7 +221,7 @@ media:"Media",words:"Key words",related:"Related articles",nores:"No results.",r
 sRead:"articles read",sQuiz:"correct answers",sStreak:"days in a row",reset:"Erase my progress",resetq:"Erase all progress on this device?",
 acct:"No account required. Later, an optional account will save your progress on all your devices.",
 guest:"Your progress is saved on this device only.",galt:"Image gallery",galtx:"All article illustrations. They will be replaced by photos uploaded from the admin.",
-glt:"Glossary",gltx:"All key words from the articles, in alphabetical order.",filter:"Filter words",foot:"Zetwal Edu · a Zetwal Organisation project",
+glt:"Glossary",gltx:"All key words from the articles, in alphabetical order.",filter:"Filter words",zhome:"Zetwal home",foot:"Zetwal Edu · a Zetwal Organisation project",
 addr:"National Road #1, at the entrance of Jean Pierre Alley, Pont-Gaudin area, Gonaïves, Haiti W.I",lang:"Language",skip:"Skip to content",
 done:"Read",pts:"points",inprog:"In preparation",avail:"articles available",of:"of",
 bits:"Bits",dec:"Decimal",hex:"Hexadecimal",listen:"Listen",
@@ -236,7 +236,7 @@ media:"Медиа",words:"Ключевые слова",related:"Читайте �
 sRead:"прочитано статей",sQuiz:"верных ответов",sStreak:"дней подряд",reset:"Стереть мой прогресс",resetq:"Стереть весь прогресс на этом устройстве?",
 acct:"Аккаунт не обязателен. Позже необязательный аккаунт сохранит ваш прогресс на всех устройствах.",
 guest:"Ваш прогресс сохраняется только на этом устройстве.",galt:"Галерея изображений",galtx:"Все иллюстрации статей. Их заменят фотографии, загруженные из администрирования.",
-glt:"Словарь",gltx:"Все ключевые слова из статей по алфавиту.",filter:"Фильтр слов",foot:"Zetwal Edu · проект Zetwal Organisation",
+glt:"Словарь",gltx:"Все ключевые слова из статей по алфавиту.",filter:"Фильтр слов",zhome:"На главную Zetwal",foot:"Zetwal Edu · проект Zetwal Organisation",
 addr:"Национальная дорога № 1, при входе в переулок Жан-Пьер, район Пон-Годен, Гонаив, Гаити W.I",lang:"Язык",skip:"К содержимому",
 done:"Прочитано",pts:"баллов",inprog:"В подготовке",avail:"статей доступно",of:"из",
 bits:"Биты",dec:"Десятичное",hex:"Шестнадцатеричное",listen:"Слушать",
@@ -3505,7 +3505,7 @@ function route(){var h=location.hash.replace(/^#\/?/,""),p=h.split("/");nav();wi
  document.title=(p[0]==="a"&&artById(p[1])?tr(artById(p[1]).t)+" · ":"")+"Zetwal Edu"}
 function chrome(){
  document.documentElement.lang=LCODE[lang];
- $("#sk").textContent=t("skip");$("#qs").placeholder=t("ph");$("#qb").textContent=t("go");$("#fo").textContent=t("foot");$("#ad").textContent=t("addr");
+ $("#sk").textContent=t("skip");$("#qs").placeholder=t("ph");$("#qb").textContent=t("go");$("#fo").textContent=t("foot");$("#hm").textContent="← "+t("zhome");$("#hm").title=t("zhome");$("#hf").textContent=t("zhome");$("#ad").textContent=t("addr");
  $("#lg").innerHTML=LANGS.map(function(l){return'<button class="lb'+(l[0]===lang?" on":"")+'" data-l="'+l[0]+'" aria-label="'+l[1]+'" title="'+l[1]+'">'+l[0].toUpperCase()+'</button>'}).join("");
  $("#bar").innerHTML=[["#/","⌂",t("home")],["#/d","🎮",t("games")],["#/f","🃏",t("flash")],["#/p","★",t("prog")]].map(function(x){return'<a href="'+x[0]+'"><i>'+x[1]+'</i>'+x[2]+'</a>'}).join("");
  $$(".lb").forEach(function(b){b.onclick=function(){lang=b.getAttribute("data-l");sset("ze_lang",lang);P.langs[lang]=1;save();checkBadges();chrome();route()}});refreshStats()}
