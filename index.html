@@ -834,7 +834,7 @@ button{touch-action:manipulation}
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 .8l2.1 4.6 5 .6-3.7 3.4 1 5-4.4-2.5-4.4 2.5 1-5L.9 6l5-.6L8 .8z'/%3E%3C/svg%3E") 0 0/var(--s) var(--s) repeat-x;
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 .8l2.1 4.6 5 .6-3.7 3.4 1 5-4.4-2.5-4.4 2.5 1-5L.9 6l5-.6L8 .8z'/%3E%3C/svg%3E") 0 0/var(--s) var(--s) repeat-x}
 
-/* ── 8. Kat sèvis ─────────────────────────────────────────────── */
+/* ── 8. Sis sèvis ─────────────────────────────────────────────── */
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
 .card{position:relative;grid-column:span 6;display:flex;flex-direction:column;justify-content:space-between;
   gap:28px;min-height:310px;padding:34px 32px 26px;border-radius:6px;overflow:hidden;
@@ -1176,6 +1176,7 @@ header.hero{background:transparent!important}
       <li><a href="shop.html">Shop</a></li>
       <li><a href="games.html">Jwèt</a></li>
       <li><a href="travay.html">Travay</a></li>
+      <li><a href="edu.html">Edu</a></li>
     </ul>
 
     <div class="nav-act">
@@ -1221,6 +1222,7 @@ header.hero{background:transparent!important}
   <a href="shop.html">Shop</a>
   <a href="games.html">Jwèt</a>
   <a href="travay.html">Travay</a>
+  <a href="edu.html">Edu</a>
   <button class="zi-btn" type="button" data-zi aria-label="Enstale Zetwal sou telefòn ou"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Enstale Zetwal</button>
 
   <div id="dr-auth">
@@ -1393,10 +1395,10 @@ header.hero{background:transparent!important}
     <div class="head">
       <div>
         <div class="eyebrow up">Sèvis nou yo</div>
-        <h2 class="h2" data-split="wd">Kat sèvis, yon sèl zetwal</h2>
+        <h2 class="h2" data-split="wd">Sis sèvis, yon sèl zetwal</h2>
         <div class="draw" style="--w:120px;margin-top:18px"></div>
       </div>
-      <div class="count up d2">01 — 05</div>
+      <div class="count up d2">01 — 06</div>
     </div>
 
     <div class="grid">
@@ -1506,6 +1508,32 @@ header.hero{background:transparent!important}
         <div class="card-foot">
           <span class="chip">Gonaïves</span>
           <span class="go">Antre nan Travay <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a href="edu.html" class="card w12">
+        <span class="shot" data-media="home.card.edu" aria-hidden="true"></span>
+        <div class="card-top">
+          <span class="no">06</span>
+          <svg class="em" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M24 9 3 19l21 10 21-10L24 9Z" style="--l:120"/>
+            <path d="M11 24v9c0 2.5 6 6 13 6s13-3.5 13-6v-9" style="--l:80"/>
+            <path d="M45 19v12" style="--l:14"/>
+            <circle class="pt" cx="45" cy="33" r="1.6"/>
+          </svg>
+        </div>
+        <div class="mid">
+          <h3>Zetwal Edu</h3>
+          <p>Yon espas aprantisaj gratis pou tout moun, nan kreyòl, fransè, anglè ak ris. Atik ki verifye, laboratwa, jwèt ak kesyon pou w aprann alèz.</p>
+          <div class="svcs">
+            <span><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg> Atik</span>
+            <span><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3"/></svg> Laboratwa</span>
+            <span><svg viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></svg> Verifye</span>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="chip">Gratis · 4 lang</span>
+          <span class="go">Antre nan Edu <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
       </a>
 
@@ -2504,7 +2532,7 @@ function pqWatch(user){
    ═══════════════════════════════════════════════════════════ */
 var KB = [
   { k:['sevis','sevis','kisa','ofri','mond','kat','kòmand','sant'],
-    a:function(){ return "Zetwal gen kat sèvis :\n\n• <b>Zetwal Kòmand</b> — kous, manje, pake, tout ak swiv an dirèk.\n• <b>Lavri Zetwal</b> — lave rad ou nan mwens pase 24h.\n• <b>Shop Zetwal</b> — pwodwi lokal ak entènasyonal, livrezon rapid.\n• <b>Jwèt Zetwal</b> — jwèt entèaktif ak pwen Zetwal.\n\nKlike sou kat ki nan seksyon « Kat sèvis, yon sèl zetwal » la."; } },
+    a:function(){ return "Zetwal gen sis sèvis :\n\n• <b>Zetwal Kòmand</b> — kous, manje, pake, tout ak swiv an dirèk.\n• <b>Lavri Zetwal</b> — lave rad ou nan mwens pase 24h.\n• <b>Shop Zetwal</b> — pwodwi lokal ak entènasyonal, livrezon rapid.\n• <b>Jwèt Zetwal</b> — jwèt entèaktif ak pwen Zetwal.\n• <b>Travay</b> — chèche oswa bay travay nan Gonaïves.\n• <b>Zetwal Edu</b> — espas aprantisaj gratis nan 4 lang.\n\nKlike sou kat ki nan seksyon « Sis sèvis, yon sèl zetwal » la."; } },
 
   { k:['le','lè','ouvri','fenmen','ferme','ore','ouve','ouvè','orè','magazen'],
     a:function(){
@@ -2532,7 +2560,7 @@ var KB = [
       return "Sitasyon an ap chaje. Li parèt pi ba nan paj la, anba seksyon sèvis yo."; } },
 
   { k:['foto','imaj','photo','pic','ekran','vizyel'],
-    a:function(){ return "Chak kat sèvis ka gen pwòp foto pa l ki ranpli tout kat la, ak tèks la sou li. Si pa gen foto, anblèm dore a rete — sit la pa janm gen twou."; } },
+    a:function(){ return "Chak kat sèvis (sis an tout) ka gen pwòp foto pa l ki ranpli tout kat la, ak tèks la sou li. Si pa gen foto, anblèm dore a rete — sit la pa janm gen twou."; } },
 
   { k:['anbyans','efe','nej','nèj','lapli','etwal','bouton','fon','animasyon'],
     a:function(){ return "Bouton anba adwat la chanje anbyans paj la : <b>Etwal</b>, <b>Nèj</b>, <b>Lapli</b>, oswa <b>Anyen</b>.\n\nKlike sou li otan fwa ou vle. Si telefòn ou mande mwens mouvman, nou koupe tout animasyon otomatikman."; } },
