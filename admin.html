@@ -4787,7 +4787,17 @@ machin:"Une brouette, une balançoire (bascule) ou une ramp de chargement, sans 
 plant:"Une plantule qui sort du sol, ou une fleur avec une abeille, en gros plan.",
 bet:"Un animal de la faune haïtienne (photo libre de droits) : oiseau, lézard ou papillon.",
 okipasyon:"Une photo d'archive du domaine public ou une carte d'Haïti de l'époque.",
-tanje:"Un agenda ouvert avec une liste manuscrite et un stylo, sans visage."
+tanje:"Un agenda ouvert avec une liste manuscrite et un stylo, sans visage.",
+biom:"Photo de paysages de biomes : forêt tropicale, savane, désert, océan. Libre de droits.",
+koray:"Photo de récif corallien et de mangrove avec poissons. Libre de droits.",
+nonble:"Illustration d'une horloge avec chiffres, usage éducatif.",
+pliryel:"Illustration de livres/cahiers en français, usage éducatif.",
+sitadel:"Photo de la Citadelle Laferrière (Milot), domaine public ou licence libre.",
+desimal:"Illustration d'une règle graduée ou d'un tableau de décimales.",
+fekoupe:"Photo d'œuvres de fer découpé de Croix-des-Bouquets ou de peintures haïtiennes (autorisation de l'artiste).",
+wout:"Photo d'un piéton sur passage ou d'un motard avec casque.",
+manje:"Photo de soupe joumou et d'un plat de riz et haricots.",
+kare:"Illustration d'un carré avec aire, schéma pédagogique."
 };
 const ED_PHOTO_RULES=["Format paysage, ratio 5:3 (ex. 1200×720 px). Les photos verticales sont recadrées au centre.","Taille minimale 800 px de large. La compression en WebP est automatique (≈100–200 Ko).","Droits : votre propre photo, ou une photo libre (Wikimedia Commons, Unsplash) avec le crédit rempli. Jamais une image prise au hasard sur Internet.","Pas de filigrane, pas de texte incrusté (le texte est traduit par le site), pas de logo de marque.","Personnes : jamais de visage d'enfant identifiable sans autorisation écrite d'un parent. Préférez les mains, le dos ou le flou.","Sujets sensibles (santé, sexualité, violence) : images neutres, jamais de corps ni de mise en scène choquante."];
 function eduPhotoCount(){return ED.cat.filter(a=>(ED.over[a.id]||{}).img).length;}
