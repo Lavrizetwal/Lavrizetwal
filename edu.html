@@ -166,6 +166,8 @@ body{background:radial-gradient(circle at 20% 0,#EEF2FB,#D5DDF0 70%)}
 .vform{display:grid;gap:12px}.vform label{display:grid;gap:4px;font-weight:600;font-size:14px}.vform input:not([type=checkbox]),.vform textarea{font:inherit;padding:10px;border:1px solid var(--line);border-radius:6px;width:100%;box-sizing:border-box}
 .vform .chk{display:flex;gap:8px;align-items:flex-start;font-weight:400}.hp{position:absolute;left:-9999px;height:0;overflow:hidden}
 .vmsg{min-height:1.2em;margin:0}.vmsg.bad{color:#9B1C1C;font-weight:600}.vmsg.ok{color:#14653A;font-weight:700}
+.ph{position:relative;display:block;width:100%;height:100%}.ph>svg{display:block;width:100%;height:100%}.ph>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#eef1f7}
+.fig .ph,.gi .ph{height:auto;aspect-ratio:5/3}.cr{display:block;margin-top:4px;font-size:11px;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -1213,7 +1215,9 @@ function streak(){var s=0,d=new Date();for(;;){var k=d.toISOString().slice(0,10)
 function points(){var n=0,k;for(k in P.read)n+=10;for(k in P.quiz)n+=5*P.quiz[k];return n+(P.xp||0)}
 function artById(id){for(var i=0;i<ART.length;i++)if(ART[i].id===id)return ART[i]}
 function subjById(id){for(var i=0;i<SUBJ.length;i++)if(SUBJ[i].id===id)return SUBJ[i]}
-function img(a){var u=window.EDU_IMG[a.id];return u?'<img src="'+esc(u)+'" alt="'+esc(tr(a.t))+'">':IMG[a.img]()}
+window.EDU_ALT=window.EDU_ALT||{};window.EDU_CR=window.EDU_CR||{};
+function img(a){var u=window.EDU_IMG[a.id],svg=IMG[a.img]();if(!u||!/^https:\/\//.test(u))return svg;var al=window.EDU_ALT[a.id],alt=(al&&(al[lang]||al.fr||al.ht))||tr(a.t);
+ return'<span class="ph">'+svg+'<img src="'+esc(u)+'" alt="'+esc(alt)+'" loading="lazy" decoding="async" onerror="var f=this.closest(\'.fig\'),c=f&&f.querySelector(\'.cr\');if(c)c.remove();this.remove()"></span>'}
 function speak(text,lk){try{var u=new SpeechSynthesisUtterance(text);var code=GREETV[lk]||"fr-FR";u.lang=code;var vs=speechSynthesis.getVoices();for(var i=0;i<vs.length;i++){if(vs[i].lang.toLowerCase().indexOf(code.slice(0,2))===0){u.voice=vs[i];break}}speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 
 /* ---------- textes des laboratoires ---------- */
@@ -1587,7 +1591,7 @@ function applyRemote(){var id,o,a,i,ls=["ht","fr","en","ru"];
  for(id in RM.over){a=artById(id);o=RM.over[id];if(!a||!o)continue;
   if(o.t)a.t=mergeL(a.t,o.t);if(o.sum)a.sum=mergeL(a.sum,o.sum);
   if(o.b){var nb={};ls.forEach(function(l){nb[l]=(o.b[l]&&o.b[l].length)?o.b[l]:a.b[l]});a.b=nb}
-  if(o.img&&/^https:\/\//.test(o.img))window.EDU_IMG[id]=o.img}
+  if(o.img&&/^https:\/\//.test(o.img))window.EDU_IMG[id]=o.img;else delete window.EDU_IMG[id];window.EDU_ALT[id]=o.ia||null;window.EDU_CR[id]=o.ic||""}
  for(i=ART.length-1;i>=0;i--){var m=RM.meta[ART[i].id];if(m&&m.h&&ART[i].s!=="sexo")ART.splice(i,1)}}
 function metaOf(a){var m=RM.meta[a.id]||{},pub=m.p||a.pub||DEFPUB,upd=m.u||a.upd||pub,
  v=m.v||a.ver||(NOAUTO[a.s]?"none":"auto");
@@ -1799,7 +1803,7 @@ function artView(id){var a=artById(id);if(!a)return home();var g0=ageOf(a);if(g0
  var rel=ART.filter(function(x){return x.id!==a.id&&(x.s===a.s||x.lv===a.lv)}).slice(0,3);
  main.innerHTML='<div class="crumb"><a href="#/">'+t("home")+'</a> › <a href="#/s/'+s.id+'">'+esc(tr(s.t))+'</a></div>'+
  '<article class="art" style="--c:'+s.c+'"><h1>'+esc(tr(a.t))+'</h1><div class="meta"><span class="chip" style="background:'+s.c+'">'+esc(tr(s.t))+'</span><span class="chip lg">'+t(LVN[a.lv])+'</span><span>'+a.min+' '+t("min")+'</span><button class="btn sm" id="tts">🔊 '+t("listen")+'</button>'+vbadge(a)+agb(a)+'<button class="btn sm sec" id="det">ℹ️ '+t("det")+'</button></div><p class="upd">'+t("d_upd")+' : '+fdate(metaOf(a).upd)+'</p>'+
- '<figure class="fig">'+img(a)+'<figcaption>'+esc(tr(a.sum))+'</figcaption></figure><div class="txt">'+body+'</div></article>'+
+ '<figure class="fig">'+img(a)+'<figcaption>'+esc(tr(a.sum))+(window.EDU_IMG[a.id]&&window.EDU_CR[a.id]?'<small class="cr">'+esc(window.EDU_CR[a.id])+'</small>':"")+'</figcaption></figure><div class="txt">'+body+'</div></article>'+
  '<section class="box"><h2>🧪 '+t("lab")+'</h2><div id="lab"></div></section>'+
  '<section class="box"><h2>📚 '+t("words")+'</h2><div class="gws">'+words+'</div></section>'+
  '<section class="box"><h2>✅ '+t("quiz")+'</h2><div id="qz"></div></section>'+

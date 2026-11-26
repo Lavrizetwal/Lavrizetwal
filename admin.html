@@ -2331,7 +2331,12 @@ tbody tr:last-child td{border-bottom:none}
         <div class="form-grid">
           <div class="field"><label for="ed-q">Rechercher</label><input id="ed-q" class="input" placeholder="Titre ou identifiant" oninput="eduDraw()"></div>
           <div class="field"><label for="ed-f">Statut</label><select id="ed-f" class="input" onchange="eduDraw()"><option value="">Tous</option><option value="auto">Vérifié par Zetwal</option><option value="pro">Relu par un professionnel</option><option value="none">En attente</option></select></div>
+          <div class="field"><label for="ed-p">Photo</label><select id="ed-p" class="input" onchange="eduDraw()"><option value="">Toutes</option><option value="no">Sans photo (illustration du code)</option><option value="yes">Avec photo</option></select></div>
         </div>
+        <div id="ed-photostat" class="card-sub" style="margin:var(--s3) 0 0"></div>
+        <details style="margin-top:var(--s3)"><summary><b>Règles pour les photos</b> (à lire avant d'en ajouter)</summary><ul id="ed-photorules" style="margin:var(--s3) 0 0 18px"></ul>
+          <p class="card-sub">Si une photo manque ou ne s'affiche pas chez le visiteur, Edu montre automatiquement l'illustration dessinée par le code : rien ne casse.</p>
+          <button class="btn btn-quiet btn-sm" onclick="eduPhotoList()">Copier la liste des photos à demander</button> <span id="ed-photomsg" class="card-sub" style="margin:0"></span></details>
         <div class="card" style="margin-top:var(--s4)">
           <h4 style="margin:0 0 var(--s3)">Marquer la sélection comme relue</h4>
           <div class="form-grid">
@@ -4651,6 +4656,62 @@ function eduLoadCat(){return new Promise((res,rej)=>{
       const cat=Z.ALL.map(a=>({id:a.id,s:a.s,lv:a.lv,age:a.age||0,t:Object.assign({},a.t),sum:Object.assign({},a.sum),b:JSON.parse(JSON.stringify(a.b)),img:a.img}));
       f.remove(); res({cat,subj}); return; } }catch(e){} if(++tries>60){ clearTimeout(to); f.remove(); rej(new Error('Catalogue Edu illisible')); } else setTimeout(wait,150); })(); };
   document.body.appendChild(f); }); }
+
+/* ── Photos : ce que l'admin doit fournir pour chaque article ── */
+const ED_PHOTO={
+fraksyon:"Une pizza, un pain ou une galette coupés en parts égales, vus de dessus, une part levée.",
+fonksyon:"Une route en pente ou un escalier vu de côté (idée de pente), ou un tableau avec une droite tracée.",
+lalin:"La Lune dans le ciel nocturne, de préférence une phase partielle, bien nette.",
+kowodone:"Un globe terrestre ou une carte avec les méridiens et parallèles ; ou une boussole sur une carte.",
+"1804":"Le monument ou le site historique lié à 1804 (Citadelle Laferrière, Palais Sans-Souci, Champ-de-Mars) en photo réelle.",
+kouleur:"Un gros plan d'écran de téléphone ou d'ordinateur où l'on voit les pixels rouge/vert/bleu, ou un prisme qui décompose la lumière.",
+bidje:"Billets et pièces de gourdes sur une table avec un carnet de comptes, mains visibles sans visage.",
+bine:"Une carte électronique ou un écran de code, en gros plan ; éviter les logos de marques.",
+ortograf:"Un cahier d'école avec une phrase écrite en créole, ou des lettres sur un tableau.",
+salit:"Deux ou plusieurs personnes qui se saluent (poignée de main, signe de la main). Visages flous ou de dos si possible.",
+miltiplikasyon:"Des objets rangés en rangées égales (œufs en boîte de 12, rangées de plants).",
+fotosentez:"Une feuille verte vue en gros plan à contre-jour, ou un jeune plant au soleil.",
+lavaj:"Des mains qui se lavent sous un robinet avec du savon (mousse visible), sans visage.",
+kedlo:"Une personne qui prend le pouls au poignet (mains uniquement), ou un stéthoscope.",
+memwa:"Un cahier de révision, des cartes mémoire ou une personne qui étudie (de dos).",
+newon:"Une illustration scientifique libre de droits de neurones (Wikimedia Commons) ou un schéma net.",
+lob:"Un schéma ou une imagerie cérébrale libre de droits (vue latérale du cerveau).",
+dsm:"Un livre de référence fermé sur un bureau, sans titre de marque lisible, ou des lunettes sur des notes.",
+piramid:"Un livre de lois, la Constitution ou un marteau de juge posés sur une table.",
+emosyon:"Plusieurs expressions de visage d'enfants ou d'adultes avec leur accord écrit, ou des masques d'émotions.",
+neurotrans:"Schéma d'une synapse net et libre de droits.",
+afazi:"Une séance d'orthophonie (mains, images de mots), sans visage identifiable.",
+vaksen:"Une seringue et un flacon de vaccin, ou un agent de santé qui prépare une vaccination (sans visage du patient).",
+dwatimoun:"Des enfants qui jouent ou vont à l'école, avec autorisation écrite des parents, de dos ou flous.",
+ia:"Un ordinateur ou une salle de serveurs, ou un robot jouet ; éviter les logos.",
+oni:"Le siège de l'ONU à New York, ou des drapeaux de pays alignés.",
+solare:"Une image du Système solaire libre de droits (NASA / ESA).",
+moyenne:"Un graphique en barres sur papier ou écran, avec un stylo.",
+proba:"Un dé et des pièces de monnaie sur une table.",
+religions:"Des lieux de culte variés côte à côte (église, mosquée, temple, houmfò) en vue extérieure respectueuse, sans fidèles reconnaissables.",
+"sx-kom":"ATTENTION sujet sensible : pas de corps ni d'enfants. Photo neutre : une porte qu'on ferme à clé, un cadenas, ou des mains d'adulte tenant une main d'enfant (de dos).",
+"sx-non":"ATTENTION sujet sensible : pas de personnes reconnaissables. Photo neutre : un panneau stop, une main levée (paume) en gros plan.",
+"sx-pibete":"ATTENTION sujet sensible : pas de corps. Photo neutre : une plante qui pousse, un calendrier, ou un rayon d'école.",
+"sx-konsan":"ATTENTION sujet sensible : pas de couples. Photo neutre : un feu vert/rouge, ou une main qui fait « stop ».",
+"sx-relasyon":"ATTENTION sujet sensible : pas de couples. Photo neutre : deux chaises face à face, ou deux mains qui se serrent (adultes, cadrage serré).",
+"sx-kontra":"Photo neutre d'une boîte de préservatifs fermée ou d'un centre de santé (façade). Pas de personnes.",
+"sx-ist":"Photo neutre d'un laboratoire de dépistage (tube, tampon, gants) ou d'un ruban rouge de sensibilisation. Pas de personnes.",
+"sx-vyolans":"ATTENTION sujet sensible : aucune mise en scène de violence. Photo neutre : une porte de centre de santé ou une main qui en tient une autre (adultes, cadrage serré).",
+"sx-adilt":"Photo neutre : consultation médicale (bureau de médecin, sans patient), ou boîte de préservatifs fermée.",
+"sx-pwoblem":"Photo neutre : cabinet de consultation vide, ou deux chaises face à face.",
+eskelet:"Un squelette de cabinet ou de classe, ou une radiographie libre de droits.",
+kolera:"Un robinet ou un puits d'eau potable, un verre d'eau, ou un sachet de SRO.",
+nitrisyon:"Une assiette de repas haïtien équilibré (riz, pwa, légumes, fruits) vue de dessus.",
+modpas:"Un cadenas posé sur un clavier, ou une clé sur un téléphone ; pas de mots de passe lisibles.",
+arnak:"Un téléphone avec un SMS suspect flouté, ou une main qui hésite devant un lien.",
+tranbleman:"Une carte des plaques tectoniques ou une faille visible en photo réelle ; éviter les photos de victimes.",
+sezon:"Un paysage haïtien en saison sèche et en saison des pluies (même lieu si possible), ou la Terre inclinée (NASA).",
+pouvwa:"Le Palais législatif ou un tribunal en vue extérieure, ou une balance de la justice.",
+premyesen:"Une trousse de premiers secours ouverte avec compresses et bandes, sans blessé visible."
+};
+const ED_PHOTO_RULES=["Format paysage, ratio 5:3 (ex. 1200×720 px). Les photos verticales sont recadrées au centre.","Taille minimale 800 px de large. La compression en WebP est automatique (≈100–200 Ko).","Droits : votre propre photo, ou une photo libre (Wikimedia Commons, Unsplash) avec le crédit rempli. Jamais une image prise au hasard sur Internet.","Pas de filigrane, pas de texte incrusté (le texte est traduit par le site), pas de logo de marque.","Personnes : jamais de visage d'enfant identifiable sans autorisation écrite d'un parent. Préférez les mains, le dos ou le flou.","Sujets sensibles (santé, sexualité, violence) : images neutres, jamais de corps ni de mise en scène choquante."];
+function eduPhotoCount(){return ED.cat.filter(a=>(ED.over[a.id]||{}).img).length;}
+
 window.initEdu=async()=>{
   const l=document.getElementById('ed-list'); if(!l) return;
   l.innerHTML=skeletonCards(3);
@@ -4670,17 +4731,19 @@ function eduVSel(){const s=document.getElementById('ed-vsel'); if(!s) return;
   const d=document.getElementById('ed-vd'); if(d&&!d.value) d.value=new Date().toISOString().slice(0,10);}
 window.eduPickV=()=>{const id=document.getElementById('ed-vsel').value, v=ED.vers.find(x=>x.id===id); if(v){document.getElementById('ed-vn').value=v.name||''; document.getElementById('ed-vt').value=v.title||'';}};
 window.eduDraw=()=>{
-  const q=(document.getElementById('ed-q').value||'').toLowerCase(), f=document.getElementById('ed-f').value, l=document.getElementById('ed-list');
-  const rows=ED.cat.filter(a=>(!f||eduStat(a)===f)&&(!q||a.id.toLowerCase().includes(q)||(a.t.fr||'').toLowerCase().includes(q)||(a.t.ht||'').toLowerCase().includes(q)));
+  const q=(document.getElementById('ed-q').value||'').toLowerCase(), f=document.getElementById('ed-f').value, pf=document.getElementById('ed-p').value, l=document.getElementById('ed-list');
+  const st=document.getElementById('ed-photostat'); if(st) st.textContent=eduPhotoCount()+' article(s) sur '+ED.cat.length+' ont une photo ; les autres affichent l\'illustration du code.';
+  const rp=document.getElementById('ed-photorules'); if(rp&&!rp.children.length) rp.innerHTML=ED_PHOTO_RULES.map(x=>'<li>'+escH(x)+'</li>').join('');
+  const rows=ED.cat.filter(a=>(!f||eduStat(a)===f)&&(!pf||(pf==='yes')===!!(ED.over[a.id]||{}).img)&&(!q||a.id.toLowerCase().includes(q)||(a.t.fr||'').toLowerCase().includes(q)||(a.t.ht||'').toLowerCase().includes(q)));
   if(!rows.length){ l.innerHTML=emptyState('search','Aucun article','Aucun article ne correspond à ce filtre.'); return; }
-  l.innerHTML='<div class="table-wrap"><table class="stack"><thead><tr><th></th><th>Article</th><th>Matière</th><th>Statut</th><th></th></tr></thead><tbody>'+rows.map(a=>{
+  l.innerHTML='<div class="table-wrap"><table class="stack"><thead><tr><th></th><th>Article</th><th>Matière</th><th>Statut</th><th>Photo</th><th></th></tr></thead><tbody>'+rows.map(a=>{
     const st=eduStat(a), m=ED.meta[a.id]||{}, hid=m.hidden;
     return '<tr><td><input type="checkbox" aria-label="Sélectionner" '+(ED.sel.has(a.id)?'checked ':'')+'onchange="eduTog(\''+a.id+'\',this.checked)"></td>'
      +'<td><b>'+escH(a.t.fr||a.t.ht)+'</b><br><span class="card-sub" style="margin:0">'+escH(a.id)+(a.age?' · '+a.age+'+':'')+(hid?' · masqué':'')+'</span></td>'
      +'<td>'+escH((ED.subj[a.s]||{}).t||a.s)+'</td>'
      +'<td><span class="chip '+(st==='pro'?'chip-gold':st==='auto'?'chip-ok':'chip-info')+'">'+ED_STAT[st]+'</span>'+(st==='pro'&&m.verifier_name?'<br><span class="card-sub" style="margin:0">'+escH(m.verifier_name)+'</span>':'')+'</td>'
-     +'<td><button class="btn btn-ghost btn-sm" onclick="eduEdit(\''+a.id+'\')">Modifier</button></td></tr>'
-     +(ED.open===a.id?'<tr><td colspan="5">'+eduForm(a)+'</td></tr>':'');}).join('')+'</tbody></table></div>';
+     +'<td>'+(((ED.over[a.id]||{}).img)?'<img src="'+escH(ED.over[a.id].img)+'" alt="" style="width:56px;height:34px;object-fit:cover;border-radius:4px" onerror="this.replaceWith(document.createTextNode(\'lien cassé\'))">':'<span class="card-sub" style="margin:0">illustration</span>')+'</td><td><button class="btn btn-ghost btn-sm" onclick="eduEdit(\''+a.id+'\')">Modifier</button></td></tr>'
+     +(ED.open===a.id?'<tr><td colspan="6">'+eduForm(a)+'</td></tr>':'');}).join('')+'</tbody></table></div>';
 };
 window.eduTog=(id,on)=>{on?ED.sel.add(id):ED.sel.delete(id);};
 window.eduBulk=async(kind)=>{
@@ -4695,7 +4758,7 @@ window.eduBulk=async(kind)=>{
   msg.textContent=ok+' article(s) mis à jour'+(bad?' — arrêt : '+bad:''); if(!bad) ED.sel.clear(); initEdu();
 };
 window.eduEdit=(id)=>{ED.open=ED.open===id?null:id; eduDraw();};
-function eduCur(a){const o=ED.over[a.id]||{}; return {t:Object.assign({},a.t,o.t||{}),sum:Object.assign({},a.sum,o.sum||{}),b:ED_LANGS.reduce((r,l)=>{r[l]=(o.b&&o.b[l])||a.b[l];return r;},{}),img:o.img||''};}
+function eduCur(a){const o=ED.over[a.id]||{}; return {t:Object.assign({},a.t,o.t||{}),sum:Object.assign({},a.sum,o.sum||{}),b:ED_LANGS.reduce((r,l)=>{r[l]=(o.b&&o.b[l])||a.b[l];return r;},{}),img:o.img||'',ic:o.ic||'',ia:Object.assign({},o.ia||{})};}
 function eduForm(a){
   const m=ED.meta[a.id]||{}, st=eduStat(a), c=eduCur(a), lock=a.s==='sexo', ts=new Date().toISOString().slice(0,10);
   const lf=(k,l,v,rows)=>'<div class="field"><label>'+k+' ('+l.toUpperCase()+')</label>'+(rows?'<textarea class="input" rows="'+rows+'" data-ed="'+k+'" data-l="'+l+'">'+escH(v)+'</textarea>':'<input class="input" data-ed="'+k+'" data-l="'+l+'" value="'+escH(v)+'">')+'</div>';
@@ -4709,10 +4772,10 @@ function eduForm(a){
    +'<div class="field"><label>Date de publication</label><input type="date" class="input" id="edf-pub" value="'+escH(m.published_on||'')+'"></div>'
    +'<div class="field"><label>Dernière mise à jour</label><input type="date" class="input" id="edf-upd" value="'+escH(m.updated_on||ts)+'"></div>'
    +'<div class="field"><label>Remarque affichée</label><input class="input" id="edf-note" maxlength="300" value="'+escH(m.note||'')+'"></div>'
-   +'<div class="field"><label>Image (lien https)</label><input class="input" id="edf-img" placeholder="https://…" value="'+escH(c.img)+'"></div>'
+   
    +(lock?'':'<div class="field"><label>Accès (âge)</label><select class="input" id="edf-age"><option value="">Par défaut ('+(a.age||0)+')</option><option value="0"'+(m.min_age===0?' selected':'')+'>Tous âges</option><option value="14"'+(m.min_age===14?' selected':'')+'>14+</option><option value="18"'+(m.min_age===18?' selected':'')+'>18+</option></select></div>')
    +'<div class="field"><label><input type="checkbox" id="edf-h"'+(m.hidden&&!lock?' checked':'')+(lock?' disabled':'')+'> Masquer cet article</label></div>'
-   +'</div><details style="margin-top:var(--s3)"><summary>Modifier les textes (4 langues)</summary><div class="form-grid" style="margin-top:var(--s3)">'
+   +'</div>'+eduPhotoBlock(a,c)+'<details style="margin-top:var(--s3)"><summary>Modifier les textes (4 langues)</summary><div class="form-grid" style="margin-top:var(--s3)">'
    +ED_LANGS.map(l=>lf('t',l,c.t[l]||'')+lf('sum',l,c.sum[l]||'',2)).join('')
    +ED_LANGS.map(l=>'<div class="field span2"><label>Texte ('+l.toUpperCase()+') — séparez les paragraphes par une ligne vide ; « ## » = titre, « &gt; » = encadré</label><textarea class="input" rows="10" data-ed="b" data-l="'+l+'">'+escH((c.b[l]||[]).join('\n\n'))+'</textarea></div>').join('')
    +'</div></details>'
@@ -4723,11 +4786,16 @@ window.eduSave=async(id)=>{
   const v=g('edf-v').value, vn=g('edf-vn').value.trim(), vt=g('edf-vt').value.trim(), vd=g('edf-vd').value||null;
   if(v==='pro'&&(!vn||!vt||!vd)){msg.textContent='Un article « relu » exige nom, titre et date du relecteur.';return;}
   const img=g('edf-img').value.trim(); if(img&&!/^https:\/\//.test(img)){msg.textContent="Le lien d'image doit commencer par https://";return;}
+  const ic=g('edf-ic').value.trim(), ia={}; ED_LANGS.forEach(l=>{const v=g('edf-ia-'+l).value.trim(); if(v) ia[l]=v;});
+  if(img&&!ic){msg.textContent="Indiquez le crédit de la photo (auteur et licence, ou « Photo Zetwal »).";return;}
   const c=eduCur(a), o=Object.assign({},ED.over[id]||{}); let changed=false;
   root.querySelectorAll('[data-ed]').forEach(el=>{ const k=el.dataset.ed,l=el.dataset.l,val=el.value.trim();
     if(k==='b'){ const arr=val.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean); if(JSON.stringify(arr)!==JSON.stringify(c.b[l]||[])){o.b=Object.assign({},o.b||{}); o.b[l]=arr; changed=true;} }
     else if(val!==(c[k][l]||'')){ o[k]=Object.assign({},o[k]||{}); o[k][l]=val; changed=true; } });
   if(img!==c.img){ if(img) o.img=img; else delete o.img; changed=true; }
+  if(ic!==c.ic){ if(ic) o.ic=ic; else delete o.ic; changed=true; }
+  if(JSON.stringify(ia)!==JSON.stringify(c.ia)){ if(Object.keys(ia).length) o.ia=ia; else delete o.ia; changed=true; }
+  if(!img){ delete o.ia; delete o.ic; }
   const ageSel=g('edf-age'), age=ageSel&&ageSel.value!==''?+ageSel.value:null;
   msg.textContent='Enregistrement…';
   try{
@@ -4744,6 +4812,32 @@ window.eduReset=async(id)=>{
   if(msg.dataset.arm!=='1'){msg.dataset.arm='1';msg.textContent='Cliquez encore pour confirmer : les textes reviennent à la version d\'origine.';return;}
   const {error}=await db.rpc('edu_admin_set_override',{p_article:id,p_data:{}}); if(error){msg.textContent=eduErr(error);return;} toast("Texte d'origine rétabli",'success'); ED.open=null; initEdu();
 };
+
+function eduPhotoBlock(a,c){
+  const br=ED_PHOTO[a.id]||"Une photo réelle qui illustre clairement le sujet de l'article.";
+  return '<div class="card" style="margin:var(--s4) 0 0"><h4 style="margin:0 0 var(--s2)">Photo de l\'article</h4>'
+   +'<p style="margin:0 0 var(--s2)"><b>Photo demandée :</b> '+escH(br)+'</p>'
+   +'<p class="card-sub" style="margin:0 0 var(--s3)">Format paysage 5:3 (idéal 1200×720 px), compressée automatiquement. Sans photo, Edu garde l\'illustration du code.</p>'
+   +'<div style="display:flex;gap:var(--s4);flex-wrap:wrap;align-items:flex-start"><div style="width:240px;max-width:100%;aspect-ratio:5/3;background:var(--bg-2,#1a2338);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center"><img id="edf-prev" alt="Aperçu" style="width:100%;height:100%;object-fit:cover;'+(c.img?'':'display:none')+'" src="'+escH(c.img)+'" onerror="this.style.display=\'none\';document.getElementById(\'edf-prevmsg\').textContent=\'Le lien ne s\\u2019affiche pas : Edu montrera l\\u2019illustration.\'"><span id="edf-prevmsg" class="card-sub" style="margin:0;padding:8px;text-align:center">'+(c.img?'':'Aucune photo : illustration du code')+'</span></div>'
+   +'<div style="flex:1 1 260px;min-width:0"><div class="field"><label>Téléverser une photo</label><input type="file" accept="image/*" class="input" onchange="eduPhotoUp(this)"></div>'
+   +'<div class="field"><label>ou lien https de la photo</label><input class="input" id="edf-img" placeholder="https://…" value="'+escH(c.img)+'" oninput="eduPhotoPrev()"></div>'
+   +'<div class="field"><label>Crédit (obligatoire avec une photo)</label><input class="input" id="edf-ic" maxlength="160" placeholder="Photo Zetwal, ou Nom / Wikimedia Commons CC BY-SA 4.0" value="'+escH(c.ic)+'"></div>'
+   +'<button class="btn btn-ghost btn-sm" type="button" onclick="eduPhotoClear()">Retirer la photo (revenir à l\'illustration)</button> <span id="edf-photomsg" class="card-sub" style="margin:0"></span></div></div>'
+   +'<details style="margin-top:var(--s3)"><summary>Texte alternatif (accessibilité) par langue</summary><div class="form-grid" style="margin-top:var(--s3)">'
+   +ED_LANGS.map(l=>'<div class="field"><label>Description de la photo ('+l.toUpperCase()+')</label><input class="input" id="edf-ia-'+l+'" maxlength="200" value="'+escH(c.ia[l]||'')+'"></div>').join('')
+   +'</div><p class="card-sub">Décrivez ce qu\'on voit, pour les personnes qui ne voient pas l\'image. Sans description, le titre de l\'article est utilisé.</p></details></div>';
+}
+window.eduPhotoPrev=()=>{const u=document.getElementById('edf-img').value.trim(), im=document.getElementById('edf-prev'), m=document.getElementById('edf-prevmsg'); if(/^https:\/\//.test(u)){im.style.display='';im.src=u;m.textContent='';}else{im.style.display='none';m.textContent='Aucune photo : illustration du code';}};
+window.eduPhotoClear=()=>{document.getElementById('edf-img').value='';document.getElementById('edf-ic').value='';eduPhotoPrev();};
+window.eduPhotoUp=async(inp)=>{const f=inp.files&&inp.files[0], m=document.getElementById('edf-photomsg'); if(!f) return;
+  if(f.size>15*1024*1024){m.textContent='Fichier trop lourd (15 Mo maximum).';return;}
+  m.textContent='Compression et envoi…';
+  try{ const r=await uploadSiteImage(f,'edu',1200); document.getElementById('edf-img').value=r.url; eduPhotoPrev(); m.textContent='Photo envoyée ('+Math.round(r.size/1024)+' Ko). Remplissez le crédit puis cliquez sur Enregistrer.'; }
+  catch(e){ m.textContent='Envoi impossible : '+eduErr(e); } inp.value=''; };
+window.eduPhotoList=async()=>{const m=document.getElementById('ed-photomsg');
+  const lines=ED.cat.filter(a=>!(ED.over[a.id]||{}).img).map(a=>'- '+(a.t.fr||a.t.ht)+' ['+a.id+'] : '+(ED_PHOTO[a.id]||'photo réelle illustrant le sujet'));
+  const txt='Photos à fournir pour Zetwal Edu (format paysage 5:3, min. 800 px, avec crédit) :\n'+ED_PHOTO_RULES.map(x=>'* '+x).join('\n')+'\n\n'+lines.join('\n');
+  try{ await navigator.clipboard.writeText(txt); m.textContent=lines.length+' photo(s) copiée(s) dans le presse-papiers.'; }catch(e){ m.textContent='Copie impossible : sélectionnez le texte ci-dessous.'; const ta=document.createElement('textarea'); ta.className='input'; ta.rows=8; ta.value=txt; m.after(ta); } };
 function eduApps(){
   const el=document.getElementById('ed-apps'); if(!ED.apps.length){el.innerHTML=emptyState('user','Aucune candidature','Les candidatures envoyées depuis la page « Devenir vérificateur » apparaissent ici.');return;}
   el.innerHTML=ED.apps.map(a=>{const ck=a.checklist||{}, cb=(k,t)=>'<label style="display:inline-flex;gap:6px;align-items:center;margin-right:14px"><input type="checkbox" id="ap-'+k+'-'+a.id+'"'+(ck[k]?' checked':'')+'> '+t+'</label>';
