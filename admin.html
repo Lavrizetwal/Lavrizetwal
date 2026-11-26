@@ -4726,7 +4726,15 @@ chenalim:"Une scène de nature : herbe, insecte et oiseau, ou une mare avec pois
 dlopwop:"Un récipient d'eau propre avec couvercle et une louche à manche, ou de l'eau qui bout dans une casserole.",
 newton:"Un ballon qui roule ou une bille qui heurte une autre bille, ou une charrette poussée (sans visage).",
 pousantaj:"Une étiquette de réduction (-15 %) sur un article, ou des billets de gourdes avec une calculatrice.",
-etidye:"Un cahier ouvert avec un stylo sur un bureau et un minuteur, mains visibles, sans visage."
+etidye:"Un cahier ouvert avec un stylo sur un bureau et un minuteur, mains visibles, sans visage.",
+vetye:"Un monument ou la citadelle/fort près du Cap-Haïtien (photo libre de droits) ou une carte de la région du Nord.",
+drapo:"Le drapeau haïtien bleu et rouge qui flotte, ou un drapeau cousu à la main (sans visage).",
+elektrik:"Une ampoule allumée reliée à une pile, ou un panneau solaire sur un toit.",
+klima:"Un paysage haïtien avec collines déboisées ou plantation d'arbres, ou un panneau solaire.",
+malarya:"Une moustiquaire installée au-dessus d'un lit, sans personne.",
+atom:"Un schéma simple d'atome dessiné à la main ou une molécule d'eau en perles colorées.",
+jeyometri:"Un terrain rectangulaire avec un mètre ruban et des piquets, ou une règle et une équerre sur un cahier.",
+pwoveb:"Un livre ouvert de proverbes ou des mains de plusieurs générations qui travaillent ensemble (sans visage)."
 };
 const ED_PHOTO_RULES=["Format paysage, ratio 5:3 (ex. 1200×720 px). Les photos verticales sont recadrées au centre.","Taille minimale 800 px de large. La compression en WebP est automatique (≈100–200 Ko).","Droits : votre propre photo, ou une photo libre (Wikimedia Commons, Unsplash) avec le crédit rempli. Jamais une image prise au hasard sur Internet.","Pas de filigrane, pas de texte incrusté (le texte est traduit par le site), pas de logo de marque.","Personnes : jamais de visage d'enfant identifiable sans autorisation écrite d'un parent. Préférez les mains, le dos ou le flou.","Sujets sensibles (santé, sexualité, violence) : images neutres, jamais de corps ni de mise en scène choquante."];
 function eduPhotoCount(){return ED.cat.filter(a=>(ED.over[a.id]||{}).img).length;}
