@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta property="og:title" content="Zetwal Edu"><meta property="og:description" content="Espas aprantisaj gratis an kreyòl, fransè, angle ak ris."><meta property="og:image" content="https://zetwal.org/logo-192.png"><meta property="og:type" content="website">
 <title>Zetwal Edu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>try{var __t=localStorage.getItem("zt-theme");if(__t==="light"||__t==="dark")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
@@ -244,7 +245,7 @@ guest:"Pwogrè w sove sou aparèy sa a sèlman.",galt:"Galri imaj",galtx:"Tout i
 glt:"Diksyonè",gltx:"Tout mo kle nan atik yo, pa lòd alfabetik.",filter:"Filtre mo yo",zhome:"Akèy Zetwal",foot:"Zetwal Edu · yon pwojè Zetwal Organisation",
 addr:"Wout Nasyonal #1, nan antre ri Jean Pierre a, zòn Pont-Gaudin, Gonayiv, Ayiti W.I",lang:"Lang",skip:"Ale nan kontni an",
 done:"Li",pts:"pwen",inprog:"Nan preparasyon",avail:"atik disponib",of:"sou",
-bits:"Bit yo",dec:"Desimal",hex:"Egzadesimal",listen:"Koute",
+bits:"Bit yo",dec:"Desimal",hex:"Egzadesimal",listen:"Koute",share:"Pataje",shcopy:"Kopye lyen an",shcopied:"Lyen kopye ✓",shmsg:"Gade atik sa a sou Zetwal Edu",shmore:"Pataje sou…",
 },
 fr:{tag:"Gratuit. Aucun compte nécessaire pour apprendre.",ph:"Chercher un mot, un sujet…",go:"Chercher",home:"Accueil",subj:"Matières",gloss:"Dictionnaire",gal:"Galerie",prog:"Progrès",
 lv1:"Débutant",lv2:"Intermédiaire",lv3:"Avancé",
@@ -259,7 +260,7 @@ guest:"Votre progression est enregistrée sur cet appareil uniquement.",galt:"Ga
 glt:"Dictionnaire",gltx:"Tous les mots clés des articles, par ordre alphabétique.",filter:"Filtrer les mots",zhome:"Accueil Zetwal",foot:"Zetwal Edu · un projet de Zetwal Organisation",
 addr:"Route Nationale n° 1, entrée de la ruelle Jean Pierre, zone de Pont-Gaudin, Gonaïves, Haïti W.I",lang:"Langue",skip:"Aller au contenu",
 done:"Lu",pts:"points",inprog:"En préparation",avail:"articles disponibles",of:"sur",
-bits:"Bits",dec:"Décimal",hex:"Hexadécimal",listen:"Écouter",
+bits:"Bits",dec:"Décimal",hex:"Hexadécimal",listen:"Écouter",share:"Partager",shcopy:"Copier le lien",shcopied:"Lien copié ✓",shmsg:"Découvrez cet article sur Zetwal Edu",shmore:"Partager sur…",
 },
 en:{tag:"Free. No account needed to learn.",ph:"Search a word or topic…",go:"Search",home:"Home",subj:"Subjects",gloss:"Glossary",gal:"Gallery",prog:"Progress",
 lv1:"Beginner",lv2:"Intermediate",lv3:"Advanced",
@@ -274,7 +275,7 @@ guest:"Your progress is saved on this device only.",galt:"Image gallery",galtx:"
 glt:"Glossary",gltx:"All key words from the articles, in alphabetical order.",filter:"Filter words",zhome:"Zetwal home",foot:"Zetwal Edu · a Zetwal Organisation project",
 addr:"National Road #1, at the entrance of Jean Pierre Alley, Pont-Gaudin area, Gonaïves, Haiti W.I",lang:"Language",skip:"Skip to content",
 done:"Read",pts:"points",inprog:"In preparation",avail:"articles available",of:"of",
-bits:"Bits",dec:"Decimal",hex:"Hexadecimal",listen:"Listen",
+bits:"Bits",dec:"Decimal",hex:"Hexadecimal",listen:"Listen",share:"Share",shcopy:"Copy link",shcopied:"Link copied ✓",shmsg:"Check out this article on Zetwal Edu",shmore:"Share on…",
 },
 ru:{tag:"Бесплатно. Для обучения аккаунт не нужен.",ph:"Найти слово или тему…",go:"Найти",home:"Главная",subj:"Предметы",gloss:"Словарь",gal:"Галерея",prog:"Прогресс",
 lv1:"Начальный",lv2:"Средний",lv3:"Продвинутый",
@@ -289,7 +290,7 @@ guest:"Ваш прогресс сохраняется только на этом
 glt:"Словарь",gltx:"Все ключевые слова из статей по алфавиту.",filter:"Фильтр слов",zhome:"На главную Zetwal",foot:"Zetwal Edu · проект Zetwal Organisation",
 addr:"Национальная дорога № 1, при входе в переулок Жан-Пьер, район Пон-Годен, Гонаив, Гаити W.I",lang:"Язык",skip:"К содержимому",
 done:"Прочитано",pts:"баллов",inprog:"В подготовке",avail:"статей доступно",of:"из",
-bits:"Биты",dec:"Десятичное",hex:"Шестнадцатеричное",listen:"Слушать",
+bits:"Биты",dec:"Десятичное",hex:"Шестнадцатеричное",listen:"Слушать",share:"Поделиться",shcopy:"Копировать ссылку",shcopied:"Ссылка скопирована ✓",shmsg:"Посмотрите эту статью на Zetwal Edu",shmore:"Поделиться в…",
 }};
 
 /* ===== Catalogue : matières, chronologie, glossaire ===== */
@@ -4215,6 +4216,19 @@ function detailsModal(a){var m=metaOf(a),g=ageOf(a),old=$("#ovl");if(old)old.rem
  function cl(){o.remove();document.removeEventListener("keydown",kd);try{prev&&prev.focus()}catch(e){}}
  function kd(e){if(e.key==="Escape")cl()}document.addEventListener("keydown",kd);
  o.onclick=function(e){if(e.target===o)cl()};$("#mc").onclick=cl;$("#mv").onclick=cl;$("#mc").focus()}
+function shareArt(a,btn){var url="https://zetwal.org/edu.html#/a/"+a.id,ttl=tr(a.t),txt=t("shmsg")+" : "+ttl;
+ if(navigator.share){navigator.share({title:ttl,text:txt,url:url}).catch(function(){});return}
+ var old=$("#ovl");if(old)old.remove();var e=encodeURIComponent,full=e(txt+" "+url);
+ var links=[["WhatsApp","https://wa.me/?text="+full],["Facebook","https://www.facebook.com/sharer/sharer.php?u="+e(url)],["Telegram","https://t.me/share/url?url="+e(url)+"&text="+e(txt)],["X","https://twitter.com/intent/tweet?text="+e(txt)+"&url="+e(url)],["E-mail","mailto:?subject="+e(ttl)+"&body="+full]];
+ var o=document.createElement("div");o.id="ovl";o.className="ovl";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");
+ o.innerHTML='<div class="mbox"><h2>🔗 '+t("share")+'</h2><p class="mttl">'+esc(ttl)+'</p><input id="shu" class="search" readonly value="'+esc(url)+'" aria-label="URL"><div class="mrow" style="margin-top:10px"><button class="btn" id="shc">'+t("shcopy")+'</button></div><p class="mx">'+t("shmore")+'</p><div class="mrow">'+links.map(function(l){return'<a class="btn sec" target="_blank" rel="noopener" href="'+l[1]+'">'+l[0]+'</a>'}).join(" ")+'</div><div class="mrow" style="margin-top:12px"><button class="btn sec" id="mc">'+t("close")+'</button></div></div>';
+ document.body.appendChild(o);var prev=document.activeElement;
+ function cl(){o.remove();document.removeEventListener("keydown",kd);try{prev&&prev.focus()}catch(x){}}
+ function kd(ev){if(ev.key==="Escape")cl()}document.addEventListener("keydown",kd);
+ o.onclick=function(ev){if(ev.target===o)cl()};$("#mc").onclick=cl;
+ $("#shc").onclick=function(){var b=this,inp=$("#shu");function ok(){b.textContent=t("shcopied")}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(ok).catch(function(){inp.select();try{document.execCommand("copy");ok()}catch(x){}});else{inp.select();try{document.execCommand("copy");ok()}catch(x){}}};
+ $("#shc").focus()}
 /* accès : 14+ confirmation, 18+ compte adulte */
 var AUTHS={st:"idle",adult:false};
 function loadScript(u,cb,er){var s=document.createElement("script");s.src=u;s.onload=cb;s.onerror=er;document.head.appendChild(s)}
@@ -4946,7 +4960,7 @@ function artView(id){var a=artById(id);if(!a)return home();var g0=ageOf(a);if(g0
  var words=a.w.map(function(k){var g=G[k];return g?'<div class="gw"><b>'+esc(tr(g.t))+'</b><span>'+esc(tr(g.d))+'</span></div>':""}).join("");
  var rel=ART.filter(function(x){return x.id!==a.id&&(x.s===a.s||x.lv===a.lv)}).slice(0,3);
  main.innerHTML='<div class="crumb"><a href="#/">'+t("home")+'</a> › <a href="#/s/'+s.id+'">'+esc(tr(s.t))+'</a></div>'+
- '<article class="art" style="--c:'+s.c+'"><h1>'+esc(tr(a.t))+'</h1><div class="meta"><span class="chip" style="background:'+s.c+'">'+esc(tr(s.t))+'</span><span class="chip lg">'+t(LVN[a.lv])+'</span><span>'+a.min+' '+t("min")+'</span><button class="btn sm" id="tts">🔊 '+t("listen")+'</button>'+vbadge(a)+agb(a)+'<button class="btn sm sec" id="det">ℹ️ '+t("det")+'</button></div><p class="upd">'+t("d_upd")+' : '+fdate(metaOf(a).upd)+'</p>'+
+ '<article class="art" style="--c:'+s.c+'"><h1>'+esc(tr(a.t))+'</h1><div class="meta"><span class="chip" style="background:'+s.c+'">'+esc(tr(s.t))+'</span><span class="chip lg">'+t(LVN[a.lv])+'</span><span>'+a.min+' '+t("min")+'</span><button class="btn sm" id="tts">🔊 '+t("listen")+'</button>'+vbadge(a)+agb(a)+'<button class="btn sm sec" id="det">ℹ️ '+t("det")+'</button><button class="btn sm sec" id="shr">🔗 '+t("share")+'</button></div><p class="upd">'+t("d_upd")+' : '+fdate(metaOf(a).upd)+'</p>'+
  '<figure class="fig">'+img(a)+'<figcaption>'+esc(tr(a.sum))+(window.EDU_IMG[a.id]&&window.EDU_CR[a.id]?'<small class="cr">'+esc(window.EDU_CR[a.id])+'</small>':"")+'</figcaption></figure><div class="txt">'+body+'</div></article>'+
  '<section class="box"><h2>🧪 '+t("lab")+'</h2><div id="lab"></div></section>'+
  '<section class="box"><h2>📚 '+t("words")+'</h2><div class="gws">'+words+'</div></section>'+
@@ -4955,7 +4969,7 @@ function artView(id){var a=artById(id);if(!a)return home();var g0=ageOf(a);if(g0
  (rel.length?'<h2 class="sec">'+t("related")+'</h2><div class="alist">'+rel.map(aLink).join("")+'</div>':"");
  LABS[a.lab]($("#lab"));quiz(a,$("#qz"));
  $("#mk").onclick=function(){if(!P.read[a.id]){P.read[a.id]=today();touchDay();save();refreshStats();zetaSay();checkBadges()}this.textContent="✓ "+t("done")};
- $("#det").onclick=function(){detailsModal(a)};$("#tts").onclick=function(){speak(tr(a.b).filter(function(p){return p.indexOf("## ")!==0&&p.indexOf("> ")!==0}).join(" ").replace(/\*\*/g,""),lang)}}
+ $("#det").onclick=function(){detailsModal(a)};$("#shr").onclick=function(){shareArt(a,this)};$("#tts").onclick=function(){speak(tr(a.b).filter(function(p){return p.indexOf("## ")!==0&&p.indexOf("> ")!==0}).join(" ").replace(/\*\*/g,""),lang)}}
 function allView(){main.innerHTML='<h1 class="pt">'+t("subjt")+' · '+SUBJ.length+'</h1><input id="af" class="search" placeholder="'+t("fsubj")+'" aria-label="'+t("fsubj")+'"><div class="sgrid" id="ag" style="margin-top:14px"></div>';
  function draw(){var q=$("#af").value.toLowerCase();$("#ag").innerHTML=SUBJ.filter(function(s){return!q||Object.keys(s.t).some(function(l){return s.t[l].toLowerCase().indexOf(q)>=0})||s.tp.some(function(p){return T(p[1])[lang].toLowerCase().indexOf(q)>=0})}).map(function(s){return'<a class="stile" href="#/s/'+s.id+'"><i>'+esc(s.ic)+'</i><b>'+esc(tr(s.t))+'</b><span>'+esc(tr(s.d))+'</span></a>'}).join("")}
  $("#af").oninput=draw;draw()}
