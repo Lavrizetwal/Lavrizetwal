@@ -4707,7 +4707,13 @@ arnak:"Un téléphone avec un SMS suspect flouté, ou une main qui hésite devan
 tranbleman:"Une carte des plaques tectoniques ou une faille visible en photo réelle ; éviter les photos de victimes.",
 sezon:"Un paysage haïtien en saison sèche et en saison des pluies (même lieu si possible), ou la Terre inclinée (NASA).",
 pouvwa:"Le Palais législatif ou un tribunal en vue extérieure, ou une balance de la justice.",
-premyesen:"Une trousse de premiers secours ouverte avec compresses et bandes, sans blessé visible."
+premyesen:"Une trousse de premiers secours ouverte avec compresses et bandes, sans blessé visible.",
+gonayiv:"Une photo réelle des Gonaïves liée à l'indépendance (place de l'Indépendance, monument, drapeau haïtien). Éviter les tableaux protégés par des droits.",
+gramar:"Un cahier ou un tableau d'école avec des phrases créoles écrites (mwen ap manje…), mains seulement.",
+estres:"Une personne de dos qui respire face à un paysage calme, ou une main sur la poitrine ; éviter les visages.",
+tansyon:"Un tensiomètre sur un bras (sans visage) ou un tensiomètre posé sur une table.",
+kontra:"Un contrat et un stylo sur une table, mains visibles, texte illisible.",
+enter:"Des pièces et billets de gourdes empilés avec une calculatrice, ou une pousse de plante qui grandit."
 };
 const ED_PHOTO_RULES=["Format paysage, ratio 5:3 (ex. 1200×720 px). Les photos verticales sont recadrées au centre.","Taille minimale 800 px de large. La compression en WebP est automatique (≈100–200 Ko).","Droits : votre propre photo, ou une photo libre (Wikimedia Commons, Unsplash) avec le crédit rempli. Jamais une image prise au hasard sur Internet.","Pas de filigrane, pas de texte incrusté (le texte est traduit par le site), pas de logo de marque.","Personnes : jamais de visage d'enfant identifiable sans autorisation écrite d'un parent. Préférez les mains, le dos ou le flou.","Sujets sensibles (santé, sexualité, violence) : images neutres, jamais de corps ni de mise en scène choquante."];
 function eduPhotoCount(){return ED.cat.filter(a=>(ED.over[a.id]||{}).img).length;}
