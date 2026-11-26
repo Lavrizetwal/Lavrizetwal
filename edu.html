@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Zetwal Edu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>try{var __t=localStorage.getItem("zt-theme");if(__t==="light"||__t==="dark")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
 <style>
 :root{--navy:#12306B;--navy2:#0B1E47;--gold:#E0B040;--paper:#FBF6E8;--ink:#1d2433;--mut:#5b6478;--line:#e3d9b8;--serif:Georgia,"Times New Roman","Noto Serif",serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif}
 *{box-sizing:border-box}
@@ -16,7 +18,7 @@ button,input,select{font:inherit}
 header{background:linear-gradient(180deg,var(--navy),var(--navy2));color:#fff;border-bottom:4px solid var(--gold);position:sticky;top:0;z-index:20}
 .hd{display:flex;align-items:center;gap:14px;padding:10px max(16px,env(safe-area-inset-left,0px));flex-wrap:wrap;max-width:1300px;margin:0 auto}
 .brand{font:700 26px/1 var(--serif);text-decoration:none;color:#fff;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
-.lgo{border-radius:50%;background:#fff;object-fit:contain}#hm{text-decoration:none;white-space:nowrap;margin-left:auto}#lg{margin-left:0}.brand i{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--navy2);font-style:normal;font-size:20px}
+.lgo{border-radius:50%;background:#fff;object-fit:contain}#hm{text-decoration:none;white-space:nowrap;margin-left:auto;display:inline-block}#lg{margin-left:0}.brand i{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--navy2);font-style:normal;font-size:20px}
 .brand small{display:block;font:500 11px var(--sans);opacity:.8;letter-spacing:.4px}
 #sf{flex:1;min-width:220px;display:flex;gap:6px}
 #qs{flex:1;min-width:0;padding:9px 12px;border:2px solid var(--gold);border-radius:6px;background:#fff;color:var(--ink)}
@@ -168,13 +170,61 @@ body{background:radial-gradient(circle at 20% 0,#EEF2FB,#D5DDF0 70%)}
 .vmsg{min-height:1.2em;margin:0}.vmsg.bad{color:#9B1C1C;font-weight:600}.vmsg.ok{color:#14653A;font-weight:700}
 .ph{position:relative;display:block;width:100%;height:100%}.ph>svg{display:block;width:100%;height:100%}.ph>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#eef1f7}
 .fig .ph,.gi .ph{height:auto;aspect-ratio:5/3}.cr{display:block;margin-top:4px;font-size:11px;color:var(--mut)}
+
+/* ===== Thème Zetwal.org : blanc/ivoire, bleu ancre, or (mêmes jetons que l'accueil) ===== */
+:root{--bg:#FFFFFF;--bg-2:#FBF9F4;--bg-3:#F4F0E6;--surface:#FFFFFF;--band:#14234F;--on-band:#F4F1E8;--ink:#14234F;--ink-2:#3A4768;
+--navy:#14234F;--navy2:#14234F;--gold:#D4AF37;--gold-ink:#7C5C0A;--paper:#FFFFFF;--mut:#566079;--line:rgba(20,35,79,.14);
+--shadow:0 1px 2px rgba(20,35,79,.05),0 14px 34px -14px rgba(20,35,79,.18);--soft:#FBF9F4;--hl:#FBF3D9;--ok:#0F7B4F;--bad:#B42318;
+--serif:'Cormorant Garamond',Georgia,serif;--sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+:root[data-theme="dark"]{--bg:#0A0D18;--bg-2:#0D1120;--bg-3:#12172A;--surface:#10152A;--band:#070A14;--on-band:#EEF0F6;--ink:#EEF0F6;--ink-2:#C3C9DA;
+--navy:#EEF0F6;--navy2:#EEF0F6;--gold:#D4AF37;--gold-ink:#E7C65A;--paper:#10152A;--mut:#9AA2BA;--line:rgba(255,255,255,.14);
+--shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px -14px rgba(0,0,0,.7);--soft:#0D1120;--hl:#2A2410;--ok:#34D399;--bad:#FF8A80;color-scheme:dark}
+body{background:var(--bg-2);color:var(--ink);font-family:var(--sans);font-size:16px}
+h1,h2,h3,.brand,.big,.qq,.lvc b,.stile b,.acard b,.gw b,.gt b,.fcard b,.bq{font-family:var(--serif);color:var(--ink)}
+.txt,.tlbox,.fcard span{font-family:var(--sans);font-size:17px;line-height:1.75}
+header{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);box-shadow:0 3px 0 var(--gold)}
+.brand{color:var(--ink);font-weight:700;font-size:24px;letter-spacing:.14em;text-transform:none}.brand small{color:var(--mut);letter-spacing:.06em}
+.lgo{background:transparent}
+#qs{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:10px 16px}#qs:focus{border-color:var(--gold)}
+#qb,.btn{background:var(--gold);color:#14234F;border-radius:999px}
+#hm,.btn.sec,#mc.btn,#tb{background:transparent;color:var(--ink);border:1px solid var(--line)}
+#tb{border-radius:999px;width:38px;height:38px;padding:0;cursor:pointer;font-size:17px;line-height:1}
+.lb{color:var(--ink);border-color:var(--line);border-radius:999px}.lb.on{background:var(--band);color:var(--on-band);border-color:var(--band)}
+#mini{color:var(--gold-ink)}
+#side{background:var(--band);color:var(--on-band)}#side a.on,.allb{background:var(--gold);color:#14234F!important}
+.sh{color:var(--gold)}
+body #main{background:var(--bg);border-color:var(--line)}
+.hero,.shead{background:radial-gradient(circle at 85% 20%,rgba(212,175,55,.25),transparent 45%),var(--band);color:var(--on-band);border-bottom:4px solid var(--gold);box-shadow:var(--shadow)}
+.hero h1,.shead h1{color:var(--on-band)}.hero p{color:var(--on-band)}
+.hstats span{color:var(--on-band)}
+.sec{border-bottom:1px solid var(--line);box-shadow:0 2px 0 var(--gold)}
+.sec:before{color:var(--gold)}
+.lvc,.stile,.acard,.gt,.panel,.box,.rankbar,.bdg,.gw,.stats div,.fig,.gi,.gate,.mbox,.opt,.fcard,.slot,.bit,.tc,.clock,.chipb,.tld,.fpie,.gpl,.map{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.gt{background:linear-gradient(135deg,var(--surface),var(--hl))}
+.box .gw,.gc{background:var(--soft)}
+.callout,.vban,.tile,.wsteps li.cur,.tc:hover{background:var(--hl);color:var(--ink)}
+.lvc .n{text-shadow:none;color:var(--gold-ink)}
+.stile i,.acard .sj,.crumb a,.ctl output,.tlbox .yr,.stats b,.topic.live em{color:var(--gold-ink)}
+.chip{background:var(--band)!important;color:#fff}.chip.lg{background:var(--gold)!important;color:#14234F}
+.lvb.l3{color:var(--gold)}
+.opt.good{background:rgba(15,123,79,.14);border-color:var(--ok);color:var(--ink)}.opt.bad{background:rgba(180,35,24,.14);border-color:var(--bad);color:var(--ink)}
+.msg.ok,.okc,.vmsg.ok{color:var(--ok)}.msg.ko,.koc,.vmsg.bad{color:var(--bad)}
+.ctl select,.ctl input[type=number],.vform input:not([type=checkbox]),.vform textarea,.search,.bform input{background:var(--bg);color:var(--ink);border-color:var(--line)}
+.bit.on,.tc.on{background:var(--band);color:var(--gold)}
+.lab-out b,.big,.bq{color:var(--ink)}
+.trk{background:var(--bg-3)}
+footer{color:var(--mut)}footer b{color:var(--ink)}#hf{color:var(--gold-ink)!important}
+#bar{background:var(--band);border-top:3px solid var(--gold)}
+.ph>img{background:var(--bg-3)}
+:root[data-theme="dark"] .lgo{background:#fff}
+@media(max-width:860px){#side a{background:rgba(255,255,255,.08)}#tb{width:44px;height:44px}}
 </style>
 </head>
 <body>
 <a class="skip" id="sk" href="#main">Skip</a>
 <header><div class="hd"><a class="brand" href="#/"><img src="logo-192.png" alt="" width="34" height="34" class="lgo"><span>Zetwal Edu<small>zetwal.org</small></span></a>
 <form id="sf" role="search"><input id="qs" type="search" aria-label="search" autocomplete="off"><button id="qb" class="btn" type="submit">Search</button></form>
-<a id="hm" class="btn" href="/">Zetwal</a><div id="lg" role="group" aria-label="Language"></div><span id="mini"></span></div></header>
+<button id="tb" type="button" aria-label="Theme">◐</button><a id="hm" class="btn" href="/">Zetwal</a><div id="lg" role="group" aria-label="Language"></div><span id="mini"></span></div></header>
 <div class="wrap"><nav id="side" aria-label="Menu"></nav><main id="main" tabindex="-1"></main></div>
 <nav id="bar" aria-label="Menu"></nav>
 <footer><a id="hf" href="/" style="color:inherit;margin-right:12px"></a><b id="fo"></b><span id="ad"></span></footer>
@@ -3413,6 +3463,8 @@ LABS.mch16=pickLab([[L("Obsève pri yo","Observe les prix","Watch prices","Сл�
 
 LABS.ekz16=pickLab([[L("Objektif","Objectif","Goal","Цель"),L("Chwazi yon bagay ou vle achte epi kalkile konbyen w dwe mete sou kote chak semèn.","Choisis un objet à acheter et calcule combien mettre de côté chaque semaine.","Choose something to buy and work out how much to save each week.","Выберите, что хотите купить, и подсчитайте, сколько откладывать в неделю.")],[L("Kaye depans","Cahier de dépenses","Spending notebook","Тетрадь расходов"),L("Note tout depans ou pandan yon semèn.","Note toutes tes dépenses pendant une semaine.","Note all your spending for a week.","Записывайте все расходы в течение недели.")],[L("Fwod","Arnaque","Scam","Мошенничество"),L("Ki siy ki montre yon pwomès lajan se yon fwod ?","Quels signes montrent qu'une promesse d'argent est une arnaque ?","What signs show a money promise is a scam?","Какие признаки показывают, что денежное обещание — мошенничество?")]],PICK);
 LABS.lek16=pickLab([[L("Li yon paragraf","Lis un paragraphe","Read a paragraph","Прочтите абзац"),L("Chwazi yon paragraf epi rezime l nan 2 fraz.","Choisis un paragraphe et résume-le en 2 phrases.","Pick a paragraph and summarise it in 2 sentences.","Выберите абзац и перескажите его в двух предложениях.")],[L("Nouvo mo","Mots nouveaux","New words","Новые слова"),L("Note 3 nouvo mo ou jwenn jodi a ak sans yo.","Note 3 mots nouveaux trouvés aujourd'hui avec leur sens.","Note 3 new words you found today and their meaning.","Запишите три новых слова, найденных сегодня, и их значения.")],[L("Li fò","Lis à voix haute","Read aloud","Читайте вслух"),L("Li yon tèks fò bay yon zanmi pandan 5 minit.","Lis un texte à voix haute à un ami pendant 5 minutes.","Read a text aloud to a friend for 5 minutes.","Читайте текст вслух другу 5 минут.")]],PICK);
+(function(){var b=document.getElementById("tb");if(!b)return;function cur(){return document.documentElement.getAttribute("data-theme")==="dark"||(!document.documentElement.getAttribute("data-theme")&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light"}
+function ic(){b.textContent=cur()==="dark"?"☀":"☾"}ic();b.onclick=function(){var n=cur()==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("zt-theme",n)}catch(x){}ic()}})();
 /* ---------- quiz ---------- */
 function quiz(a,el){
  var qs=a.q,i=0,ok=0,locked=false;
