@@ -2136,7 +2136,7 @@ function renderLevels(){
 $('#gk-lvls').addEventListener('click',function(e){ var b=e.target.closest('[data-lv]'); if(!b||b.disabled) return; ZS.play('tap'); startLevel(+b.dataset.lv,false); });
 
 /* ── Consentements ── */
-var CS_GEN='<p class="cs-gen">Les jetons sont des points de jeu : ils s’utilisent uniquement dans l’univers Zetwal (jeux et boutique du hub) et ne sont pas convertibles en argent. Réservé aux personnes de 18 ans ou plus.</p>';
+var CS_GEN='<p class="cs-gen">Les jetons sont des points de jeu : ils s’utilisent uniquement dans l’univers Zetwal (jeux et boutique du hub) et ne sont pas convertibles en argent. Ils ne peuvent être ni vendus, ni échangés, ni envoyés à un autre joueur. Réservé aux personnes de 18 ans ou plus.</p>';
 function consentModal(game,rules,okLabel,go){
   openModal('<h2>Avant de jouer</h2>'+rules+CS_GEN+
     '<label class="gm-chk"><input type="checkbox" id="cs-c"><span>J’ai lu et compris les gains et les pertes possibles, et je consens à jouer.</span></label>'+
