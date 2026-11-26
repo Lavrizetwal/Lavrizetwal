@@ -1246,6 +1246,8 @@ body.gm{background:var(--bg)}
 .dl-q{padding:30px 28px;border:1px solid rgba(212,175,55,.4);border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));min-height:150px;display:flex;align-items:center;justify-content:center;text-align:center}
 .dl-q p{font-family:var(--serif);font-weight:600;font-size:clamp(1.5rem,3.8vw,2.3rem);line-height:1.25;text-wrap:balance}
 .dl-q.mem p{font-size:clamp(1.8rem,5vw,3rem);letter-spacing:.04em;color:var(--gold-lt)}
+.dl-q.mem.emo p{font-size:clamp(2rem,7.5vw,2.8rem);letter-spacing:.12em;line-height:1.55;word-break:break-word;color:inherit}
+.gm-opt.emo span{font-size:2rem;line-height:1.2}
 .dl-q .hint{display:block;margin-top:10px;font:500 .84rem var(--sans);letter-spacing:.14em;text-transform:none;color:var(--on-band-2)}
 .dl-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
 .gm-opt{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 18px;border-radius:6px;border:1px solid rgba(212,175,55,.35);background:rgba(255,255,255,.05);color:var(--on-band);text-align:left;font-size:1.04rem;line-height:1.35;cursor:pointer;touch-action:manipulation;transition:background .15s,border-color .15s,transform .1s}
@@ -2070,14 +2072,16 @@ function enter(r,resumed){
   showQ(r.q,r.left_ms);
 }
 function pips(){ $$('.dl-pip').forEach(function(p,i){ p.className='dl-pip'+(i<D.i?' done':i===D.i?' now':''); }); }
+var EMO=/\p{Extended_Pictographic}/u;
+function isEmo(x){ return EMO.test(String(x==null?'':x)); }
 function showQ(q,left){
   cancelAnimationFrame(raf); D.q=q; D.i=q.i; D.lock=false; pips();
   var ctn=CATS[q.cat]?CATS[q.cat].n:'', lvt='Niveau '+q.lvl;
   $('#dl-m1').innerHTML='<b>Question '+(q.i+1)+' / '+q.total+'</b>'; $('#dl-m2').textContent=lvt+' · '+ctn;
   $('#dl-wait').textContent=''; $('#dl-tb').classList.remove('urg');
   var showMs=q.show_ms||0, inShow=!!q.show&&left>10000, ansMs=Math.min(left,10000);
-  var box=$('#dl-q'); box.className='dl-q'+(q.show?' mem':'');
-  var opts=''; ['A','B','C','D'].forEach(function(L,k){ if(q.opts[k]!=null) opts+='<button class="gm-opt" type="button" data-k="'+k+'" disabled><kbd>'+L+'</kbd><span>'+esc(q.opts[k])+'</span></button>'; });
+  var box=$('#dl-q'); box.className='dl-q'+(q.show?' mem':'')+(isEmo(q.show)?' emo':'');
+  var opts=''; ['A','B','C','D'].forEach(function(L,k){ if(q.opts[k]!=null) opts+='<button class="gm-opt'+(isEmo(q.opts[k])?' emo':'')+'" type="button" data-k="'+k+'" disabled><kbd>'+L+'</kbd><span>'+esc(q.opts[k])+'</span></button>'; });
   $('#dl-opts').innerHTML=opts;
   if(inShow){
     var showLeft=left-10000;
@@ -2373,9 +2377,9 @@ function buildRoom(r,old,prev){
 }
 function buildQ(r){
   var q=r.q, b=$('#sl-rb'), L=['A','B','C','D'], mine=r.mine, myc=mine?mine.c:null;
-  var opts=''; L.forEach(function(l,k){ if(q.opts[k]!=null) opts+='<button class="gm-opt'+(mine&&myc===k?' pick':'')+'" type="button" data-k="'+k+'" disabled><kbd>'+l+'</kbd><span>'+esc(q.opts[k])+'</span></button>'; });
+  var opts=''; L.forEach(function(l,k){ if(q.opts[k]!=null) opts+='<button class="gm-opt'+(isEmo(q.opts[k])?' emo':'')+(mine&&myc===k?' pick':'')+'" type="button" data-k="'+k+'" disabled><kbd>'+l+'</kbd><span>'+esc(q.opts[k])+'</span></button>'; });
   b.innerHTML='<div id="sl-pl">'+plBar(r)+'</div><div class="dl-meta"><span><b>Question '+(q.i+1)+' / '+q.total+'</b></span><span>Niveau '+q.lvl+' · '+esc(CATS[q.cat]?CATS[q.cat].n:'')+'</span></div>'+
-   '<div class="dl-timer" id="sl-tb" role="timer" aria-label="Temps restant"><i id="sl-ti"></i></div><div class="dl-q'+(q.show?' mem':'')+'" id="sl-q"><p id="sl-qt"></p></div><div class="dl-opts" id="sl-opts">'+opts+'</div><div class="dl-wait" id="sl-wt"></div>'+rxBar()+
+   '<div class="dl-timer" id="sl-tb" role="timer" aria-label="Temps restant"><i id="sl-ti"></i></div><div class="dl-q'+(q.show?' mem':'')+(isEmo(q.show)?' emo':'')+'" id="sl-q"><p id="sl-qt"></p></div><div class="dl-opts" id="sl-opts">'+opts+'</div><div class="dl-wait" id="sl-wt"></div>'+rxBar()+
    '<div class="sl-row" style="margin-top:16px;justify-content:center"><button class="gm-btn q sm" type="button" id="sl-leave">Quitter (mise perdue)</button></div>';
   var lastS=-1, shown=false, idx=q.i;
   (function frame(){
@@ -2395,7 +2399,7 @@ function buildQ(r){
 function buildRev(r){
   var v=r.rev, b=$('#sl-rb'), L=['A','B','C','D'], myc=null, mypts=0;
   r.rev.picks.forEach(function(p,i){ var pl=r.players[i]; if(pl&&pl.me){ myc=p.c; mypts=p.pts; } });
-  var opts=''; L.forEach(function(l,k){ if(v.opts[k]!=null) opts+='<button class="gm-opt '+(k===v.ans?'sl-opt-ok':(k===myc?'sl-opt-ko':''))+(k===myc?' pick':'')+'" type="button" disabled><kbd>'+l+'</kbd><span>'+esc(v.opts[k])+'</span></button>'; });
+  var opts=''; L.forEach(function(l,k){ if(v.opts[k]!=null) opts+='<button class="gm-opt '+(isEmo(v.opts[k])?'emo ':'')+(k===v.ans?'sl-opt-ok':(k===myc?'sl-opt-ko':''))+(k===myc?' pick':'')+'" type="button" disabled><kbd>'+l+'</kbd><span>'+esc(v.opts[k])+'</span></button>'; });
   var pk='<div class="sl-picks">'+v.picks.map(function(p){ var ok=p.c===v.ans; return '<div><span>'+esc(p.pseudo)+' : '+(p.c>=0&&v.opts[p.c]!=null?esc(v.opts[p.c]):'pas de réponse')+'</span><span class="'+(ok?'g':'b')+'">'+(ok?'+'+p.pts:'0')+'</span></div>'; }).join('')+'</div>';
   b.innerHTML='<div id="sl-pl">'+plBar(r)+'</div><div class="dl-meta"><span><b>Question '+(r.idx+1)+' / '+r.total+'</b></span><span>Bonne réponse affichée</span></div><div class="dl-q'+(v.show?' mem':'')+'"><p>'+esc(v.q)+'</p></div><div class="dl-opts">'+opts+'</div>'+pk+rxBar()+
    '<div class="sl-row" style="margin-top:16px;justify-content:center"><button class="gm-btn q sm" type="button" id="sl-leave">Quitter (mise perdue)</button></div>';
