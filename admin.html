@@ -2323,6 +2323,43 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </section>
 
+    <section class="panel" id="tab-edu">
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="star"></span> Zetwal Edu : articles, vérification et contenu</h3>
+          <button class="btn btn-ghost btn-sm" onclick="initEdu()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
+        <p class="card-sub">Choisissez les articles relus par un professionnel : ils reçoivent le badge « Relu par un professionnel » avec le nom, le titre et la date. Les autres restent « Vérifié par Zetwal » (contrôle automatique) ou « En attente de relecture ». Vous pouvez tout modifier (textes, images, dates, masquage) sauf les règles Sexualité (tranches d'âge et accès), verrouillées.</p>
+        <div class="form-grid">
+          <div class="field"><label for="ed-q">Rechercher</label><input id="ed-q" class="input" placeholder="Titre ou identifiant" oninput="eduDraw()"></div>
+          <div class="field"><label for="ed-f">Statut</label><select id="ed-f" class="input" onchange="eduDraw()"><option value="">Tous</option><option value="auto">Vérifié par Zetwal</option><option value="pro">Relu par un professionnel</option><option value="none">En attente</option></select></div>
+        </div>
+        <div class="card" style="margin-top:var(--s4)">
+          <h4 style="margin:0 0 var(--s3)">Marquer la sélection comme relue</h4>
+          <div class="form-grid">
+            <div class="field"><label for="ed-vsel">Vérificateur approuvé</label><select id="ed-vsel" class="input" onchange="eduPickV()"></select></div>
+            <div class="field"><label for="ed-vn">Nom affiché</label><input id="ed-vn" class="input" maxlength="120"></div>
+            <div class="field"><label for="ed-vt">Titre affiché</label><input id="ed-vt" class="input" maxlength="160" placeholder="Médecin généraliste"></div>
+            <div class="field"><label for="ed-vd">Date de relecture</label><input id="ed-vd" type="date" class="input"></div>
+          </div>
+          <div style="display:flex;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s3)">
+            <button class="btn" onclick="eduBulk('pro')">Marquer comme relus (pro)</button>
+            <button class="btn btn-quiet" onclick="eduBulk('auto')">Remettre en « Vérifié par Zetwal »</button>
+            <button class="btn btn-quiet" onclick="eduBulk('none')">Mettre en attente</button>
+            <span id="ed-bulkmsg" class="card-sub" style="margin:0;align-self:center"></span>
+          </div>
+        </div>
+        <div id="ed-list" style="margin-top:var(--s4)"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="user"></span> Candidatures de vérificateurs</h3></div>
+        <p class="card-sub">Appel vidéo : le professionnel montre son visage, une pièce d'identité valide et un diplôme ou une attestation. Aucun document n'est conservé : cochez ce que vous avez vu. « Validé » exige visage + identité + diplôme cochés.</p>
+        <div id="ed-apps"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><span data-icon="check"></span> Vérificateurs approuvés</h3></div>
+        <div id="ed-vers"></div>
+      </div>
+    </section>
+
     <section class="panel" id="tab-travay">
       <div class="card">
         <div class="card-head">
@@ -2697,6 +2734,9 @@ const NAV=[
   {g:'Jeux', items:[
     {id:'jetons',label:'Jetons de jeu',icon:'coins'}
   ]},
+  {g:'Edu', items:[
+    {id:'edu',label:'Zetwal Edu',icon:'star'}
+  ]},
   {g:'Réglages', items:[
     {id:'profils',label:'Pwofil & Mesaj',icon:'user'},
     {id:'broadcast',label:'Messages e-mail / SMS',icon:'send'},
@@ -2823,6 +2863,7 @@ window.switchTab = (name)=>{
   if(name==='moveprice')     loadMovePrice();
   if(name==='travay')        loadTravay();
   if(name==='jetons')        initJetons();
+  if(name==='edu')           initEdu();
   if(name==='points')        initPoints();
   if(name==='wash')          initWashTarifs();
   if(name==='add')           initColorPicker();
@@ -4595,6 +4636,137 @@ window.jfRun=async()=>{
   toast(kept+' faits ajoutés','success'); const keep=log.innerHTML; await jfStats(); document.getElementById('jf-log').innerHTML=keep;
 };
 window.initJetons=()=>{ jtRecent(); jtTesters(); jtSalon(); jfStats(); };
+
+/* ═════════ Zetwal Edu : vérification, contenu, candidatures ═════════ */
+const ED={cat:[],subj:{},meta:{},over:{},vers:[],apps:[],sel:new Set(),open:null};
+const ED_LANGS=['ht','fr','en','ru'];
+const ED_STAT={auto:'Vérifié par Zetwal',pro:'Relu par un professionnel',none:'En attente'};
+const ED_APPST={new:'Nouvelle',call_planned:'Appel prévu',verified:'Validé',rejected:'Refusée'};
+function eduErr(e){const m=String((e&&e.message)||e||''); if(/denied/.test(m)) return "Réservé à l'administrateur (session admin requise)"; if(/locked_sexuality/.test(m)) return 'Règle verrouillée : les règles Sexualité ne se modifient pas'; if(/checklist_incomplete/.test(m)) return 'Cochez visage, identité et diplôme avant de valider'; return m||'Erreur';}
+function eduLoadCat(){return new Promise((res,rej)=>{
+  const f=document.createElement('iframe'); f.style.cssText='position:absolute;width:0;height:0;border:0;visibility:hidden'; f.setAttribute('aria-hidden','true'); f.src='edu.html';
+  const to=setTimeout(()=>{f.remove();rej(new Error('Catalogue Edu introuvable (edu.html)'));},15000);
+  f.onload=()=>{ let tries=0; (function wait(){ try{ const Z=f.contentWindow.ZetwalEdu; if(Z&&Z.ALL){ clearTimeout(to);
+      const subj={}; Z.SUBJ.forEach(s=>{subj[s.id]={id:s.id,t:s.t.fr||s.t.ht}});
+      const cat=Z.ALL.map(a=>({id:a.id,s:a.s,lv:a.lv,age:a.age||0,t:Object.assign({},a.t),sum:Object.assign({},a.sum),b:JSON.parse(JSON.stringify(a.b)),img:a.img}));
+      f.remove(); res({cat,subj}); return; } }catch(e){} if(++tries>60){ clearTimeout(to); f.remove(); rej(new Error('Catalogue Edu illisible')); } else setTimeout(wait,150); })(); };
+  document.body.appendChild(f); }); }
+window.initEdu=async()=>{
+  const l=document.getElementById('ed-list'); if(!l) return;
+  l.innerHTML=skeletonCards(3);
+  try{
+    const [c,r]=await Promise.all([eduLoadCat(), db.rpc('edu_admin_state')]);
+    if(r.error) throw r.error;
+    ED.cat=c.cat; ED.subj=c.subj; const d=r.data||{};
+    ED.meta={}; (d.meta||[]).forEach(m=>ED.meta[m.article_id]=m);
+    ED.over={}; (d.over||[]).forEach(o=>ED.over[o.article_id]=o.data||{});
+    ED.vers=d.verifiers||[]; ED.apps=d.apps||[];
+    eduVSel(); eduDraw(); eduApps(); eduVers();
+  }catch(e){ l.innerHTML=errorState('Chargement impossible',eduErr(e),'initEdu()'); }
+};
+function eduStat(a){const m=ED.meta[a.id]; return (m&&m.verif)||((['med','dsm','droit','relig','sexo','pharma'].indexOf(a.s)>=0)?'none':'auto');}
+function eduVSel(){const s=document.getElementById('ed-vsel'); if(!s) return;
+  s.innerHTML='<option value="">— Saisir à la main —</option>'+ED.vers.filter(v=>v.active).map(v=>'<option value="'+escH(v.id)+'">'+escH(v.name)+(v.title?' · '+escH(v.title):'')+'</option>').join('');
+  const d=document.getElementById('ed-vd'); if(d&&!d.value) d.value=new Date().toISOString().slice(0,10);}
+window.eduPickV=()=>{const id=document.getElementById('ed-vsel').value, v=ED.vers.find(x=>x.id===id); if(v){document.getElementById('ed-vn').value=v.name||''; document.getElementById('ed-vt').value=v.title||'';}};
+window.eduDraw=()=>{
+  const q=(document.getElementById('ed-q').value||'').toLowerCase(), f=document.getElementById('ed-f').value, l=document.getElementById('ed-list');
+  const rows=ED.cat.filter(a=>(!f||eduStat(a)===f)&&(!q||a.id.toLowerCase().includes(q)||(a.t.fr||'').toLowerCase().includes(q)||(a.t.ht||'').toLowerCase().includes(q)));
+  if(!rows.length){ l.innerHTML=emptyState('search','Aucun article','Aucun article ne correspond à ce filtre.'); return; }
+  l.innerHTML='<div class="table-wrap"><table class="stack"><thead><tr><th></th><th>Article</th><th>Matière</th><th>Statut</th><th></th></tr></thead><tbody>'+rows.map(a=>{
+    const st=eduStat(a), m=ED.meta[a.id]||{}, hid=m.hidden;
+    return '<tr><td><input type="checkbox" aria-label="Sélectionner" '+(ED.sel.has(a.id)?'checked ':'')+'onchange="eduTog(\''+a.id+'\',this.checked)"></td>'
+     +'<td><b>'+escH(a.t.fr||a.t.ht)+'</b><br><span class="card-sub" style="margin:0">'+escH(a.id)+(a.age?' · '+a.age+'+':'')+(hid?' · masqué':'')+'</span></td>'
+     +'<td>'+escH((ED.subj[a.s]||{}).t||a.s)+'</td>'
+     +'<td><span class="chip '+(st==='pro'?'chip-gold':st==='auto'?'chip-ok':'chip-info')+'">'+ED_STAT[st]+'</span>'+(st==='pro'&&m.verifier_name?'<br><span class="card-sub" style="margin:0">'+escH(m.verifier_name)+'</span>':'')+'</td>'
+     +'<td><button class="btn btn-ghost btn-sm" onclick="eduEdit(\''+a.id+'\')">Modifier</button></td></tr>'
+     +(ED.open===a.id?'<tr><td colspan="5">'+eduForm(a)+'</td></tr>':'');}).join('')+'</tbody></table></div>';
+};
+window.eduTog=(id,on)=>{on?ED.sel.add(id):ED.sel.delete(id);};
+window.eduBulk=async(kind)=>{
+  const msg=document.getElementById('ed-bulkmsg'); const ids=[...ED.sel];
+  if(!ids.length){msg.textContent='Sélectionnez au moins un article.';return;}
+  const vn=document.getElementById('ed-vn').value.trim(), vt=document.getElementById('ed-vt').value.trim(), vd=document.getElementById('ed-vd').value||null, vid=document.getElementById('ed-vsel').value||null;
+  if(kind==='pro'&&(!vn||!vt)){msg.textContent='Indiquez le nom et le titre du relecteur.';return;}
+  msg.textContent='Enregistrement…'; let ok=0,bad='';
+  for(const id of ids){ const m=ED.meta[id]||{};
+    const {error}=await db.rpc('edu_admin_set_meta',{p_article:id,p_verif:kind,p_verifier_id:kind==='pro'?vid:null,p_verifier_name:kind==='pro'?vn:null,p_verifier_title:kind==='pro'?vt:null,p_verified_on:kind==='pro'?vd:null,p_note:m.note||null,p_hidden:!!m.hidden,p_published:m.published_on||null,p_updated:m.updated_on||null,p_min_age:null});
+    if(error){bad=eduErr(error);break;} ok++; }
+  msg.textContent=ok+' article(s) mis à jour'+(bad?' — arrêt : '+bad:''); if(!bad) ED.sel.clear(); initEdu();
+};
+window.eduEdit=(id)=>{ED.open=ED.open===id?null:id; eduDraw();};
+function eduCur(a){const o=ED.over[a.id]||{}; return {t:Object.assign({},a.t,o.t||{}),sum:Object.assign({},a.sum,o.sum||{}),b:ED_LANGS.reduce((r,l)=>{r[l]=(o.b&&o.b[l])||a.b[l];return r;},{}),img:o.img||''};}
+function eduForm(a){
+  const m=ED.meta[a.id]||{}, st=eduStat(a), c=eduCur(a), lock=a.s==='sexo', ts=new Date().toISOString().slice(0,10);
+  const lf=(k,l,v,rows)=>'<div class="field"><label>'+k+' ('+l.toUpperCase()+')</label>'+(rows?'<textarea class="input" rows="'+rows+'" data-ed="'+k+'" data-l="'+l+'">'+escH(v)+'</textarea>':'<input class="input" data-ed="'+k+'" data-l="'+l+'" value="'+escH(v)+'">')+'</div>';
+  return '<div class="card" style="margin:0" data-edform="'+a.id+'">'
+   +(lock?'<p class="card-sub" style="color:var(--gold-pale)">Règles Sexualité verrouillées : tranche d\'âge ('+(a.age||'tous âges')+') et accès (confirmation 14+, compte 18+) non modifiables. Vous pouvez corriger les textes, images, dates et la vérification.</p>':'')
+   +'<div class="form-grid">'
+   +'<div class="field"><label>Statut de vérification</label><select class="input" id="edf-v"><option value="auto"'+(st==='auto'?' selected':'')+'>Vérifié par Zetwal (automatique)</option><option value="pro"'+(st==='pro'?' selected':'')+'>Relu par un professionnel</option><option value="none"'+(st==='none'?' selected':'')+'>En attente de relecture</option></select></div>'
+   +'<div class="field"><label>Relecteur (nom)</label><input class="input" id="edf-vn" value="'+escH(m.verifier_name||'')+'"></div>'
+   +'<div class="field"><label>Titre du relecteur</label><input class="input" id="edf-vt" value="'+escH(m.verifier_title||'')+'"></div>'
+   +'<div class="field"><label>Date de vérification</label><input type="date" class="input" id="edf-vd" value="'+escH(m.verified_on||'')+'"></div>'
+   +'<div class="field"><label>Date de publication</label><input type="date" class="input" id="edf-pub" value="'+escH(m.published_on||'')+'"></div>'
+   +'<div class="field"><label>Dernière mise à jour</label><input type="date" class="input" id="edf-upd" value="'+escH(m.updated_on||ts)+'"></div>'
+   +'<div class="field"><label>Remarque affichée</label><input class="input" id="edf-note" maxlength="300" value="'+escH(m.note||'')+'"></div>'
+   +'<div class="field"><label>Image (lien https)</label><input class="input" id="edf-img" placeholder="https://…" value="'+escH(c.img)+'"></div>'
+   +(lock?'':'<div class="field"><label>Accès (âge)</label><select class="input" id="edf-age"><option value="">Par défaut ('+(a.age||0)+')</option><option value="0"'+(m.min_age===0?' selected':'')+'>Tous âges</option><option value="14"'+(m.min_age===14?' selected':'')+'>14+</option><option value="18"'+(m.min_age===18?' selected':'')+'>18+</option></select></div>')
+   +'<div class="field"><label><input type="checkbox" id="edf-h"'+(m.hidden&&!lock?' checked':'')+(lock?' disabled':'')+'> Masquer cet article</label></div>'
+   +'</div><details style="margin-top:var(--s3)"><summary>Modifier les textes (4 langues)</summary><div class="form-grid" style="margin-top:var(--s3)">'
+   +ED_LANGS.map(l=>lf('t',l,c.t[l]||'')+lf('sum',l,c.sum[l]||'',2)).join('')
+   +ED_LANGS.map(l=>'<div class="field span2"><label>Texte ('+l.toUpperCase()+') — séparez les paragraphes par une ligne vide ; « ## » = titre, « &gt; » = encadré</label><textarea class="input" rows="10" data-ed="b" data-l="'+l+'">'+escH((c.b[l]||[]).join('\n\n'))+'</textarea></div>').join('')
+   +'</div></details>'
+   +'<div style="display:flex;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4)"><button class="btn" onclick="eduSave(\''+a.id+'\')">Enregistrer</button><button class="btn btn-quiet" onclick="eduReset(\''+a.id+'\')">Rétablir le texte d\'origine</button><span id="edf-msg" class="card-sub" style="margin:0;align-self:center"></span></div></div>';
+}
+window.eduSave=async(id)=>{
+  const a=ED.cat.find(x=>x.id===id), root=document.querySelector('[data-edform="'+id+'"]'), msg=document.getElementById('edf-msg'), g=x=>document.getElementById(x);
+  const v=g('edf-v').value, vn=g('edf-vn').value.trim(), vt=g('edf-vt').value.trim(), vd=g('edf-vd').value||null;
+  if(v==='pro'&&(!vn||!vt||!vd)){msg.textContent='Un article « relu » exige nom, titre et date du relecteur.';return;}
+  const img=g('edf-img').value.trim(); if(img&&!/^https:\/\//.test(img)){msg.textContent="Le lien d'image doit commencer par https://";return;}
+  const c=eduCur(a), o=Object.assign({},ED.over[id]||{}); let changed=false;
+  root.querySelectorAll('[data-ed]').forEach(el=>{ const k=el.dataset.ed,l=el.dataset.l,val=el.value.trim();
+    if(k==='b'){ const arr=val.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean); if(JSON.stringify(arr)!==JSON.stringify(c.b[l]||[])){o.b=Object.assign({},o.b||{}); o.b[l]=arr; changed=true;} }
+    else if(val!==(c[k][l]||'')){ o[k]=Object.assign({},o[k]||{}); o[k][l]=val; changed=true; } });
+  if(img!==c.img){ if(img) o.img=img; else delete o.img; changed=true; }
+  const ageSel=g('edf-age'), age=ageSel&&ageSel.value!==''?+ageSel.value:null;
+  msg.textContent='Enregistrement…';
+  try{
+    if(changed){ const r=await db.rpc('edu_admin_set_override',{p_article:id,p_data:o}); if(r.error) throw r.error; }
+    const upd=changed?new Date().toISOString().slice(0,10):(g('edf-upd').value||null);
+    const r2=await db.rpc('edu_admin_set_meta',{p_article:id,p_verif:v,p_verifier_id:null,p_verifier_name:v==='pro'?vn:null,p_verifier_title:v==='pro'?vt:null,p_verified_on:v==='pro'?vd:null,p_note:g('edf-note').value.trim()||null,p_hidden:g('edf-h').checked,p_published:g('edf-pub').value||null,p_updated:upd,p_min_age:a.s==='sexo'?null:age});
+    if(r2.error) throw r2.error;
+    toast('Article enregistré','success'); ED.open=null; initEdu();
+  }catch(e){ msg.textContent=eduErr(e); }
+};
+window.eduReset=async(id)=>{
+  const msg=document.getElementById('edf-msg');
+  if(!ED.over[id]){msg.textContent="Aucune modification de texte à rétablir.";return;}
+  if(msg.dataset.arm!=='1'){msg.dataset.arm='1';msg.textContent='Cliquez encore pour confirmer : les textes reviennent à la version d\'origine.';return;}
+  const {error}=await db.rpc('edu_admin_set_override',{p_article:id,p_data:{}}); if(error){msg.textContent=eduErr(error);return;} toast("Texte d'origine rétabli",'success'); ED.open=null; initEdu();
+};
+function eduApps(){
+  const el=document.getElementById('ed-apps'); if(!ED.apps.length){el.innerHTML=emptyState('user','Aucune candidature','Les candidatures envoyées depuis la page « Devenir vérificateur » apparaissent ici.');return;}
+  el.innerHTML=ED.apps.map(a=>{const ck=a.checklist||{}, cb=(k,t)=>'<label style="display:inline-flex;gap:6px;align-items:center;margin-right:14px"><input type="checkbox" id="ap-'+k+'-'+a.id+'"'+(ck[k]?' checked':'')+'> '+t+'</label>';
+    const dt=a.call_at?new Date(a.call_at).toISOString().slice(0,16):'';
+    return '<div class="card" style="margin:0 0 var(--s3)"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><b>'+escH(a.name)+'</b> · '+escH(a.profession)+(a.specialty?' · '+escH(a.specialty):'')+'<br><span class="card-sub" style="margin:0">'+escH(a.email)+(a.phone?' · '+escH(a.phone):'')+(a.country?' · '+escH(a.country):'')+' · '+new Date(a.created_at).toLocaleDateString('fr-FR')+'</span></div><span class="chip '+(a.status==='verified'?'chip-ok':a.status==='rejected'?'chip-bad':a.status==='call_planned'?'chip-info':'chip-warn')+'">'+ED_APPST[a.status]+'</span></div>'
+     +(a.subjects?'<p class="card-sub" style="margin:8px 0 0">Matières : '+escH(a.subjects)+(a.languages?' · Langues : '+escH(a.languages):'')+'</p>':'')
+     +(a.availability?'<p class="card-sub" style="margin:4px 0 0">Disponibilité : '+escH(a.availability)+'</p>':'')+(a.message?'<p style="margin:8px 0 0">'+escH(a.message)+'</p>':'')
+     +'<div class="form-grid" style="margin-top:var(--s3)"><div class="field"><label>Statut</label><select class="input" id="ap-st-'+a.id+'">'+Object.keys(ED_APPST).map(k=>'<option value="'+k+'"'+(a.status===k?' selected':'')+'>'+ED_APPST[k]+'</option>').join('')+'</select></div>'
+     +'<div class="field"><label>Appel vidéo (date et heure)</label><input type="datetime-local" class="input" id="ap-dt-'+a.id+'" value="'+dt+'"></div>'
+     +'<div class="field span2"><label>Vu pendant l\'appel</label><div>'+cb('face','Visage')+cb('id','Pièce d\'identité valide')+cb('diploma','Diplôme / attestation')+cb('licence','Numéro d\'ordre / licence')+'</div></div>'
+     +'<div class="field span2"><label>Note interne</label><input class="input" id="ap-nt-'+a.id+'" maxlength="500" value="'+escH(a.admin_note||'')+'"></div></div>'
+     +'<div style="display:flex;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s3)"><button class="btn" onclick="eduAppSave(\''+a.id+'\')">Enregistrer</button><button class="btn btn-quiet" onclick="eduAppDel(\''+a.id+'\')">Supprimer</button><span class="card-sub" id="ap-msg-'+a.id+'" style="margin:0;align-self:center"></span></div></div>';}).join('');
+}
+window.eduAppSave=async(id)=>{const g=x=>document.getElementById(x), msg=g('ap-msg-'+id), dt=g('ap-dt-'+id).value;
+  const ck={face:g('ap-face-'+id).checked,id:g('ap-id-'+id).checked,diploma:g('ap-diploma-'+id).checked,licence:g('ap-licence-'+id).checked};
+  const {error}=await db.rpc('edu_admin_set_app',{p_id:id,p_status:g('ap-st-'+id).value,p_call_at:dt?new Date(dt).toISOString():null,p_checklist:ck,p_note:g('ap-nt-'+id).value.trim()||null});
+  if(error){msg.textContent=eduErr(error);return;} toast('Candidature enregistrée','success'); initEdu();};
+window.eduAppDel=async(id)=>{const msg=document.getElementById('ap-msg-'+id); if(msg.dataset.arm!=='1'){msg.dataset.arm='1';msg.textContent='Cliquez encore pour supprimer définitivement cette candidature.';return;}
+  const {error}=await db.rpc('edu_admin_delete_app',{p_id:id}); if(error){msg.textContent=eduErr(error);return;} toast('Candidature supprimée','success'); initEdu();};
+function eduVers(){const el=document.getElementById('ed-vers'); if(!ED.vers.length){el.innerHTML=emptyState('check','Aucun vérificateur','Une candidature validée ajoute automatiquement la personne ici.');return;}
+  el.innerHTML=ED.vers.map(v=>'<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)"><div><b>'+escH(v.name)+'</b> · '+escH(v.title||'')+(v.specialty?' · '+escH(v.specialty):'')+'</div><button class="btn btn-ghost btn-sm" onclick="eduVerTog(\''+v.id+'\','+(!v.active)+')">'+(v.active?'Désactiver':'Réactiver')+'</button></div>').join('');}
+window.eduVerTog=async(id,on)=>{const {error}=await db.rpc('edu_admin_set_verifier',{p_id:id,p_active:on}); if(error){toast(eduErr(error),'error');return;} initEdu();};
+
 window.jtQuick=v=>{ const i=document.getElementById('jt-amt'); if(i){ i.value=v; jtReset(); } };
 function jtReset(){ JT.pending=null; const c=document.getElementById('jt-confirm'); if(c) c.innerHTML=''; const g=document.getElementById('jt-go'); if(g){ g.hidden=false; g.disabled=false; } }
 window.jtFind=async()=>{
