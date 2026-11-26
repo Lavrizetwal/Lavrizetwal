@@ -4742,7 +4742,15 @@ epay:"Une tirelire ou une boîte avec des pièces de gourdes et un carnet de com
 selil:"Une image au microscope de cellules (photo libre de droits) ou un schéma de cellule dessiné.",
 son:"Un tambour ou une guitare dont les cordes vibrent, mains visibles, sans visage.",
 desalin:"Un portrait ou une statue de Dessalines (œuvre du domaine public ou autorisée) ou le monument de Marchand-Dessalines.",
-fakenyouz:"Un téléphone affichant une page d'actualités (texte illisible), sans visage."
+fakenyouz:"Un téléphone affichant une page d'actualités (texte illisible), sans visage.",
+asid:"Un citron coupé et du bicarbonate dans un bol, ou des bandelettes de pH (sans visage).",
+ekwasyon:"Une balance à plateaux équilibrée avec des poids, ou un tableau avec une équation écrite à la craie.",
+ponktiyasyon:"Un cahier avec une phrase écrite à la main et des signes de ponctuation entourés.",
+pase:"Un calendrier ou un cahier d'anglais avec des verbes au passé écrits à la main.",
+biznis:"Un étal de marché avec des régimes de bananes et un carnet de comptes, sans visage.",
+egzesis:"Des chaussures de sport sur un chemin, ou un terrain de football de quartier vide.",
+dechet:"Des bacs de tri ou un tas de compost dans un jardin, sans personne.",
+lang:"Un livre ou un panneau écrit en créole haïtien, ou une salle de classe avec une phrase en créole au tableau."
 };
 const ED_PHOTO_RULES=["Format paysage, ratio 5:3 (ex. 1200×720 px). Les photos verticales sont recadrées au centre.","Taille minimale 800 px de large. La compression en WebP est automatique (≈100–200 Ko).","Droits : votre propre photo, ou une photo libre (Wikimedia Commons, Unsplash) avec le crédit rempli. Jamais une image prise au hasard sur Internet.","Pas de filigrane, pas de texte incrusté (le texte est traduit par le site), pas de logo de marque.","Personnes : jamais de visage d'enfant identifiable sans autorisation écrite d'un parent. Préférez les mains, le dos ou le flou.","Sujets sensibles (santé, sexualité, violence) : images neutres, jamais de corps ni de mise en scène choquante."];
 function eduPhotoCount(){return ED.cat.filter(a=>(ED.over[a.id]||{}).img).length;}
