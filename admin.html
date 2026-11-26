@@ -2311,6 +2311,11 @@ tbody tr:last-child td{border-bottom:none}
           <button class="btn btn-ghost btn-sm" onclick="jtSalon()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
         <div id="jt-salon"></div>
       </div>
+      <div class="card" id="jt-fact-card">
+        <div class="card-head"><h3><span data-icon="settings"></span> Banque de questions du Duel Mental</h3>
+          <button class="btn btn-ghost btn-sm" onclick="jfStats()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
+        <div id="jf-body"></div>
+      </div>
       <div class="card">
         <div class="card-head"><h3><span data-icon="history"></span> Derniers mouvements d'administration</h3>
           <button class="btn btn-ghost btn-sm" onclick="jtRecent()"><span data-icon="refresh" data-size="sm"></span> Actualiser</button></div>
@@ -4538,7 +4543,56 @@ window.jtSalonSet=async(k,v)=>{
   catch(e){ toast('Enregistrement impossible : '+jtErr(e),'error'); }
   jtSalon();
 };
-window.initJetons=()=>{ jtRecent(); jtTesters(); jtSalon(); };
+
+/* Banque de questions : état, génération par IA (vérifiée deux fois), retrait d'un fait */
+const JF_CATS={2:'Haïti',4:'Culture générale',5:'Philosophie'};
+let jfStop=false, jfBusy=false;
+window.jfStats=async()=>{
+  const el=document.getElementById('jf-body'); if(!el||jfBusy) return;
+  try{
+    const {data:d,error}=await db.rpc('zj_admin_fact_stats'); if(error) throw error;
+    const T=Number((document.getElementById('jf-target')||{}).value)||1000;
+    const g={}; d.rows.forEach(r=>{ (g[r.cat]=g[r.cat]||{})[r.lvl]=r; });
+    let h='<p style="color:var(--muted);margin-bottom:var(--s3)">Objectif : <input type="number" id="jf-target" class="input" style="width:100px;display:inline-block" value="'+T+'" onchange="jfStats()"> faits par niveau et par catégorie. Plus un niveau contient de faits différents, moins un joueur peut les mémoriser.</p>';
+    h+='<div style="overflow-x:auto"><table class="table"><thead><tr><th>Catégorie</th>'+[1,2,3,4,5,6,7,8,9,10].map(i=>'<th>N'+i+'</th>').join('')+'</tr></thead><tbody>';
+    [2,4,5].forEach(c=>{ h+='<tr><td><b>'+JF_CATS[c]+'</b></td>'+[1,2,3,4,5,6,7,8,9,10].map(l=>{ const r=(g[c]||{})[l]||{n:0,ia:0}; const pc=Math.min(100,Math.round(100*r.n/T)); return '<td title="'+r.ia+' générés par IA"><b>'+jtN(r.n)+'</b><div style="height:4px;background:var(--line,#ddd);border-radius:2px;margin-top:3px"><i style="display:block;height:4px;width:'+pc+'%;background:var(--ok,#2a9d6a);border-radius:2px"></i></div></td>'; }).join('')+'</tr>'; });
+    h+='</tbody></table></div>';
+    h+='<div style="display:flex;gap:var(--s4);flex-wrap:wrap;align-items:flex-end;margin-top:var(--s4)">'
+      +'<div class="field"><label>Catégories</label><div style="display:flex;gap:12px;flex-wrap:wrap">'+[2,4,5].map(c=>'<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" class="jf-c" value="'+c+'" checked> '+JF_CATS[c]+'</label>').join('')+'</div></div>'
+      +'<div class="field"><label>Niveaux de</label><input type="number" id="jf-l1" class="input" min="1" max="10" value="1" style="width:80px"></div>'
+      +'<div class="field"><label>à</label><input type="number" id="jf-l2" class="input" min="1" max="10" value="10" style="width:80px"></div>'
+      +'<div class="field"><label>Lots par niveau (15 faits chacun)</label><input type="number" id="jf-b" class="input" min="1" max="20" value="1" style="width:100px"></div>'
+      +'<button class="btn" id="jf-go" onclick="jfRun()">Générer des faits</button><button class="btn btn-ghost" id="jf-st" onclick="jfStop=true" hidden>Arrêter</button></div>'
+      +'<p style="color:var(--muted);font-size:.85rem;margin-top:var(--s2)">Chaque fait est écrit par l\'IA, puis contrôlé par une seconde IA qui répond sans voir la réponse attendue ; seuls les faits sur lesquels les deux sont d\'accord sont ajoutés. Appels aujourd\'hui : '+d.today+' / '+d.cap+'. Le navigateur doit rester ouvert pendant la génération.</p><div id="jf-log" style="font-size:.88rem;margin-top:var(--s2)"></div>';
+    if(d.recent.length) h+='<h4 style="margin-top:var(--s4)">Derniers faits générés (contrôle par sondage)</h4><div style="overflow-x:auto"><table class="table stack"><thead><tr><th>Cat.</th><th>Niv.</th><th>Question</th><th>Réponse</th><th></th></tr></thead><tbody>'+d.recent.map(r=>'<tr><td data-l="Cat.">'+JF_CATS[r.cat]+'</td><td data-l="Niv.">'+r.lvl+'</td><td data-l="Question">'+escH(r.q)+'</td><td data-l="Réponse"><b>'+escH(r.r)+'</b></td><td><button class="btn btn-ghost btn-sm" onclick="jfOff('+r.id+')">Retirer</button></td></tr>').join('')+'</tbody></table></div>';
+    el.innerHTML=h;
+  }catch(e){ el.innerHTML=emptyState('alert','Banque indisponible',jtErr(e)); }
+};
+window.jfOff=async(id)=>{ try{ const {error}=await db.rpc('zj_admin_fact_off',{p_id:id}); if(error) throw error; toast('Fait retiré','success'); jfStats(); }catch(e){ toast('Impossible : '+jtErr(e),'error'); } };
+window.jfRun=async()=>{
+  if(jfBusy) return;
+  const cats=[...document.querySelectorAll('.jf-c:checked')].map(x=>+x.value); if(!cats.length){ toast('Choisissez une catégorie','error'); return; }
+  const l1=Math.max(1,Math.min(10,+document.getElementById('jf-l1').value||1)), l2=Math.max(l1,Math.min(10,+document.getElementById('jf-l2').value||10)), nb=Math.max(1,Math.min(20,+document.getElementById('jf-b').value||1));
+  const log=document.getElementById('jf-log'); jfBusy=true; jfStop=false; document.getElementById('jf-go').disabled=true; document.getElementById('jf-st').hidden=false;
+  let kept=0, asked=0, fails=0; const line=t=>{ log.innerHTML='<div>'+t+'</div>'+log.innerHTML; };
+  try{
+    const {data}=await db.auth.getSession(); const tok=data&&data.session&&data.session.access_token; if(!tok) throw new Error('session');
+    outer: for(let b=0;b<nb;b++) for(const c of cats) for(let l=l1;l<=l2;l++){
+      if(jfStop) break outer;
+      try{
+        const r=await fetch(SUPABASE_URL+'/functions/v1/zfaits',{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+tok},body:JSON.stringify({cat:c,lvl:l,count:15})});
+        const j=await r.json().catch(()=>({}));
+        if(r.ok&&j.ok){ kept+=j.kept; asked+=j.got; fails=0; line(JF_CATS[c]+' niveau '+l+' : '+j.kept+' ajoutés sur '+j.got+' proposés'); }
+        else if(j.error==='no_key'){ line('<b>Clé ANTHROPIC_API_KEY absente</b> : ajoutez-la dans les secrets Supabase (Edge Functions), puis relancez.'); break outer; }
+        else if(j.error==='cap'){ line('Plafond d\'appels du jour atteint ('+j.cap+').'); break outer; }
+        else { fails++; line(JF_CATS[c]+' niveau '+l+' : échec ('+escH(j.error||r.status)+')'); if(fails>=4){ line('Trop d\'échecs de suite, arrêt.'); break outer; } }
+      }catch(e){ fails++; line('Erreur réseau'); if(fails>=4) break outer; }
+    }
+  }catch(e){ line('Session expirée : reconnectez-vous.'); }
+  jfBusy=false; document.getElementById('jf-go').disabled=false; document.getElementById('jf-st').hidden=true;
+  toast(kept+' faits ajoutés','success'); const keep=log.innerHTML; await jfStats(); document.getElementById('jf-log').innerHTML=keep;
+};
+window.initJetons=()=>{ jtRecent(); jtTesters(); jtSalon(); jfStats(); };
 window.jtQuick=v=>{ const i=document.getElementById('jt-amt'); if(i){ i.value=v; jtReset(); } };
 function jtReset(){ JT.pending=null; const c=document.getElementById('jt-confirm'); if(c) c.innerHTML=''; const g=document.getElementById('jt-go'); if(g){ g.hidden=false; g.disabled=false; } }
 window.jtFind=async()=>{
