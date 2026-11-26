@@ -4714,7 +4714,13 @@ gramar:"Un cahier ou un tableau d'école avec des phrases créoles écrites (mwe
 estres:"Une personne de dos qui respire face à un paysage calme, ou une main sur la poitrine ; éviter les visages.",
 tansyon:"Un tensiomètre sur un bras (sans visage) ou un tensiomètre posé sur une table.",
 kontra:"Un contrat et un stylo sur une table, mains visibles, texte illisible.",
-enter:"Des pièces et billets de gourdes empilés avec une calculatrice, ou une pousse de plante qui grandit."
+enter:"Des pièces et billets de gourdes empilés avec une calculatrice, ou une pousse de plante qui grandit.",
+somey:"Une chambre calme et sombre avec un lit fait, sans visage, ou un réveil sur une table de nuit.",
+sikdlo:"Un nuage de pluie au-dessus d'une rivière ou d'une colline haïtienne, ou une goutte sur une feuille.",
+matye:"Un glaçon qui fond dans un verre d'eau, ou une casserole d'eau qui bout avec de la vapeur.",
+toussaint:"Un portrait ancien ou une statue de Toussaint Louverture (œuvre du domaine public ou autorisée), ou le fort de Joux.",
+dijesyon:"Un repas varié sur une table (légumes, fruits, riz, pois), sans visage.",
+vitamin:"Un assortiment coloré de fruits et légumes (mangue, papaye, goyave, carottes, épinards) sur un marché."
 };
 const ED_PHOTO_RULES=["Format paysage, ratio 5:3 (ex. 1200×720 px). Les photos verticales sont recadrées au centre.","Taille minimale 800 px de large. La compression en WebP est automatique (≈100–200 Ko).","Droits : votre propre photo, ou une photo libre (Wikimedia Commons, Unsplash) avec le crédit rempli. Jamais une image prise au hasard sur Internet.","Pas de filigrane, pas de texte incrusté (le texte est traduit par le site), pas de logo de marque.","Personnes : jamais de visage d'enfant identifiable sans autorisation écrite d'un parent. Préférez les mains, le dos ou le flou.","Sujets sensibles (santé, sexualité, violence) : images neutres, jamais de corps ni de mise en scène choquante."];
 function eduPhotoCount(){return ED.cat.filter(a=>(ED.over[a.id]||{}).img).length;}
