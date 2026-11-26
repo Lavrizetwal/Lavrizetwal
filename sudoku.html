@@ -1912,7 +1912,7 @@ function gateConsent(game,rules,go){
   var c=GM.st&&GM.st.consents&&GM.st.consents[game]&&(+GM.st.consents[game].v>=(+GM.st.consent_v||1));
   if(c) return go();
   openModal('<h2>Avant de jouer</h2>'+rules+
-    '<p class="cs-gen">Les jetons sont des points de jeu : ils s’utilisent uniquement dans l’univers Zetwal (jeux et boutique du hub) et ne sont pas convertibles en argent. Réservé aux personnes de 18 ans ou plus. Plafond de gain : '+(GM.st&&GM.st.cap_day?GM.st.cap_day:300)+' jetons par jour.</p>'+
+    '<p class="cs-gen">Les jetons sont des points de jeu : ils s’utilisent uniquement dans l’univers Zetwal (jeux et boutique du hub) et ne sont pas convertibles en argent. Ils ne peuvent être ni vendus, ni échangés, ni envoyés à un autre joueur. Réservé aux personnes de 18 ans ou plus. Plafond de gain : '+(GM.st&&GM.st.cap_day?GM.st.cap_day:300)+' jetons par jour.</p>'+
     '<label class="gm-chk"><input type="checkbox" id="cs-c"><span>J’ai lu et compris les gains et les pertes possibles, et je consens à jouer.</span></label>'+
     '<p class="gm-err" id="cs-e" role="alert"></p><div class="row"><button class="gm-btn" type="button" id="cs-ok" disabled>Je consens et je joue</button><button class="gm-btn q" type="button" data-close>Annuler</button></div>','gm-consent');
   $('#cs-c').addEventListener('change',function(){ $('#cs-ok').disabled=!this.checked; });
