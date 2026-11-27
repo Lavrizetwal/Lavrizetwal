@@ -2301,7 +2301,7 @@ $('#m-google').addEventListener('click', async function(){
       $('#m-ph-1').style.display = 'none'; $('#m-ph-2').style.display = '';
       msg('Nou voye yon kòd SMS bay ' + n + '.', true);
       setTimeout(function(){ $('#m-ph-code').focus(); }, 50);
-    }catch(e){ msg(say(e)); try{ resetV(); }catch(x){} }
+    }catch(e){ var cc=e&&e.code; msg((cc==='auth/operation-not-allowed'||cc==='auth/billing-not-enabled'||cc==='auth/internal-error')?"Enskripsyon pa SMS poko disponib pou kounye a. Itilize imel + modpas, Google oswa Facebook.":say(e)); try{ resetV(); }catch(x){} }
     send.disabled = false; send.textContent = old;
   });
   var back = $('#m-ph-back');
