@@ -7794,10 +7794,11 @@ window.aiSend=()=>{
   aiRespond(q);
 };
 /* IA réelle (Claude) : utilisée seulement quand le moteur local n'est pas sûr, ou sur demande. */
-let aiRealState='unknown', aiHist=[];
+let aiRealState='unknown', aiHist=[], aiOffUntil=0;
+function aiIsOff(){ if(aiRealState==='off'&&Date.now()>aiOffUntil) aiRealState='unknown'; return aiRealState==='off'; }
 function aiFmt(t){ return escH(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>'); }
 async function aiReal(q){
-  if(aiRealState==='off') return null;
+  if(aiIsOff()) return null;
   try{
     const {data}=await db.auth.getSession(); const tok=data&&data.session&&data.session.access_token; if(!tok) return null;
     const ctx=AI2.context(q);
@@ -7805,7 +7806,7 @@ async function aiReal(q){
     const r=await fetch(SUPABASE_URL+'/functions/v1/zassist',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+tok},
       body:JSON.stringify({messages:aiHist.concat([{role:'user',content:q}]).slice(-8),tab:(TAB_META[currentTab]||{}).t||currentTab,context:ctx.text})});
     clearTimeout(to);
-    if(r.status===503||r.status===403){ aiRealState='off'; return null; }
+    if(r.status===503||r.status===403){ aiRealState='off'; aiOffUntil=Date.now()+60000; return null; }
     if(r.status===429) return {cap:true};
     if(!r.ok) return null;
     const j=await r.json(); if(!j.text) return null; aiRealState='ok'; return {text:j.text};
@@ -7820,7 +7821,7 @@ window.aiAskReal=async(q)=>{
 };
 async function aiRespond(q){
   const r=AI2.explain(q), sure=(r.kind==='answer'||r.kind==='nav'||r.kind==='where'||r.kind==='greet');
-  if(!sure && aiRealState!=='off'){
+  if(!sure && !aiIsOff()){
     const w=document.createElement('div'); w.className='msg bot'; w.textContent='…'; const c=document.getElementById('ai-chat'); c.appendChild(w); c.scrollTop=c.scrollHeight;
     const rr=await aiReal(q);
     if(rr&&rr.text){ w.innerHTML=aiFmt(rr.text)+'<br><span style="opacity:.6;font-size:.8em">Réponse de l\'IA — vérifiez avant d\'agir.</span>'; aiHist.push({role:'user',content:q},{role:'assistant',content:rr.text}); aiHist=aiHist.slice(-8); c.scrollTop=c.scrollHeight; return; }
