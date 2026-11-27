@@ -2201,6 +2201,20 @@ tbody tr:last-child td{border-bottom:none}
         </div>
       </div>
 
+      <div class="card" style="max-width:620px">
+        <div class="card-head"><h3><span data-icon="star"></span> Thème de Noël</h3></div>
+        <p class="card-sub">Neige légère, ruban et message de fêtes sur tout le site, en gardant le style Zetwal. Automatique du 1er décembre au 15 janvier.</p>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r-md);background:var(--bg-deep);border:1px solid var(--line);margin-bottom:16px">
+          <span id="xmas-dot" class="dot"></span>
+          <span id="xmas-label" style="font-weight:600;font-size:.9rem">Chargement…</span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="xmas-b-auto" style="flex:1" onclick="setXmas('auto')">Automatique (1 déc → 15 jan)</button>
+          <button class="btn btn-ok" id="xmas-b-on" style="flex:1" onclick="setXmas('on')">Activer maintenant</button>
+          <button class="btn btn-bad" id="xmas-b-off" style="flex:1" onclick="setXmas('off')">Désactiver</button>
+        </div>
+      </div>
+
       <div class="card" style="max-width:760px">
         <div class="card-head"><h3><span data-icon="swap"></span> Taux de change</h3></div>
         <p class="card-sub">La gourde est la monnaie de référence. Ces taux convertissent tous les montants affichés dans la console.</p>
@@ -4632,7 +4646,7 @@ window.jfRun=async()=>{
         const r=await fetch(SUPABASE_URL+'/functions/v1/zfaits',{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+tok},body:JSON.stringify({cat:c,lvl:l,count:15})});
         const j=await r.json().catch(()=>({}));
         if(r.ok&&j.ok){ kept+=j.kept; asked+=j.got; fails=0; line(JF_CATS[c]+' niveau '+l+' : '+j.kept+' ajoutés sur '+j.got+' proposés'); }
-        else if(j.error==='no_key'){ line('<b>Clé ANTHROPIC_API_KEY absente</b> : ajoutez-la dans les secrets Supabase (Edge Functions), puis relancez.'); break outer; }
+        else if(j.error==='no_key'){ line('<b>Aucune clé IA</b> : ajoutez DEEPSEEK_API_KEY (ou ANTHROPIC_API_KEY) dans les secrets Supabase (Edge Functions), puis relancez.'); break outer; }
         else if(j.error==='cap'){ line('Plafond d\'appels du jour atteint ('+j.cap+').'); break outer; }
         else { fails++; line(JF_CATS[c]+' niveau '+l+' : échec ('+escH(j.error||r.status)+')'); if(fails>=4){ line('Trop d\'échecs de suite, arrêt.'); break outer; } }
       }catch(e){ fails++; line('Erreur réseau'); if(fails>=4) break outer; }
@@ -6747,10 +6761,27 @@ async function createNotification(type,title,message,target='admin',metadata={})
    13. PARAMÈTRES
    ════════════════════════════════════════════════════════════ */
 let settingsInit=false, quotesData=[], activeDayIdx=0;
+function xmasInWindow(){const d=new Date(),m=d.getMonth()+1,day=d.getDate();return m===12||(m===1&&day<=15)}
+async function refreshXmas(){
+  let mode='auto';
+  try{const {data}=await db.from('site_settings').select('value').eq('key','xmas_mode').single();if(data&&(data.value==='on'||data.value==='off'||data.value==='auto'))mode=data.value}catch(e){}
+  const act=mode==='on'||(mode==='auto'&&xmasInWindow());
+  const dot=document.getElementById('xmas-dot'),lb=document.getElementById('xmas-label');
+  if(dot)dot.className='dot'+(act?' on':'');
+  if(lb)lb.textContent=(act?'Actif':'Inactif')+' — '+(mode==='auto'?'mode automatique (1 déc → 15 jan)':mode==='on'?'forcé activé':'forcé désactivé');
+  ['auto','on','off'].forEach(k=>{const b=document.getElementById('xmas-b-'+k);if(b)b.style.outline=(k===mode)?'2px solid var(--gold)':'none'});
+}
+window.setXmas=async(val)=>{
+  try{
+    await db.from('site_settings').upsert({key:'xmas_mode',value:val,updated_at:new Date().toISOString()},{onConflict:'key'});
+    toast(val==='auto'?'Thème de Noël : automatique':val==='on'?'Thème de Noël activé':'Thème de Noël désactivé','success');
+    await refreshXmas();
+  }catch(e){ toast('Modification impossible : '+rlsHint(e),'error'); }
+};
 async function initSettings(){
-  if(settingsInit){ await refreshStoreStatus(); return; }
+  if(settingsInit){ await Promise.all([refreshStoreStatus(),refreshXmas()]); return; }
   settingsInit=true;
-  await Promise.all([refreshStoreStatus(),loadQuotes()]);
+  await Promise.all([refreshStoreStatus(),loadQuotes(),refreshXmas()]);
 }
 async function refreshStoreStatus(){
   const dot=document.getElementById('admin-store-dot');
