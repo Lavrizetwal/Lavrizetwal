@@ -15,10 +15,10 @@
     var d=new Date(), m=d.getMonth()+1, day=d.getDate(), n=daysToXmas();
     if(m===1 && day<=15) return 'Bònn ane '+d.getFullYear()+' !';
     if(m===12 && day>=26) return 'Bòn fèt ! Bònn ane '+(d.getFullYear()+1)+' !';
-    if(n===0) return 'Jwayezo Nwèl !';
+    if(n===0) return 'Jwaye Nwèl !';
     if(n===1) return 'Demen se Nwèl !';
     if(n>1 && n<=40) return 'Rete '+n+' jou anvan Nwèl';
-    return 'Jwayezo Nwèl !';
+    return 'Jwaye Nwèl !';
   }
   function swag(c1,c2,c3){
     var b=function(x,y,c){ return '<rect x="'+(x-2)+'" y="'+(y-6)+'" width="4" height="3.2" fill="#3d3d3d"/><ellipse cx="'+x+'" cy="'+(y+0.5)+'" rx="3.4" ry="4.4" fill="'+c+'"/><ellipse cx="'+(x-1.1)+'" cy="'+(y-1)+'" rx="1" ry="1.5" fill="#fff" fill-opacity=".55"/>'; };
@@ -84,7 +84,7 @@
     document.documentElement.classList.add('zxm');
     if(!ribbon){ ribbon=document.createElement('div'); ribbon.className='zxm-rib'; ribbon.setAttribute('aria-hidden','true'); document.body.appendChild(ribbon); }
     if(!glow){ glow=document.createElement('div'); glow.className='zxm-glow'; glow.setAttribute('aria-hidden','true'); document.body.appendChild(glow); }
-    if(!foot && FOOT.test(location.pathname)){ foot=document.createElement('div'); foot.className='zxm-foot'; foot.setAttribute('aria-hidden','true'); foot.innerHTML='<div class="zxm-trees"></div><div class="zxm-msg"><b>Jwayezo Nwèl ak Bònn Ane !</b>Zetwal Organisation te swete nou lapè, sante ak lajwa.</div>'; document.body.appendChild(foot); }
+    if(!foot && FOOT.test(location.pathname)){ foot=document.createElement('div'); foot.className='zxm-foot'; foot.setAttribute('aria-hidden','true'); foot.innerHTML='<div class="zxm-trees"></div><div class="zxm-msg"><b>Jwaye Nwèl ak Bònn Ane !</b>Zetwal Organisation te swete nou lapè, sante ak lajwa.</div>'; document.body.appendChild(foot); }
     if(!btn){
       btn=document.createElement('button'); btn.type='button'; btn.className='zxm-btn'; btn.textContent='❄'; btn.title='Nèj'; btn.setAttribute('aria-label','Nèj / Neige / Snow');
       btn.setAttribute('aria-pressed',snowOn()?'true':'false');
