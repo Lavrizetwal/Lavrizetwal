@@ -220,7 +220,20 @@ footer{color:var(--mut)}footer b{color:var(--ink)}#hf{color:var(--gold-ink)!impo
 :root[data-theme="dark"] .lgo{background:#fff}
 @media(max-width:860px){#side a{background:rgba(255,255,255,.08)}#tb{width:44px;height:44px}}
 #side a.allb,.allb,#side .allb{background:var(--gold)!important;color:#14234F!important}
+
+.hero{position:relative;overflow:hidden}
+.hglyphs{position:absolute;right:18px;top:6px;bottom:6px;width:46%;display:grid;grid-template-columns:repeat(3,1fr);align-items:center;justify-items:center;pointer-events:none;font-family:"Cormorant Garamond",Georgia,serif}
+.hglyphs i{font-style:normal;font-size:clamp(40px,6vw,86px);line-height:1;color:rgba(212,175,55,.2)}
+.hglyphs i:nth-child(2n){color:rgba(238,240,246,.12)}
+.hero h1,.hero p,.hero .hstats{position:relative}
+.qd{margin-bottom:18px;min-height:0}.qd .qf{min-height:0}.qd .qq{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.35rem;font-weight:600;margin-bottom:12px}
+.wod{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:14px 0 4px;padding:12px 16px;border-left:4px solid var(--gold);background:var(--surface);border-radius:0 10px 10px 0}
+.wod .wl{font-size:.74rem;letter-spacing:.08em;color:var(--gold-ink,#7C5C0A);font-weight:700;text-transform:uppercase}
+.wod b{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.3rem}
+.wod span:last-child{flex:1 1 260px;color:var(--mut)}
+@media(max-width:700px){.hglyphs{opacity:.55;width:60%}}
 </style>
+<script src="noel.js" defer></script>
 </head>
 <body>
 <a class="skip" id="sk" href="#main">Skip</a>
@@ -246,7 +259,7 @@ guest:"Pwogrè w sove sou aparèy sa a sèlman.",galt:"Galri imaj",galtx:"Tout i
 glt:"Diksyonè",gltx:"Tout mo kle nan atik yo, pa lòd alfabetik.",filter:"Filtre mo yo",zhome:"Akèy Zetwal",foot:"Zetwal Edu · yon pwojè Zetwal Organisation",
 addr:"Wout Nasyonal #1, nan antre ri Jean Pierre a, zòn Pont-Gaudin, Gonayiv, Ayiti W.I",lang:"Lang",skip:"Ale nan kontni an",
 done:"Li",pts:"pwen",inprog:"Nan preparasyon",avail:"atik disponib",of:"sou",
-bits:"Bit yo",dec:"Desimal",hex:"Egzadesimal",listen:"Koute",share:"Pataje",shcopy:"Kopye lyen an",shcopied:"Lyen kopye ✓",shmsg:"Gade atik sa a sou Zetwal Edu",shmore:"Pataje sou…",
+bits:"Bit yo",dec:"Desimal",hex:"Egzadesimal",listen:"Koute",share:"Pataje",qotd:"Kesyon jou a",qotdsub:"Yon kesyon pou reflechi chak jou.",qread:"Li atik la",wod:"Mo jou a",shcopy:"Kopye lyen an",shcopied:"Lyen kopye ✓",shmsg:"Gade atik sa a sou Zetwal Edu",shmore:"Pataje sou…",
 },
 fr:{tag:"Gratuit. Aucun compte nécessaire pour apprendre.",ph:"Chercher un mot, un sujet…",go:"Chercher",home:"Accueil",subj:"Matières",gloss:"Dictionnaire",gal:"Galerie",prog:"Progrès",
 lv1:"Débutant",lv2:"Intermédiaire",lv3:"Avancé",
@@ -261,7 +274,7 @@ guest:"Votre progression est enregistrée sur cet appareil uniquement.",galt:"Ga
 glt:"Dictionnaire",gltx:"Tous les mots clés des articles, par ordre alphabétique.",filter:"Filtrer les mots",zhome:"Accueil Zetwal",foot:"Zetwal Edu · un projet de Zetwal Organisation",
 addr:"Route Nationale n° 1, entrée de la ruelle Jean Pierre, zone de Pont-Gaudin, Gonaïves, Haïti W.I",lang:"Langue",skip:"Aller au contenu",
 done:"Lu",pts:"points",inprog:"En préparation",avail:"articles disponibles",of:"sur",
-bits:"Bits",dec:"Décimal",hex:"Hexadécimal",listen:"Écouter",share:"Partager",shcopy:"Copier le lien",shcopied:"Lien copié ✓",shmsg:"Découvrez cet article sur Zetwal Edu",shmore:"Partager sur…",
+bits:"Bits",dec:"Décimal",hex:"Hexadécimal",listen:"Écouter",share:"Partager",qotd:"Question du jour",qotdsub:"Une question pour réfléchir chaque jour.",qread:"Lire l'article",wod:"Mot du jour",shcopy:"Copier le lien",shcopied:"Lien copié ✓",shmsg:"Découvrez cet article sur Zetwal Edu",shmore:"Partager sur…",
 },
 en:{tag:"Free. No account needed to learn.",ph:"Search a word or topic…",go:"Search",home:"Home",subj:"Subjects",gloss:"Glossary",gal:"Gallery",prog:"Progress",
 lv1:"Beginner",lv2:"Intermediate",lv3:"Advanced",
@@ -276,7 +289,7 @@ guest:"Your progress is saved on this device only.",galt:"Image gallery",galtx:"
 glt:"Glossary",gltx:"All key words from the articles, in alphabetical order.",filter:"Filter words",zhome:"Zetwal home",foot:"Zetwal Edu · a Zetwal Organisation project",
 addr:"National Road #1, at the entrance of Jean Pierre Alley, Pont-Gaudin area, Gonaïves, Haiti W.I",lang:"Language",skip:"Skip to content",
 done:"Read",pts:"points",inprog:"In preparation",avail:"articles available",of:"of",
-bits:"Bits",dec:"Decimal",hex:"Hexadecimal",listen:"Listen",share:"Share",shcopy:"Copy link",shcopied:"Link copied ✓",shmsg:"Check out this article on Zetwal Edu",shmore:"Share on…",
+bits:"Bits",dec:"Decimal",hex:"Hexadecimal",listen:"Listen",share:"Share",qotd:"Question of the day",qotdsub:"One question to think about every day.",qread:"Read the article",wod:"Word of the day",shcopy:"Copy link",shcopied:"Link copied ✓",shmsg:"Check out this article on Zetwal Edu",shmore:"Share on…",
 },
 ru:{tag:"Бесплатно. Для обучения аккаунт не нужен.",ph:"Найти слово или тему…",go:"Найти",home:"Главная",subj:"Предметы",gloss:"Словарь",gal:"Галерея",prog:"Прогресс",
 lv1:"Начальный",lv2:"Средний",lv3:"Продвинутый",
@@ -291,7 +304,7 @@ guest:"Ваш прогресс сохраняется только на этом
 glt:"Словарь",gltx:"Все ключевые слова из статей по алфавиту.",filter:"Фильтр слов",zhome:"На главную Zetwal",foot:"Zetwal Edu · проект Zetwal Organisation",
 addr:"Национальная дорога № 1, при входе в переулок Жан-Пьер, район Пон-Годен, Гонаив, Гаити W.I",lang:"Язык",skip:"К содержимому",
 done:"Прочитано",pts:"баллов",inprog:"В подготовке",avail:"статей доступно",of:"из",
-bits:"Биты",dec:"Десятичное",hex:"Шестнадцатеричное",listen:"Слушать",share:"Поделиться",shcopy:"Копировать ссылку",shcopied:"Ссылка скопирована ✓",shmsg:"Посмотрите эту статью на Zetwal Edu",shmore:"Поделиться в…",
+bits:"Биты",dec:"Десятичное",hex:"Шестнадцатеричное",listen:"Слушать",share:"Поделиться",qotd:"Вопрос дня",qotdsub:"Один вопрос для размышления каждый день.",qread:"Читать статью",wod:"Слово дня",shcopy:"Копировать ссылку",shcopied:"Ссылка скопирована ✓",shmsg:"Посмотрите эту статью на Zetwal Edu",shmore:"Поделиться в…",
 }};
 
 /* ===== Catalogue : matières, chronologie, glossaire ===== */
@@ -4939,13 +4952,17 @@ function home(){
  var d=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5),a=ART[d%ART.length];
  var lv=[1,2,3].map(function(n){return'<a class="lvc" href="#/l/'+n+'"><span class="n">'+n+'</span><b>'+t(LVN[n])+'</b><span>'+t("lvd"+n)+'</span></a>'}).join("");
  var tile=function(s,tab){return'<a class="stile" href="#/s/'+s.id+'"'+(tab?' tabindex="-1"':'')+'><i>'+esc(s.ic)+'</i><b>'+esc(tr(s.t))+'</b><span>'+esc(tr(s.d))+'</span></a>'};var sj=SUBJ.map(function(s){return tile(s)}).join(""),sjc=SUBJ.map(function(s){return tile(s,1)}).join("");
- main.innerHTML='<section class="hero"><h1>Zetwal Edu</h1><p>'+t("tag")+'</p><div class="hstats"><span><b>'+SUBJ.length+'</b> '+t("subj")+'</span><span><b>'+ART.length+'</b> '+t("avail")+'</span><span><b>4</b> '+t("nlang")+'</span></div></section>'+rankBar()+'<div class="vban"><span>'+t("becomevd")+'</span><a class="btn" href="#/v">'+t("becomev")+'</a></div>'+
+ var okA=ART.filter(function(x){return !ageOf(x)&&x.q&&x.q.length}),qa=okA.length?okA[(d*7)%okA.length]:null,qq=qa?qa.q[d%qa.q.length]:null,gk=[];okA.forEach(function(x){(x.w||[]).forEach(function(k){if(G[k]&&gk.indexOf(k)<0)gk.push(k)})});var wk=gk.length?G[gk[(d*5)%gk.length]]:null;
+ var qd=qq?'<h2 class="sec">'+t("qotd")+'</h2><p class="sub">'+t("qotdsub")+'</p><div class="box qd" id="qd"><div class="qq">'+esc(tr(qq.q))+'</div><div class="qo">'+qq.o.map(function(o,k){return'<button class="opt" data-k="'+k+'">'+esc(tr(o))+'</button>'}).join("")+'</div><div class="qf" id="qdf" aria-live="polite"></div></div>':"";
+ var wd=wk?'<div class="wod"><span class="wl">'+t("wod")+'</span><b>'+esc(tr(wk.t))+'</b><span>'+esc(tr(wk.d))+'</span></div>':"";
+ main.innerHTML='<section class="hero"><div class="hglyphs" aria-hidden="true"><i>π</i><i>∑</i><i>Ω</i><i>ℵ</i><i>é</i><i>Ж</i></div><h1>Zetwal Edu</h1><p>'+t("tag")+'</p><div class="hstats"><span><b>'+SUBJ.length+'</b> '+t("subj")+'</span><span><b>'+ART.length+'</b> '+t("avail")+'</span><span><b>4</b> '+t("nlang")+'</span></div></section>'+wd+qd+rankBar()+'<div class="vban"><span>'+t("becomevd")+'</span><a class="btn" href="#/v">'+t("becomev")+'</a></div>'+
  '<h2 class="sec">'+t("where")+'</h2><p class="sub">'+t("wheresub")+'</p><div class="lvs">'+lv+'</div>'+
  '<h2 class="sec">'+t("games")+'</h2>'+gameTiles()+'<h2 class="sec">'+t("daily")+'</h2>'+aLink(a)+
  '<h2 class="sec">'+t("subjt")+' · '+SUBJ.length+'</h2><div class="car big" id="hcar"><div class="car-in" style="animation-duration:'+(SUBJ.length*3.2)+'s"><div class="cg">'+sj+'</div><div class="cg clone" aria-hidden="true">'+sjc+'</div></div></div><p style="text-align:center"><a class="btn" href="#/all" style="text-decoration:none;display:inline-block">'+t("showall")+' ('+SUBJ.length+')</a></p>'+
  '<h2 class="sec">'+t("timeline")+'</h2><div id="htl" class="panel"></div>'+
  '<h2 class="sec">'+ART.length+' '+t("avail")+'</h2><div class="alist">'+ART.map(aLink).join("")+'</div>';
- LABS.timeline($("#htl"))}
+ LABS.timeline($("#htl"));
+ var qdb=$("#qd");if(qdb&&qq&&qa)$$(".opt",qdb).forEach(function(b){b.onclick=function(){if(qdb.getAttribute("data-d"))return;qdb.setAttribute("data-d","1");var k=+b.getAttribute("data-k"),good=k===qq.a;b.classList.add(good?"good":"bad");if(!good)$$(".opt",qdb)[qq.a].classList.add("good");$("#qdf").innerHTML='<b class="'+(good?"okc":"koc")+'">'+t(good?"good":"bad")+'</b> <a class="btn" href="#/a/'+qa.id+'">'+t("qread")+'</a>'}})}
 function levelView(n){
  var arts=ART.filter(function(a){return a.lv===n}),tps="";
  SUBJ.forEach(function(s){var l=s.tp.filter(function(p){return p[0]===n&&!p[2]});if(l.length){tps+='<h3 class="subh" style="--c:'+s.c+'">'+esc(tr(s.t))+'</h3>'+l.map(function(p){return topicRow(s,p)}).join("")}});
