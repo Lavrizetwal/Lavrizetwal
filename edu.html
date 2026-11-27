@@ -3899,9 +3899,9 @@ coords:function(el){
  ci.onchange=function(){var c=CITIES[+ci.value];la.value=c[1];lo.value=c[2];draw()};
  la.oninput=lo.oninput=draw;draw()},
 timeline:function(el){
- el.innerHTML='<div class="tl" id="tl"></div><div class="tlbox" id="tb">'+tr(LB.tlhint)+'</div>';
+ el.innerHTML='<div class="tl" id="tl"></div><div class="tlbox" id="tlb">'+tr(LB.tlhint)+'</div>';
  var h="";TL.forEach(function(e,i){h+='<button class="tld" data-i="'+i+'"><b>'+e[0]+'</b></button>'});$("#tl",el).innerHTML=h;
- $$(".tld",el).forEach(function(b){b.onclick=function(){$$(".tld",el).forEach(function(x){x.classList.remove("on")});b.classList.add("on");var e=TL[+b.getAttribute("data-i")];$("#tb",el).innerHTML='<b class="yr">'+e[0]+'</b> '+esc(T(e[1])[lang])}})},
+ $$(".tld",el).forEach(function(b){b.onclick=function(){$$(".tld",el).forEach(function(x){x.classList.remove("on")});b.classList.add("on");var e=TL[+b.getAttribute("data-i")];$("#tlb",el).innerHTML='<b class="yr">'+e[0]+'</b> '+esc(T(e[1])[lang])}})},
 rgb:function(el){
  el.innerHTML='<div class="lab-grid"><div id="sw" class="swatch"></div><div class="ctl"><label>'+tr(LB.mix.r)+' <output id="ro"></output><input id="r" type="range" min="0" max="255" value="224"></label><label>'+tr(LB.mix.g)+' <output id="go"></output><input id="g" type="range" min="0" max="255" value="176"></label><label>'+tr(LB.mix.b)+' <output id="bo"></output><input id="b" type="range" min="0" max="255" value="64"></label><div class="big" id="hx"></div></div></div>';
  var r=$("#r",el),g=$("#g",el),b=$("#b",el);
