@@ -1979,14 +1979,36 @@ function blocker(){
   var s=GM.st;
   if(!GM.user) return {k:'login',t:'Connexion requise',m:'Connectez-vous pour jouer, suivre vos statistiques et entrer au classement.',b:'Se connecter',f:goLogin};
   if(!s) return {k:'err',t:'Jeux indisponibles',m:'Impossible de joindre le serveur. Si votre compte est protégé par une clé d’accès (empreinte ou visage), déverrouillez-le quand l’écran de sécurité s’affiche : la page se rechargera toute seule. Sinon, réessayez dans un instant.'};
+  if(s.authed===false) return verifyB();
   if(!s.can_play){
     if(!s.open) return {k:'closed',t:'Les jeux ouvrent bientôt',m:'Le Sudoku, le Duel Mental et La course vers la mort sont en préparation. Ils ouvriront très prochainement sur Zetwal.'};
-    return {k:'verify',t:'Adresse e-mail à vérifier',m:'Vérifiez votre adresse e-mail pour pouvoir jouer, puis rechargez la page.'};
+    return verifyB();
   }
   if(!s.adult) return {k:'age',t:s.age_known?'Accès réservé aux adultes':'Un dernier contrôle',m:s.age_known?'Les jeux Zetwal sont réservés aux personnes de 18 ans ou plus.':'Confirmez votre âge : les jeux sont réservés aux personnes de 18 ans ou plus.',b:s.age_known?null:'Confirmer mon âge',f:function(){ ageModal(function(){ location.reload(); }); }};
   return null;
 }
-function noteHtml(b,cls){ return '<div class="gm-note'+(cls?' '+cls:'')+'"><b>'+esc(b.t)+'</b>'+esc(b.m)+(b.b?'<br><button class="gm-btn sm" type="button" id="gm-nb">'+esc(b.b)+'</button>':'')+'</div>'; }
+function noteHtml(b,cls){ return '<div class="gm-note'+(cls?' '+cls:'')+'"><b>'+esc(b.t)+'</b>'+esc(b.m)+(b.b?'<br><button class="gm-btn sm" type="button" id="gm-nb">'+esc(b.b)+'</button>':'')+(b.b2?' <button class="gm-btn sm q" type="button" id="gm-nb2">'+esc(b.b2)+'</button>':'')+(b.k==='verify'?'<br><small id="gm-vmsg" role="status"></small>':'')+'</div>'; }
+
+/* ── E-mail à vérifier : message clair + actions (renvoyer / j'ai vérifié) ── */
+function verifyB(){
+  return {k:'verify',t:'Adresse e-mail à vérifier',m:'Pour jouer, confirmez votre adresse e-mail : ouvrez le message reçu de Zetwal (regardez aussi les spams) et touchez le lien. Ensuite, touchez « J’ai vérifié ».',b:'J’ai vérifié mon e-mail',f:verifyRecheck,b2:'Renvoyer l’e-mail',f2:verifyResend};
+}
+function verifyMsg(t){ var m=document.getElementById('gm-vmsg'); if(m) m.textContent=t; }
+function verifyRecheck(){
+  var u=null; try{ u=window.firebase&&firebase.auth().currentUser; }catch(e){}
+  if(!u){ goLogin(); return; }
+  verifyMsg('Vérification en cours…');
+  u.reload().then(function(){
+    if(u.emailVerified) return u.getIdToken(true).then(function(){ location.reload(); });
+    verifyMsg('Pas encore confirmé. Touchez le lien dans l’e-mail reçu, puis recommencez.');
+  }).catch(function(){ verifyMsg('Connexion impossible. Réessayez dans un instant.'); });
+}
+function verifyResend(){
+  var u=null; try{ u=window.firebase&&firebase.auth().currentUser; }catch(e){}
+  if(!u){ goLogin(); return; }
+  u.sendEmailVerification().then(function(){ verifyMsg('E-mail envoyé à '+(u.email||'votre adresse')+'. Regardez aussi les spams.'); })
+   .catch(function(e){ verifyMsg(e&&e.code==='auth/too-many-requests'?'Trop de demandes. Patientez quelques minutes puis réessayez.':'Envoi impossible pour le moment. Réessayez plus tard.'); });
+}
 var ERRS={ max:'Vous avez déjà le maximum de cet article.', non_equipable:'Cet article ne s’équipe pas : il s’active tout seul.', deja:'Vous possédez déjà cet article.', rupture:'Cet article est épuisé.', introuvable:'Article introuvable.', non_possede:'Vous ne possédez pas cet article.', consentement:'Confirmez d’abord votre consentement pour jouer.', ferme:'Les jeux sont fermés pour le moment.', age:'Confirmez votre âge pour jouer.', autre_partie:'Vous avez déjà une partie en cours.', niveau:'Niveau inconnu.', choix:'Choix invalide.',
   plafond:'Plafond quotidien atteint : vous avez gagné le maximum autorisé aujourd’hui. Revenez demain.', mythique_jour:'Le niveau Mythique est limité à une partie par jour.',
   banque:'Aucune question disponible pour ce choix pour le moment. Choisissez-en un autre.', terminee:'Cette partie est terminée.', ordre:'Réponse déjà prise en compte.', session:'Partie introuvable.' };
@@ -2070,7 +2092,7 @@ var LVN=['','Facile','Moyen','Difficile','Légendaire','Mythique'], GLV=['','Ama
 var CATN=['','Calcul mental','Haïti','Mémoire','Culture générale','Philosophie'];
 var period='all';
 $('#hb-wal-ic').innerHTML=JT;
-function showNote(b){ var n=$('#hb-note'); if(!b){ n.innerHTML=''; return; } n.innerHTML=noteHtml(b,b.k==='err'?'bad':''); var bt=$('#gm-nb'); if(bt&&b.f) bt.addEventListener('click',b.f); }
+function showNote(b){ var n=$('#hb-note'); if(!b){ n.innerHTML=''; return; } n.innerHTML=noteHtml(b,b.k==='err'?'bad':''); var bt=$('#gm-nb'); if(bt&&b.f) bt.addEventListener('click',b.f); var bt2=$('#gm-nb2'); if(bt2&&b.f2) bt2.addEventListener('click',b.f2); }
 
 /* ── Klasman ── */
 function lvLabel(g,x){
@@ -2146,7 +2168,6 @@ function hubNote(){
   if(b&&b.k==='login') b={k:b.k,t:'Connectez-vous pour jouer',m:'Connectez-vous avec votre compte Zetwal pour jouer, voir vos statistiques et entrer au classement.',b:'Se connecter',f:goLogin};
   else if(b&&b.k==='closed') b={k:b.k,t:'Les jeux ouvrent bientôt',m:'Sudoku, Duel Mental, La course vers la mort et Gomoku ouvriront bientôt sur Zetwal. Vous pouvez déjà voir le classement ci-dessous.'};
   else if(b&&b.k==='age') b={k:b.k,t:s&&s.age_known?'Accès réservé aux adultes':'Un dernier contrôle',m:s&&s.age_known?'Les jeux Zetwal sont réservés aux personnes de 18 ans ou plus.':'Confirmez votre âge : les jeux sont réservés aux personnes de 18 ans ou plus.',b:s&&s.age_known?null:'Confirmer mon âge',f:b.f};
-  else if(b&&b.k==='verify') b={k:b.k,t:'Vérifiez votre adresse e-mail',m:'Vérifiez votre adresse e-mail pour pouvoir jouer, puis rechargez la page.'};
   else if(!b&&s&&s.resume){ b={k:'resume',t:'Vous avez une partie en cours',m:'Le temps continue de s’écouler. Retournez dans la partie pour la terminer.',b:'Reprendre la partie',f:function(){ location.href=(s.resume.game==='duel'?'duel.html':s.resume.game==='course'?'course.html':s.resume.game==='gomoku'?'gomoku.html':'sudoku.html'); }}; }
   showNote(b);
 }

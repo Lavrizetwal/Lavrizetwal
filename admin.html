@@ -5199,12 +5199,22 @@ window.jtTesters=async()=>{
     JT.testers=data||[]; JT.delAsk=null; jtTestersDraw();
   }catch(e){ el.innerHTML=emptyState('alert','Liste indisponible',jtErr(e)); }
 };
+function jtStatut(t){
+  const M={no_account:['var(--muted)','Pas encore inscrit','Doit créer son compte Zetwal avec cette adresse.'],
+    verify:['var(--bad)','E-mail à vérifier','Il doit toucher le lien reçu par e-mail, puis ouvrir la page Jeux (bouton « J’ai vérifié »).'],
+    age:['var(--bad)','Âge à confirmer','Page Jeux > « Confirmer mon âge » (date de naissance).'],
+    minor:['var(--bad)','Mineur','Accès refusé : moins de 18 ans.'],
+    ready:['var(--ok)','Prêt à jouer','']};
+  const m=M[t.statut]||M.no_account;
+  return '<span style="color:'+m[0]+';font-weight:600">'+m[1]+'</span>'+(m[2]?'<div style="color:var(--muted);font-size:.8rem">'+m[2]+'</div>':'');
+}
 function jtTestersDraw(){
   const el=document.getElementById('jt-testers'); if(!el) return;
   const rows=JT.testers;
-  el.innerHTML=rows.length?'<table class="table stack"><thead><tr><th>Testeur</th><th>Accès</th><th>Jetons</th><th></th></tr></thead><tbody>'
+  el.innerHTML=rows.length?'<table class="table stack"><thead><tr><th>Testeur</th><th>Accès</th><th>Statut</th><th>Jetons</th><th></th></tr></thead><tbody>'
     +rows.map((t,i)=>'<tr><td data-l="Testeur">'+escH(t.name||t.email)+'<div style="color:var(--muted);font-size:.8rem">'+escH(t.email)+(t.note?' · '+escH(t.note):'')+(t.has_account?'':' · pas encore connecté')+'</div></td>'
       +'<td data-l="Accès"><span style="color:'+(t.active?'var(--ok)':'var(--bad)')+';font-weight:600">'+(t.active?'Actif':'Expiré')+'</span><div style="color:var(--muted);font-size:.8rem">'+escH(jtUntil(t))+'</div></td>'
+      +'<td data-l="Statut">'+jtStatut(t)+'</td>'
       +'<td data-l="Jetons">'+(t.has_account?jtN(t.balance):'—')+'</td>'
       +'<td data-l=""><div style="display:flex;gap:6px;flex-wrap:wrap">'
       +(t.kind==='temporaire'?'<button class="btn btn-quiet btn-sm" onclick="jtTesterRenew('+i+')">Renouveler</button>':'')
