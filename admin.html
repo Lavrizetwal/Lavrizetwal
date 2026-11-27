@@ -4646,7 +4646,7 @@ window.jfRun=async()=>{
         const r=await fetch(SUPABASE_URL+'/functions/v1/zfaits',{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+tok},body:JSON.stringify({cat:c,lvl:l,count:15})});
         const j=await r.json().catch(()=>({}));
         if(r.ok&&j.ok){ kept+=j.kept; asked+=j.got; fails=0; line(JF_CATS[c]+' niveau '+l+' : '+j.kept+' ajoutés sur '+j.got+' proposés'); }
-        else if(j.error==='no_key'){ line('<b>Aucune clé IA</b> : ajoutez DEEPSEEK_API_KEY (ou ANTHROPIC_API_KEY) dans les secrets Supabase (Edge Functions), puis relancez.'); break outer; }
+        else if(j.error==='no_key'){ line('<b>Aucune clé IA</b> : ajoutez ZAI_API_KEY (gratuit), GROQ_API_KEY ou GEMINI_API_KEY dans les secrets Supabase (Edge Functions), puis relancez.'); break outer; }
         else if(j.error==='cap'){ line('Plafond d\'appels du jour atteint ('+j.cap+').'); break outer; }
         else { fails++; line(JF_CATS[c]+' niveau '+l+' : échec ('+escH(j.error||r.status)+')'); if(fails>=4){ line('Trop d\'échecs de suite, arrêt.'); break outer; } }
       }catch(e){ fails++; line('Erreur réseau'); if(fails>=4) break outer; }
