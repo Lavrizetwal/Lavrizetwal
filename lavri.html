@@ -1718,6 +1718,8 @@ var PRICES = {
     hebdo:   { unit:'semèn', tiers:[ {name:'Esansyèl',   kg:50,  perKg:76}, {name:'Pwofesyonèl', kg:100, perKg:74, best:true}, {name:'Antrepriz', kg:200, perKg:72} ] },
     mensuel: { unit:'mwa',   tiers:[ {name:'Esansyèl',   kg:200, perKg:76}, {name:'Pwofesyonèl', kg:500, perKg:72, best:true}, {name:'Antrepriz', kg:1000, perKg:70} ] }
   },
+  /* Remiz inifòm lekòl (% sou lavaj la sèlman). 0 = dezaktive. Admin ka chanje li. */
+  uniform: { pct: 10 },
   extraStep: 5,
   extraCost: 200,
   options: [
@@ -1996,7 +1998,7 @@ async function loadPrices(){
       var r = await sb.from('site_settings').select('value').eq('key','lavri_prices').single();
       if(r.data && r.data.value){
         var p = JSON.parse(r.data.value);
-        if(p && p.plans && p.plans.length){ if(!p.subs) p.subs = PRICES.subs; if(!p.perKg) p.perKg = PRICES.perKg; if(!p.options) p.options = PRICES.options; PRICES = p; }
+        if(p && p.plans && p.plans.length){ if(!p.subs) p.subs = PRICES.subs; if(!p.perKg) p.perKg = PRICES.perKg; if(!p.options) p.options = PRICES.options; if(p.uniform === undefined) p.uniform = PRICES.uniform; PRICES = p; }
       }
     }catch(e){}
   }
@@ -2025,7 +2027,7 @@ function renderPlans(){
         + '<button class="btn '+(p.best?'btn-g':'btn-o')+'" data-plan="'+esc(p.id)+'">Chwazi fòmil sa</button>'
         + '</div>';
     }).join('');
-    fine.textContent = 'Tarif piblik : ' + pk + ' HTG pa kilo, ak yon minimòm de ' + fmt((PRICES.plans[0]||{}).price||650) + ' HTG. Kalkilatè a anba a bay yon estimasyon; pri final la fikse lè nou peze rad yo.';
+    fine.textContent = 'Tarif piblik : ' + pk + ' HTG pa kilo, ak yon minimòm de ' + fmt((PRICES.plans[0]||{}).price||650) + ' HTG. Kalkilatè a anba a bay yon estimasyon; pri final la fikse lè nou peze rad yo.' + (uniPct() ? ' Remiz ' + uniPct() + ' % sou lavaj inifòm lekòl yo, pou ankouraje edikasyon an Ayiti.' : '');
   } else {
     var S = (PRICES.subs||{})[PTAB]; if(!S){ host.innerHTML=''; fine.textContent=''; return; }
     host.innerHTML = S.tiers.map(function(t,i){
@@ -2081,8 +2083,14 @@ function renderPlans(){
 
 /* ══ 7. KALKILATÈ ═════════════════════════════════════════════ */
 var chosen = {};
+function uniPct(){ var u = PRICES.uniform; var n = u && Number(u.pct); return (n > 0 && n < 100) ? Math.round(n) : 0; }
 function buildOptions(){
-  $('#opts').innerHTML = PRICES.options.map(function(o){
+  var up = uniPct();
+  var uniRow = up ? '<div class="opt" data-opt="uniform" role="checkbox" tabindex="0" aria-checked="false">'
+      + '<span class="bx"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>'
+      + '<span class="opt-n">Inifòm lekòl <span style="color:var(--ink-3);font-size:.8rem">— pou ankouraje edikasyon</span></span>'
+      + '<span class="opt-p free" data-p="uniform">−' + up + ' %</span></div>' : '';
+  $('#opts').innerHTML = uniRow + PRICES.options.map(function(o){
     return '<div class="opt" data-opt="'+esc(o.id)+'" role="checkbox" tabindex="0" aria-checked="false">'
       + '<span class="bx"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>'
       + '<span class="opt-n">'+esc(o.name) + (o.note ? ' <span style="color:var(--ink-3);font-size:.8rem">— '+esc(o.note)+'</span>' : '') + '</span>'
@@ -2140,6 +2148,8 @@ function compute(){
   var total = r.base + r.extra;
   var lines = [{ k: r.plan.perKg ? (r.plan.name + ' · ' + kg + ' kg × ' + fmt(r.plan.perKg) + ' HTG') : (r.plan.name + ' (' + r.plan.min + '–' + r.plan.max + ' kg)'), v:fmt(r.base) + ' HTG' }];
   if(r.extra) lines.push({ k:'Pwa anplis (' + (kg - r.plan.max) + ' kg)', v:'+' + fmt(r.extra) + ' HTG' });
+  var upc = uniPct();
+  if(upc && chosen.uniform){ var rem = Math.round((r.base + r.extra) * upc / 100); total -= rem; lines.push({ k:'Remiz inifòm lekòl (−' + upc + ' %)', v:'−' + fmt(rem) + ' HTG', free:true }); }
 
   PRICES.options.forEach(function(o){
     var p = optPrice(o, kg);

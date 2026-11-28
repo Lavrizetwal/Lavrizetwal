@@ -4503,6 +4503,7 @@ const LAVRI_DEF={perKg:80,plans:[
   {id:'geant',name:'Le Géant',min:15,max:22,perKg:80,lab:'Fòmil premium',feat:['80 HTG pa kilo, kalkile sou pwa egzak la','<b>Sechaj gratis</b> — enkli apati 15 kg','Pou gwo fanmi ak ti biznis']}],
   subs:{hebdo:{unit:'semèn',tiers:[{name:'Esansyèl',kg:50,perKg:76},{name:'Pwofesyonèl',kg:100,perKg:74,best:true},{name:'Antrepriz',kg:200,perKg:72}]},
         mensuel:{unit:'mwa',tiers:[{name:'Esansyèl',kg:200,perKg:76},{name:'Pwofesyonèl',kg:500,perKg:72,best:true},{name:'Antrepriz',kg:1000,perKg:70}]}},
+  uniform:{pct:10},
   extraStep:5,extraCost:200,
   options:[{id:'sechaj',name:'Sechaj',price:200,free:'>=15',note:'Gratis apati 15 kg'},{id:'pliyaj',name:'Pliyaj rad',price:150},{id:'dra',name:'Dra ak lòt twal',price:100},{id:'ekspres',name:'Sèvis ekspres',price:200,note:'Prè nan 6 èdtan'}]};
 let lpData=null;
@@ -4514,6 +4515,7 @@ async function loadLavriPrices(){
     lpData=(p&&p.plans&&p.plans.length)?p:JSON.parse(JSON.stringify(LAVRI_DEF));
     if(!lpData.subs) lpData.subs=JSON.parse(JSON.stringify(LAVRI_DEF.subs));
     if(!lpData.perKg) lpData.perKg=LAVRI_DEF.perKg;
+    if(lpData.uniform===undefined) lpData.uniform=LAVRI_DEF.uniform;
     renderLavriPrices();
   }catch(e){ box.innerHTML=errorState('Tarifs indisponibles','Impossible de lire les tarifs publics.','loadLavriPrices()',e.message); }
 }
@@ -4525,7 +4527,8 @@ function renderLavriPrices(){
     +'<div class="field"><label for="lp-kg">Prix au kilo (HTG)</label>'+lpNum('lp-kg',lpData.perKg)+'<div class="hint">Formules « Malin » et « Géant ».</div></div>'
     +'<div class="field"><label for="lp-min">Forfait minimum « Petit » (HTG)</label>'+lpNum('lp-min',petit.price||650)+'<div class="hint">Jusqu\'à '+escH(petit.max||8)+' kg.</div></div>'
     +'<div class="field"><label for="lp-xs">Palier supplémentaire (kg)</label>'+lpNum('lp-xs',lpData.extraStep||5)+'</div>'
-    +'<div class="field"><label for="lp-xc">Coût par palier (HTG)</label>'+lpNum('lp-xc',lpData.extraCost||200,0)+'</div></div>';
+    +'<div class="field"><label for="lp-xc">Coût par palier (HTG)</label>'+lpNum('lp-xc',lpData.extraCost||200,0)+'</div>'
+    +'<div class="field"><label for="lp-uni">Remise uniformes scolaires (%)</label>'+lpNum('lp-uni',(lpData.uniform&&lpData.uniform.pct)||0,0)+'<div class="hint">Appliquée au lavage seul (pas aux options). 0 = désactivée. Affichée sur la page Lavri.</div></div></div>';
   ['hebdo','mensuel'].forEach(k=>{
     const S=lpData.subs[k]; if(!S) return;
     h+='<h4 style="margin:22px 0 10px;font-size:.9rem">Abonnement par '+escH(S.unit)+'</h4><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">'
@@ -4537,9 +4540,11 @@ function renderLavriPrices(){
 window.saveLavriPrices=async()=>{
   const n=id=>parseInt(document.getElementById(id).value,10);
   const perKg=n('lp-kg'), minP=n('lp-min'), xs=n('lp-xs'), xc=n('lp-xc');
+  const uni=n('lp-uni');
+  if(!(uni>=0&&uni<=50)){ toast('Remise uniformes : entre 0 et 50 %','error'); return; }
   if(!(perKg>0&&minP>0&&xs>0&&xc>=0)){ toast('Vérifiez les montants (nombres positifs)','error'); return; }
   const p=JSON.parse(JSON.stringify(lpData));
-  p.perKg=perKg; p.extraStep=xs; p.extraCost=xc;
+  p.perKg=perKg; p.extraStep=xs; p.extraCost=xc; p.uniform={pct:uni};
   p.plans.forEach(pl=>{
     if(pl.id==='petit'){ pl.price=minP; pl.feat=(pl.feat||[]).map(f=>f.replace(/minimòm : [\d\s]+ HTG/,'minimòm : '+minP+' HTG')); }
     if(pl.perKg){ pl.perKg=perKg; pl.feat=(pl.feat||[]).map(f=>f.replace(/^\d[\d\s]* HTG pa kilo/,perKg+' HTG pa kilo')); }
