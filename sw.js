@@ -4,7 +4,7 @@
    move koneksyon. Li PA JANM kenbe done : pri, kòmand, pwen ak
    machin yo toujou soti dirèk nan sèvè a.
    ════════════════════════════════════════════════════════════════ */
-const VERSION = 'zetwal-v94';
+const VERSION = 'zetwal-v95';
 
 /* Paj ak fichye ki chaje depi telefòn nan */
 const SHELL = [
@@ -16,6 +16,7 @@ const SHELL = [
   '/legal.html',
   '/games.html',
   '/scenes.js',
+  '/talk.js',
   '/promo.js',
   '/adrese.js',
   '/minor.js',
@@ -59,6 +60,7 @@ function isData(url){
       || url.hostname.indexOf('googleapis.com') >= 0
       || url.hostname.indexOf('gstatic.com') >= 0
       || url.hostname.indexOf('qrserver.com') >= 0
+      || url.pathname === '/edu-index.json'
       || url.pathname.indexOf('/rest/v1/') >= 0
       || url.pathname.indexOf('/storage/v1/') >= 0;   /* images et vidéos de pub : directement du réseau (Range des vidéos) */
 }

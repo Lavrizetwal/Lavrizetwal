@@ -63,6 +63,7 @@ Person.prototype.draw=function(){
 /* ── Voitures (vue de dessus) ── */
 function Car(o){ this.x=o.x; this.y=o.y; this.dir=o.dir; this.v=o.v||rnd(60,95); this.col=o.col||pick(['#E8E3D3','#C7CBD6','#14234F','#B42318','#4B5563','#2D6CDF']); this.len=o.len||rnd(34,44); this.taxi=!!o.taxi; if(this.taxi) this.col='#D4AF37'; this.lane=o.lane; }
 Car.prototype.update=function(dt,list){
+  if(this.hold>0){ this.hold-=dt; return; }
   var sl=1, dx=this.x-ptr.x, dy=this.y-ptr.y, d=Math.sqrt(dx*dx+dy*dy); if(d<110*S) sl=clamp((d-30*S)/(80*S),0,1);
   this.x+=this.dir[0]*this.v*S*sl*dt; this.y+=this.dir[1]*this.v*S*sl*dt;
   var m=80; if(this.x<-m) this.x=W+m; else if(this.x>W+m) this.x=-m; if(this.y<-m) this.y=H+m; else if(this.y>H+m) this.y=-m;
@@ -267,9 +268,18 @@ var rt=0; addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(
 addEventListener('zt-theme',function(){ theme(); if(CALM){ bg(); SC.draw(); } });
 document.addEventListener('visibilitychange',function(){ hidden=document.hidden; if(!hidden) start(); });
 addEventListener('pointermove',function(e){ ptr.x=e.clientX; ptr.y=e.clientY; },{passive:true});
+addEventListener('pointerdown',function(e){ ptr.x=e.clientX; ptr.y=e.clientY; },{passive:true});
 addEventListener('pointerleave',function(){ ptr.x=ptr.y=-999; });
 var vt=0; function onScroll(){ if(vt) return; vt=requestAnimationFrame(function(){ vt=0; var v=clamp((scrollY-innerHeight*.08)/(innerHeight*.5),0,.94); document.documentElement.style.setProperty('--veil',v.toFixed(3)); }); }
 addEventListener('scroll',onScroll,{passive:true}); onScroll();
 rebuild();
-window.__scene={kind:kind,redraw:function(){ bg(); SC.draw(); },step:function(n){ for(var i=0;i<n;i++) SC.tick(.05); }};
+/* Habitants qui peuvent parler (talk.js) : {x,y,ref,k:'p'|'c'|'o'} en pixels écran, y = au-dessus de la tête */
+function ents(){
+  var o=[];
+  if(kind==='lavri'){ (LV.ppl||[]).forEach(function(p){ if(!p.dead) o.push({x:p.x,y:p.y-15*S,ref:p,k:'p'}); }); }
+  else if(kind==='games'){ (GA.pcs||[]).forEach(function(p){ o.push({x:p.x,y:p.y-p.s*.55,ref:p,k:'o',t:p.k}); }); }
+  else { (CT.ppl||[]).forEach(function(p){ if(!p.dead) o.push({x:p.x,y:p.y-15*S,ref:p,k:'p'}); }); (CT.cars||[]).forEach(function(c){ o.push({x:c.x,y:c.y-14*S,ref:c,k:'c'}); }); }
+  return o;
+}
+window.__scene={kind:kind,ents:ents,ptr:function(){ return ptr; },dark:function(){ return dark; },scale:function(){ return S; },redraw:function(){ bg(); SC.draw(); },step:function(n){ for(var i=0;i<n;i++) SC.tick(.05); }};
 })();
